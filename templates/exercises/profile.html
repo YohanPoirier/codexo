@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Ma progression — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow">Ton parcours</span>
+<h1>Progression</h1>
+<p>{{ results|length }} / {{ total_exercises }} exercices réussis au total.</p>
+{% for r in results %}
+  <div class="profile-row">
+    <span>{{ r.exercise.theme.name }} — {{ r.exercise.title }}</span>
+    <span>{{ r.created_at|date:"d/m/Y H:i" }}</span>
+  </div>
+{% empty %}
+  <p>Aucun exercice réussi pour l'instant. À toi de jouer !</p>
+{% endfor %}
+{% endblock %}

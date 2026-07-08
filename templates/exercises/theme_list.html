@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Thèmes — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow">Sommaire</span>
+<h1>Choisis un thème</h1>
+<div class="theme-grid">
+  {% for item in themes_data %}
+    <a class="theme-card" href="{% url 'exercise_list' item.theme.slug %}">
+      <span class="chapter-num">{{ forloop.counter|stringformat:"02d" }}</span>
+      <h3>{{ item.theme.name }}</h3>
+      <p>{{ item.theme.description|default:"Exercices pratiques" }}</p>
+      <div class="progress-track">
+        <div class="progress-fill" style="width: {% widthratio item.done item.total 100 %}%"></div>
+      </div>
+      <span class="progress-label">{{ item.done }} / {{ item.total }} exercices réussis</span>
+    </a>
+  {% empty %}
+    <p>Aucun thème pour le moment.</p>
+  {% endfor %}
+</div>
+{% endblock %}

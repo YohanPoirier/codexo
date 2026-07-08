@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Inscription — Codexo{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <span class="eyebrow">Nouveau ici</span>
+  <h2>Créer un compte</h2>
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <p>
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+      </p>
+    {% endfor %}
+    <button type="submit">S'inscrire</button>
+  </form>
+  <div class="switch">Déjà un compte ? <a href="{% url 'login' %}">Se connecter</a></div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Codexo{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<header class="site">
+  <div class="bar">
+    <a class="brand" href="{% url 'theme_list' %}">Codexo<span class="dot">.</span></a>
+    <nav>
+      {% if user.is_authenticated %}
+        <a href="{% url 'theme_list' %}">Thèmes</a>
+        <a href="{% url 'profile' %}">Progression</a>
+        <a href="{% url 'logout' %}">Déconnexion</a>
+      {% else %}
+        <a href="{% url 'login' %}">Connexion</a>
+        <a href="{% url 'signup' %}">Inscription</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+</body>
+</html>

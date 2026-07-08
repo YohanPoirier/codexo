@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ theme.name }} — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow"><a href="{% url 'theme_list' %}">← Thèmes</a></span>
+<h1>{{ theme.name }}</h1>
+<p>{{ theme.description }}</p>
+<ul class="exercise-list">
+  {% for exercise in exercises %}
+    <li>
+      <a href="{% url 'exercise_detail' theme.slug exercise.slug %}">
+        <span class="status-badge {% if exercise.id in solved_ids %}done{% endif %}">
+          {% if exercise.id in solved_ids %}✓{% else %}{{ forloop.counter }}{% endif %}
+        </span>
+        <span class="exercise-title">{{ exercise.title }}</span>
+      </a>
+    </li>
+  {% empty %}
+    <p>Pas encore d'exercice dans ce thème.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

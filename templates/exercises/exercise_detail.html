@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ exercise.title }} — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow"><a href="{% url 'exercise_list' theme.slug %}">← {{ theme.name }}</a></span>
+<h1>{{ exercise.title }}</h1>
+
+<div class="statement">{{ exercise.statement }}</div>
+
+<div class="editor-panel">
+  <label for="code-editor">Ton code</label>
+  <textarea id="code-editor" spellcheck="false"></textarea>
+</div>
+
+<div class="actions">
+  <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
+  <button id="reset-btn" class="reset-btn" type="button" title="Revenir au code de départ">Réinitialiser</button>
+  <span id="pyodide-status">Initialisation de l'environnement Python…</span>
+</div>
+
+<div id="result-box" class="result-box hidden"></div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+<script>
+const EXERCISE_ID = {{ exercise.id }};
+const TESTS_URL = "{% url 'exercise_tests' exercise.id %}";
+const SUBMIT_URL = "{% url 'submit_result' exercise.id %}";
+const LAST_SUBMITTED_CODE = {% if last_result %}"{{ last_result.submitted_code|escapejs }}"{% else %}null{% endif %};
+</script>
+<script src="{% static 'js/exercise.js' %}"></script>
+{% endblock %}
