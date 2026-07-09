@@ -148,7 +148,7 @@ class Command(BaseCommand):
                 for i, case in enumerate(ex_data.get("test_cases", [])):
                     TestCase.objects.create(
                         exercise=exercise,
-                        args=case["args"],
+                        args=repr(case["args"]),
                         order=i,
                     )
         if settings.DEBUG:

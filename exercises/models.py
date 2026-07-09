@@ -47,17 +47,33 @@ class Exercise(models.Model):
     def build_test_code(self):
         """Génère le code de test : appelle solution_code pour calculer l'attendu de chaque
         TestCase, puis compare à ce que produit la fonction de l'étudiant."""
+        import ast
         import json as _json
 
         fn = self.function_name
-        cases_payload = [{"args": tc.args} for tc in self.test_cases.order_by("order", "id")]
+        cases_payload = []
+        parse_errors = []
+
+        for tc in self.test_cases.order_by("order", "id"):
+            try:
+                parsed = ast.literal_eval(tc.args)
+                if not isinstance(parsed, (list, tuple)):
+                    raise ValueError("les arguments doivent former une liste, ex: [2, 3]")
+                cases_payload.append({"args": list(parsed)})
+            except Exception as e:
+                parse_errors.append(f"Test #{tc.order} : args invalide ({e})")
+
         cases_json = _json.dumps(cases_payload, ensure_ascii=False)
+        errors_json = _json.dumps(parse_errors, ensure_ascii=False)
         solution_json = _json.dumps(self.solution_code or "", ensure_ascii=False)
 
         return (
             "__RESULTS__ = []\n"
             "import json as _json\n"
             f"_cases = _json.loads({cases_json!r})\n"
+            f"_parse_errors = _json.loads({errors_json!r})\n"
+            "for _err in _parse_errors:\n"
+            "    __RESULTS__.append((False, f\"Erreur de configuration de l'exercice : {_err}\"))\n"
             f"_solution_src = _json.loads({solution_json!r})\n"
             "_solution_ns = {}\n"
             "exec(_solution_src, _solution_ns)\n"
@@ -85,14 +101,28 @@ class TestCase(models.Model):
     """Un cas de test individuel pour un exercice (toujours basé sur une fonction)."""
 
     exercise = models.ForeignKey(Exercise, related_name="test_cases", on_delete=models.CASCADE)
-    args = models.JSONField(
-        default=list,
-        help_text="Arguments à passer à la fonction, en JSON. Ex : [2, 3] ou [[1, 2, 3]] pour un seul argument liste.",
+    args = models.TextField(
+        default="[]",
+        help_text=(
+            "Arguments à passer à la fonction, en syntaxe Python (pas JSON). "
+            "Ex : [2, 3]  ou  ['bonjour']  ou  [True, None]  ou  [{'a': 1, 'b': 2}]  ou  [[1, 2, 3]]."
+        ),
     )
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
         ordering = ["order", "id"]
+
+    def clean(self):
+        import ast
+        from django.core.exceptions import ValidationError
+
+        try:
+            parsed = ast.literal_eval(self.args)
+        except Exception as e:
+            raise ValidationError({"args": f"Syntaxe Python invalide : {e}"})
+        if not isinstance(parsed, (list, tuple)):
+            raise ValidationError({"args": "Les arguments doivent former une liste, ex: [2, 3]"})
 
     def __str__(self):
         return f"{self.exercise.function_name}({self.args})"
