@@ -1,1 +1,1 @@
-web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn codexo.wsgi
+web: python manage.py migrate && python manage.py collectstatic --noinput && python manage.py seed_exercises && (python manage.py createsuperuser --noinput || true) && gunicorn codexo.wsgi
