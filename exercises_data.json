@@ -1,0 +1,97 @@
+[
+  {
+    "name": "Variables & types",
+    "slug": "variables-types",
+    "description": "Manipuler des nombres, des chaînes et des booléens.",
+    "exercises": [
+      {
+        "title": "Addition simple",
+        "slug": "addition-simple",
+        "statement": "Écris une fonction `addition(a, b)` qui renvoie la somme de a et b.",
+        "starter_code": "def addition(a, b):\n    pass\n",
+        "function_name": "addition",
+        "solution_code": "def addition(a, b):\n    return a + b\n",
+        "test_cases": [
+          "[15, 27]",
+          "[0, 0]",
+          "[-5, 5]"
+        ]
+      },
+      {
+        "title": "Conversion en chaîne",
+        "slug": "conversion-chaine",
+        "statement": "Écris une fonction `phrase(nombre)` qui renvoie le texte \"J'ai {nombre} pommes\" (en remplaçant {nombre} par la valeur reçue), en utilisant str() pour convertir le nombre en texte.",
+        "starter_code": "def phrase(nombre):\n    pass\n",
+        "function_name": "phrase",
+        "solution_code": "def phrase(nombre):\n    return \"J'ai \" + str(nombre) + \" pommes\"\n",
+        "test_cases": [
+          "[12]",
+          "[0]",
+          "[1]"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Conditions",
+    "slug": "conditions",
+    "description": "Utiliser if / elif / else pour prendre des décisions.",
+    "exercises": [
+      {
+        "title": "Pair ou impair",
+        "slug": "pair-impair",
+        "statement": "Écris une fonction `parite(n)` qui renvoie la chaîne \"pair\" si n est pair, sinon \"impair\".",
+        "starter_code": "def parite(n):\n    pass\n",
+        "function_name": "parite",
+        "solution_code": "def parite(n):\n    return 'pair' if n % 2 == 0 else 'impair'\n",
+        "test_cases": [
+          "[4]",
+          "[7]",
+          "[0]",
+          "[-3]"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Boucles",
+    "slug": "boucles",
+    "description": "Répéter des actions avec for et while.",
+    "exercises": [
+      {
+        "title": "Somme de 1 à n",
+        "slug": "somme-1-a-n",
+        "statement": "Écris une fonction `somme(n)` qui renvoie la somme des entiers de 1 à n inclus.",
+        "starter_code": "def somme(n):\n    pass\n",
+        "function_name": "somme",
+        "solution_code": "def somme(n):\n    total = 0\n    for i in range(1, n + 1):\n        total += i\n    return total\n",
+        "test_cases": [
+          "[5]",
+          "[1]",
+          "[10]",
+          "[0]"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Listes",
+    "slug": "listes",
+    "description": "Créer, parcourir et transformer des listes.",
+    "exercises": [
+      {
+        "title": "Doubler chaque élément",
+        "slug": "doubler-elements",
+        "statement": "Écris une fonction `doubler(liste)` qui renvoie une nouvelle liste où chaque élément est multiplié par 2.",
+        "starter_code": "def doubler(liste):\n    pass\n",
+        "function_name": "doubler",
+        "solution_code": "def doubler(liste):\n    return [x * 2 for x in liste]\n",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[]]",
+          "[[0, -1]]"
+        ]
+      }
+    ]
+  }
+]
