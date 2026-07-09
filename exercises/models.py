@@ -27,27 +27,13 @@ class Exercise(models.Model):
 
     function_name = models.CharField(
         max_length=100,
-        blank=True,
-        help_text=(
-            "Nom de la fonction que l'étudiant doit écrire (ex: 'triple'). "
-            "Si rempli, les tests ci-dessous (section 'Test cases') sont utilisés automatiquement."
-        ),
+        help_text="Nom de la fonction que l'étudiant doit écrire (ex: 'triple').",
     )
     solution_code = models.TextField(
-        blank=True,
         help_text=(
             "Code de correction : une implémentation complète et correcte de la fonction. "
-            "S'il est rempli, le résultat attendu de chaque test est calculé automatiquement "
-            "en exécutant ce code — tu n'as qu'à indiquer les arguments à tester, pas le résultat."
-        ),
-    )
-
-    test_code = models.TextField(
-        blank=True,
-        help_text=(
-            "Avancé : code Python de correction écrit à la main, exécuté après le code de l'étudiant. "
-            "Doit définir une liste __RESULTS__ de tuples (bool_ok, message). "
-            "Utilisé uniquement si 'function_name' est vide (ex: pour tester une variable plutôt qu'une fonction)."
+            "Le résultat attendu de chaque test (ci-dessous) est calculé automatiquement "
+            "en exécutant ce code — tu n'as qu'à indiquer les arguments à tester."
         ),
     )
 
@@ -59,18 +45,12 @@ class Exercise(models.Model):
         return f"{self.theme.name} — {self.title}"
 
     def build_test_code(self):
-        """Renvoie le code de test à exécuter : généré depuis function_name + les TestCase liés
-        (avec calcul automatique de l'attendu si solution_code est rempli), sinon test_code écrit à la main."""
-        if not self.function_name:
-            return self.test_code
-
+        """Génère le code de test : appelle solution_code pour calculer l'attendu de chaque
+        TestCase, puis compare à ce que produit la fonction de l'étudiant."""
         import json as _json
 
         fn = self.function_name
-        cases_payload = [
-            {"args": tc.args, "expected": tc.expected}
-            for tc in self.test_cases.order_by("order", "id")
-        ]
+        cases_payload = [{"args": tc.args} for tc in self.test_cases.order_by("order", "id")]
         cases_json = _json.dumps(cases_payload, ensure_ascii=False)
         solution_json = _json.dumps(self.solution_code or "", ensure_ascii=False)
 
@@ -80,20 +60,16 @@ class Exercise(models.Model):
             f"_cases = _json.loads({cases_json!r})\n"
             f"_solution_src = _json.loads({solution_json!r})\n"
             "_solution_ns = {}\n"
-            "if _solution_src:\n"
-            "    exec(_solution_src, _solution_ns)\n"
+            "exec(_solution_src, _solution_ns)\n"
             "for _case in _cases:\n"
             "    _args = _case.get('args', [])\n"
             "    _args_repr = ', '.join(repr(a) for a in _args)\n"
-            f"    if _solution_ns and '{fn}' in _solution_ns:\n"
-            "        try:\n"
-            f"            _attendu = _solution_ns['{fn}'](*_args)\n"
-            "        except Exception as e:\n"
-            "            __RESULTS__.append((False, f\"Erreur dans le code de correction pour "
+            "    try:\n"
+            f"        _attendu = _solution_ns['{fn}'](*_args)\n"
+            "    except Exception as e:\n"
+            "        __RESULTS__.append((False, f\"Erreur dans le code de correction pour "
             + fn + "({_args_repr}) : {e}\"))\n"
-            "            continue\n"
-            "    else:\n"
-            "        _attendu = _case.get('expected')\n"
+            "        continue\n"
             "    try:\n"
             f"        _obtenu = {fn}(*_args)\n"
             "        _ok = _obtenu == _attendu\n"
@@ -106,17 +82,12 @@ class Exercise(models.Model):
 
 
 class TestCase(models.Model):
-    """Un cas de test individuel pour un exercice basé sur une fonction."""
+    """Un cas de test individuel pour un exercice (toujours basé sur une fonction)."""
 
     exercise = models.ForeignKey(Exercise, related_name="test_cases", on_delete=models.CASCADE)
     args = models.JSONField(
         default=list,
         help_text="Arguments à passer à la fonction, en JSON. Ex : [2, 3] ou [[1, 2, 3]] pour un seul argument liste.",
-    )
-    expected = models.JSONField(
-        blank=True,
-        null=True,
-        help_text="Résultat attendu — à remplir seulement si aucun 'code de correction' n'est fourni sur l'exercice.",
     )
     order = models.PositiveIntegerField(default=0)
 

@@ -11,7 +11,7 @@ class ExerciseInline(admin.TabularInline):
 class TestCaseInline(admin.TabularInline):
     model = TestCase
     extra = 1
-    fields = ("args", "expected", "order")
+    fields = ("args", "order")
 
 
 @admin.register(Theme)
@@ -29,23 +29,15 @@ class ExerciseAdmin(admin.ModelAdmin):
         (None, {"fields": ("theme", "title", "slug", "order")}),
         ("Contenu affiché à l'étudiant", {"fields": ("statement", "starter_code")}),
         (
-            "Correction automatique — méthode simple (fonction)",
+            "Correction automatique",
             {
                 "fields": ("function_name", "solution_code"),
                 "description": (
                     "Renseigne le nom de la fonction et un code de correction complet (une vraie "
                     "implémentation qui fonctionne). Le résultat attendu de chaque test sera calculé "
-                    "automatiquement à partir de ce code : tu n'as qu'à ajouter des lignes de test "
-                    "ci-dessous avec les arguments à essayer, sans avoir à écrire le résultat toi-même."
+                    "automatiquement à partir de ce code : ajoute des lignes de test ci-dessous avec "
+                    "juste les arguments à essayer, sans avoir à écrire le résultat toi-même."
                 ),
-            },
-        ),
-        (
-            "Correction automatique — méthode avancée (code Python)",
-            {
-                "classes": ("collapse",),
-                "fields": ("test_code",),
-                "description": "Utilisé uniquement si 'Nom de la fonction' ci-dessus est laissé vide.",
             },
         ),
     )

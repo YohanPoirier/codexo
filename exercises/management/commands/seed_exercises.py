@@ -1,5 +1,8 @@
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from exercises.models import Theme, Exercise, TestCase
+from accounts.models import User
+import os
 
 
 DATA = [
@@ -12,33 +15,33 @@ DATA = [
                 "title": "Addition simple",
                 "slug": "addition-simple",
                 "statement": (
-                    "Crée une variable `resultat` qui contient la somme de 15 et 27."
+                    "Écris une fonction `addition(a, b)` qui renvoie la somme de a et b."
                 ),
-                "starter_code": "resultat = 0\n",
-                "test_code": (
-                    "__RESULTS__ = []\n"
-                    "try:\n"
-                    "    ok = resultat == 42\n"
-                    "except NameError:\n"
-                    "    ok = False\n"
-                    "__RESULTS__.append((ok, f'resultat doit valoir 42 (obtenu : {resultat if \"resultat\" in dir() else \"non défini\"})'))\n"
-                ),
+                "starter_code": "def addition(a, b):\n    pass\n",
+                "function_name": "addition",
+                "solution_code": "def addition(a, b):\n    return a + b\n",
+                "test_cases": [
+                    {"args": [15, 27]},
+                    {"args": [0, 0]},
+                    {"args": [-5, 5]},
+                ],
             },
             {
                 "title": "Conversion en chaîne",
                 "slug": "conversion-chaine",
                 "statement": (
-                    "Crée une variable `phrase` qui contient exactement le texte :\n"
-                    "\"J'ai 12 pommes\"\n"
-                    "en utilisant une variable `nombre = 12` convertie en texte avec str()."
+                    "Écris une fonction `phrase(nombre)` qui renvoie le texte "
+                    "\"J'ai {nombre} pommes\" (en remplaçant {nombre} par la valeur reçue), "
+                    "en utilisant str() pour convertir le nombre en texte."
                 ),
-                "starter_code": "nombre = 12\nphrase = \"\"\n",
-                "test_code": (
-                    "__RESULTS__ = []\n"
-                    "attendu = \"J'ai 12 pommes\"\n"
-                    "ok = phrase == attendu\n"
-                    "__RESULTS__.append((ok, f'phrase attendue : {attendu!r} (obtenu : {phrase!r})'))\n"
-                ),
+                "starter_code": "def phrase(nombre):\n    pass\n",
+                "function_name": "phrase",
+                "solution_code": "def phrase(nombre):\n    return \"J'ai \" + str(nombre) + \" pommes\"\n",
+                "test_cases": [
+                    {"args": [12]},
+                    {"args": [0]},
+                    {"args": [1]},
+                ],
             },
         ],
     },
@@ -137,9 +140,8 @@ class Command(BaseCommand):
                         "order": ex_order,
                         "statement": ex_data["statement"],
                         "starter_code": ex_data["starter_code"],
-                        "function_name": ex_data.get("function_name", ""),
-                        "solution_code": ex_data.get("solution_code", ""),
-                        "test_code": ex_data.get("test_code", ""),
+                        "function_name": ex_data["function_name"],
+                        "solution_code": ex_data["solution_code"],
                     },
                 )
                 exercise.test_cases.all().delete()
@@ -147,7 +149,28 @@ class Command(BaseCommand):
                     TestCase.objects.create(
                         exercise=exercise,
                         args=case["args"],
-                        expected=case.get("expected"),
                         order=i,
                     )
+        if settings.DEBUG:
+            admin_email = os.environ.get("DJANGO_SUPERUSER_EMAIL")
+            admin_password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
+            if admin_email and admin_password:
+                admin, created = User.objects.get_or_create(
+                    email=admin_email,
+                    defaults={"is_staff": True, "is_superuser": True},
+                )
+                admin.is_staff = True
+                admin.is_superuser = True
+                admin.set_password(admin_password)
+                admin.save()
+                action = "créé" if created else "mis à jour"
+                self.stdout.write(self.style.SUCCESS(
+                    f"Compte admin local {action} : {admin_email}"
+                ))
+            else:
+                self.stdout.write(self.style.WARNING(
+                    "DJANGO_SUPERUSER_EMAIL / DJANGO_SUPERUSER_PASSWORD non définis "
+                    "(vérifie ton fichier .env) : compte admin non créé automatiquement."
+                ))
+
         self.stdout.write(self.style.SUCCESS("Thèmes et exercices créés avec succès."))
