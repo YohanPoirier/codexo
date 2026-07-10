@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static exercise_extras %}
 {% block title %}{{ exercise.title }} — Codexo{% endblock %}
 {% block content %}
 <span class="eyebrow"><a href="{% url 'exercise_list' theme.slug %}">← {{ theme.name }}</a></span>
 <h1>{{ exercise.title }}</h1>
 
-<div class="statement">{{ exercise.statement }}</div>
+<div class="statement">{{ exercise.statement|render_statement }}</div>
 
 <div class="editor-panel">
   <label for="code-editor">{% if exercise.kind == "sql" %}Ta requête SQL{% else %}Ton code{% endif %}</label>
