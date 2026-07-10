@@ -213,6 +213,23 @@ for _case in _cases:
         )
 
 
+class Hint(models.Model):
+    """Un indice optionnel pour un exercice, révélé progressivement à l'étudiant qui le demande
+    (bouton "Voir un indice" côté interface, un indice à la fois, dans l'ordre)."""
+
+    exercise = models.ForeignKey(Exercise, related_name="hints", on_delete=models.CASCADE)
+    text = models.TextField(
+        help_text="Texte de l'indice (Markdown simple accepté, comme pour l'énoncé).",
+    )
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.exercise.title} — indice #{self.order}"
+
+
 class TestCase(models.Model):
     """Un cas de test individuel pour un exercice (toujours basé sur une fonction)."""
 

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Theme, Exercise, Result, TestCase
+from .models import Theme, Exercise, Result, TestCase, Hint
 
 
 class ExerciseInline(admin.TabularInline):
@@ -12,6 +12,12 @@ class TestCaseInline(admin.TabularInline):
     model = TestCase
     extra = 1
     fields = ("args", "order")
+
+
+class HintInline(admin.TabularInline):
+    model = Hint
+    extra = 1
+    fields = ("text", "order")
 
 
 @admin.register(Theme)
@@ -38,7 +44,7 @@ class ThemeAdmin(admin.ModelAdmin):
 class ExerciseAdmin(admin.ModelAdmin):
     list_display = ("title", "theme", "kind", "order", "function_name")
     list_filter = ("theme", "kind")
-    inlines = [TestCaseInline]
+    inlines = [TestCaseInline, HintInline]
     fieldsets = (
         (None, {"fields": ("theme", "title", "slug", "order", "kind")}),
         ("Contenu affiché à l'étudiant", {"fields": ("statement", "starter_code")}),

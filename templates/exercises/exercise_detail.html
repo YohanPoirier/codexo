@@ -7,6 +7,17 @@
 
 <div class="statement">{{ exercise.statement|render_statement }}</div>
 
+{% if hints %}
+<div class="hints-panel">
+  <button id="hint-btn" type="button" class="hint-btn">Voir un indice</button>
+  <div id="hints-list">
+    {% for hint in hints %}
+      <div class="hint-item hidden">{{ hint.text|render_statement }}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
 <div class="editor-panel">
   <label for="code-editor">{% if exercise.kind == "sql" %}Ta requête SQL{% else %}Ton code{% endif %}</label>
   <textarea id="code-editor" spellcheck="false"></textarea>

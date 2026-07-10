@@ -3,7 +3,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from exercises.models import Theme, Exercise, TestCase
+from exercises.models import Theme, Exercise, TestCase, Hint
 from accounts.models import User
 import os
 
@@ -51,6 +51,13 @@ class Command(BaseCommand):
                     TestCase.objects.create(
                         exercise=exercise,
                         args=args_source,
+                        order=i,
+                    )
+                exercise.hints.all().delete()
+                for i, hint_text in enumerate(ex_data.get("hints", [])):
+                    Hint.objects.create(
+                        exercise=exercise,
+                        text=hint_text,
                         order=i,
                     )
         if settings.DEBUG:

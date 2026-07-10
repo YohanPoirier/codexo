@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from .models import Theme, Exercise, TestCase
+from .models import Theme, Exercise, TestCase, Hint
 from .export_utils import export_exercises_to_json
 
 
@@ -19,3 +19,5 @@ post_save.connect(_auto_export, sender=Exercise, dispatch_uid="auto_export_exerc
 post_delete.connect(_auto_export, sender=Exercise, dispatch_uid="auto_export_exercise_delete")
 post_save.connect(_auto_export, sender=TestCase, dispatch_uid="auto_export_testcase_save")
 post_delete.connect(_auto_export, sender=TestCase, dispatch_uid="auto_export_testcase_delete")
+post_save.connect(_auto_export, sender=Hint, dispatch_uid="auto_export_hint_save")
+post_delete.connect(_auto_export, sender=Hint, dispatch_uid="auto_export_hint_delete")

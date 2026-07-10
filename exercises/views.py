@@ -46,10 +46,11 @@ def exercise_detail(request, theme_slug, exercise_slug):
     last_result = (
         Result.objects.filter(user=request.user, exercise=exercise).order_by("-created_at").first()
     )
+    hints = list(exercise.hints.all())
     return render(
         request,
         "exercises/exercise_detail.html",
-        {"theme": theme, "exercise": exercise, "last_result": last_result},
+        {"theme": theme, "exercise": exercise, "last_result": last_result, "hints": hints},
     )
 
 

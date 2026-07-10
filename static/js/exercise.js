@@ -79,6 +79,35 @@
   const resetBtn = document.getElementById("reset-btn");
   let starterCode = "";
 
+  // --- Indices : révélation progressive, un clic = un indice de plus ---
+  const hintBtn = document.getElementById("hint-btn");
+  if (hintBtn) {
+    const hintItems = Array.from(document.querySelectorAll(".hint-item"));
+    let revealedCount = 0;
+
+    function updateHintButton() {
+      const remaining = hintItems.length - revealedCount;
+      if (remaining <= 0) {
+        hintBtn.disabled = true;
+        hintBtn.textContent = "Tous les indices sont affichés";
+      } else if (revealedCount === 0) {
+        hintBtn.textContent = "Voir un indice (" + hintItems.length + " disponible" + (hintItems.length > 1 ? "s" : "") + ")";
+      } else {
+        hintBtn.textContent = "Voir un autre indice (" + remaining + " restant" + (remaining > 1 ? "s" : "") + ")";
+      }
+    }
+
+    hintBtn.addEventListener("click", function () {
+      if (revealedCount < hintItems.length) {
+        hintItems[revealedCount].classList.remove("hidden");
+        revealedCount++;
+        updateHintButton();
+      }
+    });
+
+    updateHintButton();
+  }
+
   async function init() {
     try {
       const res = await fetch(TESTS_URL);

@@ -10,15 +10,18 @@
         "slug": "addition-simple",
         "statement": "Écris une fonction `addition(a, b)` qui renvoie la somme de a et b.",
         "kind": "python",
-        "starter_code": "def addition(a, b):\n    pass\n",
+        "starter_code": "def addition(a, b):\r\n    pass",
         "function_name": "addition",
-        "solution_code": "def addition(a, b):\n    return a + b\n",
+        "solution_code": "def addition(a, b):\r\n    return a + b",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
           "[15, 27]",
           "[0, 0]",
           "[-5, 5]"
+        ],
+        "hints": [
+          "Il faut utiliser `+`"
         ]
       },
       {
@@ -35,7 +38,8 @@
           "[12]",
           "[0]",
           "[1]"
-        ]
+        ],
+        "hints": []
       }
     ]
   },
@@ -60,7 +64,8 @@
           "[7]",
           "[0]",
           "[-3]"
-        ]
+        ],
+        "hints": []
       }
     ]
   },
@@ -85,7 +90,8 @@
           "[1]",
           "[10]",
           "[0]"
-        ]
+        ],
+        "hints": []
       }
     ]
   },
@@ -109,7 +115,8 @@
           "[[1, 2, 3]]",
           "[[]]",
           "[[0, -1]]"
-        ]
+        ],
+        "hints": []
       }
     ]
   },
@@ -129,7 +136,8 @@
         "solution_code": "",
         "sql_setup": "",
         "sql_solution": "SELECT nom FROM etudiants WHERE age >= 18;",
-        "test_cases": []
+        "test_cases": [],
+        "hints": []
       },
       {
         "title": "Nombre d'étudiants mineurs",
@@ -141,7 +149,8 @@
         "solution_code": "",
         "sql_setup": "",
         "sql_solution": "SELECT COUNT(*) FROM etudiants WHERE age < 18;",
-        "test_cases": []
+        "test_cases": [],
+        "hints": []
       }
     ]
   }
