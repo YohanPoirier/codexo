@@ -5,18 +5,22 @@
 <span class="eyebrow"><a href="{% url 'exercise_list' theme.slug %}">← {{ theme.name }}</a></span>
 <h1>{{ exercise.title }}</h1>
 
-<div class="statement">{{ exercise.statement|render_statement }}</div>
-
-{% if hints %}
-<div class="hints-panel">
-  <button id="hint-btn" type="button" class="hint-btn">Voir un indice</button>
-  <div id="hints-list">
-    {% for hint in hints %}
-      <div class="hint-item hidden">{{ hint.text|render_statement }}</div>
-    {% endfor %}
+<div class="statement">
+  {{ exercise.statement|render_statement }}
+  {% if hints %}
+  <div class="hints-panel">
+    <button id="hint-btn" type="button" class="hint-btn">Indice</button>
+    <div id="hints-list">
+      {% for hint in hints %}
+        <div class="hint-item hidden">
+          <span class="hint-icon">💡</span>
+          <div class="hint-text">{{ hint.text|render_statement }}</div>
+        </div>
+      {% endfor %}
+    </div>
   </div>
+  {% endif %}
 </div>
-{% endif %}
 
 <div class="editor-panel">
   <label for="code-editor">{% if exercise.kind == "sql" %}Ta requête SQL{% else %}Ton code{% endif %}</label>

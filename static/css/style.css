@@ -110,23 +110,25 @@ main { padding: 48px 0 80px; }
 
 .editor-panel { margin-bottom: 18px; }
 
-.hints-panel { margin: 0 0 22px; }
+.hints-panel { margin-top: 16px; }
 .hint-btn {
-  font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem;
   background: transparent; color: var(--amber); border: 1px solid var(--amber);
-  border-radius: 8px; padding: 10px 16px; cursor: pointer;
+  border-radius: 8px; padding: 8px 14px; cursor: pointer;
 }
 .hint-btn:hover { background: var(--amber); color: white; }
-.hint-btn:disabled { opacity: .55; cursor: default; background: transparent; color: var(--ink-soft); border-color: var(--rule); }
-#hints-list { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+.hint-btn.hidden { display: none; }
+#hints-list { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 .hint-item {
-  background: #fdf6e8; border: 1px solid var(--amber); border-radius: var(--radius);
-  padding: 14px 18px; font-size: .95rem;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: .95rem;
 }
 .hint-item.hidden { display: none; }
-.hint-item p { margin: 0 0 8px; }
-.hint-item p:last-child { margin-bottom: 0; }
-.hint-item code {
+.hint-icon { flex-shrink: 0; font-size: 1.05rem; line-height: 1.5; }
+.hint-text { min-width: 0; }
+.hint-text p { margin: 0 0 8px; }
+.hint-text p:last-child { margin-bottom: 0; }
+.hint-text code {
   background: var(--paper); color: var(--indigo-deep); padding: 2px 6px;
   border: 1px solid var(--rule); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: .92em;
 }
