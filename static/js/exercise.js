@@ -27,23 +27,53 @@
       "</pre></div>";
   }
 
+  function prefixLines(text) {
+    return text
+      .replace(/\n$/, "") // évite une ligne vide en trop à la fin (print ajoute déjà un \n)
+      .split("\n")
+      .map((line) => ">> " + line)
+      .join("\n");
+  }
+
+  // Mémorise quels menus "Affichages" sont ouverts, pour les garder ouverts
+  // d'une vérification à l'autre (les tests restent dans le même ordre).
+  const openPrintIndices = new Set();
+
   function showResultLines(items) {
     resultBox.classList.remove("hidden", "all-success", "all-error");
     const allOk = items.length > 0 && items.every((it) => it.ok);
     resultBox.classList.add(allOk ? "all-success" : "all-error");
 
     resultBox.innerHTML = items
-      .map(
-        (it) =>
+      .map((it, i) => {
+        const printsBlock = it.printed
+          ? '<details class="prints-toggle" data-index="' + i + '"' +
+            (openPrintIndices.has(i) ? " open" : "") + ">" +
+            '<summary>Affichages <span class="info-dot" title="Ce que print() a affiché pendant ce test">?</span></summary>' +
+            '<pre class="prints-output">' + escapeHtml(prefixLines(it.printed)) + "</pre>" +
+            "</details>"
+          : "";
+        return (
           '<div class="result-line ' +
           (it.ok ? "ok" : "fail") +
-          '"><span class="result-icon">' +
-          (it.ok ? "✓" : "✗") +
-          "</span><span class=\"result-msg\">" +
-          escapeHtml(it.msg) +
-          "</span></div>"
-      )
+          '">' +
+          '<span class="result-icon">' + (it.ok ? "✓" : "✗") + "</span>" +
+          '<div class="result-body">' +
+          '<span class="result-msg">' + escapeHtml(it.msg) + "</span>" +
+          printsBlock +
+          "</div>" +
+          "</div>"
+        );
+      })
       .join("");
+
+    resultBox.querySelectorAll(".prints-toggle").forEach((el) => {
+      el.addEventListener("toggle", function () {
+        const idx = Number(el.dataset.index);
+        if (el.open) openPrintIndices.add(idx);
+        else openPrintIndices.delete(idx);
+      });
+    });
   }
 
   const resetBtn = document.getElementById("reset-btn");
@@ -150,7 +180,7 @@ finally:
       } else {
         const resultsProxy = pyodide.globals.get("__RESULTS__");
         const results = resultsProxy ? resultsProxy.toJs() : [];
-        const items = results.map((item) => ({ ok: item[0], msg: item[1] }));
+        const items = results.map((item) => ({ ok: item[0], msg: item[1], printed: item[2] || "" }));
         if (items.length === 0) items.push({ ok: false, msg: "Aucun test défini pour cet exercice." });
         const allOk = items.length > 0 && items.every((it) => it.ok);
         showResultLines(items);

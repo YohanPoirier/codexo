@@ -151,7 +151,24 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
 }
 .result-line.ok .result-icon { color: white; background: var(--ok); }
 .result-line.fail .result-icon { color: white; background: var(--err); }
+.result-body { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
 .result-line .result-msg { white-space: pre-wrap; word-break: break-word; margin: 0; font-family: inherit; }
+
+.prints-toggle { font-size: .8rem; }
+.prints-toggle summary {
+  cursor: pointer; color: inherit; opacity: .75; user-select: none;
+}
+.prints-toggle summary:hover { opacity: 1; }
+.info-dot {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%; border: 1px solid currentColor;
+  font-size: .7rem; font-weight: 700; margin-left: 4px; cursor: help; opacity: .8;
+}
+.prints-output {
+  background: rgba(255,255,255,.6); border: 1px solid currentColor; border-radius: 6px;
+  padding: 8px 10px; margin: 6px 0 0; white-space: pre-wrap; word-break: break-word;
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem; opacity: .95;
+}
 
 .auth-card {
   max-width: 420px; margin: 60px auto; background: var(--paper-alt); border: 1px solid var(--rule);

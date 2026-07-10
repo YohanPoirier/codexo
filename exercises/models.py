@@ -110,7 +110,11 @@ class Exercise(models.Model):
 
     def _build_python_test_code(self):
         """Génère le code de test pour un exercice Python : appelle solution_code pour calculer
-        l'attendu de chaque TestCase, puis compare à ce que produit la fonction de l'étudiant."""
+        l'attendu de chaque TestCase, puis compare à ce que produit la fonction de l'étudiant.
+
+        Chaque entrée de __RESULTS__ est un triplet (ok, message, prints) : 'prints' contient
+        tout ce que l'étudiant a affiché avec print() pendant CET appel précis, pour l'aider à
+        se débugger (affiché ensuite dans un menu déroulant côté interface)."""
         import ast
         import json as _json
 
@@ -131,34 +135,34 @@ class Exercise(models.Model):
         errors_json = _json.dumps(parse_errors, ensure_ascii=False)
         solution_json = _json.dumps(self.solution_code or "", ensure_ascii=False)
 
-        return (
-            "__RESULTS__ = []\n"
-            "import json as _json\n"
-            f"_cases = _json.loads({cases_json!r})\n"
-            f"_parse_errors = _json.loads({errors_json!r})\n"
-            "for _err in _parse_errors:\n"
-            "    __RESULTS__.append((False, f\"Erreur de configuration de l'exercice : {_err}\"))\n"
-            f"_solution_src = _json.loads({solution_json!r})\n"
-            "_solution_ns = {}\n"
-            "exec(_solution_src, _solution_ns)\n"
-            "for _case in _cases:\n"
-            "    _args = _case.get('args', [])\n"
-            "    _args_repr = ', '.join(repr(a) for a in _args)\n"
-            "    try:\n"
-            f"        _attendu = _solution_ns['{fn}'](*_args)\n"
-            "    except Exception as e:\n"
-            "        __RESULTS__.append((False, f\"Erreur dans le code de correction pour "
-            + fn + "({_args_repr}) : {e}\"))\n"
-            "        continue\n"
-            "    try:\n"
-            f"        _obtenu = {fn}(*_args)\n"
-            "        _ok = _obtenu == _attendu\n"
-            "        __RESULTS__.append((_ok, f\""
-            + fn + "({_args_repr}) doit valoir {_attendu!r} (obtenu : {_obtenu!r})\"))\n"
-            "    except Exception as e:\n"
-            "        __RESULTS__.append((False, f\""
-            + fn + "({_args_repr}) a levé une erreur : {e}\"))\n"
-        )
+        template = '''__RESULTS__ = []
+import json as _json, io as _io, contextlib as _contextlib
+_cases = _json.loads(%(cases_json)r)
+_parse_errors = _json.loads(%(errors_json)r)
+for _err in _parse_errors:
+    __RESULTS__.append((False, f"Erreur de configuration de l'exercice : {_err}", ""))
+_solution_src = _json.loads(%(solution_json)r)
+_solution_ns = {}
+exec(_solution_src, _solution_ns)
+for _case in _cases:
+    _args = _case.get('args', [])
+    _args_repr = ', '.join(repr(a) for a in _args)
+    try:
+        _attendu = _solution_ns['__FN__'](*_args)
+    except Exception as e:
+        __RESULTS__.append((False, f"Erreur dans le code de correction pour __FN__({_args_repr}) : {e}", ""))
+        continue
+    _out = _io.StringIO()
+    try:
+        with _contextlib.redirect_stdout(_out):
+            _obtenu = __FN__(*_args)
+        _ok = _obtenu == _attendu
+        __RESULTS__.append((_ok, f"__FN__({_args_repr}) doit valoir {_attendu!r} (obtenu : {_obtenu!r})", _out.getvalue()))
+    except Exception as e:
+        __RESULTS__.append((False, f"__FN__({_args_repr}) a levé une erreur : {e}", _out.getvalue()))
+''' % {"cases_json": cases_json, "errors_json": errors_json, "solution_json": solution_json}
+
+        return template.replace("__FN__", fn)
 
     def _build_sql_test_code(self):
         """Génère le code de test pour un exercice SQL : crée une base en mémoire depuis sql_setup,
