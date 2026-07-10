@@ -7,6 +7,14 @@ class Theme(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     order = models.PositiveIntegerField(default=0)
+    sql_setup = models.TextField(
+        blank=True,
+        help_text=(
+            "[SQL] Base de données partagée par défaut pour tous les exercices SQL de ce thème "
+            "(instructions CREATE TABLE + INSERT). Un exercice peut définir son propre 'sql_setup' "
+            "pour utiliser des données différentes ponctuellement, sinon celui du thème est utilisé."
+        ),
+    )
 
     class Meta:
         ordering = ["order", "name"]
@@ -16,24 +24,53 @@ class Theme(models.Model):
 
 
 class Exercise(models.Model):
+    PYTHON = "python"
+    SQL = "sql"
+    KIND_CHOICES = [
+        (PYTHON, "Python (fonction)"),
+        (SQL, "SQL (requête)"),
+    ]
+
     theme = models.ForeignKey(Theme, related_name="exercises", on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     slug = models.SlugField()
     order = models.PositiveIntegerField(default=0)
     statement = models.TextField(help_text="Énoncé de l'exercice (Markdown simple accepté).")
+    kind = models.CharField(max_length=10, choices=KIND_CHOICES, default=PYTHON)
     starter_code = models.TextField(
-        blank=True, help_text="Code de départ affiché dans l'éditeur (ex: l'en-tête de la fonction)."
+        blank=True,
+        help_text="Code de départ affiché dans l'éditeur (l'en-tête de la fonction, ou un commentaire SQL).",
     )
 
+    # --- Champs pour les exercices Python (kind=PYTHON) ---
     function_name = models.CharField(
         max_length=100,
-        help_text="Nom de la fonction que l'étudiant doit écrire (ex: 'triple').",
+        blank=True,
+        help_text="[Python] Nom de la fonction que l'étudiant doit écrire (ex: 'triple').",
     )
     solution_code = models.TextField(
+        blank=True,
         help_text=(
-            "Code de correction : une implémentation complète et correcte de la fonction. "
+            "[Python] Code de correction : une implémentation complète et correcte de la fonction. "
             "Le résultat attendu de chaque test (ci-dessous) est calculé automatiquement "
             "en exécutant ce code — tu n'as qu'à indiquer les arguments à tester."
+        ),
+    )
+
+    # --- Champs pour les exercices SQL (kind=SQL) ---
+    sql_setup = models.TextField(
+        blank=True,
+        help_text=(
+            "[SQL] Optionnel : instructions SQL (CREATE TABLE + INSERT) propres à CET exercice, "
+            "si tu veux des données différentes de celles du thème. Laisse vide pour réutiliser "
+            "automatiquement le 'sql_setup' défini sur le thème."
+        ),
+    )
+    sql_solution = models.TextField(
+        blank=True,
+        help_text=(
+            "[SQL] La requête SQL correcte. Le résultat attendu est calculé automatiquement en "
+            "l'exécutant sur les données de sql_setup, puis comparé à la requête de l'étudiant."
         ),
     )
 
@@ -44,9 +81,36 @@ class Exercise(models.Model):
     def __str__(self):
         return f"{self.theme.name} — {self.title}"
 
+    @property
+    def effective_sql_setup(self):
+        """Le sql_setup à utiliser : celui de l'exercice s'il est défini, sinon celui du thème."""
+        return self.sql_setup or self.theme.sql_setup
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if self.kind == self.PYTHON:
+            if not self.function_name or not self.solution_code:
+                raise ValidationError(
+                    "Un exercice Python doit avoir un 'function_name' et un 'solution_code'."
+                )
+        elif self.kind == self.SQL:
+            if not self.effective_sql_setup:
+                raise ValidationError(
+                    "Un exercice SQL doit avoir un 'sql_setup' (sur l'exercice ou sur son thème) "
+                    "et une 'sql_solution'."
+                )
+            if not self.sql_solution:
+                raise ValidationError("Un exercice SQL doit avoir une 'sql_solution'.")
+
     def build_test_code(self):
-        """Génère le code de test : appelle solution_code pour calculer l'attendu de chaque
-        TestCase, puis compare à ce que produit la fonction de l'étudiant."""
+        if self.kind == self.SQL:
+            return self._build_sql_test_code()
+        return self._build_python_test_code()
+
+    def _build_python_test_code(self):
+        """Génère le code de test pour un exercice Python : appelle solution_code pour calculer
+        l'attendu de chaque TestCase, puis compare à ce que produit la fonction de l'étudiant."""
         import ast
         import json as _json
 
@@ -94,6 +158,54 @@ class Exercise(models.Model):
             "    except Exception as e:\n"
             "        __RESULTS__.append((False, f\""
             + fn + "({_args_repr}) a levé une erreur : {e}\"))\n"
+        )
+
+    def _build_sql_test_code(self):
+        """Génère le code de test pour un exercice SQL : crée une base en mémoire depuis sql_setup,
+        exécute sql_solution pour obtenir l'attendu, puis exécute la requête de l'étudiant
+        (disponible dans __STUDENT_SQL__, texte brut non exécuté comme du Python) et compare."""
+        import json as _json
+
+        setup_json = _json.dumps(self.effective_sql_setup or "", ensure_ascii=False)
+        solution_json = _json.dumps(self.sql_solution or "", ensure_ascii=False)
+
+        return (
+            "__RESULTS__ = []\n"
+            "import sqlite3, json as _json\n"
+            f"_setup_sql = _json.loads({setup_json!r})\n"
+            f"_solution_sql = _json.loads({solution_json!r})\n"
+            "\n"
+            "def _run_query(sql_text):\n"
+            "    _conn = sqlite3.connect(':memory:')\n"
+            "    try:\n"
+            "        _conn.executescript(_setup_sql)\n"
+            "        _cur = _conn.cursor()\n"
+            "        _cur.execute(sql_text)\n"
+            "        _cols = [d[0] for d in _cur.description] if _cur.description else []\n"
+            "        _rows = _cur.fetchall()\n"
+            "        return _cols, _rows\n"
+            "    finally:\n"
+            "        _conn.close()\n"
+            "\n"
+            "try:\n"
+            "    _attendu_cols, _attendu_rows = _run_query(_solution_sql)\n"
+            "except Exception as e:\n"
+            "    __RESULTS__.append((False, f\"Erreur dans la requête de correction : {e}\"))\n"
+            "else:\n"
+            "    try:\n"
+            "        _obtenu_cols, _obtenu_rows = _run_query(__STUDENT_SQL__)\n"
+            "    except Exception as e:\n"
+            "        __RESULTS__.append((False, f\"Erreur dans ta requête SQL : {e}\"))\n"
+            "    else:\n"
+            "        _ok = sorted(map(str, _obtenu_rows)) == sorted(map(str, _attendu_rows))\n"
+            "        _msg = (\n"
+            "            f\"{len(_attendu_rows)} ligne(s) attendue(s), {len(_obtenu_rows)} obtenue(s). \"\n"
+            "            f\"Attendu (colonnes {_attendu_cols}) : {_attendu_rows[:5]}"
+            "{'...' if len(_attendu_rows) > 5 else ''} | \"\n"
+            "            f\"Obtenu (colonnes {_obtenu_cols}) : {_obtenu_rows[:5]}"
+            "{'...' if len(_obtenu_rows) > 5 else ''}\"\n"
+            "        )\n"
+            "        __RESULTS__.append((_ok, _msg))\n"
         )
 
 

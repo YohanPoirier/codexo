@@ -99,10 +99,33 @@
     resultBox.classList.add("hidden");
 
     try {
-      pyodide.globals.set("__STUDENT_CODE__", code);
       pyodide.globals.set("__TEST_CODE__", testCode);
 
-      const runner = `
+      let runner;
+      if (EXERCISE_KIND === "sql") {
+        // En SQL, le texte de l'étudiant est une REQUÊTE, pas du code Python à exécuter :
+        // on le passe tel quel comme variable, test_code (généré côté serveur) s'occupe
+        // de l'exécuter via sqlite3 et de comparer le résultat à la requête de correction.
+        pyodide.globals.set("__STUDENT_SQL__", code);
+        runner = `
+import sys, io, traceback
+
+__stdout_capture__ = io.StringIO()
+__RESULTS__ = []
+__RUNTIME_ERROR__ = None
+
+_old_stdout = sys.stdout
+sys.stdout = __stdout_capture__
+try:
+    exec(__TEST_CODE__, globals())
+except Exception:
+    __RUNTIME_ERROR__ = traceback.format_exc()
+finally:
+    sys.stdout = _old_stdout
+`;
+      } else {
+        pyodide.globals.set("__STUDENT_CODE__", code);
+        runner = `
 import sys, io, traceback
 
 __stdout_capture__ = io.StringIO()
@@ -119,6 +142,7 @@ except Exception:
 finally:
     sys.stdout = _old_stdout
 `;
+      }
       await pyodide.runPythonAsync(runner);
 
       const runtimeError = pyodide.globals.get("__RUNTIME_ERROR__");

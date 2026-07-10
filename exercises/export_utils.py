@@ -16,6 +16,7 @@ def export_exercises_to_json():
             "name": theme.name,
             "slug": theme.slug,
             "description": theme.description,
+            "sql_setup": theme.sql_setup,
             "exercises": [],
         }
         for ex in theme.exercises.order_by("order"):
@@ -23,9 +24,12 @@ def export_exercises_to_json():
                 "title": ex.title,
                 "slug": ex.slug,
                 "statement": ex.statement,
+                "kind": ex.kind,
                 "starter_code": ex.starter_code,
                 "function_name": ex.function_name,
                 "solution_code": ex.solution_code,
+                "sql_setup": ex.sql_setup,
+                "sql_solution": ex.sql_solution,
                 "test_cases": [tc.args for tc in ex.test_cases.order_by("order")],
             })
         data.append(theme_entry)

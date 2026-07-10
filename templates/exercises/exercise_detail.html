@@ -8,7 +8,7 @@
 <div class="statement">{{ exercise.statement }}</div>
 
 <div class="editor-panel">
-  <label for="code-editor">Ton code</label>
+  <label for="code-editor">{% if exercise.kind == "sql" %}Ta requête SQL{% else %}Ton code{% endif %}</label>
   <textarea id="code-editor" spellcheck="false"></textarea>
 </div>
 
@@ -23,6 +23,7 @@
 <script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
 <script>
 const EXERCISE_ID = {{ exercise.id }};
+const EXERCISE_KIND = "{{ exercise.kind }}";
 const TESTS_URL = "{% url 'exercise_tests' exercise.id %}";
 const SUBMIT_URL = "{% url 'submit_result' exercise.id %}";
 const LAST_SUBMITTED_CODE = {% if last_result %}"{{ last_result.submitted_code|escapejs }}"{% else %}null{% endif %};

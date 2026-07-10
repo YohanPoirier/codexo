@@ -18,25 +18,52 @@ class TestCaseInline(admin.TabularInline):
 class ThemeAdmin(admin.ModelAdmin):
     list_display = ("name", "slug", "order")
     inlines = [ExerciseInline]
+    fieldsets = (
+        (None, {"fields": ("name", "slug", "description", "order")}),
+        (
+            "Base de données SQL partagée",
+            {
+                "fields": ("sql_setup",),
+                "description": (
+                    "Instructions SQL (CREATE TABLE + INSERT) utilisées par défaut par tous les "
+                    "exercices SQL de ce thème — pratique pour faire plusieurs questions sur le "
+                    "même jeu de données, sans le recopier à chaque exercice."
+                ),
+            },
+        ),
+    )
 
 
 @admin.register(Exercise)
 class ExerciseAdmin(admin.ModelAdmin):
-    list_display = ("title", "theme", "order", "function_name")
-    list_filter = ("theme",)
+    list_display = ("title", "theme", "kind", "order", "function_name")
+    list_filter = ("theme", "kind")
     inlines = [TestCaseInline]
     fieldsets = (
-        (None, {"fields": ("theme", "title", "slug", "order")}),
+        (None, {"fields": ("theme", "title", "slug", "order", "kind")}),
         ("Contenu affiché à l'étudiant", {"fields": ("statement", "starter_code")}),
         (
-            "Correction automatique",
+            "Correction automatique — exercices Python",
             {
                 "fields": ("function_name", "solution_code"),
                 "description": (
-                    "Renseigne le nom de la fonction et un code de correction complet (une vraie "
-                    "implémentation qui fonctionne). Le résultat attendu de chaque test sera calculé "
-                    "automatiquement à partir de ce code : ajoute des lignes de test ci-dessous avec "
-                    "juste les arguments à essayer, sans avoir à écrire le résultat toi-même."
+                    "Uniquement si Type = 'Python (fonction)'. Renseigne le nom de la fonction et un "
+                    "code de correction complet (une vraie implémentation qui fonctionne). Le résultat "
+                    "attendu de chaque test sera calculé automatiquement : ajoute des lignes de test "
+                    "ci-dessous avec juste les arguments à essayer, sans écrire le résultat toi-même."
+                ),
+            },
+        ),
+        (
+            "Correction automatique — exercices SQL",
+            {
+                "fields": ("sql_setup", "sql_solution"),
+                "description": (
+                    "Uniquement si Type = 'SQL (requête)'. 'sql_setup' est OPTIONNEL ici : laisse "
+                    "vide pour réutiliser automatiquement la base de données définie sur le thème "
+                    "— ne remplis ce champ que si CET exercice a besoin de données différentes. "
+                    "'sql_solution' est la requête correcte : le résultat attendu est calculé "
+                    "automatiquement en l'exécutant, puis comparé à la requête de l'étudiant."
                 ),
             },
         ),
