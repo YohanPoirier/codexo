@@ -12,7 +12,9 @@ class Theme(models.Model):
         help_text=(
             "[SQL] Base de données partagée par défaut pour tous les exercices SQL de ce thème "
             "(instructions CREATE TABLE + INSERT). Un exercice peut définir son propre 'sql_setup' "
-            "pour utiliser des données différentes ponctuellement, sinon celui du thème est utilisé."
+            "pour utiliser des données différentes ponctuellement, sinon celui du thème est utilisé. "
+            "Astuce : ajoute des commentaires SQL ('-- texte') après une table ou une colonne pour "
+            "qu'ils apparaissent dans le résumé de schéma affiché aux étudiants."
         ),
     )
 
@@ -21,6 +23,13 @@ class Theme(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def schema_summary(self):
+        """Résumé auto-généré (tables/colonnes/extrait de données) de la base SQL
+        partagée de ce thème, pour affichage aux étudiants. Voir schema_utils.py."""
+        from .schema_utils import summarize_sql_setup
+        return summarize_sql_setup(self.sql_setup)
 
 
 class Exercise(models.Model):

@@ -1,0 +1,37 @@
+{% if schema_summary.error %}
+  <p class="schema-error">{{ schema_summary.error }}</p>
+{% elif schema_summary.tables %}
+  <div class="schema-summary">
+    <h3 class="schema-summary-title">Description de la base de données</h3>
+    {% for table in schema_summary.tables %}
+      <div class="schema-table">
+        <h4>{{ table.name }}{% if table.comment %} <span class="schema-table-comment">— {{ table.comment }}</span>{% endif %}</h4>
+        <table class="schema-columns">
+          <thead><tr><th>Colonne</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            {% for col in table.columns %}
+              <tr>
+                <td><code>{{ col.name }}</code>{% if col.pk %} <span class="pk-badge">clé primaire</span>{% endif %}</td>
+                <td>{{ col.type }}</td>
+                <td>{{ col.comment }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if table.sample_rows %}
+          <details class="schema-sample">
+            <summary>Aperçu des données ({{ table.sample_rows|length }} ligne{{ table.sample_rows|length|pluralize }}{% if table.truncated %} sur {{ table.total_rows }}{% endif %})</summary>
+            <table class="schema-sample-table">
+              <thead><tr>{% for col in table.columns %}<th>{{ col.name }}</th>{% endfor %}</tr></thead>
+              <tbody>
+                {% for row in table.sample_rows %}
+                  <tr>{% for value in row %}<td>{{ value }}</td>{% endfor %}</tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </details>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

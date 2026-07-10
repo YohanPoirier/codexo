@@ -212,3 +212,49 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
 
 .profile-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed var(--rule); }
 .starter-hint { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--ink-soft); margin-top: -6px; margin-bottom: 18px; }
+
+/* --- Résumé de schéma SQL (auto-généré depuis sql_setup) --- */
+.schema-summary {
+  background: var(--indigo-deep); color: #eef1fb; border-radius: var(--radius);
+  padding: 26px 28px; margin: 28px 0 32px;
+}
+.schema-summary-title {
+  color: white; font-size: 1.1rem; margin: 0 0 16px;
+  border-bottom: 1px solid rgba(255,255,255,.15); padding-bottom: 12px;
+  text-align: center;
+}
+.schema-table {
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 8px;
+  padding: 16px 18px; margin-top: 14px;
+}
+.schema-table:first-of-type { margin-top: 0; }
+.schema-table h4 { margin: 0 0 10px; font-size: 1.02rem; color: white; }
+.schema-table-comment { font-weight: 400; color: #b7c0d9; font-size: .9rem; }
+table.schema-columns, table.schema-sample-table {
+  width: 100%; border-collapse: collapse; font-size: .88rem; color: #eef1fb;
+}
+table.schema-columns th, table.schema-columns td,
+table.schema-sample-table th, table.schema-sample-table td {
+  text-align: left; padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,.12);
+}
+table.schema-columns th, table.schema-sample-table th {
+  font-family: 'JetBrains Mono', monospace; font-size: .74rem; text-transform: uppercase;
+  letter-spacing: .04em; color: #9aa5c2; font-weight: 500;
+}
+table.schema-columns code {
+  font-family: 'JetBrains Mono', monospace; font-size: .88em;
+  background: rgba(0,0,0,.25); color: #eef1fb; border: 1px solid rgba(255,255,255,.14);
+  border-radius: 4px; padding: 1px 5px;
+}
+.pk-badge {
+  font-family: 'JetBrains Mono', monospace; font-size: .68rem; text-transform: uppercase;
+  color: var(--amber); border: 1px solid var(--amber); border-radius: 4px; padding: 1px 5px; margin-left: 4px;
+}
+.schema-sample { margin-top: 12px; font-size: .85rem; }
+.schema-sample summary { cursor: pointer; color: #cdd6ef; user-select: none; }
+.schema-sample summary:hover { color: white; }
+.schema-sample table.schema-sample-table { margin-top: 8px; }
+.schema-error {
+  background: #fbe9e4; color: #8a3320; border: 1px solid var(--err); border-radius: var(--radius);
+  padding: 12px 16px; margin: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+}

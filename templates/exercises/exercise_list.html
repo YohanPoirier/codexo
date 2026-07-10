@@ -4,6 +4,7 @@
 <span class="eyebrow"><a href="{% url 'theme_list' %}">← Thèmes</a></span>
 <h1>{{ theme.name }}</h1>
 <p>{{ theme.description }}</p>
+{% include "exercises/_schema_summary.html" %}
 <ul class="exercise-list">
   {% for exercise in exercises %}
     <li>

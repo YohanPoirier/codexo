@@ -35,7 +35,12 @@ def exercise_list(request, theme_slug):
     return render(
         request,
         "exercises/exercise_list.html",
-        {"theme": theme, "exercises": exercises, "solved_ids": solved_ids},
+        {
+            "theme": theme,
+            "exercises": exercises,
+            "solved_ids": solved_ids,
+            "schema_summary": theme.schema_summary,
+        },
     )
 
 
@@ -50,7 +55,12 @@ def exercise_detail(request, theme_slug, exercise_slug):
     return render(
         request,
         "exercises/exercise_detail.html",
-        {"theme": theme, "exercise": exercise, "last_result": last_result, "hints": hints},
+        {
+            "theme": theme,
+            "exercise": exercise,
+            "last_result": last_result,
+            "hints": hints,
+        },
     )
 
 
