@@ -133,8 +133,6 @@ button.reset-btn {
 }
 button.reset-btn:hover { border-color: var(--err); color: var(--err); }
 
-#pyodide-status { font-family: 'JetBrains Mono', monospace; font-size: .82rem; color: var(--ink-soft); }
-
 .result-box { margin-top: 20px; border-radius: var(--radius); padding: 6px; border: 1px solid var(--rule); background: var(--paper-alt); }
 .result-box.hidden { display: none; }
 .result-box.all-success { border-color: var(--ok); }

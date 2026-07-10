@@ -1,7 +1,6 @@
 (function () {
   const editor = document.getElementById("code-editor");
   const runBtn = document.getElementById("run-btn");
-  const statusEl = document.getElementById("pyodide-status");
   const resultBox = document.getElementById("result-box");
 
   let pyodide = null;
@@ -57,7 +56,7 @@
       starterCode = data.starter_code || "";
       testCode = data.test_code || "";
     } catch (e) {
-      statusEl.textContent = "Impossible de charger l'exercice.";
+      runBtn.textContent = "Erreur : exercice non chargé";
       return;
     }
 
@@ -65,14 +64,13 @@
     // tentative enregistrée en base pour cet exercice (ou null si aucune).
     editor.value = LAST_SUBMITTED_CODE !== null && LAST_SUBMITTED_CODE !== "" ? LAST_SUBMITTED_CODE : starterCode;
 
-    statusEl.textContent = "Chargement de Python (peut prendre quelques secondes)…";
+    runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
     try {
       pyodide = await loadPyodide();
     } catch (e) {
-      statusEl.textContent = "Erreur de chargement de Python.";
+      runBtn.textContent = "Erreur de chargement de Python";
       return;
     }
-    statusEl.textContent = "Prêt.";
     runBtn.disabled = false;
     runBtn.textContent = "Vérifier";
   }
