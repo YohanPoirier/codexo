@@ -36,7 +36,7 @@ header.site {
   position: sticky; top: 0; z-index: 10;
 }
 header.site .bar {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 8px;
   padding: 18px 24px; max-width: 920px; margin: 0 auto;
 }
 header.site .brand {
@@ -44,8 +44,37 @@ header.site .brand {
   color: var(--indigo-deep); text-decoration: none; letter-spacing: -.01em;
 }
 header.site .brand .dot { color: var(--amber); }
-header.site nav a { margin-left: 18px; font-size: .92rem; color: var(--ink-soft); text-decoration: none; }
+header.site nav { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+header.site nav a { font-size: .92rem; color: var(--ink-soft); text-decoration: none; }
 header.site nav a:hover { color: var(--indigo); }
+
+.nav-toggle {
+  display: none; /* réapparaît seulement sur mobile, voir media query plus bas */
+  flex-direction: column; justify-content: center; gap: 5px;
+  width: 32px; height: 32px; background: none; border: none; cursor: pointer; padding: 0;
+}
+.nav-toggle span {
+  display: block; width: 100%; height: 2px; background: var(--indigo-deep); border-radius: 2px;
+  transition: transform .15s ease, opacity .15s ease;
+}
+/* Transforme les 3 barres en croix quand le menu est ouvert */
+.nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 640px) {
+  header.site .bar { padding: 14px 16px; }
+  header.site .brand { font-size: 1.15rem; }
+  .nav-toggle { display: flex; }
+  header.site nav {
+    display: none; /* replié par défaut, ouvert via la classe .open ajoutée par nav.js */
+    flex-direction: column; align-items: flex-start; gap: 2px;
+    flex: 1 0 100%; /* force le passage à la ligne sous le logo + bouton */
+    margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--rule);
+  }
+  header.site nav.open { display: flex; }
+  header.site nav a { padding: 8px 0; font-size: .95rem; }
+}
 
 main { padding: 48px 0 80px; }
 
@@ -140,7 +169,7 @@ textarea#code-editor {
 }
 textarea#code-editor:focus { outline: 2px solid var(--amber); outline-offset: 2px; }
 
-.actions { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+.actions { display: flex; align-items: center; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
 button.run-btn {
   font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: .9rem;
   background: var(--indigo); color: white; border: none; border-radius: 8px;
@@ -166,6 +195,86 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
   opacity: 0; transition: opacity .25s ease;
 }
 .save-confirm.visible { opacity: 1; }
+
+@media (max-width: 480px) {
+  .actions { flex-direction: column; align-items: stretch; }
+  button.run-btn, button.reset-btn, .save-btn, .abandon-btn { width: 100%; text-align: center; }
+  .save-confirm { text-align: center; }
+}
+
+/* --- Bouton Abandonner + fenêtre de confirmation --- */
+.abandon-btn {
+  background: transparent; border: 1px solid var(--err); border-radius: 8px;
+  padding: 11px 18px; font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  color: var(--err); cursor: pointer; margin-left: auto;
+}
+.abandon-btn:hover { background: var(--err); color: white; }
+
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(28,39,71,.55);
+  align-items: center; justify-content: center; padding: 20px; z-index: 100;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--paper); border-radius: var(--radius); padding: 26px 28px;
+  max-width: 460px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,.25);
+}
+.modal-box p { margin: 0 0 14px; line-height: 1.6; }
+.modal-box p:last-of-type { margin-bottom: 20px; }
+.modal-box code {
+  background: var(--paper-alt); border: 1px solid var(--rule); border-radius: 4px;
+  padding: 1px 6px; font-family: 'JetBrains Mono', monospace; font-size: .92em;
+}
+.modal-actions { display: flex; gap: 12px; }
+.modal-confirm {
+  flex: 1; background: var(--err); color: white; border: none; border-radius: 8px;
+  padding: 12px; font-weight: 600; cursor: pointer; font-size: .95rem;
+}
+.modal-confirm:hover { background: #96331f; }
+.modal-cancel {
+  flex: 1; background: transparent; color: var(--ink-soft); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 12px; cursor: pointer; font-size: .95rem;
+}
+.modal-cancel:hover { border-color: var(--ink); color: var(--ink); }
+
+/* --- État verrouillé (exercice abandonné, en attente des 48h) --- */
+.abandon-locked {
+  background: var(--paper-alt); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 24px 26px; margin-top: 22px;
+}
+.abandon-locked-title {
+  font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .06em;
+  font-size: .8rem; color: var(--err); margin: 0 0 12px;
+}
+.abandon-locked p { margin: 0 0 12px; line-height: 1.6; }
+.solution-code {
+  background: var(--indigo-deep); color: #eef1fb; border-radius: 8px; padding: 16px 18px;
+  overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: .88rem; margin-top: 14px;
+}
+
+.status-badge.locked { background: var(--amber); border-color: var(--amber); color: white; }
+
+/* --- Ligne d'exercice verrouillé (non cliquable, sur la page du thème) --- */
+.locked-row {
+  display: flex; align-items: center; gap: 14px; padding: 16px 18px; margin-bottom: 10px;
+  background: var(--paper-alt); border: 1px solid var(--rule); border-radius: var(--radius);
+  opacity: .7; cursor: not-allowed;
+}
+.locked-until {
+  font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--ink-soft);
+  margin-left: auto; white-space: nowrap;
+}
+
+/* --- Messages Django (ex: exercice indisponible après un abandon récent) --- */
+.messages { list-style: none; padding: 0; margin: 0 0 24px; }
+.message {
+  padding: 12px 16px; border-radius: 8px; font-size: .92rem; margin-bottom: 8px;
+}
+.message.info {
+  background: #fdf3e2; color: #8a5a12; border: 1px solid var(--amber);
+}
+.message.success { background: #e5f2e9; color: #1e5734; border: 1px solid var(--ok); }
+.message.error { background: #fbe9e4; color: #8a3320; border: 1px solid var(--err); }
 
 .result-box { margin-top: 20px; border-radius: var(--radius); padding: 6px; border: 1px solid var(--rule); background: var(--paper-alt); }
 .result-box.hidden { display: none; }
@@ -240,6 +349,7 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
 .schema-table:first-of-type { margin-top: 0; }
 .schema-table h4 { margin: 0 0 10px; font-size: 1.02rem; color: white; }
 .schema-table-comment { font-weight: 400; color: #b7c0d9; font-size: .9rem; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table.schema-columns, table.schema-sample-table {
   width: 100%; border-collapse: collapse; font-size: .88rem; color: #eef1fb;
 }

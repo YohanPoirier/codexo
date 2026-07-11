@@ -270,6 +270,23 @@ class TestCase(models.Model):
         return f"{self.exercise.function_name}({self.args})"
 
 
+class Abandonment(models.Model):
+    """Enregistre qu'un étudiant a choisi d'abandonner un exercice pour voir la solution.
+    Utilisé pour verrouiller une nouvelle tentative pendant 48h (voir ABANDON_LOCK_DURATION
+    dans exercises/views.py) : le temps de digérer la solution plutôt que de la recopier
+    immédiatement pour valider l'exercice sans l'avoir vraiment compris."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="abandonments", on_delete=models.CASCADE)
+    exercise = models.ForeignKey(Exercise, related_name="abandonments", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user} a abandonné {self.exercise} le {self.created_at:%d/%m/%Y %H:%M}"
+
+
 class Result(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="results", on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, related_name="results", on_delete=models.CASCADE)

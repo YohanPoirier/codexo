@@ -22,27 +22,51 @@
   {% endif %}
 </div>
 
-<div class="editor-panel">
-  <label for="code-editor">{% if exercise.kind == "sql" %}Ta requête SQL{% else %}Ton code{% endif %}</label>
-  <textarea id="code-editor" spellcheck="false"></textarea>
-</div>
+{% if show_solution_once %}
+  <div class="abandon-locked">
+    <p class="abandon-locked-title">Solution de l'exercice</p>
+    <p>Voici la solution. Prends le temps de bien la comprendre (ligne par ligne si besoin) avant de continuer.</p>
+    <pre class="solution-code"><code>{% if exercise.kind == "sql" %}{{ exercise.sql_solution }}{% else %}{{ exercise.solution_code }}{% endif %}</code></pre>
+    <p>Tu pourras retenter cet exercice à partir du <strong>{{ retry_at|date:"d/m/Y à H:i" }}</strong>. En attendant, il ne sera plus consultable — retiens bien ce que tu viens de voir !</p>
+  </div>
+{% else %}
+  <div class="editor-panel">
+    <label for="code-editor">{% if exercise.kind == "sql" %}Ta requête SQL{% else %}Ton code{% endif %}</label>
+    <textarea id="code-editor" spellcheck="false"></textarea>
+  </div>
 
-<div class="actions">
-  <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
-  <button id="reset-btn" class="reset-btn" type="button" title="Revenir au code de départ">Réinitialiser</button>
-  <button id="save-btn" class="save-btn" type="button" title="Enregistrer maintenant">💾</button>
-  <span id="save-confirm" class="save-confirm">Enregistré ✓</span>
-</div>
+  <div class="actions">
+    <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
+    <button id="reset-btn" class="reset-btn" type="button" title="Revenir au code de départ">Réinitialiser</button>
+    <button id="save-btn" class="save-btn" type="button" title="Enregistrer maintenant">💾</button>
+    <span id="save-confirm" class="save-confirm">Enregistré ✓</span>
+    <button id="abandon-btn" class="abandon-btn" type="button">Abandonner</button>
+  </div>
 
-<div id="result-box" class="result-box hidden"></div>
+  <div id="result-box" class="result-box hidden"></div>
 
-<script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
-<script>
-const EXERCISE_ID = {{ exercise.id }};
-const EXERCISE_KIND = "{{ exercise.kind }}";
-const TESTS_URL = "{% url 'exercise_tests' exercise.id %}";
-const SUBMIT_URL = "{% url 'submit_result' exercise.id %}";
-const LAST_SUBMITTED_CODE = {% if last_result %}"{{ last_result.submitted_code|escapejs }}"{% else %}null{% endif %};
-</script>
-<script src="{% static 'js/exercise.js' %}"></script>
+  <div id="abandon-modal" class="modal-overlay">
+    <div class="modal-box">
+      <p>Avant de regarder la solution, nous vous conseillons d'user et abuser de <code>print()</code> afin de comprendre ce que fait votre programme actuel.</p>
+      <p>Si vous confirmez abandonner, vous pourrez tenter l'exercice dans 48h.</p>
+      <form method="post" action="{% url 'abandon_exercise' exercise.id %}">
+        {% csrf_token %}
+        <div class="modal-actions">
+          <button type="submit" class="modal-confirm">Confirmer</button>
+          <button type="button" id="abandon-cancel" class="modal-cancel">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+  <script>
+  const EXERCISE_ID = {{ exercise.id }};
+  const EXERCISE_KIND = "{{ exercise.kind }}";
+  const TESTS_URL = "{% url 'exercise_tests' exercise.id %}";
+  const SUBMIT_URL = "{% url 'submit_result' exercise.id %}";
+  const LAST_SUBMITTED_CODE = {% if last_result %}"{{ last_result.submitted_code|escapejs }}"{% else %}null{% endif %};
+  </script>
+  <script src="{% static 'js/exercise.js' %}"></script>
+{% endif %}
 {% endblock %}

@@ -317,6 +317,28 @@ finally:
     });
   }
 
+  // Bouton "Abandonner" : ouvre une fenêtre de confirmation personnalisée (plus adaptée au
+  // mobile et plus flexible qu'un window.confirm natif, qui n'autorise ni texte long formaté
+  // ni libellés de boutons personnalisés). La confirmation elle-même est un vrai formulaire
+  // HTML (voir exercise_detail.html), pas un fetch : plus simple et plus robuste.
+  const abandonBtn = document.getElementById("abandon-btn");
+  const abandonModal = document.getElementById("abandon-modal");
+  const abandonCancel = document.getElementById("abandon-cancel");
+  if (abandonBtn && abandonModal) {
+    abandonBtn.addEventListener("click", function () {
+      abandonModal.classList.add("open");
+    });
+    abandonCancel.addEventListener("click", function () {
+      abandonModal.classList.remove("open");
+    });
+    abandonModal.addEventListener("click", function (e) {
+      if (e.target === abandonModal) abandonModal.classList.remove("open"); // clic sur le fond
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") abandonModal.classList.remove("open");
+    });
+  }
+
   runBtn.addEventListener("click", runCheck);
   init();
 })();

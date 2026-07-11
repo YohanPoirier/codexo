@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load exercise_extras %}
 {% block title %}{{ theme.name }} — Codexo{% endblock %}
 {% block content %}
 <span class="eyebrow"><a href="{% url 'theme_list' %}">← Thèmes</a></span>
@@ -8,12 +9,20 @@
 <ul class="exercise-list">
   {% for exercise in exercises %}
     <li>
-      <a href="{% url 'exercise_detail' theme.slug exercise.slug %}">
-        <span class="status-badge {% if exercise.id in solved_ids %}done{% endif %}">
-          {% if exercise.id in solved_ids %}✓{% else %}{{ forloop.counter }}{% endif %}
-        </span>
-        <span class="exercise-title">{{ exercise.title }}</span>
-      </a>
+      {% if exercise.id in locked_ids %}
+        <div class="locked-row" title="Indisponible suite à un abandon récent">
+          <span class="status-badge locked">⏳</span>
+          <span class="exercise-title">{{ exercise.title }}</span>
+          <span class="locked-until">Disponible le {{ locked_retry_at|get_item:exercise.id|date:"d/m à H:i" }}</span>
+        </div>
+      {% else %}
+        <a href="{% url 'exercise_detail' theme.slug exercise.slug %}">
+          <span class="status-badge {% if exercise.id in solved_ids %}done{% endif %}">
+            {% if exercise.id in solved_ids %}✓{% else %}{{ forloop.counter }}{% endif %}
+          </span>
+          <span class="exercise-title">{{ exercise.title }}</span>
+        </a>
+      {% endif %}
     </li>
   {% empty %}
     <p>Pas encore d'exercice dans ce thème.</p>
