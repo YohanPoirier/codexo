@@ -156,6 +156,17 @@ button.reset-btn {
 }
 button.reset-btn:hover { border-color: var(--err); color: var(--err); }
 
+.save-btn {
+  background: transparent; border: 1px solid var(--rule); border-radius: 8px;
+  padding: 11px 14px; font-size: .95rem; line-height: 1; cursor: pointer; color: var(--ink-soft);
+}
+.save-btn:hover { border-color: var(--indigo); color: var(--indigo); }
+.save-confirm {
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem; color: var(--ok);
+  opacity: 0; transition: opacity .25s ease;
+}
+.save-confirm.visible { opacity: 1; }
+
 .result-box { margin-top: 20px; border-radius: var(--radius); padding: 6px; border: 1px solid var(--rule); background: var(--paper-alt); }
 .result-box.hidden { display: none; }
 .result-box.all-success { border-color: var(--ok); }
@@ -221,7 +232,6 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
 .schema-summary-title {
   color: white; font-size: 1.1rem; margin: 0 0 16px;
   border-bottom: 1px solid rgba(255,255,255,.15); padding-bottom: 12px;
-  text-align: center;
 }
 .schema-table {
   background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 8px;

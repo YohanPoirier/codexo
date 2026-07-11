@@ -101,9 +101,20 @@ def submit_result(request, exercise_id):
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
     exercise = get_object_or_404(Exercise, id=exercise_id)
-    payload = json.loads(request.body.decode("utf-8"))
-    submitted_code = payload.get("code", "")
-    success = bool(payload.get("success", False))
+
+    if request.content_type == "application/json":
+        payload = json.loads(request.body.decode("utf-8"))
+        submitted_code = payload.get("code", "")
+        success = bool(payload.get("success", False))
+    else:
+        # navigator.sendBeacon() envoie les données au format formulaire classique
+        # (application/x-www-form-urlencoded), pas en JSON — utilisé pour la sauvegarde
+        # automatique au départ de la page (voir exercise.js), plus fiable que fetch
+        # à ce moment précis car le navigateur garantit d'essayer d'envoyer la requête
+        # même si la page se ferme juste après l'appel.
+        submitted_code = request.POST.get("code", "")
+        success = request.POST.get("success") in ("true", "1", "True")
+
     Result.objects.create(
         user=request.user,
         exercise=exercise,

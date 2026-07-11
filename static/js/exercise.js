@@ -254,6 +254,69 @@ finally:
     }
   });
 
+  // Sauvegarde automatique du code en cours quand l'étudiant quitte la page (ex: clique sur
+  // "Thèmes", "Progression", ferme l'onglet...), même s'il n'a pas cliqué sur "Vérifier".
+  // NB : on marque ces sauvegardes success=false (on n'a pas le temps de relancer les tests
+  // à ce moment précis) — ça n'affecte pas /profil/, qui ne compte que les tentatives réussies.
+  //
+  // On utilise navigator.sendBeacon() plutôt que fetch : c'est l'API conçue spécifiquement
+  // pour "envoyer une petite requête juste avant que la page se ferme", et le navigateur
+  // s'engage à essayer de l'envoyer même si la page est détruite juste après l'appel — ce que
+  // fetch(..., { keepalive: true }) ne garantit pas dans tous les cas (fermeture brutale d'onglet).
+  // sendBeacon ne permet pas d'ajouter un header personnalisé, donc le jeton CSRF est envoyé
+  // dans le corps de la requête au format formulaire classique ('csrfmiddlewaretoken'),
+  // que Django sait lire nativement (voir submit_result dans views.py).
+  //
+  // Deux événements déclenchent la sauvegarde car aucun des deux n'est fiable à 100% seul :
+  // - 'pagehide' : se déclenche à la fermeture/navigation.
+  // - 'visibilitychange' : se déclenche dès que l'onglet passe en arrière-plan (changement
+  //   d'appli, verrouillage d'écran...), donc plus tôt et plus fiable sur mobile.
+  let lastSavedCode = null; // évite une double sauvegarde si les deux événements se déclenchent l'un après l'autre
+
+  function saveDraftOnLeave() {
+    if (!testCode) return; // page pas encore chargée, rien à sauvegarder
+    const code = editor.value;
+    if (code === lastSavedCode) return; // déjà sauvegardé (ex: pagehide juste après visibilitychange)
+    lastSavedCode = code;
+
+    const payload = new URLSearchParams();
+    payload.set("code", code);
+    payload.set("success", "");
+    payload.set("csrfmiddlewaretoken", getCookie("csrftoken"));
+
+    const sent = navigator.sendBeacon && navigator.sendBeacon(SUBMIT_URL, payload);
+    if (!sent) {
+      // Repli si sendBeacon est indisponible (très rare) ou refuse l'envoi (payload trop gros)
+      fetch(SUBMIT_URL, {
+        method: "POST",
+        keepalive: true,
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify({ code, success: false }),
+      }).catch(() => {});
+    }
+  }
+
+  window.addEventListener("pagehide", saveDraftOnLeave);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") saveDraftOnLeave();
+  });
+
+  // Bouton disquette : enregistrement manuel explicite, sur simple clic.
+  const saveBtn = document.getElementById("save-btn");
+  const saveConfirm = document.getElementById("save-confirm");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", async function () {
+      await submitResult(editor.value, false);
+      if (saveConfirm) {
+        saveConfirm.classList.add("visible");
+        setTimeout(() => saveConfirm.classList.remove("visible"), 1500);
+      }
+    });
+  }
+
   runBtn.addEventListener("click", runCheck);
   init();
 })();
