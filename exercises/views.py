@@ -1,6 +1,7 @@
 import json
 from datetime import timedelta
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseNotAllowed
@@ -13,6 +14,11 @@ from .models import Theme, Exercise, Result, Abandonment
 # Durée pendant laquelle un exercice est verrouillé après un abandon (voir abandon_exercise
 # ci-dessous). Passé ce délai, l'étudiant peut retenter l'exercice normalement.
 ABANDON_LOCK_DURATION = timedelta(hours=48)
+
+# En local (DEBUG=True), le verrou est désactivé pour ne pas gêner les tests/débogage :
+# un abandon est toujours enregistré en base, mais il ne bloque jamais l'accès à l'exercice.
+# En production (DEBUG=False, sur Render), le verrou reste actif normalement pour les étudiants.
+ABANDON_LOCK_ENABLED = not settings.DEBUG
 
 
 @login_required
@@ -50,7 +56,7 @@ def exercise_list(request, theme_slug):
     locked_retry_at = {
         ex_id: ts + ABANDON_LOCK_DURATION
         for ex_id, ts in latest_abandon_at.items()
-        if now < ts + ABANDON_LOCK_DURATION
+        if ABANDON_LOCK_ENABLED and now < ts + ABANDON_LOCK_DURATION
     }
     locked_ids = set(locked_retry_at.keys())
 
@@ -78,12 +84,11 @@ def exercise_detail(request, theme_slug, exercise_slug):
         Abandonment.objects.filter(user=request.user, exercise=exercise).order_by("-created_at").first()
     )
     retry_at = last_abandonment.created_at + ABANDON_LOCK_DURATION if last_abandonment else None
-    locked = retry_at is not None and timezone.now() < retry_at
+    locked = ABANDON_LOCK_ENABLED and retry_at is not None and timezone.now() < retry_at
 
     # Juste après avoir confirmé un abandon (voir abandon_exercise), ce drapeau de session est
-    # posé puis consommé ici via .pop() : la solution ne s'affiche donc qu'UNE SEULE FOIS, à
-    # l'instant précis où l'étudiant vient de confirmer. À la moindre revisite de la page
-    # pendant les 48h (retour arrière, favori...), l'exercice n'est plus consultable du tout.
+    # posé puis consommé ici via .pop() : la solution s'affiche donc UNE SEULE FOIS, à l'instant
+    # précis où l'étudiant vient de confirmer — que le verrou soit actif ou non (DEBUG).
     just_abandoned = request.session.pop("just_abandoned_exercise_id", None) == exercise.id
 
     if locked and not just_abandoned:
@@ -106,7 +111,7 @@ def exercise_detail(request, theme_slug, exercise_slug):
             "exercise": exercise,
             "last_result": last_result,
             "hints": hints,
-            "show_solution_once": locked and just_abandoned,
+            "show_solution_once": just_abandoned,
             "retry_at": retry_at,
         },
     )

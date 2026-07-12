@@ -121,10 +121,10 @@
     ]
   },
   {
-    "name": "SQL — Sélection de données",
+    "name": "SQL — BDD Etudiants",
     "slug": "sql-selection",
-    "description": "Écrire des requêtes SELECT.",
-    "sql_setup": "\nCREATE TABLE etudiants (id INTEGER PRIMARY KEY, nom TEXT, age INTEGER);\nINSERT INTO etudiants (id, nom, age) VALUES (1, 'Alice', 22);\nINSERT INTO etudiants (id, nom, age) VALUES (2, 'Bob', 17);\nINSERT INTO etudiants (id, nom, age) VALUES (3, 'Chloé', 18);\n",
+    "description": "Écrire des requêtes SQL",
+    "sql_setup": "CREATE TABLE etudiants (id INTEGER PRIMARY KEY, nom TEXT, age INTEGER);\r\nINSERT INTO etudiants (id, nom, age) VALUES (1, 'Alice', 22);\r\nINSERT INTO etudiants (id, nom, age) VALUES (2, 'Bob', 17);\r\nINSERT INTO etudiants (id, nom, age) VALUES (3, 'Chloé', 18);",
     "exercises": [
       {
         "title": "Étudiants majeurs",
@@ -151,6 +151,120 @@
         "sql_solution": "SELECT COUNT(*) FROM etudiants WHERE age < 18;",
         "test_cases": [],
         "hints": []
+      }
+    ]
+  },
+  {
+    "name": "Parcours de graphe",
+    "slug": "parcours-graphe",
+    "description": "Parcourir un graphe",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Parcours en largeur",
+        "slug": "parcours-largeur",
+        "statement": "Écris une fonction `parcours_largeur(graphe, depart)` qui effectue un **parcours en largeur** d'un graphe et renvoie la liste des nœuds visités, dans l'ordre de leur visite.\r\n\r\nConvention à respecter :\r\n\r\n- `graphe` est un dictionnaire `{noeud: [liste des voisins]}`.\r\n- `depart` est le nœud de départ (une clé du dictionnaire).\r\n- Visite toujours les voisins d'un nœud **dans l'ordre où ils apparaissent** dans sa liste d'adjacence.\r\n- Chaque nœud n'apparaît qu'**une seule fois** dans le résultat, à sa première visite.\r\n- Les graphes utilisés dans cet exercice sont **acycliques**.\r\n\r\nExemple :\r\n\r\n```python\r\ngraphe = {\"A\": [\"B\", \"C\"], \"B\": [\"D\"], \"C\": [\"E\"], \"D\": [], \"E\": []}\r\nparcours_largeur(graphe, \"A\")  # renvoie ['A', 'B', 'C', 'D', 'E']\r\n```",
+        "kind": "python",
+        "starter_code": "def parcours_largeur(graphe, depart):\r\n    pass",
+        "function_name": "parcours_largeur",
+        "solution_code": "def parcours_largeur(graphe, depart):\r\n    visites = [depart]\r\n    file = [depart]\r\n    while file:\r\n        noeud = file.pop(0)\r\n        for voisin in graphe[noeud]:\r\n            if voisin not in visites:\r\n                visites.append(voisin)\r\n                file.append(voisin)\r\n    return visites",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'A': ['B', 'C'], 'B': ['D'], 'C': ['E'], 'D': [], 'E': []}, 'A']",
+          "[{'R': ['A', 'B'], 'A': ['C', 'D'], 'B': [], 'C': [], 'D': []}, 'R']",
+          "[{'1': ['2', '3', '4'], '2': ['5'], '3': [], '4': ['6'], '5': [], '6': []}, '1']",
+          "[{'X': []}, 'X']"
+        ],
+        "hints": [
+          "Utilise une file (FIFO) : ajoute les voisins non visités à la fin, retire toujours le premier élément (avec `file.pop(0)`).",
+          "Marque un nœud comme visité DÈS que tu l'ajoutes à la file, pas seulement quand tu le traites — sinon il risque d'être ajouté plusieurs fois si plusieurs nœuds pointent vers lui."
+        ]
+      },
+      {
+        "title": "Parcours en profondeur",
+        "slug": "parcours-profondeur",
+        "statement": "Écris une fonction `parcours_profondeur(graphe, depart)` qui effectue un **parcours en profondeur** d'un graphe et renvoie la liste des nœuds visités, dans l'ordre de leur visite.\r\n\r\nMême convention que pour le parcours en largeur :\r\n\r\n- `graphe` est un dictionnaire `{noeud: [liste des voisins]}`.\r\n- `depart` est le nœud de départ.\r\n- Visite toujours les voisins d'un nœud **dans l'ordre où ils apparaissent** dans sa liste d'adjacence.\r\n- Chaque nœud n'apparaît qu'**une seule fois** dans le résultat, à sa première visite.\r\n- Les graphes utilisés dans cet exercice sont **acycliques** (aucun cycle, type arbre ou DAG).\r\n\r\nExemple (même graphe que l'exercice précédent) :\r\n\r\n```python\r\ngraphe = {\"A\": [\"B\", \"C\"], \"B\": [\"D\"], \"C\": [\"E\"], \"D\": [], \"E\": []}\r\nparcours_profondeur(graphe, \"A\")  # renvoie ['A', 'B', 'D', 'C', 'E']\r\n```",
+        "kind": "python",
+        "starter_code": "def parcours_profondeur(graphe, depart):\r\n    pass",
+        "function_name": "parcours_profondeur",
+        "solution_code": "def parcours_profondeur(graphe, depart):\r\n    visites = []\r\n\r\n    def visiter(noeud):\r\n        if noeud in visites:\r\n            return\r\n        visites.append(noeud)\r\n        for voisin in graphe[noeud]:\r\n            visiter(voisin)\r\n\r\n    visiter(depart)\r\n    return visites",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'A': ['B', 'C'], 'B': ['D'], 'C': ['E'], 'D': [], 'E': []}, 'A']",
+          "[{'R': ['A', 'B'], 'A': ['C', 'D'], 'B': [], 'C': [], 'D': []}, 'R']",
+          "[{'1': ['2', '3', '4'], '2': ['5'], '3': [], '4': ['6'], '5': [], '6': []}, '1']",
+          "[{'X': []}, 'X']"
+        ],
+        "hints": [
+          "Utilise la récursivité (ou une pile manuelle) : on va aussi loin que possible dans une branche avant de revenir en arrière.",
+          "Marque un nœud comme visité dès qu'on y entre (en l'ajoutant au résultat), avant d'explorer ses voisins — utile si un même nœud est atteignable par plusieurs chemins différents."
+        ]
+      },
+      {
+        "title": "Plus court chemin (Dijkstra)",
+        "slug": "plus-court-chemin",
+        "statement": "Écris une fonction `plus_court_chemin(graphe, depart, arrivee)` qui calcule la **distance la plus courte** entre `depart` et `arrivee` dans un graphe pondéré, avec l'algorithme de Dijkstra.\n\nConvention :\n\n- `graphe` est un dictionnaire `{noeud: [(voisin, poids), ...]}` : chaque valeur est une liste de tuples *(voisin, poids de l'arête)*.\n- Les poids sont des nombres positifs ou nuls.\n- La fonction renvoie la **distance totale** du plus court chemin (un nombre), pas la liste des nœuds du chemin.\n- Si `arrivee` n'est pas atteignable depuis `depart`, renvoie `None`.\n\nExemple :\n\n```python\ngraphe = {\n    \"A\": [(\"B\", 2), (\"C\", 5)],\n    \"B\": [(\"C\", 1), (\"D\", 4)],\n    \"C\": [(\"D\", 1)],\n    \"D\": [],\n}\nplus_court_chemin(graphe, \"A\", \"D\")  # renvoie 4 (A → B → C → D : 2 + 1 + 1)\n```",
+        "kind": "python",
+        "starter_code": "def plus_court_chemin(graphe, depart, arrivee):\n    pass\n",
+        "function_name": "plus_court_chemin",
+        "solution_code": "import heapq\n\ndef plus_court_chemin(graphe, depart, arrivee):\n    distances = {depart: 0}\n    file = [(0, depart)]\n    valides = set()\n    while file:\n        distance, noeud = heapq.heappop(file)\n        if noeud in valides:\n            continue\n        valides.add(noeud)\n        if noeud == arrivee:\n            return distance\n        for voisin, poids in graphe.get(noeud, []):\n            nouvelle_distance = distance + poids\n            if voisin not in distances or nouvelle_distance < distances[voisin]:\n                distances[voisin] = nouvelle_distance\n                heapq.heappush(file, (nouvelle_distance, voisin))\n    return None\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'A': [('B', 2), ('C', 5)], 'B': [('C', 1), ('D', 4)], 'C': [('D', 1)], 'D': []}, 'A', 'D']",
+          "[{'A': [('B', 2), ('C', 5)], 'B': [('C', 1), ('D', 4)], 'C': [('D', 1)], 'D': []}, 'A', 'C']",
+          "[{'A': [('B', 3)], 'B': [('C', 4)], 'C': []}, 'A', 'C']",
+          "[{'A': [('B', 1)], 'B': [], 'Z': []}, 'A', 'Z']"
+        ],
+        "hints": [
+          "Utilise une file de priorité (module `heapq`) : à chaque étape, traite le nœud non encore validé qui a la plus petite distance connue depuis le départ.",
+          "Dès que tu extrais le nœud d'arrivée de la file, sa distance est garantie minimale : tu peux renvoyer immédiatement. S'il n'est jamais extrait, renvoie `None`."
+        ]
+      },
+      {
+        "title": "Détection de cycle",
+        "slug": "detection-cycle",
+        "statement": "Écris une fonction `contient_cycle(graphe)` qui renvoie `True` si un **graphe non orienté** contient au moins un cycle, `False` sinon.\n\n- `graphe` est un dictionnaire `{noeud: [liste des voisins]}`.\n- Le graphe est **non orienté** : si `B` est dans la liste de `A`, alors `A` est aussi dans la liste de `B`.\n- Le graphe peut contenir plusieurs composantes séparées (pas forcément connexe).\n\nExemple :\n\n```python\ngraphe = {\"A\": [\"B\", \"C\"], \"B\": [\"A\", \"C\"], \"C\": [\"A\", \"B\"]}\ncontient_cycle(graphe)  # renvoie True (A-B-C-A forme un cycle)\n```",
+        "kind": "python",
+        "starter_code": "def contient_cycle(graphe):\n    pass\n",
+        "function_name": "contient_cycle",
+        "solution_code": "def contient_cycle(graphe):\n    visites = set()\n\n    def parcourir(noeud, parent):\n        visites.add(noeud)\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                if parcourir(voisin, noeud):\n                    return True\n            elif voisin != parent:\n                return True\n        return False\n\n    for depart in graphe:\n        if depart not in visites:\n            if parcourir(depart, None):\n                return True\n    return False\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'A': ['B', 'C'], 'B': ['A', 'C'], 'C': ['A', 'B']}]",
+          "[{'A': ['B', 'C'], 'B': ['A'], 'C': ['A']}]",
+          "[{'A': ['B'], 'B': ['A'], 'C': ['D', 'E'], 'D': ['C', 'E'], 'E': ['C', 'D']}]",
+          "[{'X': []}]"
+        ],
+        "hints": [
+          "Fais un parcours (BFS ou DFS) en mémorisant, pour chaque nœud visité, par quel nœud tu y es arrivé (son \"parent\").",
+          "Si tu rencontres un voisin déjà visité qui n'est PAS le parent direct du nœud courant, c'est qu'il existe un autre chemin vers lui : il y a un cycle.",
+          "N'oublie pas de vérifier toutes les composantes du graphe, pas seulement celle du premier nœud (un graphe non connexe peut avoir un cycle dans une composante et pas dans une autre)."
+        ]
+      },
+      {
+        "title": "Test de connexité",
+        "slug": "test-connexite",
+        "statement": "Écris une fonction `est_connexe(graphe)` qui renvoie `True` si un **graphe non orienté** est connexe (chaque nœud est atteignable depuis n'importe quel autre), `False` sinon.\n\n- `graphe` est un dictionnaire `{noeud: [liste des voisins]}`.\n- Le graphe est **non orienté**.\n\nExemple :\n\n```python\ngraphe = {\"A\": [\"B\"], \"B\": [\"A\", \"C\"], \"C\": [\"B\"]}\nest_connexe(graphe)  # renvoie True\n\ngraphe2 = {\"A\": [\"B\"], \"B\": [\"A\"], \"C\": [\"D\"], \"D\": [\"C\"]}\nest_connexe(graphe2)  # renvoie False (deux groupes séparés)\n```",
+        "kind": "python",
+        "starter_code": "def est_connexe(graphe):\n    pass\n",
+        "function_name": "est_connexe",
+        "solution_code": "def est_connexe(graphe):\n    depart = next(iter(graphe))\n    visites = {depart}\n    file = [depart]\n    while file:\n        noeud = file.pop(0)\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                visites.add(voisin)\n                file.append(voisin)\n    return len(visites) == len(graphe)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'A': ['B'], 'B': ['A', 'C'], 'C': ['B']}]",
+          "[{'A': ['B'], 'B': ['A'], 'C': ['D'], 'D': ['C']}]",
+          "[{'X': []}]",
+          "[{'A': ['B', 'C'], 'B': ['A', 'C'], 'C': ['A', 'B']}]"
+        ],
+        "hints": [
+          "Pars d'un nœud au hasard (par exemple le premier du dictionnaire) et fais un parcours en largeur ou en profondeur depuis ce nœud.",
+          "Compte combien de nœuds différents tu as réussi à visiter, puis compare ce nombre au nombre total de nœuds du graphe (`len(graphe)`)."
+        ]
       }
     ]
   }
