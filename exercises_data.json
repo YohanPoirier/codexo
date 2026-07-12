@@ -70,6 +70,214 @@
     ]
   },
   {
+    "name": "Booléens",
+    "slug": "booleens",
+    "description": "Manipuler des expressions booléennes et les opérateurs and / or / not.",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Majorité",
+        "slug": "majeur",
+        "statement": "Écris une fonction `majeur(age)` qui renvoie `True` si `age` correspond à une personne majeure (18 ans ou plus), `False` sinon.",
+        "kind": "python",
+        "starter_code": "def majeur(age):\n    pass\n",
+        "function_name": "majeur",
+        "solution_code": "def majeur(age):\n    return age >= 18\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[18]",
+          "[17]",
+          "[0]",
+          "[99]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Nombre pair",
+        "slug": "est-pair",
+        "statement": "Écris une fonction `est_pair(n)` qui renvoie `True` si `n` est pair, `False` sinon.",
+        "kind": "python",
+        "starter_code": "def est_pair(n):\n    pass\n",
+        "function_name": "est_pair",
+        "solution_code": "def est_pair(n):\n    return n % 2 == 0\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[4]",
+          "[7]",
+          "[0]",
+          "[-2]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Mauvais mot de passe",
+        "slug": "mauvais-mot-de-passe",
+        "statement": "Écris une fonction `mauvais_mot_de_passe(saisie)` qui renvoie `True` si `saisie` est différente du mot de passe attendu (`\"python\"`), `False` si elle est correcte.",
+        "kind": "python",
+        "starter_code": "def mauvais_mot_de_passe(saisie):\n    pass\n",
+        "function_name": "mauvais_mot_de_passe",
+        "solution_code": "def mauvais_mot_de_passe(saisie):\n    return saisie != \"python\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[\"python\"]",
+          "[\"PYTHON\"]",
+          "[\"azerty\"]",
+          "[\"\"]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Réduction",
+        "slug": "reduction-ou",
+        "statement": "Écris une fonction `reduction(age)` qui renvoie `True` si la personne a droit à une réduction (moins de 18 ans, ou 60 ans et plus), `False` sinon.",
+        "kind": "python",
+        "starter_code": "def reduction(age):\n    pass\n",
+        "function_name": "reduction",
+        "solution_code": "def reduction(age):\n    return age < 18 or age >= 60\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[10]",
+          "[18]",
+          "[59]",
+          "[60]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Réduction (sans or)",
+        "slug": "reduction-sans-or",
+        "statement": "Écris une fonction `reduction(age)` qui renvoie exactement le même résultat que l'exercice précédent (`True` si la personne a moins de 18 ans, ou 60 ans et plus), mais **sans utiliser `or`**.\n\nIndice de méthode : le contraire de \"moins de 18 ans OU 60 ans et plus\" est \"18 ans et plus ET moins de 60 ans\", donc `18 <= age < 60`. Il ne reste plus qu'à inverser ce résultat avec `not`.",
+        "kind": "python",
+        "starter_code": "def reduction(age):\n    pass\n",
+        "function_name": "reduction",
+        "solution_code": "def reduction(age):\n    return not (18 <= age < 60)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[10]",
+          "[18]",
+          "[59]",
+          "[60]"
+        ],
+        "hints": [
+          "Applique la loi de De Morgan : `not (A or B)` équivaut à `not A and not B`. Ici, ça revient à écrire `not (18 <= age < 60)`."
+        ]
+      },
+      {
+        "title": "Accès à l'attraction",
+        "slug": "acces-attraction",
+        "statement": "Écris une fonction `acces_attraction(age, taille)` qui renvoie `True` si la personne peut accéder à l'attraction : elle doit avoir au moins 10 ans **et** mesurer au moins 1,40 m.",
+        "kind": "python",
+        "starter_code": "def acces_attraction(age, taille):\n    pass\n",
+        "function_name": "acces_attraction",
+        "solution_code": "def acces_attraction(age, taille):\n    return age >= 10 and taille >= 1.40\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[12, 1.5]",
+          "[8, 1.5]",
+          "[12, 1.2]",
+          "[10, 1.40]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Voyelle",
+        "slug": "est-voyelle",
+        "statement": "Écris une fonction `est_voyelle(lettre)` qui renvoie `True` si `lettre` est une voyelle (a, e, i, o, u, y), `False` sinon.",
+        "kind": "python",
+        "starter_code": "def est_voyelle(lettre):\n    pass\n",
+        "function_name": "est_voyelle",
+        "solution_code": "def est_voyelle(lettre):\n    return lettre in \"aeiouy\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[\"a\"]",
+          "[\"b\"]",
+          "[\"y\"]",
+          "[\"z\"]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Peut conduire",
+        "slug": "peut-conduire",
+        "statement": "Écris une fonction `peut_conduire(age, permis)` qui renvoie `True` si la personne peut conduire : elle doit avoir au moins 18 ans **et** posséder son permis (`permis` est un booléen).",
+        "kind": "python",
+        "starter_code": "def peut_conduire(age, permis):\n    pass\n",
+        "function_name": "peut_conduire",
+        "solution_code": "def peut_conduire(age, permis):\n    return age >= 18 and permis\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[20, True]",
+          "[20, False]",
+          "[16, True]",
+          "[18, True]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Week-end",
+        "slug": "week-end",
+        "statement": "Écris une fonction `week_end(jour)` qui renvoie `True` si `jour` vaut \"samedi\" ou \"dimanche\", `False` sinon.",
+        "kind": "python",
+        "starter_code": "def week_end(jour):\n    pass\n",
+        "function_name": "week_end",
+        "solution_code": "def week_end(jour):\n    return jour == \"samedi\" or jour == \"dimanche\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[\"samedi\"]",
+          "[\"dimanche\"]",
+          "[\"lundi\"]",
+          "[\"mardi\"]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Accord de prêt",
+        "slug": "pret",
+        "statement": "Écris une fonction `pret(salaire, cdi, apport)` qui renvoie `True` si la banque accorde le prêt : soit le salaire est d'au moins 1800€ **et** la personne est en CDI, soit son apport est d'au moins 20000€.",
+        "kind": "python",
+        "starter_code": "def pret(salaire, cdi, apport):\n    pass\n",
+        "function_name": "pret",
+        "solution_code": "def pret(salaire, cdi, apport):\n    return (salaire >= 1800 and cdi) or apport >= 20000\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[2000, True, 0]",
+          "[1500, True, 0]",
+          "[1500, False, 25000]",
+          "[1000, False, 5000]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Traverser la route",
+        "slug": "traverser",
+        "statement": "Écris une fonction `traverser(feu_vert, voiture)` qui renvoie `True` si le piéton peut traverser : le feu doit être vert **et** aucune voiture ne doit arriver.",
+        "kind": "python",
+        "starter_code": "def traverser(feu_vert, voiture):\n    pass\n",
+        "function_name": "traverser",
+        "solution_code": "def traverser(feu_vert, voiture):\n    return feu_vert and not voiture\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[True, False]",
+          "[True, True]",
+          "[False, False]",
+          "[False, True]"
+        ],
+        "hints": []
+      }
+    ]
+  },
+  {
     "name": "Boucles",
     "slug": "boucles",
     "description": "Répéter des actions avec for et while.",
@@ -115,6 +323,114 @@
           "[[1, 2, 3]]",
           "[[]]",
           "[[0, -1]]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Dernier élément d'une liste",
+        "slug": "dernier-element",
+        "statement": "Écris une fonction `dernier(liste)` qui renvoie le dernier élément de `liste`.",
+        "kind": "python",
+        "starter_code": "def dernier(liste):\n    pass\n",
+        "function_name": "dernier",
+        "solution_code": "def dernier(liste):\n    return liste[-1]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[5]]",
+          "[['a', 'b', 'c']]",
+          "[[0, -1, 2]]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Inverser une liste",
+        "slug": "inverser-liste",
+        "statement": "Écris une fonction `inverser(liste)` qui renvoie une nouvelle liste dont l'ordre des éléments a été inversé. Tu ne dois pas modifier `liste`.",
+        "kind": "python",
+        "starter_code": "def inverser(liste):\n    pass\n",
+        "function_name": "inverser",
+        "solution_code": "def inverser(liste):\n    inversee = []\n    for i in range(len(liste)):\n        inversee.append(liste[-1-i])\n    return inversee\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[]]",
+          "[['a', 'b']]",
+          "[[1]]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Minimum d'une liste",
+        "slug": "minimum-liste",
+        "statement": "Écris une fonction `minimum(liste)` qui renvoie la plus petite valeur de `liste`.",
+        "kind": "python",
+        "starter_code": "def minimum(liste):\n    pass\n",
+        "function_name": "minimum",
+        "solution_code": "def minimum(liste):\n    mini = liste[0]\n    for i in range(1, len(liste)):\n        if liste[i] < mini:\n            mini = liste[i]\n    return mini\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[3, 1, 2]]",
+          "[[5]]",
+          "[[-1, -5, 2]]",
+          "[[4, 4, 4]]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Indice du minimum d'une liste",
+        "slug": "indice-minimum",
+        "statement": "Écris une fonction `indice_minimum(liste)` qui renvoie l'indice de la plus petite valeur de `liste` (en cas d'égalité, renvoie le premier indice trouvé).",
+        "kind": "python",
+        "starter_code": "def indice_minimum(liste):\n    pass\n",
+        "function_name": "indice_minimum",
+        "solution_code": "def indice_minimum(liste):\n    imini = 0\n    for i in range(1, len(liste)):\n        if liste[i] < liste[imini]:\n            imini = i\n    return imini\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[3, 1, 2]]",
+          "[[5]]",
+          "[[-1, -5, 2]]",
+          "[[1, 1, 1]]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Indices des éléments nuls",
+        "slug": "indices-zeros",
+        "statement": "Écris une fonction `indices_zeros(liste)` qui renvoie la liste des indices où `liste` vaut 0.",
+        "kind": "python",
+        "starter_code": "def indices_zeros(liste):\n    pass\n",
+        "function_name": "indices_zeros",
+        "solution_code": "def indices_zeros(liste):\n    indices = []\n    for i in range(len(liste)):\n        if liste[i] == 0:\n            indices.append(i)\n    return indices\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[0, 1, 0, 2]]",
+          "[[1, 2, 3]]",
+          "[[0, 0, 0]]",
+          "[[]]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Éléments négatifs d'une liste",
+        "slug": "elements-negatifs",
+        "statement": "Écris une fonction `elements_negatifs(liste)` qui renvoie la liste des éléments négatifs de `liste`, dans leur ordre d'origine.",
+        "kind": "python",
+        "starter_code": "def elements_negatifs(liste):\n    pass\n",
+        "function_name": "elements_negatifs",
+        "solution_code": "def elements_negatifs(liste):\n    negatifs = []\n    for x in liste:\n        if x < 0:\n            negatifs.append(x)\n    return negatifs\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[-1, 2, -3, 4]]",
+          "[[1, 2, 3]]",
+          "[[-1, -2, -3]]",
+          "[[]]"
         ],
         "hints": []
       }

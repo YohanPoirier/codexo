@@ -372,3 +372,49 @@ table.schema-columns code {
   background: #fbe9e4; color: #8a3320; border: 1px solid var(--err); border-radius: var(--radius);
   padding: 12px 16px; margin: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: .85rem;
 }
+
+/* --- Coloration syntaxique (CodeMirror) : enveloppe la textarea #code-editor --- */
+.CodeMirror {
+  height: auto;
+  min-height: 220px;
+  background: var(--indigo-deep) !important;
+  color: #eef1fb !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .92rem;
+  border-radius: var(--radius);
+}
+.CodeMirror-focused { outline: 2px solid var(--amber); outline-offset: 2px; }
+.CodeMirror-lines { padding: 12px 0; }
+.CodeMirror pre.CodeMirror-line { padding: 0 16px; }
+.CodeMirror-gutters {
+  background: var(--indigo-deep) !important;
+  border-right: 1px solid rgba(255,255,255,.1);
+}
+.CodeMirror-linenumber { color: #7f8bae; padding: 0 8px 0 4px; }
+.CodeMirror-cursor { border-left: 2px solid var(--amber) !important; }
+.CodeMirror-selected { background: rgba(255,255,255,.15) !important; }
+
+/* Couleurs des tokens. !important est nécessaire ici : codemirror.min.css se charge
+   APRÈS ce fichier (le <link> est dans exercise_detail.html, après le <head> de base.html
+   qui charge déjà style.css), donc à spécificité égale ses couleurs par défaut (pensées
+   pour un fond clair) l'emporteraient sinon sur les nôtres. */
+.cm-s-default .cm-keyword    { color: #c792ea !important; }
+.cm-s-default .cm-def        { color: #82aaff !important; }
+.cm-s-default .cm-variable   { color: #e8ecf7 !important; }
+.cm-s-default .cm-variable-2 { color: #82aaff !important; }
+.cm-s-default .cm-variable-3,
+.cm-s-default .cm-type       { color: #4fd6be !important; }
+.cm-s-default .cm-string     { color: #c3e88d !important; }
+.cm-s-default .cm-string-2   { color: #ecc48d !important; }
+.cm-s-default .cm-number     { color: #f78c6c !important; }
+.cm-s-default .cm-comment    { color: #9aa5c9 !important; font-style: italic; }
+.cm-s-default .cm-atom       { color: #ff5370 !important; }
+.cm-s-default .cm-builtin    { color: #89ddff !important; }
+.cm-s-default .cm-meta,
+.cm-s-default .cm-qualifier  { color: #a6b1d6 !important; }
+.cm-s-default .cm-bracket    { color: #d6deeb !important; }
+.cm-s-default .cm-tag        { color: #f07178 !important; }
+.cm-s-default .cm-attribute  { color: #ffcb6b !important; }
+.cm-s-default .cm-property   { color: #d6deeb !important; }
+.cm-s-default .cm-operator   { color: #e8ecf7 !important; }
+.cm-s-default .cm-error      { color: #ff5370 !important; }

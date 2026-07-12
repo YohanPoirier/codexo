@@ -5,6 +5,15 @@
 
   let pyodide = null;
   let testCode = "";
+  let cm = null; // instance CodeMirror, créée dans init()
+
+  function getCode() {
+    return cm ? cm.getValue() : editor.value;
+  }
+  function setCode(value) {
+    if (cm) cm.setValue(value);
+    else editor.value = value;
+  }
 
   function getCookie(name) {
     const match = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
@@ -96,6 +105,34 @@
     });
   }
 
+  // --- Coloration syntaxique : enveloppe la textarea #code-editor avec CodeMirror.
+  // fromTextArea() garde la textarea d'origine en mémoire (cachée) et permet de
+  // resynchroniser sa valeur avec cm.save() — mais ici on lit/écrit directement
+  // via cm.getValue() / cm.setValue(), donc getCode()/setCode() suffisent partout
+  // ailleurs dans ce fichier, pas besoin d'appeler cm.save() manuellement.
+  function initCodeMirror(initialValue) {
+    editor.value = initialValue; // valeur de secours si CodeMirror ne charge pas (CDN indisponible)
+    cm = CodeMirror.fromTextArea(editor, {
+      mode: EXERCISE_KIND === "sql" ? "text/x-sql" : "python",
+      lineNumbers: true,
+      indentUnit: 4,
+      tabSize: 4,
+      indentWithTabs: false,
+      viewportMargin: Infinity, // la zone grandit avec le contenu plutôt que scroller en interne
+      extraKeys: {
+        Tab: function (cmInstance) {
+          if (cmInstance.somethingSelected()) {
+            cmInstance.execCommand("indentMore");
+          } else {
+            cmInstance.replaceSelection("    ", "end");
+          }
+        },
+        "Shift-Tab": "indentLess",
+      },
+    });
+    cm.setValue(initialValue);
+  }
+
   async function init() {
     try {
       const res = await fetch(TESTS_URL);
@@ -109,7 +146,9 @@
 
     // LAST_SUBMITTED_CODE est injecté par le template : le code de la dernière
     // tentative enregistrée en base pour cet exercice (ou null si aucune).
-    editor.value = LAST_SUBMITTED_CODE !== null && LAST_SUBMITTED_CODE !== "" ? LAST_SUBMITTED_CODE : starterCode;
+    const initialCode =
+      LAST_SUBMITTED_CODE !== null && LAST_SUBMITTED_CODE !== "" ? LAST_SUBMITTED_CODE : starterCode;
+    initCodeMirror(initialCode);
 
     runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
     try {
@@ -138,7 +177,7 @@
   }
 
   async function runCheck() {
-    const code = editor.value;
+    const code = getCode();
     runBtn.disabled = true;
     runBtn.textContent = "Vérification…";
     resultBox.classList.add("hidden");
@@ -211,45 +250,13 @@ finally:
     runBtn.textContent = "Vérifier";
   }
 
-  editor.addEventListener("keydown", function (e) {
-    if (e.key === "Tab") {
-      e.preventDefault();
-      const start = editor.selectionStart;
-      const end = editor.selectionEnd;
-      const indent = "    "; // 4 espaces, convention Python
-
-      if (start === end) {
-        // Pas de sélection : insère juste l'indentation au curseur
-        editor.value = editor.value.slice(0, start) + indent + editor.value.slice(end);
-        editor.selectionStart = editor.selectionEnd = start + indent.length;
-      } else {
-        // Sélection multi-lignes : indente (ou désindente avec Shift+Tab) chaque ligne sélectionnée
-        const before = editor.value.slice(0, start);
-        const selected = editor.value.slice(start, end);
-        const after = editor.value.slice(end);
-        const lines = selected.split("\n");
-
-        let newLines, addedFirstLine, removedFirstLine;
-        if (e.shiftKey) {
-          newLines = lines.map((line) => (line.startsWith(indent) ? line.slice(indent.length) : line.replace(/^\s{1,4}/, "")));
-        } else {
-          newLines = lines.map((line) => indent + line);
-        }
-        const newSelected = newLines.join("\n");
-        editor.value = before + newSelected + after;
-        editor.selectionStart = start;
-        editor.selectionEnd = start + newSelected.length;
-      }
-    }
-  });
-
   resetBtn.addEventListener("click", function () {
-    if (editor.value.trim() === starterCode.trim()) return;
+    if (getCode().trim() === starterCode.trim()) return;
     const confirmed = window.confirm(
       "Revenir au code de départ ? Ton code actuel dans l'éditeur sera perdu (mais tes tentatives déjà validées restent enregistrées)."
     );
     if (confirmed) {
-      editor.value = starterCode;
+      setCode(starterCode);
       resultBox.classList.add("hidden");
     }
   });
@@ -275,7 +282,7 @@ finally:
 
   function saveDraftOnLeave() {
     if (!testCode) return; // page pas encore chargée, rien à sauvegarder
-    const code = editor.value;
+    const code = getCode();
     if (code === lastSavedCode) return; // déjà sauvegardé (ex: pagehide juste après visibilitychange)
     lastSavedCode = code;
 
@@ -309,7 +316,7 @@ finally:
   const saveConfirm = document.getElementById("save-confirm");
   if (saveBtn) {
     saveBtn.addEventListener("click", async function () {
-      await submitResult(editor.value, false);
+      await submitResult(getCode(), false);
       if (saveConfirm) {
         saveConfirm.classList.add("visible");
         setTimeout(() => saveConfirm.classList.remove("visible"), 1500);
