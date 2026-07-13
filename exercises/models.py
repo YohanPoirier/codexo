@@ -176,7 +176,19 @@ for _case in _cases:
     def _build_sql_test_code(self):
         """Génère le code de test pour un exercice SQL : crée une base en mémoire depuis sql_setup,
         exécute sql_solution pour obtenir l'attendu, puis exécute la requête de l'étudiant
-        (disponible dans __STUDENT_SQL__, texte brut non exécuté comme du Python) et compare."""
+        (disponible dans __STUDENT_SQL__, texte brut non exécuté comme du Python) et compare.
+
+        IMPORTANT : la comparaison NE trie PAS les lignes avant de comparer (contrairement à une
+        version précédente qui faisait sorted(...) des deux côtés). Trier annulerait tout exercice
+        portant sur ORDER BY, puisqu'une requête sans ORDER BY (ou avec le mauvais tri) donnerait
+        alors le même résultat "trié" qu'une requête correcte. On compare donc les lignes dans
+        l'ordre exact renvoyé par SQLite.
+
+        Limite à connaître : pour une requête SANS ORDER BY, l'ordre des lignes n'est pas garanti
+        par la norme SQL. En pratique, SQLite renvoie les lignes d'une requête simple (SELECT/WHERE
+        sans jointure ni tri) dans l'ordre d'insertion, donc ça ne pose pas de problème ici — mais
+        si un exercice sans ORDER BY se met à échouer de façon inexpliquée pour une requête
+        pourtant correcte, c'est la première piste à vérifier."""
         import json as _json
 
         setup_json = _json.dumps(self.effective_sql_setup or "", ensure_ascii=False)
@@ -210,7 +222,9 @@ for _case in _cases:
             "    except Exception as e:\n"
             "        __RESULTS__.append((False, f\"Erreur dans ta requête SQL : {e}\"))\n"
             "    else:\n"
-            "        _ok = sorted(map(str, _obtenu_rows)) == sorted(map(str, _attendu_rows))\n"
+            "        # Comparaison SANS tri : l'ordre des lignes renvoyées compte, ce qui permet\n"
+            "        # de vérifier un ORDER BY (voir docstring de cette méthode)\n"
+            "        _ok = list(map(str, _obtenu_rows)) == list(map(str, _attendu_rows))\n"
             "        _msg = (\n"
             "            f\"{len(_attendu_rows)} ligne(s) attendue(s), {len(_obtenu_rows)} obtenue(s). \"\n"
             "            f\"Attendu (colonnes {_attendu_cols}) : {_attendu_rows[:5]}"
