@@ -12,7 +12,7 @@
         "kind": "python",
         "starter_code": "def addition(a, b):\r\n    pass",
         "function_name": "addition",
-        "solution_code": "def addition(a, b):\r\n    return a + b",
+        "solution_code": "def addition(a, b):\n    # On additionne simplement les deux nombres reçus en paramètre\n    return a + b\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -31,7 +31,7 @@
         "kind": "python",
         "starter_code": "def phrase(nombre):\n    pass\n",
         "function_name": "phrase",
-        "solution_code": "def phrase(nombre):\n    return \"J'ai \" + str(nombre) + \" pommes\"\n",
+        "solution_code": "def phrase(nombre):\n    # str(nombre) convertit le nombre en texte pour pouvoir le concaténer\n    # avec les chaînes de caractères qui l'entourent\n    return \"J'ai \" + str(nombre) + \" pommes\"\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -56,7 +56,7 @@
         "kind": "python",
         "starter_code": "def parite(n):\n    pass\n",
         "function_name": "parite",
-        "solution_code": "def parite(n):\n    return 'pair' if n % 2 == 0 else 'impair'\n",
+        "solution_code": "def parite(n):\n    # n % 2 donne le reste de la division de n par 2 :\n    # ce reste vaut 0 si n est pair, 1 (ou -1) sinon\n    return 'pair' if n % 2 == 0 else 'impair'\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -82,7 +82,7 @@
         "kind": "python",
         "starter_code": "def majeur(age):\n    pass\n",
         "function_name": "majeur",
-        "solution_code": "def majeur(age):\n    return age >= 18\n",
+        "solution_code": "def majeur(age):\n    # True si age est supérieur ou égal à 18, False sinon\n    return age >= 18\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -100,7 +100,7 @@
         "kind": "python",
         "starter_code": "def est_pair(n):\n    pass\n",
         "function_name": "est_pair",
-        "solution_code": "def est_pair(n):\n    return n % 2 == 0\n",
+        "solution_code": "def est_pair(n):\n    # Un nombre est pair si le reste de sa division par 2 vaut 0\n    return n % 2 == 0\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -118,7 +118,7 @@
         "kind": "python",
         "starter_code": "def mauvais_mot_de_passe(saisie):\n    pass\n",
         "function_name": "mauvais_mot_de_passe",
-        "solution_code": "def mauvais_mot_de_passe(saisie):\n    return saisie != \"python\"\n",
+        "solution_code": "def mauvais_mot_de_passe(saisie):\n    # != signifie \"différent de\" : on renvoie True si saisie\n    # n'est PAS égale au mot de passe attendu \"python\"\n    return saisie != \"python\"\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -136,7 +136,7 @@
         "kind": "python",
         "starter_code": "def reduction(age):\n    pass\n",
         "function_name": "reduction",
-        "solution_code": "def reduction(age):\n    return age < 18 or age >= 60\n",
+        "solution_code": "def reduction(age):\n    # or : True si AU MOINS UNE des deux conditions est vraie\n    # ici : moins de 18 ans, OU 60 ans et plus\n    return age < 18 or age >= 60\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -154,7 +154,7 @@
         "kind": "python",
         "starter_code": "def reduction(age):\n    pass\n",
         "function_name": "reduction",
-        "solution_code": "def reduction(age):\n    return not (18 <= age < 60)\n",
+        "solution_code": "def reduction(age):\n    # Loi de De Morgan : not (A or B) équivaut à (not A) and (not B)\n    # Le contraire de \"age < 18 ou age >= 60\" est donc \"age >= 18 et age < 60\",\n    # que l'on peut écrire en une seule comparaison : 18 <= age < 60\n    # Il ne reste plus qu'à inverser ce résultat avec not\n    return not (18 <= age < 60)\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -174,7 +174,7 @@
         "kind": "python",
         "starter_code": "def acces_attraction(age, taille):\n    pass\n",
         "function_name": "acces_attraction",
-        "solution_code": "def acces_attraction(age, taille):\n    return age >= 10 and taille >= 1.40\n",
+        "solution_code": "def acces_attraction(age, taille):\n    # and : True seulement si LES DEUX conditions sont vraies à la fois\n    # il faut à la fois avoir 10 ans ou plus ET mesurer 1m40 ou plus\n    return age >= 10 and taille >= 1.40\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -192,7 +192,7 @@
         "kind": "python",
         "starter_code": "def est_voyelle(lettre):\n    pass\n",
         "function_name": "est_voyelle",
-        "solution_code": "def est_voyelle(lettre):\n    return lettre in \"aeiouy\"\n",
+        "solution_code": "def est_voyelle(lettre):\n    # \"in\" teste si lettre est un des caractères présents dans la chaîne\n    # \"aeiouy\" : équivalent à lettre == 'a' or lettre == 'e' or ...\n    return lettre in \"aeiouy\"\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -210,7 +210,7 @@
         "kind": "python",
         "starter_code": "def peut_conduire(age, permis):\n    pass\n",
         "function_name": "peut_conduire",
-        "solution_code": "def peut_conduire(age, permis):\n    return age >= 18 and permis\n",
+        "solution_code": "def peut_conduire(age, permis):\n    # permis est déjà un booléen (True/False), pas besoin de le comparer :\n    # on peut l'utiliser directement dans le and\n    return age >= 18 and permis\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -228,7 +228,7 @@
         "kind": "python",
         "starter_code": "def week_end(jour):\n    pass\n",
         "function_name": "week_end",
-        "solution_code": "def week_end(jour):\n    return jour == \"samedi\" or jour == \"dimanche\"\n",
+        "solution_code": "def week_end(jour):\n    # == compare deux chaînes de caractères : True si elles sont identiques\n    # or : True si jour correspond à l'un OU l'autre des deux jours\n    return jour == \"samedi\" or jour == \"dimanche\"\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -246,7 +246,7 @@
         "kind": "python",
         "starter_code": "def pret(salaire, cdi, apport):\n    pass\n",
         "function_name": "pret",
-        "solution_code": "def pret(salaire, cdi, apport):\n    return (salaire >= 1800 and cdi) or apport >= 20000\n",
+        "solution_code": "def pret(salaire, cdi, apport):\n    # Les parenthèses regroupent la première condition : (salaire >= 1800 and cdi)\n    # Le prêt est accordé si CETTE condition est vraie, OU si l'apport est suffisant à lui seul\n    return (salaire >= 1800 and cdi) or apport >= 20000\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -264,7 +264,7 @@
         "kind": "python",
         "starter_code": "def traverser(feu_vert, voiture):\n    pass\n",
         "function_name": "traverser",
-        "solution_code": "def traverser(feu_vert, voiture):\n    return feu_vert and not voiture\n",
+        "solution_code": "def traverser(feu_vert, voiture):\n    # not voiture inverse le booléen : True si aucune voiture n'arrive\n    # and : il faut à la fois le feu vert ET l'absence de voiture\n    return feu_vert and not voiture\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -290,7 +290,7 @@
         "kind": "python",
         "starter_code": "def somme(n):\n    pass\n",
         "function_name": "somme",
-        "solution_code": "def somme(n):\n    total = 0\n    for i in range(1, n + 1):\n        total += i\n    return total\n",
+        "solution_code": "def somme(n):\n    total = 0\n    # range(1, n + 1) parcourt les entiers de 1 à n inclus\n    # (range s'arrête juste avant sa borne haute, d'où le +1)\n    for i in range(1, n + 1):\n        total += i  # équivalent à total = total + i\n    return total\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -316,7 +316,7 @@
         "kind": "python",
         "starter_code": "def doubler(liste):\n    pass\n",
         "function_name": "doubler",
-        "solution_code": "def doubler(liste):\n    return [x * 2 for x in liste]\n",
+        "solution_code": "def doubler(liste):\n    # Liste en compréhension : construit une nouvelle liste en appliquant\n    # \"x * 2\" à chaque élément x de la liste d'origine, sans la modifier\n    return [x * 2 for x in liste]\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -333,7 +333,7 @@
         "kind": "python",
         "starter_code": "def dernier(liste):\n    pass\n",
         "function_name": "dernier",
-        "solution_code": "def dernier(liste):\n    return liste[-1]\n",
+        "solution_code": "def dernier(liste):\n    # L'indice -1 correspond toujours au dernier élément d'une liste,\n    # quelle que soit sa longueur\n    return liste[-1]\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -351,7 +351,7 @@
         "kind": "python",
         "starter_code": "def inverser(liste):\n    pass\n",
         "function_name": "inverser",
-        "solution_code": "def inverser(liste):\n    inversee = []\n    for i in range(len(liste)):\n        inversee.append(liste[-1-i])\n    return inversee\n",
+        "solution_code": "def inverser(liste):\n    inversee = []\n    for i in range(len(liste)):\n        # liste[-1-i] parcourt la liste depuis la fin :\n        # i=0 -> dernier élément (-1), i=1 -> avant-dernier (-2), etc.\n        inversee.append(liste[-1-i])\n    return inversee  # une NOUVELLE liste : liste d'origine jamais modifiée\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -369,7 +369,7 @@
         "kind": "python",
         "starter_code": "def minimum(liste):\n    pass\n",
         "function_name": "minimum",
-        "solution_code": "def minimum(liste):\n    mini = liste[0]\n    for i in range(1, len(liste)):\n        if liste[i] < mini:\n            mini = liste[i]\n    return mini\n",
+        "solution_code": "def minimum(liste):\n    # On part du premier élément comme \"meilleur candidat\" pour le minimum\n    mini = liste[0]\n    # Puis on compare chaque élément suivant : si on trouve plus petit,\n    # on met à jour mini\n    for i in range(1, len(liste)):\n        if liste[i] < mini:\n            mini = liste[i]\n    return mini\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -387,7 +387,7 @@
         "kind": "python",
         "starter_code": "def indice_minimum(liste):\n    pass\n",
         "function_name": "indice_minimum",
-        "solution_code": "def indice_minimum(liste):\n    imini = 0\n    for i in range(1, len(liste)):\n        if liste[i] < liste[imini]:\n            imini = i\n    return imini\n",
+        "solution_code": "def indice_minimum(liste):\n    # On mémorise l'INDICE du plus petit élément trouvé jusqu'ici, pas sa valeur\n    imini = 0\n    for i in range(1, len(liste)):\n        # On compare à liste[imini] (la valeur du minimum actuel),\n        # pas à une variable \"mini\" séparée\n        if liste[i] < liste[imini]:\n            imini = i\n    return imini\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -405,7 +405,7 @@
         "kind": "python",
         "starter_code": "def indices_zeros(liste):\n    pass\n",
         "function_name": "indices_zeros",
-        "solution_code": "def indices_zeros(liste):\n    indices = []\n    for i in range(len(liste)):\n        if liste[i] == 0:\n            indices.append(i)\n    return indices\n",
+        "solution_code": "def indices_zeros(liste):\n    indices = []\n    for i in range(len(liste)):\n        # On vérifie la VALEUR à l'indice i avant de décider de l'ajouter\n        if liste[i] == 0:\n            indices.append(i)  # on stocke l'indice i, pas la valeur liste[i]\n    return indices\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -423,7 +423,7 @@
         "kind": "python",
         "starter_code": "def elements_negatifs(liste):\n    pass\n",
         "function_name": "elements_negatifs",
-        "solution_code": "def elements_negatifs(liste):\n    negatifs = []\n    for x in liste:\n        if x < 0:\n            negatifs.append(x)\n    return negatifs\n",
+        "solution_code": "def elements_negatifs(liste):\n    negatifs = []\n    # On parcourt directement les valeurs (pas besoin des indices ici)\n    for x in liste:\n        if x < 0:\n            negatifs.append(x)\n    return negatifs\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -451,7 +451,7 @@
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
-        "sql_solution": "SELECT nom FROM etudiants WHERE age >= 18;",
+        "sql_solution": "-- Sélectionne uniquement la colonne nom, pour les lignes où age >= 18\nSELECT nom FROM etudiants WHERE age >= 18;",
         "test_cases": [],
         "hints": []
       },
@@ -464,7 +464,7 @@
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
-        "sql_solution": "SELECT COUNT(*) FROM etudiants WHERE age < 18;",
+        "sql_solution": "-- COUNT(*) compte le nombre de lignes qui vérifient la condition WHERE\nSELECT COUNT(*) FROM etudiants WHERE age < 18;",
         "test_cases": [],
         "hints": []
       }
@@ -479,11 +479,11 @@
       {
         "title": "Parcours en largeur",
         "slug": "parcours-largeur",
-        "statement": "Écris une fonction `parcours_largeur(graphe, depart)` qui effectue un **parcours en largeur** d'un graphe et renvoie la liste des nœuds visités, dans l'ordre de leur visite.\r\n\r\nConvention à respecter :\r\n\r\n- `graphe` est un dictionnaire `{noeud: [liste des voisins]}`.\r\n- `depart` est le nœud de départ (une clé du dictionnaire).\r\n- Visite toujours les voisins d'un nœud **dans l'ordre où ils apparaissent** dans sa liste d'adjacence.\r\n- Chaque nœud n'apparaît qu'**une seule fois** dans le résultat, à sa première visite.\r\n- Les graphes utilisés dans cet exercice sont **acycliques**.\r\n\r\nExemple :\r\n\r\n```python\r\ngraphe = {\"A\": [\"B\", \"C\"], \"B\": [\"D\"], \"C\": [\"E\"], \"D\": [], \"E\": []}\r\nparcours_largeur(graphe, \"A\")  # renvoie ['A', 'B', 'C', 'D', 'E']\r\n```",
+        "statement": "Écris une fonction `parcours_largeur(graphe, depart)` qui effectue un **parcours en largeur** d'un graphe et renvoie la liste des nœuds visités, dans l'ordre de leur visite.\r\n\r\nConvention à respecter :\r\n\r\n- `graphe` est un dictionnaire `{noeud: [liste des voisins]}`.\r\n- `depart` est le nœud de départ (une clé du dictionnaire).\r\n- Visite toujours les voisins d'un nœud **dans l'ordre où ils apparaissent** dans sa liste d'adjacence.\r\n- Chaque nœud n'apparaît qu'**une seule fois** dans le résultat, à sa première visite.\r\n- Les graphes utilisés dans cet exercice sont **acycliques**.\r\n\r\nExemple :\r\n\r\n```python\r\ngraphe = {\"A\": [\"B\", \"C\"], \"B\": [\"D\"], \"C\": [\"E\"], \"D\": [], \"E\": []}\r\nparcours_largeur(graphe, \"A\")  # renvoie ['A', 'B', 'C', 'D', 'E']\r\n```\n\n**Rappel : `collections.deque`**\n\nPour implémenter une file (FIFO) efficacement, utilise `collections.deque` plutôt qu'une liste Python classique :\n\n- `file.append(x)` ajoute `x` à la fin de la file.\n- `file.popleft()` retire et renvoie le premier élément de la file.\n\nContrairement à `liste.pop(0)`, qui doit décaler tous les éléments restants (donc lent sur une grande file), `deque.popleft()` s'exécute en temps constant. L'import est déjà présent dans le code de départ : `from collections import deque`.",
         "kind": "python",
-        "starter_code": "def parcours_largeur(graphe, depart):\r\n    pass",
+        "starter_code": "from collections import deque\n\ndef parcours_largeur(graphe, depart):\n    pass\n",
         "function_name": "parcours_largeur",
-        "solution_code": "def parcours_largeur(graphe, depart):\r\n    visites = [depart]\r\n    file = [depart]\r\n    while file:\r\n        noeud = file.pop(0)\r\n        for voisin in graphe[noeud]:\r\n            if voisin not in visites:\r\n                visites.append(voisin)\r\n                file.append(voisin)\r\n    return visites",
+        "solution_code": "from collections import deque\n\ndef parcours_largeur(graphe, depart):\n    # \"visites\" garde la liste des nœuds déjà rencontrés, DANS L'ORDRE de visite\n    visites = [depart]\n    # deque (\"double-ended queue\") permet d'ajouter/retirer efficacement aux\n    # DEUX extrémités : .append() ajoute à la fin, .popleft() retire le\n    # premier élément — une vraie file (FIFO)\n    file = deque([depart])\n    while file:\n        # .popleft() retire ET renvoie le premier élément de la file\n        noeud = file.popleft()\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                # On marque le voisin comme visité DÈS qu'on le découvre,\n                # pas seulement quand on le traite : sinon un même nœud\n                # pourrait être ajouté plusieurs fois à la file\n                visites.append(voisin)\n                file.append(voisin)\n    return visites\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -504,7 +504,7 @@
         "kind": "python",
         "starter_code": "def parcours_profondeur(graphe, depart):\r\n    pass",
         "function_name": "parcours_profondeur",
-        "solution_code": "def parcours_profondeur(graphe, depart):\r\n    visites = []\r\n\r\n    def visiter(noeud):\r\n        if noeud in visites:\r\n            return\r\n        visites.append(noeud)\r\n        for voisin in graphe[noeud]:\r\n            visiter(voisin)\r\n\r\n    visiter(depart)\r\n    return visites",
+        "solution_code": "def parcours_profondeur(graphe, depart):\n    visites = []\n\n    def visiter(noeud):\n        # Si le nœud est déjà visité, on arrête cette branche (évite les boucles infinies)\n        if noeud in visites:\n            return\n        # On marque le nœud comme visité en l'ajoutant tout de suite au résultat,\n        # AVANT d'explorer ses voisins\n        visites.append(noeud)\n        for voisin in graphe[noeud]:\n            # Appel récursif : on va aussi loin que possible dans cette branche\n            # avant de passer au voisin suivant\n            visiter(voisin)\n\n    visiter(depart)\n    return visites\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -525,7 +525,7 @@
         "kind": "python",
         "starter_code": "def plus_court_chemin(graphe, depart, arrivee):\n    pass\n",
         "function_name": "plus_court_chemin",
-        "solution_code": "import heapq\n\ndef plus_court_chemin(graphe, depart, arrivee):\n    distances = {depart: 0}\n    file = [(0, depart)]\n    valides = set()\n    while file:\n        distance, noeud = heapq.heappop(file)\n        if noeud in valides:\n            continue\n        valides.add(noeud)\n        if noeud == arrivee:\n            return distance\n        for voisin, poids in graphe.get(noeud, []):\n            nouvelle_distance = distance + poids\n            if voisin not in distances or nouvelle_distance < distances[voisin]:\n                distances[voisin] = nouvelle_distance\n                heapq.heappush(file, (nouvelle_distance, voisin))\n    return None\n",
+        "solution_code": "import heapq\n\ndef plus_court_chemin(graphe, depart, arrivee):\n    # distances[noeud] = plus courte distance connue depuis \"depart\"\n    distances = {depart: 0}\n    # File de priorité : contient des tuples (distance, noeud), toujours\n    # triée pour que heapq.heappop() renvoie la distance la plus petite\n    file = [(0, depart)]\n    # \"valides\" contient les nœuds dont la distance minimale est confirmée\n    valides = set()\n\n    while file:\n        # On extrait toujours le nœud non confirmé avec la plus petite distance\n        distance, noeud = heapq.heappop(file)\n\n        if noeud in valides:\n            # Ce nœud a déjà été traité avec une distance plus courte\n            # (on peut avoir plusieurs entrées obsolètes dans la file)\n            continue\n        valides.add(noeud)\n\n        if noeud == arrivee:\n            # Dès qu'on extrait l'arrivée, sa distance est garantie minimale\n            return distance\n\n        for voisin, poids in graphe.get(noeud, []):\n            nouvelle_distance = distance + poids\n            # On met à jour la distance du voisin seulement si on a trouvé\n            # un chemin plus court que ce qui était connu jusque-là\n            if voisin not in distances or nouvelle_distance < distances[voisin]:\n                distances[voisin] = nouvelle_distance\n                heapq.heappush(file, (nouvelle_distance, voisin))\n\n    # Si on vide la file sans jamais extraire \"arrivee\", il est inatteignable\n    return None\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -546,7 +546,7 @@
         "kind": "python",
         "starter_code": "def contient_cycle(graphe):\n    pass\n",
         "function_name": "contient_cycle",
-        "solution_code": "def contient_cycle(graphe):\n    visites = set()\n\n    def parcourir(noeud, parent):\n        visites.add(noeud)\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                if parcourir(voisin, noeud):\n                    return True\n            elif voisin != parent:\n                return True\n        return False\n\n    for depart in graphe:\n        if depart not in visites:\n            if parcourir(depart, None):\n                return True\n    return False\n",
+        "solution_code": "def contient_cycle(graphe):\n    # Ensemble des nœuds déjà visités, tous parcours confondus\n    deja_visites = set()\n\n    # On boucle sur \"depart\" pour couvrir aussi les graphes non connexes\n    # (plusieurs morceaux séparés) : un cycle peut être dans n'importe laquelle\n    # des composantes\n    for depart in graphe:\n        if depart in deja_visites:\n            # Cette composante a déjà été explorée depuis un autre départ\n            continue\n\n        # Une liste de tuples (noeud, parent) utilisée comme une PILE (LIFO) :\n        # .append() empile à la fin, .pop() (sans argument) dépile le dernier\n        # élément ajouté. C'est ce comportement LIFO qui donne un parcours en\n        # profondeur plutôt qu'en largeur\n        pile = [(depart, None)]\n\n        while pile:\n            noeud, parent = pile.pop()\n\n            if noeud in deja_visites:\n                # Ce nœud a pu être empilé plusieurs fois (via différents\n                # voisins) avant d'être traité une première fois : on ignore\n                # les répétitions\n                continue\n            deja_visites.add(noeud)\n\n            for voisin in graphe[noeud]:\n                if voisin not in deja_visites:\n                    # Nouveau nœud : on l'empile avec \"noeud\" comme parent,\n                    # pour pouvoir l'ignorer plus tard si on le recroise\n                    pile.append((voisin, noeud))\n                elif voisin != parent:\n                    # \"voisin\" est déjà visité ET ce n'est PAS le parent direct\n                    # de \"noeud\" (celui par lequel on vient d'arriver) : il\n                    # existe donc un second chemin vers lui => cycle\n                    return True\n\n    return False\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -556,7 +556,8 @@
           "[{'X': []}]"
         ],
         "hints": [
-          "Fais un parcours (BFS ou DFS) en mémorisant, pour chaque nœud visité, par quel nœud tu y es arrivé (son \"parent\").",
+          "Piège classique : si tu te contentes de marquer un nœud comme \"déjà visité\" sans retenir PAR QUI tu y es arrivé (son parent), tu vas détecter un faux cycle sur une simple arête A-B. En effet, le graphe étant non orienté, B a A dans sa liste de voisins : quand tu traites B juste après A, tu retombes sur A qui est déjà \"visité\", alors qu'il n'y a aucun cycle — c'est juste l'arête par laquelle tu es arrivé. Il faut donc mémoriser le parent de chaque nœud, et ignorer ce cas précis.",
+          "Fais un parcours (parcours en largeur ou en profondeur) en mémorisant, pour chaque nœud visité, par quel nœud tu y es arrivé (son \"parent\").",
           "Si tu rencontres un voisin déjà visité qui n'est PAS le parent direct du nœud courant, c'est qu'il existe un autre chemin vers lui : il y a un cycle.",
           "N'oublie pas de vérifier toutes les composantes du graphe, pas seulement celle du premier nœud (un graphe non connexe peut avoir un cycle dans une composante et pas dans une autre)."
         ]
@@ -568,7 +569,7 @@
         "kind": "python",
         "starter_code": "def est_connexe(graphe):\n    pass\n",
         "function_name": "est_connexe",
-        "solution_code": "def est_connexe(graphe):\n    depart = next(iter(graphe))\n    visites = {depart}\n    file = [depart]\n    while file:\n        noeud = file.pop(0)\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                visites.add(voisin)\n                file.append(voisin)\n    return len(visites) == len(graphe)\n",
+        "solution_code": "def est_connexe(graphe):\n    # On choisit un nœud de départ arbitraire : le premier du dictionnaire\n    depart = next(iter(graphe))\n    # \"visites\" est un set (pas une liste) : on n'a besoin que de tester\n    # l'appartenance, pas de conserver l'ordre de visite\n    visites = {depart}\n    file = [depart]\n    while file:\n        noeud = file.pop(0)\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                visites.add(voisin)\n                file.append(voisin)\n    # Le graphe est connexe si on a réussi à atteindre TOUS ses nœuds\n    # depuis un seul point de départ\n    return len(visites) == len(graphe)\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
