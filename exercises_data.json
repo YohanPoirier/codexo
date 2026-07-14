@@ -584,5 +584,169 @@
         ]
       }
     ]
+  },
+  {
+    "name": "SQL — Base Codexo (méta)",
+    "slug": "sql-meta-codexo",
+    "description": "Requêtes SQL sur une base qui reproduit la structure de Codexo lui-même : élèves, thèmes, exercices et résultats.",
+    "sql_setup": "CREATE TABLE eleves (\n    id INTEGER PRIMARY KEY,\n    prenom TEXT,\n    nom TEXT\n);\nINSERT INTO eleves VALUES (1, 'Lucas', 'Martin');\nINSERT INTO eleves VALUES (2, 'Emma', 'Bernard');\nINSERT INTO eleves VALUES (3, 'Nathan', 'Dubois');\nINSERT INTO eleves VALUES (4, 'Chloé', 'Petit');\nINSERT INTO eleves VALUES (5, 'Léo', 'Robert');\nINSERT INTO eleves VALUES (6, 'Manon', 'Girard');\nINSERT INTO eleves VALUES (7, 'Mathis', 'Lefevre');\n\nCREATE TABLE themes (\n    id INTEGER PRIMARY KEY,\n    nom TEXT\n);\nINSERT INTO themes VALUES (1, 'Variables & types');\nINSERT INTO themes VALUES (2, 'Conditions');\nINSERT INTO themes VALUES (3, 'Boucles');\nINSERT INTO themes VALUES (4, 'Listes');\n\nCREATE TABLE exercices (\n    id INTEGER PRIMARY KEY,\n    titre TEXT,\n    theme_id INTEGER,\n    difficulte TEXT\n);\nINSERT INTO exercices VALUES (1, 'Addition simple', 1, 'facile');\nINSERT INTO exercices VALUES (2, 'Conversion en chaîne', 1, 'facile');\nINSERT INTO exercices VALUES (3, 'Pair ou impair', 2, 'facile');\nINSERT INTO exercices VALUES (4, 'Somme de 1 à n', 3, 'moyen');\nINSERT INTO exercices VALUES (5, 'Doubler chaque élément', 4, 'moyen');\nINSERT INTO exercices VALUES (6, 'Minimum d''une liste', 4, 'moyen');\nINSERT INTO exercices VALUES (7, 'Dernier élément d''une liste', 4, 'facile');\nINSERT INTO exercices VALUES (8, 'Inverser une liste', 4, 'moyen');\nINSERT INTO exercices VALUES (9, 'Indice du minimum d''une liste', 4, 'moyen');\nINSERT INTO exercices VALUES (10, 'Indices des éléments nuls', 4, 'moyen');\nINSERT INTO exercices VALUES (11, 'Éléments négatifs d''une liste', 4, 'moyen');\n\nCREATE TABLE resultats (\n    id INTEGER PRIMARY KEY,\n    eleve_id INTEGER,\n    exercice_id INTEGER,\n    reussi INTEGER,\n    date_passage TEXT,\n    temps_secondes INTEGER\n);\nINSERT INTO resultats VALUES (1, 1, 1, 1, '2026-03-01', 120);\nINSERT INTO resultats VALUES (2, 2, 1, 1, '2026-03-01', 95);\nINSERT INTO resultats VALUES (3, 3, 3, 0, '2026-03-02', 180);\nINSERT INTO resultats VALUES (4, 3, 3, 1, '2026-03-03', 110);\nINSERT INTO resultats VALUES (5, 4, 4, 1, '2026-03-04', 260);\nINSERT INTO resultats VALUES (6, 2, 2, 0, '2026-03-02', 150);\nINSERT INTO resultats VALUES (7, 2, 2, 1, '2026-03-03', 90);\nINSERT INTO resultats VALUES (8, 3, 1, 1, '2026-03-01', 105);\nINSERT INTO resultats VALUES (9, 4, 1, 1, '2026-03-01', 80);\nINSERT INTO resultats VALUES (10, 4, 2, 1, '2026-03-01', 140);\nINSERT INTO resultats VALUES (11, 4, 6, 1, '2026-03-07', 320);\nINSERT INTO resultats VALUES (12, 5, 1, 0, '2026-03-01', 200);\nINSERT INTO resultats VALUES (13, 5, 1, 1, '2026-03-02', 100);\nINSERT INTO resultats VALUES (14, 5, 3, 1, '2026-03-03', 130);\nINSERT INTO resultats VALUES (15, 6, 5, 1, '2026-03-05', 240);\nINSERT INTO resultats VALUES (16, 7, 3, 1, '2026-03-04', 160);\n",
+    "exercises": [
+      {
+        "title": "Liste des élèves triée",
+        "slug": "liste-eleves-triee",
+        "statement": "Écris une requête qui affiche le nom et le prénom de tous les élèves, classés par ordre alphabétique du nom, puis du prénom (en cas d'égalité de nom).",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- SELECT nom, prenom : on choisit précisément quelles colonnes récupérer\n-- (séparées par une virgule), plutôt que SELECT * qui prendrait tout\n-- FROM eleves : indique la table dans laquelle chercher les données\n-- ORDER BY nom, prenom : trie d'abord par nom, puis par prenom SEULEMENT\n-- pour départager deux élèves de même nom. Par défaut le tri est croissant\n-- (ASC, implicite) ; pour un tri décroissant, il faudrait écrire DESC\n-- après la colonne concernée, ex: ORDER BY nom DESC\nSELECT nom, prenom FROM eleves ORDER BY nom, prenom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Exercices faciles",
+        "slug": "exercices-faciles-meta",
+        "statement": "Écris une requête qui affiche les titres de tous les exercices faciles, classés par id croissant.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- WHERE difficulte = 'facile' : filtre par égalité EXACTE sur une colonne texte\n-- (contrairement à LIKE, qui permet une recherche approximative avec un motif)\nSELECT titre FROM exercices WHERE difficulte = 'facile' ORDER BY id;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Prénoms commençant par M",
+        "slug": "prenoms-commencant-par-m",
+        "statement": "Écris une requête qui affiche le nom et le prénom de tous les élèves dont le prénom commence par la lettre \"M\", classés par ordre alphabétique du nom, puis du prénom.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- LIKE permet une recherche par motif (pattern matching) sur du texte,\n-- au lieu d'une égalité stricte comme avec =\n-- Le caractère % est un joker : il représente n'importe quelle suite de\n-- caractères (y compris aucun). 'M%' signifie donc \"commence par M\"\nSELECT nom, prenom FROM eleves WHERE prenom LIKE 'M%' ORDER BY nom, prenom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Exercices du thème Boucles",
+        "slug": "exercices-theme-boucles",
+        "statement": "Écris une requête qui affiche les titres de tous les exercices du thème \"Boucles\".",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- JOIN relie deux tables entre elles à partir d'une colonne commune :\n-- ici, exercices.theme_id correspond à themes.id (clé étrangère -> clé primaire)\n-- AS permet de donner un alias (surnom) à une table, pour écrire des requêtes\n-- plus courtes : \"e\" à la place de \"exercices\", \"t\" à la place de \"themes\"\nSELECT e.titre\nFROM exercices AS e\nJOIN themes AS t ON e.theme_id = t.id\nWHERE t.nom = 'Boucles'\nORDER BY e.id;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Double jointure : élèves et exercices réussis",
+        "slug": "double-jointure-reussites",
+        "statement": "Écris une requête qui affiche le prénom de l'élève et le titre de l'exercice, pour chaque tentative réussie, triés par prénom d'élève puis par titre d'exercice.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- Deux jointures à la suite dans la même requête : on relie resultats à\n-- eleves (pour le prénom) ET resultats à exercices (pour le titre)\nSELECT el.prenom, ex.titre\nFROM resultats AS r\nJOIN eleves AS el ON r.eleve_id = el.id\nJOIN exercices AS ex ON r.exercice_id = ex.id\nWHERE r.reussi = 1\nORDER BY el.prenom, ex.titre;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Nombre total d'exercices",
+        "slug": "nombre-total-exercices",
+        "statement": "Écris une requête qui affiche le nombre total d'exercices dans la base.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- COUNT(*) compte le nombre total de lignes de la table\nSELECT COUNT(*) FROM exercices;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Nombre d'exercices par thème",
+        "slug": "nombre-exercices-par-theme",
+        "statement": "Écris une requête qui affiche, pour chaque thème, son nom et son nombre d'exercices, triés par nom de thème.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- GROUP BY regroupe les lignes ayant la même valeur dans la colonne indiquée\n-- (ici, un groupe par thème) ; COUNT(*) compte alors le nombre de lignes\n-- DANS CHAQUE groupe, plutôt que sur toute la table comme avant\nSELECT t.nom, COUNT(*)\nFROM exercices AS e\nJOIN themes AS t ON e.theme_id = t.id\nGROUP BY t.nom\nORDER BY t.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Temps total passé par élève",
+        "slug": "temps-total-par-eleve",
+        "statement": "Écris une requête qui affiche, pour chaque élève (nom, prénom), le temps total passé (en secondes) sur tous ses essais, triés par ordre alphabétique du nom.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- SUM additionne les valeurs numériques d'une colonne, GROUPÉES par élève\n-- (même logique que COUNT(*) plus haut, mais on additionne une valeur\n-- au lieu de compter des lignes)\nSELECT e.nom, e.prenom, SUM(r.temps_secondes)\nFROM resultats AS r\nJOIN eleves AS e ON r.eleve_id = e.id\nGROUP BY e.id\nORDER BY e.nom, e.prenom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Temps moyen par exercice",
+        "slug": "temps-moyen-par-exercice",
+        "statement": "Écris une requête qui affiche, pour chaque exercice (titre), le temps moyen (en secondes) passé par les élèves, triés par titre.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- AVG calcule la moyenne des valeurs numériques d'une colonne, par groupe\nSELECT ex.titre, AVG(r.temps_secondes)\nFROM resultats AS r\nJOIN exercices AS ex ON r.exercice_id = ex.id\nGROUP BY ex.id\nORDER BY ex.titre;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Meilleur temps par exercice",
+        "slug": "meilleur-temps-par-exercice",
+        "statement": "Écris une requête qui affiche, pour chaque exercice (titre), le meilleur temps (le plus petit) enregistré parmi les tentatives réussies, triés par titre.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- MIN renvoie la plus petite valeur d'une colonne, par groupe\n-- WHERE reussi = 1 : on ne garde que les tentatives réussies, un temps\n-- sur une tentative ratée n'aurait pas de sens pour un \"meilleur temps\"\nSELECT ex.titre, MIN(r.temps_secondes)\nFROM resultats AS r\nJOIN exercices AS ex ON r.exercice_id = ex.id\nWHERE r.reussi = 1\nGROUP BY ex.id\nORDER BY ex.titre;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Thèmes avec plus de 6 exercices",
+        "slug": "themes-plus-de-6-exercices",
+        "statement": "Écris une requête qui affiche le nom des thèmes contenant plus de 6 exercices.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- HAVING filtre les GROUPES après un GROUP BY, contrairement à WHERE qui\n-- filtre les lignes AVANT le regroupement. On ne peut pas écrire\n-- \"WHERE COUNT(*) > 6\" : COUNT(*) n'existe qu'une fois les groupes formés,\n-- donc son filtre doit se faire APRÈS, avec HAVING\nSELECT t.nom\nFROM exercices AS e\nJOIN themes AS t ON e.theme_id = t.id\nGROUP BY t.id\nHAVING COUNT(*) > 6\nORDER BY t.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Thèmes avec au moins 2 exercices faciles",
+        "slug": "themes-au-moins-2-exercices-faciles",
+        "statement": "Écris une requête qui affiche le nom des thèmes ayant au moins 2 exercices faciles, triés par nom.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- WHERE difficulte = 'facile' : filtre les LIGNES avant tout regroupement\n-- (on ne garde que les exercices faciles, dès le départ)\n-- GROUP BY : regroupe ensuite ces lignes déjà filtrées, par thème\n-- HAVING COUNT(*) >= 2 : filtre les GROUPES obtenus, en ne gardant que\n-- ceux qui contiennent au moins 2 lignes (donc au moins 2 exercices faciles)\n--\n-- Résumé de l'ordre d'exécution : WHERE (lignes) -> GROUP BY (groupes)\n-- -> HAVING (groupes filtrés)\nSELECT t.nom\nFROM exercices AS e\nJOIN themes AS t ON e.theme_id = t.id\nWHERE e.difficulte = 'facile'\nGROUP BY t.id\nHAVING COUNT(*) >= 2\nORDER BY t.nom;",
+        "test_cases": [],
+        "hints": []
+      }
+    ]
   }
 ]
