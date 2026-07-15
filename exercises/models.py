@@ -24,6 +24,40 @@ class Theme(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, skip_reorder=False, **kwargs):
+        # Réordonnancement automatique : quand on change l'"order" d'un thème EXISTANT,
+        # on décale les autres thèmes situés entre l'ancienne et la nouvelle position,
+        # pour ne jamais se retrouver avec deux thèmes sur le même "order" (ce qui
+        # arriverait sinon en cas de simple modification manuelle dans l'admin).
+        #
+        # skip_reorder=True désactive ce décalage : utilisé par seed_exercises.py, qui
+        # réaffecte déjà explicitement l'"order" de TOUS les thèmes dans la même boucle.
+        # Sans ce contournement, chaque affectation déclencherait un décalage en cascade
+        # des AUTRES thèmes, qui se marcherait dessus au fil des itérations suivantes et
+        # donnerait un résultat final imprévisible.
+        if self.pk is not None and not skip_reorder:
+            try:
+                old_order = Theme.objects.get(pk=self.pk).order
+            except Theme.DoesNotExist:
+                old_order = None
+
+            if old_order is not None and old_order != self.order:
+                if self.order > old_order:
+                    # Le thème descend dans la liste : tout ce qui était entre son
+                    # ancienne et sa nouvelle position remonte d'un cran pour lui
+                    # laisser la place.
+                    Theme.objects.filter(
+                        order__gt=old_order, order__lte=self.order
+                    ).exclude(pk=self.pk).update(order=models.F("order") - 1)
+                else:
+                    # Le thème remonte dans la liste : tout ce qui était entre sa
+                    # nouvelle et son ancienne position redescend d'un cran.
+                    Theme.objects.filter(
+                        order__gte=self.order, order__lt=old_order
+                    ).exclude(pk=self.pk).update(order=models.F("order") + 1)
+
+        super().save(*args, **kwargs)
+
     @property
     def schema_summary(self):
         """Résumé auto-généré (tables/colonnes/extrait de données) de la base SQL

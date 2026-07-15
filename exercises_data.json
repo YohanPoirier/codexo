@@ -44,6 +44,172 @@
     ]
   },
   {
+    "name": "Chaînes de caractères",
+    "slug": "chaines-de-caracteres",
+    "description": "Manipuler des chaînes de caractères : longueur, indices, découpage, concaténation.",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Nombre de lettres",
+        "slug": "nombre-de-lettres",
+        "statement": "Écris une fonction `nombre_de_lettres(mot)` qui renvoie le nombre de lettres de `mot`.",
+        "kind": "python",
+        "starter_code": "def nombre_de_lettres(mot):\n    pass\n",
+        "function_name": "nombre_de_lettres",
+        "solution_code": "def nombre_de_lettres(mot):\n    # len() renvoie le nombre de caractères d'une chaîne\n    return len(mot)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bonjour']",
+          "['a']",
+          "['']"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Première lettre",
+        "slug": "premiere-lettre",
+        "statement": "Écris une fonction `premiere_lettre(mot)` qui renvoie la première lettre de `mot`.",
+        "kind": "python",
+        "starter_code": "def premiere_lettre(mot):\n    pass\n",
+        "function_name": "premiere_lettre",
+        "solution_code": "def premiere_lettre(mot):\n    # L'indice 0 correspond toujours au premier caractère d'une chaîne\n    return mot[0]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bonjour']",
+          "['a']",
+          "['python']"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Dernière lettre",
+        "slug": "derniere-lettre",
+        "statement": "Écris une fonction `derniere_lettre(mot)` qui renvoie la dernière lettre de `mot`.",
+        "kind": "python",
+        "starter_code": "def derniere_lettre(mot):\n    pass\n",
+        "function_name": "derniere_lettre",
+        "solution_code": "def derniere_lettre(mot):\n    # L'indice -1 correspond toujours au dernier caractère, quelle que soit\n    # la longueur du mot\n    return mot[-1]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bonjour']",
+          "['a']",
+          "['python']"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Tranche de mot",
+        "slug": "tranche-mot",
+        "statement": "Écris une fonction `tranche_mot(mot, a, b)` qui renvoie la partie de `mot` allant de l'indice `a` jusqu'à `b` lettres avant la fin.\n\nExemple : `tranche_mot(\"bonjour\", 1, 2)` renvoie `\"onjo\"`.",
+        "kind": "python",
+        "starter_code": "def tranche_mot(mot, a, b):\n    pass\n",
+        "function_name": "tranche_mot",
+        "solution_code": "def tranche_mot(mot, a, b):\n    # mot[a:-b] extrait la partie du mot depuis l'indice a jusqu'à b\n    # caractères avant la fin\n    return mot[a:-b]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bonjour', 1, 2]",
+          "['python', 0, 1]",
+          "['chat', 1, 1]"
+        ],
+        "hints": [
+          "`mot[a:-b]` veut dire : \"du caractère d'indice a jusqu'à b caractères avant la fin\"."
+        ]
+      },
+      {
+        "title": "Répétition",
+        "slug": "repetition",
+        "statement": "Écris une fonction `repetition(lettre, n)` qui renvoie la chaîne `lettre` répétée `n` fois.",
+        "kind": "python",
+        "starter_code": "def repetition(lettre, n):\n    pass\n",
+        "function_name": "repetition",
+        "solution_code": "def repetition(lettre, n):\n    # La multiplication d'une chaîne par un entier la répète ce nombre de fois\n    return n * lettre\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['a', 3]",
+          "['bonjour', 0]",
+          "['x', 1]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Concaténation",
+        "slug": "concatenation",
+        "statement": "Écris une fonction `concatenation(mot1, mot2)` qui renvoie `mot1` et `mot2` collés l'un à l'autre.",
+        "kind": "python",
+        "starter_code": "def concatenation(mot1, mot2):\n    pass\n",
+        "function_name": "concatenation",
+        "solution_code": "def concatenation(mot1, mot2):\n    # + concatène deux chaînes de caractères bout à bout\n    return mot1 + mot2\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bon', 'jour']",
+          "['', 'python']",
+          "['abc', '']"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Mot à trou",
+        "slug": "mot-a-trou",
+        "statement": "Écris une fonction `mot_a_trou(mot, lettre)` qui renvoie `mot` avec chaque occurrence de `lettre` remplacée par un underscore `_`.",
+        "kind": "python",
+        "starter_code": "def mot_a_trou(mot, lettre):\n    pass\n",
+        "function_name": "mot_a_trou",
+        "solution_code": "def mot_a_trou(mot, lettre):\n    resultat = \"\"\n    # On parcourt le mot lettre par lettre\n    for l in mot:\n        if l != lettre:\n            resultat += l\n        else:\n            # On remplace la lettre recherchée par un underscore\n            resultat += \"_\"\n    return resultat\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bonjour', 'o']",
+          "['python', 'z']",
+          "['anana', 'a']"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Retirer les voyelles",
+        "slug": "consonnes",
+        "statement": "Écris une fonction `consonnes(mot)` qui renvoie `mot` privé de toutes ses voyelles (a, e, i, o, u, y).",
+        "kind": "python",
+        "starter_code": "def consonnes(mot):\n    pass\n",
+        "function_name": "consonnes",
+        "solution_code": "def consonnes(mot):\n    voyelles = \"aeiouy\"\n    resultat = \"\"\n    for lettre in mot:\n        # On ne garde que les lettres qui ne sont PAS des voyelles\n        if lettre not in voyelles:\n            resultat += lettre\n    return resultat\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bonjour']",
+          "['python']",
+          "['aeiou']"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Le mot est-il dans la phrase ?",
+        "slug": "contient-mot",
+        "statement": "Écris une fonction `contient_mot(phrase, mot)` qui renvoie `True` si `mot` apparaît (en tant que suite de lettres consécutives) dans `phrase`, `False` sinon.",
+        "kind": "python",
+        "starter_code": "def contient_mot(phrase, mot):\n    pass\n",
+        "function_name": "contient_mot",
+        "solution_code": "def contient_mot(phrase, mot):\n    n_m = len(mot)\n    n_p = len(phrase)\n    # On teste toutes les positions de départ possibles dans phrase : la\n    # dernière position valide est n_p - n_m (+1 car range s'arrête avant\n    # sa borne haute)\n    for i in range(n_p - n_m + 1):\n        if phrase[i:i+n_m] == mot:\n            return True\n    return False\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bonjour a tous', 'jour']",
+          "['python', 'thon']",
+          "['bonjour', 'z']",
+          "['abc', 'abcd']"
+        ],
+        "hints": [
+          "Le nombre de positions de départ possibles est `n_p - n_m + 1` : n'oublie pas le +1, sinon tu risques de rater une position valide en fin de phrase."
+        ]
+      }
+    ]
+  },
+  {
     "name": "Conditions",
     "slug": "conditions",
     "description": "Utiliser if / elif / else pour prendre des décisions.",
@@ -246,7 +412,7 @@
         "kind": "python",
         "starter_code": "def pret(salaire, cdi, apport):\n    pass\n",
         "function_name": "pret",
-        "solution_code": "def pret(salaire, cdi, apport):\n    # Les parenthèses regroupent la première condition : (salaire >= 1800 and cdi)\n    # Le prêt est accordé si CETTE condition est vraie, OU si l'apport est suffisant à lui seul\n    return (salaire >= 1800 and cdi) or apport >= 20000\n",
+        "solution_code": "def pret(salaire, cdi, apport):\n    # Les parenthèses regroupent la première condition : (salaire >= 1800 and cdi)\n    # Le prêt est accordé si CETTE condition est vraie, OU si son apport est suffisant à lui seul\n    return (salaire >= 1800 and cdi) or apport >= 20000\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -300,6 +466,165 @@
           "[0]"
         ],
         "hints": []
+      },
+      {
+        "title": "Puissance de 2",
+        "slug": "puissance-de-2",
+        "statement": "Écris une fonction `puissance_de_2(x)` qui renvoie le plus petit entier `n` tel que `2**n` soit supérieur ou égal à `x`.\n\nExemple : `puissance_de_2(5)` renvoie `3` (car `2**2 = 4 < 5` mais `2**3 = 8 >= 5`).",
+        "kind": "python",
+        "starter_code": "def puissance_de_2(x):\n    pass\n",
+        "function_name": "puissance_de_2",
+        "solution_code": "def puissance_de_2(x):\n    nb = 1\n    n = 0\n    # Tant que nb (qui vaut 2**n) est strictement inférieur à x, on double\n    # nb et on incrémente n : on avance de puissance de 2 en puissance de 2\n    while nb < x:\n        nb *= 2\n        n += 1\n    return n\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[1]",
+          "[2]",
+          "[5]",
+          "[8]",
+          "[100]"
+        ],
+        "hints": [
+          "Pars de `nb = 1` (soit `2**0`) et double `nb` à chaque tour de boucle, en comptant le nombre de doublements effectués."
+        ]
+      },
+      {
+        "title": "Somme des nombres pairs",
+        "slug": "somme-pairs",
+        "statement": "Écris une fonction `somme_pairs(n)` qui renvoie la somme des entiers pairs strictement inférieurs à `n` (0 compris).",
+        "kind": "python",
+        "starter_code": "def somme_pairs(n):\n    pass\n",
+        "function_name": "somme_pairs",
+        "solution_code": "def somme_pairs(n):\n    somme = 0\n    # range(0, n, 2) parcourt 0, 2, 4, ... en s'arrêtant avant n\n    for i in range(0, n, 2):\n        somme += i\n    return somme\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[10]",
+          "[1]",
+          "[0]",
+          "[7]"
+        ],
+        "hints": [
+          "`range(0, n, 2)` permet de parcourir directement uniquement les nombres pairs, sans avoir à tester chaque nombre avec `% 2`."
+        ]
+      },
+      {
+        "title": "Somme des chiffres d'un entier",
+        "slug": "somme-chiffres-entier",
+        "statement": "Écris une fonction `somme_chiffres_entier(n)` qui renvoie la somme des chiffres de l'entier `n` (positif ou nul).",
+        "kind": "python",
+        "starter_code": "def somme_chiffres_entier(n):\n    pass\n",
+        "function_name": "somme_chiffres_entier",
+        "solution_code": "def somme_chiffres_entier(n):\n    # str(n) convertit le nombre en texte, ce qui permet de parcourir\n    # chaque chiffre comme un caractère\n    chaine = str(n)\n    somme = 0\n    for i in range(len(chaine)):\n        # int(chaine[i]) reconvertit ce caractère en nombre pour l'additionner\n        somme += int(chaine[i])\n    return somme\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[123]",
+          "[0]",
+          "[45]",
+          "[1000]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "PGCD (algorithme des soustractions)",
+        "slug": "pgcd",
+        "statement": "Écris une fonction `pgcd(a, b)` qui renvoie le plus grand commun diviseur de `a` et `b` (deux entiers positifs ou nuls), en utilisant l'algorithme des soustractions successives : tant que `a` et `b` sont différents, on remplace le plus grand des deux par sa différence avec l'autre.\n\nCas particulier à gérer en premier : par définition, `pgcd(0, n) = n`. Sans un traitement à part pour ce cas, la boucle par soustractions successives ne se termine jamais si `a` ou `b` vaut 0.",
+        "kind": "python",
+        "starter_code": "def pgcd(a, b):\n    pass\n",
+        "function_name": "pgcd",
+        "solution_code": "def pgcd(a, b):\n    if a == 0:\n        return b\n    if b == 0:\n        return a\n\n    # Tant que a et b sont différents, on soustrait le plus petit au plus\n    # grand : le PGCD reste inchangé à chaque étape, et a finit par\n    # rejoindre b (ou l'inverse)\n    while a != b:\n        if a > b:\n            a = a - b\n        else:\n            b = b - a\n    return a\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[12, 18]",
+          "[7, 7]",
+          "[48, 18]",
+          "[17, 5]",
+          "[0, 5]",
+          "[7, 0]"
+        ],
+        "hints": [
+          "Traite le cas où `a` ou `b` vaut 0 avant la boucle : sans ça, elle ne se termine jamais."
+        ]
+      },
+      {
+        "title": "Nombre premier",
+        "slug": "est-premier",
+        "statement": "Écris une fonction `est_premier(n)` qui renvoie `True` si `n` est un nombre premier, `False` sinon.",
+        "kind": "python",
+        "starter_code": "def est_premier(n):\n    pass\n",
+        "function_name": "est_premier",
+        "solution_code": "def est_premier(n):\n    # Par définition, aucun nombre inférieur à 2 n'est premier\n    if n < 2:\n        return False\n\n    # On teste tous les diviseurs possibles de 2 à n-1 : si l'un d'eux\n    # divise n exactement, n n'est pas premier\n    for diviseur in range(2, n):\n        if n % diviseur == 0:\n            return False\n\n    return True\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[7]",
+          "[8]",
+          "[2]",
+          "[1]",
+          "[0]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Nombre de diviseurs",
+        "slug": "nombre-diviseurs",
+        "statement": "Écris une fonction `nombre_diviseurs(n)` qui renvoie le nombre de diviseurs de `n` (entier strictement positif), 1 et `n` inclus.",
+        "kind": "python",
+        "starter_code": "def nombre_diviseurs(n):\n    pass\n",
+        "function_name": "nombre_diviseurs",
+        "solution_code": "def nombre_diviseurs(n):\n    compteur = 0\n\n    # On teste chaque nombre de 1 à n : s'il divise n sans reste, c'est\n    # un diviseur\n    for diviseur in range(1, n + 1):\n        if n % diviseur == 0:\n            compteur += 1\n\n    return compteur\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[12]",
+          "[7]",
+          "[1]",
+          "[28]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Comparaison de placements",
+        "slug": "comparaison-placements",
+        "statement": "Deux placements partent du même `capital_initial`. Chaque année, le placement A augmente de 2% (sans versement supplémentaire), tandis que le placement B augmente de 1% **et** reçoit en plus un versement fixe `versement_B`.\n\nÉcris une fonction `comparaison_placements(capital_initial, versement_B)` qui renvoie le nombre d'années au bout desquelles le placement B dépasse strictement le placement A.",
+        "kind": "python",
+        "starter_code": "def comparaison_placements(capital_initial, versement_B):\n    pass\n",
+        "function_name": "comparaison_placements",
+        "solution_code": "def comparaison_placements(capital_initial, versement_B):\n    placement_A = capital_initial\n    placement_B = capital_initial\n\n    annees = 0\n\n    # Tant que B n'a pas dépassé A, on fait évoluer les deux placements\n    # d'une année supplémentaire\n    while placement_B <= placement_A:\n        placement_A = placement_A * 1.02\n        placement_B = placement_B * 1.01 + versement_B\n\n        annees += 1\n\n    return annees\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[1000, 50]",
+          "[5000, 100]",
+          "[10000, 20]",
+          "[2000, 1000]"
+        ],
+        "hints": [
+          "Simule année par année : à chaque tour de boucle, mets à jour les deux placements selon leur taux (et le versement pour B), puis compte le nombre de tours effectués."
+        ]
+      },
+      {
+        "title": "Palindrome",
+        "slug": "est-palindrome",
+        "statement": "Écris une fonction `est_palindrome(mot)` qui renvoie `True` si `mot` se lit de la même façon à l'endroit et à l'envers, `False` sinon.",
+        "kind": "python",
+        "starter_code": "def est_palindrome(mot):\n    pass\n",
+        "function_name": "est_palindrome",
+        "solution_code": "def est_palindrome(mot):\n    n = len(mot)\n\n    # On compare le caractère d'indice i (depuis le début) à celui\n    # d'indice -1-i (depuis la fin) ; n//2 suffit car au-delà on\n    # recomparerait les mêmes paires en sens inverse\n    for i in range(n // 2):\n        if mot[i] != mot[-1 - i]:\n            return False\n\n    return True\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['radar']",
+          "['kayak']",
+          "['bonjour']",
+          "['']",
+          "['a']"
+        ],
+        "hints": [
+          "Il suffit de comparer les caractères deux par deux en partant des deux extrémités vers le centre : pas besoin de reconstruire le mot inversé."
+        ]
       }
     ]
   },
@@ -437,40 +762,6 @@
     ]
   },
   {
-    "name": "SQL — BDD Etudiants",
-    "slug": "sql-selection",
-    "description": "Écrire des requêtes SQL",
-    "sql_setup": "CREATE TABLE etudiants (id INTEGER PRIMARY KEY, nom TEXT, age INTEGER);\r\nINSERT INTO etudiants (id, nom, age) VALUES (1, 'Alice', 22);\r\nINSERT INTO etudiants (id, nom, age) VALUES (2, 'Bob', 17);\r\nINSERT INTO etudiants (id, nom, age) VALUES (3, 'Chloé', 18);",
-    "exercises": [
-      {
-        "title": "Étudiants majeurs",
-        "slug": "etudiants-majeurs",
-        "statement": "Écris une requête qui sélectionne le nom des étudiants majeurs (age >= 18).",
-        "kind": "sql",
-        "starter_code": "-- Écris ta requête ici\nSELECT ",
-        "function_name": "",
-        "solution_code": "",
-        "sql_setup": "",
-        "sql_solution": "-- Sélectionne uniquement la colonne nom, pour les lignes où age >= 18\nSELECT nom FROM etudiants WHERE age >= 18;",
-        "test_cases": [],
-        "hints": []
-      },
-      {
-        "title": "Nombre d'étudiants mineurs",
-        "slug": "nb-mineurs",
-        "statement": "Écris une requête qui compte le nombre d'étudiants mineurs (age < 18).",
-        "kind": "sql",
-        "starter_code": "-- Écris ta requête ici\nSELECT ",
-        "function_name": "",
-        "solution_code": "",
-        "sql_setup": "",
-        "sql_solution": "-- COUNT(*) compte le nombre de lignes qui vérifient la condition WHERE\nSELECT COUNT(*) FROM etudiants WHERE age < 18;",
-        "test_cases": [],
-        "hints": []
-      }
-    ]
-  },
-  {
     "name": "Parcours de graphe",
     "slug": "parcours-graphe",
     "description": "Parcourir un graphe",
@@ -586,10 +877,10 @@
     ]
   },
   {
-    "name": "SQL — Base Codexo (méta)",
+    "name": "SQL — BDD Codexo",
     "slug": "sql-meta-codexo",
     "description": "Requêtes SQL sur une base qui reproduit la structure de Codexo lui-même : élèves, thèmes, exercices et résultats.",
-    "sql_setup": "CREATE TABLE eleves (\n    id INTEGER PRIMARY KEY,\n    prenom TEXT,\n    nom TEXT\n);\nINSERT INTO eleves VALUES (1, 'Lucas', 'Martin');\nINSERT INTO eleves VALUES (2, 'Emma', 'Bernard');\nINSERT INTO eleves VALUES (3, 'Nathan', 'Dubois');\nINSERT INTO eleves VALUES (4, 'Chloé', 'Petit');\nINSERT INTO eleves VALUES (5, 'Léo', 'Robert');\nINSERT INTO eleves VALUES (6, 'Manon', 'Girard');\nINSERT INTO eleves VALUES (7, 'Mathis', 'Lefevre');\n\nCREATE TABLE themes (\n    id INTEGER PRIMARY KEY,\n    nom TEXT\n);\nINSERT INTO themes VALUES (1, 'Variables & types');\nINSERT INTO themes VALUES (2, 'Conditions');\nINSERT INTO themes VALUES (3, 'Boucles');\nINSERT INTO themes VALUES (4, 'Listes');\n\nCREATE TABLE exercices (\n    id INTEGER PRIMARY KEY,\n    titre TEXT,\n    theme_id INTEGER,\n    difficulte TEXT\n);\nINSERT INTO exercices VALUES (1, 'Addition simple', 1, 'facile');\nINSERT INTO exercices VALUES (2, 'Conversion en chaîne', 1, 'facile');\nINSERT INTO exercices VALUES (3, 'Pair ou impair', 2, 'facile');\nINSERT INTO exercices VALUES (4, 'Somme de 1 à n', 3, 'moyen');\nINSERT INTO exercices VALUES (5, 'Doubler chaque élément', 4, 'moyen');\nINSERT INTO exercices VALUES (6, 'Minimum d''une liste', 4, 'moyen');\nINSERT INTO exercices VALUES (7, 'Dernier élément d''une liste', 4, 'facile');\nINSERT INTO exercices VALUES (8, 'Inverser une liste', 4, 'moyen');\nINSERT INTO exercices VALUES (9, 'Indice du minimum d''une liste', 4, 'moyen');\nINSERT INTO exercices VALUES (10, 'Indices des éléments nuls', 4, 'moyen');\nINSERT INTO exercices VALUES (11, 'Éléments négatifs d''une liste', 4, 'moyen');\n\nCREATE TABLE resultats (\n    id INTEGER PRIMARY KEY,\n    eleve_id INTEGER,\n    exercice_id INTEGER,\n    reussi INTEGER,\n    date_passage TEXT,\n    temps_secondes INTEGER\n);\nINSERT INTO resultats VALUES (1, 1, 1, 1, '2026-03-01', 120);\nINSERT INTO resultats VALUES (2, 2, 1, 1, '2026-03-01', 95);\nINSERT INTO resultats VALUES (3, 3, 3, 0, '2026-03-02', 180);\nINSERT INTO resultats VALUES (4, 3, 3, 1, '2026-03-03', 110);\nINSERT INTO resultats VALUES (5, 4, 4, 1, '2026-03-04', 260);\nINSERT INTO resultats VALUES (6, 2, 2, 0, '2026-03-02', 150);\nINSERT INTO resultats VALUES (7, 2, 2, 1, '2026-03-03', 90);\nINSERT INTO resultats VALUES (8, 3, 1, 1, '2026-03-01', 105);\nINSERT INTO resultats VALUES (9, 4, 1, 1, '2026-03-01', 80);\nINSERT INTO resultats VALUES (10, 4, 2, 1, '2026-03-01', 140);\nINSERT INTO resultats VALUES (11, 4, 6, 1, '2026-03-07', 320);\nINSERT INTO resultats VALUES (12, 5, 1, 0, '2026-03-01', 200);\nINSERT INTO resultats VALUES (13, 5, 1, 1, '2026-03-02', 100);\nINSERT INTO resultats VALUES (14, 5, 3, 1, '2026-03-03', 130);\nINSERT INTO resultats VALUES (15, 6, 5, 1, '2026-03-05', 240);\nINSERT INTO resultats VALUES (16, 7, 3, 1, '2026-03-04', 160);\n",
+    "sql_setup": "CREATE TABLE eleves (\r\n    id INTEGER PRIMARY KEY,\r\n    prenom TEXT,\r\n    nom TEXT\r\n);\r\nINSERT INTO eleves VALUES (1, 'Lucas', 'Martin');\r\nINSERT INTO eleves VALUES (2, 'Emma', 'Bernard');\r\nINSERT INTO eleves VALUES (3, 'Nathan', 'Dubois');\r\nINSERT INTO eleves VALUES (4, 'Chloé', 'Petit');\r\nINSERT INTO eleves VALUES (5, 'Léo', 'Robert');\r\nINSERT INTO eleves VALUES (6, 'Manon', 'Girard');\r\nINSERT INTO eleves VALUES (7, 'Mathis', 'Lefevre');\r\n\r\nCREATE TABLE themes (\r\n    id INTEGER PRIMARY KEY,\r\n    nom TEXT\r\n);\r\nINSERT INTO themes VALUES (1, 'Variables & types');\r\nINSERT INTO themes VALUES (2, 'Conditions');\r\nINSERT INTO themes VALUES (3, 'Boucles');\r\nINSERT INTO themes VALUES (4, 'Listes');\r\n\r\nCREATE TABLE exercices (\r\n    id INTEGER PRIMARY KEY,\r\n    titre TEXT,\r\n    theme_id INTEGER,\r\n    difficulte TEXT\r\n);\r\nINSERT INTO exercices VALUES (1, 'Addition simple', 1, 'facile');\r\nINSERT INTO exercices VALUES (2, 'Conversion en chaîne', 1, 'facile');\r\nINSERT INTO exercices VALUES (3, 'Pair ou impair', 2, 'facile');\r\nINSERT INTO exercices VALUES (4, 'Somme de 1 à n', 3, 'moyen');\r\nINSERT INTO exercices VALUES (5, 'Doubler chaque élément', 4, 'moyen');\r\nINSERT INTO exercices VALUES (6, 'Minimum d''une liste', 4, 'moyen');\r\nINSERT INTO exercices VALUES (7, 'Dernier élément d''une liste', 4, 'facile');\r\nINSERT INTO exercices VALUES (8, 'Inverser une liste', 4, 'moyen');\r\nINSERT INTO exercices VALUES (9, 'Indice du minimum d''une liste', 4, 'moyen');\r\nINSERT INTO exercices VALUES (10, 'Indices des éléments nuls', 4, 'moyen');\r\nINSERT INTO exercices VALUES (11, 'Éléments négatifs d''une liste', 4, 'moyen');\r\n\r\nCREATE TABLE resultats (\r\n    id INTEGER PRIMARY KEY,\r\n    eleve_id INTEGER,\r\n    exercice_id INTEGER,\r\n    reussi INTEGER,\r\n    date_passage TEXT,\r\n    temps_secondes INTEGER\r\n);\r\nINSERT INTO resultats VALUES (1, 1, 1, 1, '2026-03-01', 120);\r\nINSERT INTO resultats VALUES (2, 2, 1, 1, '2026-03-01', 95);\r\nINSERT INTO resultats VALUES (3, 3, 3, 0, '2026-03-02', 180);\r\nINSERT INTO resultats VALUES (4, 3, 3, 1, '2026-03-03', 110);\r\nINSERT INTO resultats VALUES (5, 4, 4, 1, '2026-03-04', 260);\r\nINSERT INTO resultats VALUES (6, 2, 2, 0, '2026-03-02', 150);\r\nINSERT INTO resultats VALUES (7, 2, 2, 1, '2026-03-03', 90);\r\nINSERT INTO resultats VALUES (8, 3, 1, 1, '2026-03-01', 105);\r\nINSERT INTO resultats VALUES (9, 4, 1, 1, '2026-03-01', 80);\r\nINSERT INTO resultats VALUES (10, 4, 2, 1, '2026-03-01', 140);\r\nINSERT INTO resultats VALUES (11, 4, 6, 1, '2026-03-07', 320);\r\nINSERT INTO resultats VALUES (12, 5, 1, 0, '2026-03-01', 200);\r\nINSERT INTO resultats VALUES (13, 5, 1, 1, '2026-03-02', 100);\r\nINSERT INTO resultats VALUES (14, 5, 3, 1, '2026-03-03', 130);\r\nINSERT INTO resultats VALUES (15, 6, 5, 1, '2026-03-05', 240);\r\nINSERT INTO resultats VALUES (16, 7, 3, 1, '2026-03-04', 160);",
     "exercises": [
       {
         "title": "Liste des élèves triée",
@@ -744,6 +1035,40 @@
         "solution_code": "",
         "sql_setup": "",
         "sql_solution": "-- WHERE difficulte = 'facile' : filtre les LIGNES avant tout regroupement\n-- (on ne garde que les exercices faciles, dès le départ)\n-- GROUP BY : regroupe ensuite ces lignes déjà filtrées, par thème\n-- HAVING COUNT(*) >= 2 : filtre les GROUPES obtenus, en ne gardant que\n-- ceux qui contiennent au moins 2 lignes (donc au moins 2 exercices faciles)\n--\n-- Résumé de l'ordre d'exécution : WHERE (lignes) -> GROUP BY (groupes)\n-- -> HAVING (groupes filtrés)\nSELECT t.nom\nFROM exercices AS e\nJOIN themes AS t ON e.theme_id = t.id\nWHERE e.difficulte = 'facile'\nGROUP BY t.id\nHAVING COUNT(*) >= 2\nORDER BY t.nom;",
+        "test_cases": [],
+        "hints": []
+      }
+    ]
+  },
+  {
+    "name": "SQL — BDD Etudiants",
+    "slug": "sql-selection",
+    "description": "Écrire des requêtes SQL",
+    "sql_setup": "CREATE TABLE etudiants (id INTEGER PRIMARY KEY, nom TEXT, age INTEGER);\r\nINSERT INTO etudiants (id, nom, age) VALUES (1, 'Alice', 22);\r\nINSERT INTO etudiants (id, nom, age) VALUES (2, 'Bob', 17);\r\nINSERT INTO etudiants (id, nom, age) VALUES (3, 'Chloé', 18);",
+    "exercises": [
+      {
+        "title": "Étudiants majeurs",
+        "slug": "etudiants-majeurs",
+        "statement": "Écris une requête qui sélectionne le nom des étudiants majeurs (age >= 18).",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- Sélectionne uniquement la colonne nom, pour les lignes où age >= 18\nSELECT nom FROM etudiants WHERE age >= 18;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Nombre d'étudiants mineurs",
+        "slug": "nb-mineurs",
+        "statement": "Écris une requête qui compte le nombre d'étudiants mineurs (age < 18).",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- COUNT(*) compte le nombre de lignes qui vérifient la condition WHERE\nSELECT COUNT(*) FROM etudiants WHERE age < 18;",
         "test_cases": [],
         "hints": []
       }

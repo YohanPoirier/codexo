@@ -21,15 +21,22 @@ class Command(BaseCommand):
             DATA = json.load(f)
 
         for order, theme_data in enumerate(DATA):
-            theme, _ = Theme.objects.update_or_create(
+            # get_or_create (au lieu de update_or_create) : on ne fixe l'"order" qu'une
+            # fois l'instance en main, pour pouvoir passer skip_reorder=True à save() et
+            # éviter que Theme.save() ne déclenche un décalage en cascade des AUTRES
+            # thèmes — ici on réaffecte déjà explicitement l'ordre de TOUS les thèmes
+            # dans cette même boucle, donc ce décalage automatique n'a pas lieu d'être
+            # (et produirait un résultat imprévisible s'il se déclenchait à chaque tour).
+            theme, _ = Theme.objects.get_or_create(
                 slug=theme_data["slug"],
-                defaults={
-                    "name": theme_data["name"],
-                    "description": theme_data["description"],
-                    "order": order,
-                    "sql_setup": theme_data.get("sql_setup", ""),
-                },
+                defaults={"name": theme_data["name"]},
             )
+            theme.name = theme_data["name"]
+            theme.description = theme_data["description"]
+            theme.order = order
+            theme.sql_setup = theme_data.get("sql_setup", "")
+            theme.save(skip_reorder=True)
+
             for ex_order, ex_data in enumerate(theme_data["exercises"]):
                 exercise, _ = Exercise.objects.update_or_create(
                     theme=theme,

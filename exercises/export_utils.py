@@ -11,7 +11,11 @@ def export_exercises_to_json():
     from exercises.models import Theme  # import tardif pour éviter les imports circulaires
 
     data = []
-    for theme in Theme.objects.order_by("order"):
+    # Trié par (order, name), comme Theme.Meta.ordering et l'admin : garantit qu'en cas
+    # d'égalité d'"order" entre deux thèmes, le JSON exporté reflète le même ordre que ce
+    # qui est affiché dans l'admin (sinon les deux peuvent diverger, l'ancien tri ne
+    # départageant pas les égalités).
+    for theme in Theme.objects.order_by("order", "name"):
         theme_entry = {
             "name": theme.name,
             "slug": theme.slug,
