@@ -807,7 +807,7 @@
       {
         "title": "Doubler chaque élément",
         "slug": "doubler-elements",
-        "statement": "Écris une fonction `doubler(liste)` qui renvoie une nouvelle liste où chaque élément est multiplié par 2.",
+        "statement": "Écris une fonction `doubler(liste)` qui renvoie une nouvelle liste où chaque élément est multiplié par 2. `liste` contient des nombres (entiers ou flottants).",
         "kind": "python",
         "starter_code": "def doubler(liste):\n    pass\n",
         "function_name": "doubler",
@@ -842,7 +842,7 @@
       {
         "title": "Inverser une liste",
         "slug": "inverser-liste",
-        "statement": "Écris une fonction `inverser(liste)` qui renvoie une nouvelle liste dont l'ordre des éléments a été inversé. Tu ne dois pas modifier `liste`.",
+        "statement": "Écris une fonction `inverser(liste)` qui renvoie une nouvelle liste dont l'ordre des éléments a été inversé. `liste` ne devra pas être modifiée.",
         "kind": "python",
         "starter_code": "def inverser(liste):\n    pass\n",
         "function_name": "inverser",
@@ -860,7 +860,7 @@
       {
         "title": "Minimum d'une liste",
         "slug": "minimum-liste",
-        "statement": "Écris une fonction `minimum(liste)` qui renvoie la plus petite valeur de `liste`.",
+        "statement": "Écris une fonction `minimum(liste)` qui renvoie la plus petite valeur de `liste`. `liste` contient des nombres (entiers ou flottants).",
         "kind": "python",
         "starter_code": "def minimum(liste):\n    pass\n",
         "function_name": "minimum",
@@ -878,7 +878,7 @@
       {
         "title": "Indice du minimum d'une liste",
         "slug": "indice-minimum",
-        "statement": "Écris une fonction `indice_minimum(liste)` qui renvoie l'indice de la plus petite valeur de `liste` (en cas d'égalité, renvoie le premier indice trouvé).",
+        "statement": "Écris une fonction `indice_minimum(liste)` qui renvoie l'indice de la plus petite valeur de `liste` (en cas d'égalité, renvoie le premier indice trouvé). `liste` contient des nombres (entiers ou flottants).",
         "kind": "python",
         "starter_code": "def indice_minimum(liste):\n    pass\n",
         "function_name": "indice_minimum",
@@ -894,9 +894,30 @@
         "hints": []
       },
       {
+        "title": "Deuxième plus grand élément d'une liste",
+        "slug": "deuxieme-maximum",
+        "statement": "Écris une fonction `deuxieme_maximum(liste)` qui renvoie la deuxième plus grande valeur de `liste`, c'est-à-dire la plus grande valeur strictement inférieure au maximum. `liste` contient des nombres (entiers ou flottants) et possède au moins deux valeurs distinctes.\n\nExemple : `deuxieme_maximum([5, 5, 3])` renvoie `3` (le maximum est 5, donc on cherche la plus grande valeur parmi celles qui restent une fois 5 exclu — même si 5 apparaît deux fois).",
+        "kind": "python",
+        "starter_code": "def deuxieme_maximum(liste):\n    pass\n",
+        "function_name": "deuxieme_maximum",
+        "solution_code": "def deuxieme_maximum(liste):\n    # On trouve d'abord le maximum de la liste...\n    maximum = max(liste)\n    # ...puis on exclut TOUTES ses occurrences (pas juste une), pour éviter\n    # de retomber sur la même valeur si le maximum est présent plusieurs fois\n    candidats = [x for x in liste if x != maximum]\n    # Le deuxième plus grand est alors le maximum de ce qui reste\n    return max(candidats)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[5, 3, 9, 1]]",
+          "[[1, 2, 3]]",
+          "[[5, 5, 3]]",
+          "[[10, 10, 10, 2]]",
+          "[[7, 8]]"
+        ],
+        "hints": [
+          "Attention aux doublons : si le maximum apparaît plusieurs fois dans la liste, il ne faut en retirer aucune occurrence, sinon tu risques de retomber sur le maximum lui-même comme \"deuxième plus grand\"."
+        ]
+      },
+      {
         "title": "Indices des éléments nuls",
         "slug": "indices-zeros",
-        "statement": "Écris une fonction `indices_zeros(liste)` qui renvoie la liste des indices où `liste` vaut 0.",
+        "statement": "Écris une fonction `indices_zeros(liste)` qui renvoie la liste des indices où les éléments de `liste` valent 0.",
         "kind": "python",
         "starter_code": "def indices_zeros(liste):\n    pass\n",
         "function_name": "indices_zeros",
@@ -926,6 +947,99 @@
           "[[1, 2, 3]]",
           "[[-1, -2, -3]]",
           "[[]]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Élément présent dans une liste",
+        "slug": "element-present",
+        "statement": "Écris une fonction `element_present(liste, element)` qui renvoie `True` si `element` se trouve dans `liste`, `False` sinon.",
+        "kind": "python",
+        "starter_code": "def element_present(liste, element):\n    pass\n",
+        "function_name": "element_present",
+        "solution_code": "def element_present(liste, element):\n    # \"in\" teste directement l'appartenance d'une valeur à une liste\n    return element in liste\n\n\n# Autre façon de faire, sans utiliser \"in\" : on parcourt la liste élément\n# par élément, et on renvoie True dès qu'on trouve une correspondance.\ndef element_present_sans_in(liste, element):\n    for x in liste:\n        if x == element:\n            return True\n    return False\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3], 2]",
+          "[[1, 2, 3], 5]",
+          "[[], 1]",
+          "[['a', 'b'], 'b']"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Les n premiers entiers pairs",
+        "slug": "premiers-pairs",
+        "statement": "Écris une fonction `premiers_pairs(n)` qui renvoie la liste des `n` premiers entiers positifs pairs (dans l'ordre croissant, en commençant à 2).\n\nExemple : `premiers_pairs(5)` renvoie `[2, 4, 6, 8, 10]`.\n\n**Tu dois utiliser une liste en compréhension** pour construire cette liste (pas de boucle `for` classique avec `.append()`).\n\n**Rappel : liste en compréhension**\n\nUne liste en compréhension permet de construire une liste en une seule ligne, en appliquant une expression à chaque élément d'un itérable :\n\n```python\n[expression for variable in iterable]\n```\n\nExemple : `[x**2 for x in range(5)]` renvoie `[0, 1, 4, 9, 16]` — pour chaque `x` parcouru par `range(5)` (soit 0, 1, 2, 3, 4), on calcule son carré.\n\nTu peux directement construire ta liste à partir de `range(...)`, sans avoir besoin de partir d'une liste existante.",
+        "kind": "python",
+        "starter_code": "def premiers_pairs(n):\n    pass\n",
+        "function_name": "premiers_pairs",
+        "solution_code": "def premiers_pairs(n):\n    # range(1, n + 1) parcourt les entiers de 1 à n inclus\n    # Pour chaque i, \"2 * i\" donne le i-ème nombre pair positif : 2, 4, 6, ...\n    # La liste en compréhension construit directement le résultat, sans\n    # boucle for classique ni .append()\n    return [2 * i for i in range(1, n + 1)]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[5]",
+          "[1]",
+          "[0]",
+          "[3]",
+          "[10]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Créer une matrice remplie de zéros",
+        "slug": "creer-matrice",
+        "statement": "Écris une fonction `creer_matrice(m, n)` qui renvoie une matrice de `m` lignes et `n` colonnes, remplie de zéros — c'est-à-dire une liste de `m` listes, chacune contenant `n` zéros.\n\nExemple : `creer_matrice(2, 3)` renvoie `[[0, 0, 0], [0, 0, 0]]`.\n\nOn pourra utiliser des listes en compréhension pour construire cette matrice (une liste en compréhension imbriquée dans une autre).",
+        "kind": "python",
+        "starter_code": "def creer_matrice(m, n):\n    pass\n",
+        "function_name": "creer_matrice",
+        "solution_code": "def creer_matrice(m, n):\n    # La liste en compréhension EXTÉRIEURE crée m lignes...\n    # ...et pour CHAQUE ligne, la liste en compréhension INTÉRIEURE crée\n    # une nouvelle liste de n zéros. \"_\" signifie qu'on n'utilise pas la\n    # valeur de la variable de boucle, seulement le nombre de répétitions.\n    return [[0 for _ in range(n)] for _ in range(m)]\n    # ATTENTION, ERREUR CLASSIQUE : écrire à la place \"[[0] * n] * m\" est\n    # FAUX, même si ça donne le même résultat en apparence. Cette écriture\n    # crée m fois la MÊME liste en mémoire (pas m listes indépendantes) :\n    # modifier une valeur dans une ligne modifierait alors TOUTES les\n    # autres lignes en même temps (effet de bord invisible au premier\n    # abord). Les tests automatiques de cet exercice NE DÉTECTENT PAS\n    # cette erreur (ils ne comparent que la valeur renvoyée, jamais son\n    # comportement après modification) : une réponse utilisant \"[[0]*n]*m\"\n    # validera donc l'exercice à tort.\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[2, 3]",
+          "[1, 1]",
+          "[3, 2]",
+          "[0, 3]",
+          "[2, 0]"
+        ],
+        "hints": [
+          "Attention si tu es tenté d'écrire `[[0] * n] * m` : ça semble plus court, mais ça crée `m` fois la MÊME liste en mémoire (pas `m` listes indépendantes) — modifier une ligne modifierait alors toutes les autres. Utilise plutôt une liste en compréhension imbriquée."
+        ]
+      },
+      {
+        "title": "Matrice identité",
+        "slug": "identite",
+        "statement": "Écris une fonction `identite(n)` qui renvoie la matrice identité de taille `n` (une matrice carrée de `n` lignes et `n` colonnes, avec des 1 sur la diagonale et des 0 partout ailleurs).\n\nExemple : `identite(3)` renvoie `[[1, 0, 0], [0, 1, 0], [0, 0, 1]]`.",
+        "kind": "python",
+        "starter_code": "def identite(n):\n    pass\n",
+        "function_name": "identite",
+        "solution_code": "def identite(n):\n    # On initialise d'abord une matrice de zéros par compréhension...\n    matrice = [[0 for _ in range(n)] for _ in range(n)]\n    # ...puis on balaie la diagonale avec une boucle for classique pour\n    # y placer des 1 (pas de \"if\" dans la compréhension : hors programme)\n    for i in range(n):\n        matrice[i][i] = 1\n    return matrice\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[1]",
+          "[2]",
+          "[3]",
+          "[0]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Transposer une matrice",
+        "slug": "transposer",
+        "statement": "Écris une fonction `transposer(matrice)` qui renvoie la transposée de `matrice` : une matrice où les lignes et les colonnes ont été échangées (`matrice` est une liste de listes, avec au moins une ligne).\n\nExemple : `transposer([[1, 2, 3], [4, 5, 6]])` renvoie `[[1, 4], [2, 5], [3, 6]]` (la 1ère colonne de `matrice` devient la 1ère ligne du résultat, etc.).",
+        "kind": "python",
+        "starter_code": "def transposer(matrice):\n    pass\n",
+        "function_name": "transposer",
+        "solution_code": "def transposer(matrice):\n    m = len(matrice)\n    n = len(matrice[0])\n    # Dans le résultat, la ligne j est construite en prenant l'élément\n    # d'indice j de CHAQUE ligne de la matrice d'origine : on parcourt donc\n    # les colonnes (j) à l'extérieur, et les lignes (i) à l'intérieur\n    return [[matrice[i][j] for i in range(m)] for j in range(n)]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[[1, 2, 3], [4, 5, 6]]]",
+          "[[[1]]]",
+          "[[[1, 2], [3, 4], [5, 6]]]"
         ],
         "hints": []
       }
