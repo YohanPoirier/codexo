@@ -2,10 +2,14 @@
   const editor = document.getElementById("code-editor");
   const runBtn = document.getElementById("run-btn");
   const resultBox = document.getElementById("result-box");
+  const solutionBox = document.getElementById("solution-reveal");
+  const solutionCodeEl = document.getElementById("solution-reveal-code");
 
   let pyodide = null;
   let testCode = "";
-  let cm = null; // instance CodeMirror, créée dans init()
+  let solutionCode = "";
+  let cm = null; // instance CodeMirror de l'éditeur, créée dans init()
+  let solutionCM = null; // instance CodeMirror (lecture seule) du corrigé, créée à la 1ère réussite
 
   function getCode() {
     return cm ? cm.getValue() : editor.value;
@@ -85,6 +89,33 @@
     });
   }
 
+  // Affiche (ou masque) le corrigé sous les résultats. Affiché uniquement quand TOUS les
+  // tests de la vérification en cours passent — masqué sinon, pour ne pas laisser un vieux
+  // corrigé visible à tort si l'étudiant modifie son code puis relance une vérification ratée.
+  function showSolutionIfSuccess(allOk) {
+    if (!solutionBox || !solutionCodeEl) return;
+    if (allOk && solutionCode) {
+      // Démasquer AVANT de créer/rafraîchir CodeMirror : un CodeMirror initialisé (ou
+      // mesuré) dans un conteneur encore "hidden" (display:none) calcule mal ses
+      // dimensions et s'affiche ensuite tout rétréci/mal formaté.
+      solutionBox.hidden = false;
+      if (!solutionCM) {
+        solutionCM = CodeMirror(solutionCodeEl, {
+          value: solutionCode,
+          mode: EXERCISE_KIND === "sql" ? "text/x-sql" : "python",
+          lineNumbers: true,
+          readOnly: true,
+          viewportMargin: Infinity,
+        });
+      } else {
+        solutionCM.setValue(solutionCode);
+        solutionCM.refresh();
+      }
+    } else {
+      solutionBox.hidden = true;
+    }
+  }
+
   const resetBtn = document.getElementById("reset-btn");
   let starterCode = "";
 
@@ -139,6 +170,7 @@
       const data = await res.json();
       starterCode = data.starter_code || "";
       testCode = data.test_code || "";
+      solutionCode = data.solution_code || "";
     } catch (e) {
       runBtn.textContent = "Erreur : exercice non chargé";
       return;
@@ -181,6 +213,7 @@
     runBtn.disabled = true;
     runBtn.textContent = "Vérification…";
     resultBox.classList.add("hidden");
+    if (solutionBox) solutionBox.hidden = true;
 
     try {
       pyodide.globals.set("__TEST_CODE__", testCode);
@@ -232,6 +265,7 @@ finally:
       const runtimeError = pyodide.globals.get("__RUNTIME_ERROR__");
       if (runtimeError) {
         showRuntimeError("Erreur dans ton code :\n\n" + runtimeError);
+        showSolutionIfSuccess(false);
         await submitResult(code, false);
       } else {
         const resultsProxy = pyodide.globals.get("__RESULTS__");
@@ -239,11 +273,19 @@ finally:
         const items = results.map((item) => ({ ok: item[0], msg: item[1], printed: item[2] || "" }));
         if (items.length === 0) items.push({ ok: false, msg: "Aucun test défini pour cet exercice." });
         const allOk = items.length > 0 && items.every((it) => it.ok);
-        showResultLines(items);
+        // Si tout est bon, inutile d'afficher le détail des tests un par un : le corrigé
+        // (voir showSolutionIfSuccess) suffit comme confirmation. resultBox reste donc caché
+        // (déjà mis à "hidden" en début de runCheck) — on ne l'affiche qu'en cas d'échec,
+        // pour aider l'étudiant à comprendre ce qui ne va pas.
+        if (!allOk) {
+          showResultLines(items);
+        }
+        showSolutionIfSuccess(allOk);
         await submitResult(code, allOk);
       }
     } catch (e) {
       showRuntimeError("Erreur inattendue : " + e.message);
+      showSolutionIfSuccess(false);
     }
 
     runBtn.disabled = false;
@@ -258,6 +300,7 @@ finally:
     if (confirmed) {
       setCode(starterCode);
       resultBox.classList.add("hidden");
+      if (solutionBox) solutionBox.hidden = true;
     }
   });
 

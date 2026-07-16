@@ -232,6 +232,176 @@
           "[-3]"
         ],
         "hints": []
+      },
+      {
+        "title": "Majeur ou mineur",
+        "slug": "majeur-ou-mineur",
+        "statement": "Écris une fonction `verifier_majorite(age)` qui renvoie la chaîne \"Majeur\" si `age` est supérieur ou égal à 18, sinon la chaîne \"Mineur\".",
+        "kind": "python",
+        "starter_code": "def verifier_majorite(age):\n    pass\n",
+        "function_name": "verifier_majorite",
+        "solution_code": "def verifier_majorite(age):\n    # Une seule condition, avec if / else : deux issues possibles qui\n    # s'excluent mutuellement (on ne peut pas être à la fois majeur et mineur)\n    if age >= 18:\n        return \"Majeur\"\n    else:\n        return \"Mineur\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[18]",
+          "[17]",
+          "[0]",
+          "[99]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Signe d'un nombre",
+        "slug": "signe-nombre",
+        "statement": "Écris une fonction `signe(n)` qui renvoie \"positif\" si `n` est strictement positif, \"négatif\" si `n` est strictement négatif, et \"nul\" si `n` vaut 0.",
+        "kind": "python",
+        "starter_code": "def signe(n):\n    pass\n",
+        "function_name": "signe",
+        "solution_code": "def signe(n):\n    # Trois cas possibles, mutuellement exclusifs : if / elif / else\n    # garantit qu'UNE SEULE des trois branches sera exécutée\n    if n > 0:\n        return \"positif\"\n    elif n < 0:\n        return \"négatif\"\n    else:\n        return \"nul\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[4]",
+          "[-3]",
+          "[0]",
+          "[-0.5]",
+          "[100]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Réductions cumulables au cinéma",
+        "slug": "reduction-cinema",
+        "statement": "Un cinéma propose plusieurs réductions qui peuvent se **cumuler** entre elles :\n\n- moins de 12 ans : +30%\n- étudiant : +10%\n- séance du mardi : +10%\n\nÉcris une fonction `reduction_cinema(age, etudiant, jour)` qui renvoie le pourcentage total de réduction, en cumulant TOUS les avantages auxquels la personne a droit.\n\nExemple : une personne étudiante de 10 ans venant un mardi cumule les 3 réductions, soit 30 + 10 + 10 = 50%.\n\n**Attention** : ces trois conditions ne sont pas mutuellement exclusives (on peut être à la fois âgé de moins de 12 ans, étudiant, ET venir un mardi). Utiliser `elif` ici serait une erreur : dès qu'une condition serait vraie, les suivantes ne seraient jamais testées, et certaines réductions seraient perdues.",
+        "kind": "python",
+        "starter_code": "def reduction_cinema(age, etudiant, jour):\n    pass\n",
+        "function_name": "reduction_cinema",
+        "solution_code": "def reduction_cinema(age, etudiant, jour):\n    reduction = 0\n\n    # Chaque condition est vérifiée INDÉPENDAMMENT des autres (plusieurs\n    # \"if\" séparés, pas de \"elif\") : plusieurs avantages peuvent s'appliquer\n    # à la fois à la même personne, contrairement à un elif qui ne garderait\n    # que le premier avantage trouvé et ignorerait les suivants\n    if age < 12:\n        reduction += 30\n\n    if etudiant:\n        reduction += 10\n\n    if jour == \"mardi\":\n        reduction += 10\n\n    return reduction\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[10, False, 'lundi']",
+          "[25, True, 'mardi']",
+          "[30, False, 'lundi']",
+          "[10, True, 'mardi']",
+          "[20, True, 'vendredi']"
+        ],
+        "hints": [
+          "Utilise plusieurs `if` indépendants, pas des `elif` : plusieurs réductions peuvent s'appliquer en même temps à la même personne, il ne faut donc pas s'arrêter à la première qui matche."
+        ]
+      },
+      {
+        "title": "Mention au bac",
+        "slug": "mention-bac",
+        "statement": "Écris une fonction `mention(moyenne)` qui renvoie la mention obtenue selon la moyenne obtenue au bac :\n\n- en dessous de 10 : \"Recalé\"\n- de 10 (inclus) à 12 (exclu) : \"Passable\"\n- de 12 (inclus) à 14 (exclu) : \"Assez bien\"\n- de 14 (inclus) à 16 (exclu) : \"Bien\"\n- 16 et au-delà : \"Très bien\"",
+        "kind": "python",
+        "starter_code": "def mention(moyenne):\n    pass\n",
+        "function_name": "mention",
+        "solution_code": "def mention(moyenne):\n    # Cinq cas mutuellement exclusifs : chaque elif ne teste que ce qui n'a\n    # pas déjà été capturé par les conditions précédentes (on sait déjà que\n    # moyenne >= 10 en arrivant au 2e elif, >= 12 au 3e, etc.)\n    if moyenne < 10:\n        return \"Recalé\"\n    elif moyenne < 12:\n        return \"Passable\"\n    elif moyenne < 14:\n        return \"Assez bien\"\n    elif moyenne < 16:\n        return \"Bien\"\n    else:\n        return \"Très bien\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[5]",
+          "[9.9]",
+          "[10]",
+          "[11.9]",
+          "[12]",
+          "[13.9]",
+          "[14]",
+          "[15.9]",
+          "[16]",
+          "[20]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Année bissextile",
+        "slug": "annee-bissextile",
+        "statement": "Écris une fonction `est_bissextile(annee)` qui renvoie `True` si `annee` est bissextile, `False` sinon.\n\nRègle : une année est bissextile si elle est divisible par 4, SAUF si elle est aussi divisible par 100 (auquel cas elle n'est PAS bissextile), sauf si elle est également divisible par 400 (auquel cas elle est de nouveau bissextile).\n\nExemples : 2024 est bissextile (divisible par 4, pas par 100). 1900 n'est PAS bissextile (divisible par 100, pas par 400). 2000 EST bissextile (divisible par 400).",
+        "kind": "python",
+        "starter_code": "def est_bissextile(annee):\n    pass\n",
+        "function_name": "est_bissextile",
+        "solution_code": "def est_bissextile(annee):\n    # Cas 1 : pas divisible par 4 -> jamais bissextile, on s'arrête là\n    if annee % 4 != 0:\n        return False\n    # Cas 2 : divisible par 4, ET pas par 100 -> bissextile (cas le plus courant)\n    elif annee % 100 != 0:\n        return True\n    # Cas 3 : divisible par 100, ET pas par 400 -> exception, PAS bissextile\n    elif annee % 400 != 0:\n        return False\n    # Cas 4 (dernier restant) : divisible par 400 -> bissextile\n    else:\n        return True\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[2024]",
+          "[2023]",
+          "[1900]",
+          "[2000]",
+          "[2100]",
+          "[2400]"
+        ],
+        "hints": [
+          "Traite les cas dans cet ordre précis : d'abord \"pas divisible par 4\" (jamais bissextile), puis \"divisible par 4 mais pas par 100\" (bissextile), puis \"divisible par 100 mais pas par 400\" (pas bissextile), et enfin ce qui reste (bissextile)."
+        ]
+      },
+      {
+        "title": "Calcul d'impôt par tranches",
+        "slug": "impot-par-tranches",
+        "statement": "Le barème simplifié de l'impôt sur le revenu est découpé en tranches, chacune ayant son propre taux :\n\n- jusqu'à 10 000 € : 0%\n- de 10 000 € à 26 000 € : 11%\n- de 26 000 € à 74 000 € : 30%\n- au-delà de 74 000 € : 41%\n\nÉcris une fonction `impot(revenu)` qui renvoie le montant total de l'impôt dû.\n\n**Important : le calcul est \"marginal\"**, ce n'est pas un taux unique appliqué à tout le revenu. Chaque tranche n'est taxée qu'à son propre taux, et uniquement sur la portion de revenu qui s'y trouve.\n\nExemple pour un revenu de 50 000 € :\n\n- 0€ sur les 10 000 premiers €\n- 11% sur la tranche 10 000 → 26 000 (soit 16 000 € × 11% = 1 760 €)\n- 30% sur la tranche 26 000 → 50 000 (soit 24 000 € × 30% = 7 200 €)\n- Total : 1 760 + 7 200 = 8 960 €",
+        "kind": "python",
+        "starter_code": "def impot(revenu):\n    pass\n",
+        "function_name": "impot",
+        "solution_code": "def impot(revenu):\n    # Tranche 1 : jusqu'à 10 000 € inclus, le taux est de 0% -> aucun impôt\n    if revenu <= 10000:\n        return 0\n\n    # Tranche 2 : de 10 000 € à 26 000 €, seule la portion AU-DESSUS de\n    # 10 000 € est taxée à 11% (pas le revenu total)\n    elif revenu <= 26000:\n        return (revenu - 10000) * 0.11\n\n    # Tranche 3 : de 26 000 € à 74 000 €. On paie d'abord l'impôt complet de\n    # la tranche 2 (calculé sur toute sa largeur, 26000 - 10000 = 16000 €),\n    # puis 30% sur la portion du revenu qui dépasse 26 000 €\n    elif revenu <= 74000:\n        impot_tranche_2 = (26000 - 10000) * 0.11\n        impot_tranche_3 = (revenu - 26000) * 0.30\n        return impot_tranche_2 + impot_tranche_3\n\n    # Tranche 4 : au-delà de 74 000 €. Même logique : on cumule l'impôt\n    # complet des tranches 2 et 3 (déjà \"pleines\"), puis 41% sur la portion\n    # qui dépasse 74 000 €\n    else:\n        impot_tranche_2 = (26000 - 10000) * 0.11\n        impot_tranche_3 = (74000 - 26000) * 0.30\n        impot_tranche_4 = (revenu - 74000) * 0.41\n        return impot_tranche_2 + impot_tranche_3 + impot_tranche_4\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[5000]",
+          "[10000]",
+          "[20000]",
+          "[26000]",
+          "[50000]",
+          "[74000]",
+          "[100000]"
+        ],
+        "hints": [
+          "Pour chaque tranche à partir de la deuxième, l'impôt total est la somme de l'impôt COMPLET des tranches précédentes (déjà pleines) et de l'impôt de la tranche actuelle, calculé uniquement sur la portion du revenu qui s'y trouve."
+        ]
+      },
+      {
+        "title": "Pierre-feuille-ciseaux",
+        "slug": "pierre-feuille-ciseaux",
+        "statement": "Écris une fonction `vainqueur(coup1, coup2)` qui détermine le gagnant d'une partie de pierre-feuille-ciseaux entre deux joueurs.\n\n`coup1` et `coup2` valent chacun \"pierre\", \"feuille\" ou \"ciseaux\".\n\nRègles : la pierre bat les ciseaux, la feuille bat la pierre, les ciseaux battent la feuille.\n\nLa fonction renvoie \"joueur1\" si le joueur 1 gagne, \"joueur2\" si le joueur 2 gagne, ou \"égalité\" si les deux joueurs ont fait le même coup.",
+        "kind": "python",
+        "starter_code": "def vainqueur(coup1, coup2):\n    pass\n",
+        "function_name": "vainqueur",
+        "solution_code": "def vainqueur(coup1, coup2):\n    # Cas particulier à traiter en premier : les deux joueurs ont fait le\n    # même coup, personne ne gagne\n    if coup1 == coup2:\n        return \"égalité\"\n\n    # Liste des combinaisons (coup1, coup2) où le joueur 1 gagne : plutôt\n    # qu'une longue suite de elif pour chaque cas, on teste l'appartenance\n    # du tuple (coup1, coup2) à cette liste avec \"in\"\n    victoires_joueur1 = [(\"pierre\", \"ciseaux\"), (\"feuille\", \"pierre\"), (\"ciseaux\", \"feuille\")]\n\n    if (coup1, coup2) in victoires_joueur1:\n        return \"joueur1\"\n    else:\n        # Le seul cas restant (coups différents, joueur 1 pas gagnant) :\n        # c'est forcément le joueur 2 qui gagne\n        return \"joueur2\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['pierre', 'ciseaux']",
+          "['ciseaux', 'pierre']",
+          "['feuille', 'feuille']",
+          "['ciseaux', 'feuille']",
+          "['pierre', 'feuille']"
+        ],
+        "hints": [
+          "Commence par traiter le cas d'égalité (`coup1 == coup2`) à part, avant de comparer les coups entre eux.",
+          "Plutôt que d'écrire une longue suite de `if`/`elif` pour chaque combinaison possible, tu peux stocker les combinaisons gagnantes du joueur 1 dans une liste de tuples et utiliser `in` pour tester l'appartenance."
+        ]
+      },
+      {
+        "title": "Calculette à 4 opérations",
+        "slug": "calculette",
+        "statement": "Écris une fonction `calculette(a, b, operation)` qui effectue une opération entre `a` et `b` selon la valeur de `operation` : \"+\", \"-\", \"*\" ou \"/\".\n\n`operation` vaudra toujours l'une de ces 4 valeurs (pas besoin de gérer un autre cas).\n\nCas particulier à gérer : si `operation` vaut \"/\" et que `b` vaut 0, renvoie la chaîne \"Erreur : division par zéro\" plutôt que de laisser Python planter.",
+        "kind": "python",
+        "starter_code": "def calculette(a, b, operation):\n    pass\n",
+        "function_name": "calculette",
+        "solution_code": "def calculette(a, b, operation):\n    if operation == \"+\":\n        return a + b\n    elif operation == \"-\":\n        return a - b\n    elif operation == \"*\":\n        return a * b\n    elif operation == \"/\":\n        # Cas particulier imbriqué DANS la branche \"/\" : on ne le teste que\n        # quand l'opération demandée est bien une division\n        if b == 0:\n            return \"Erreur : division par zéro\"\n        else:\n            return a / b\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[4, 2, '+']",
+          "[4, 2, '-']",
+          "[4, 2, '*']",
+          "[4, 2, '/']",
+          "[4, 0, '/']"
+        ],
+        "hints": [
+          "Traite le cas de la division par zéro À L'INTÉRIEUR de la branche `operation == \"/\"`, avec un `if`/`else` imbriqué : ça n'a de sens que pour cette opération précise."
+        ]
       }
     ]
   },
@@ -762,6 +932,129 @@
     ]
   },
   {
+    "name": "Tri",
+    "slug": "tri",
+    "description": "Écrire des algorithmes de tri classiques.",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Tri par insertion",
+        "slug": "tri-insertion",
+        "statement": "Écris une fonction `tri_insertion(L)` qui renvoie une **nouvelle liste** triée par ordre croissant, en utilisant le **tri par insertion**. La liste `L` d'origine ne doit pas être modifiée.\n\n**Principe du tri par insertion** :\n1. On construit une nouvelle liste `Ltriee`, initialement vide.\n2. On parcourt `L` élément par élément, et on ajoute chaque élément à la fin de `Ltriee`.\n3. On fait ensuite \"remonter\" cet élément vers sa bonne place dans `Ltriee` : tant qu'il est plus petit que son voisin de gauche, on les échange.\n\nExemple pas à pas avec `L = [5, 3, 8, 1]` :\n- On ajoute `5` → `Ltriee = [5]`\n- On ajoute `3`, puis on le fait remonter → `Ltriee = [3, 5]`\n- On ajoute `8` (déjà à sa place, plus grand que tout) → `Ltriee = [3, 5, 8]`\n- On ajoute `1`, puis on le fait remonter jusqu'au début → `Ltriee = [1, 3, 5, 8]`",
+        "kind": "python",
+        "starter_code": "def tri_insertion(L):\n    pass\n",
+        "function_name": "tri_insertion",
+        "solution_code": "def tri_insertion(L):\n    # Ltriee est la nouvelle liste qu'on construit progressivement ; on ne\n    # modifie jamais L, qui reste intacte tout au long de la fonction\n    Ltriee = []\n    for i in range(len(L)):\n        x = L[i]\n        # On ajoute d'abord x à la fin de Ltriee...\n        Ltriee.append(x)\n        j = i\n        # ...puis on le fait \"remonter\" tant qu'il est plus petit que son\n        # voisin de gauche, en échangeant les deux à chaque fois\n        while j > 0 and Ltriee[j] < Ltriee[j-1]:\n            Ltriee[j], Ltriee[j-1] = Ltriee[j-1], Ltriee[j]\n            j -= 1\n    return Ltriee\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[5, 3, 8, 1, 9]]",
+          "[[]]",
+          "[[1]]",
+          "[[3, 3, 3]]",
+          "[[5, 4, 3, 2, 1]]",
+          "[[-2, 0, 5, -1]]"
+        ],
+        "hints": [
+          "La partie de Ltriee déjà construite est toujours triée : il suffit d'insérer chaque nouvel élément à la bonne place parmi ceux déjà présents.",
+          "Une fois l'élément ajouté à la fin, compare-le à son voisin de gauche : tant qu'il est plus petit, échange-les et recommence un cran plus à gauche."
+        ]
+      },
+      {
+        "title": "Tri par sélection",
+        "slug": "tri-selection",
+        "statement": "Écris une fonction `tri_selection(L)` qui trie `L` par ordre croissant en utilisant le **tri par sélection**, puis renvoie `L`.\n\n**Attention** : contrairement à certains algorithmes de tri qui construisent une nouvelle liste, celui-ci **modifie `L` directement** (tri \"en place\").\n\n**Principe du tri par sélection** :\n1. Pour chaque position `i` de la liste :\n2. On cherche l'indice du **plus petit élément parmi ceux situés à partir de la position `i`** (les éléments avant `i` sont déjà triés).\n3. On échange cet élément avec celui actuellement en position `i`.\n4. À la fin de cette étape, la position `i` contient définitivement sa valeur triée finale.",
+        "kind": "python",
+        "starter_code": "def tri_selection(L):\n    pass\n",
+        "function_name": "tri_selection",
+        "solution_code": "def tri_selection(L):\n    for i in range(len(L)):\n        # i_min mémorise l'indice du plus petit élément trouvé parmi les\n        # éléments restants (à partir de la position i)\n        i_min = i\n        for j in range(i + 1, len(L)):\n            if L[j] < L[i_min]:\n                i_min = j\n        # On échange l'élément courant avec le minimum trouvé, ce qui place\n        # définitivement ce minimum à sa position triée finale\n        L[i], L[i_min] = L[i_min], L[i]\n    # On renvoie quand même L par commodité (pour pouvoir écrire\n    # resultat = tri_selection(ma_liste)), même si L est déjà modifiée en place\n    return L\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[5, 3, 8, 1, 9]]",
+          "[[]]",
+          "[[1]]",
+          "[[3, 3, 3]]",
+          "[[5, 4, 3, 2, 1]]",
+          "[[-2, 0, 5, -1]]"
+        ],
+        "hints": [
+          "Cherche le minimum parmi les éléments à partir de l'indice i (pas depuis le début) : ceux avant i sont déjà à leur place définitive.",
+          "Une fois le minimum trouvé, un seul échange suffit pour le placer en position i — pas besoin de décaler les autres éléments."
+        ]
+      },
+      {
+        "title": "Tri fusion (1/2)",
+        "slug": "tri-fusion-1-2",
+        "statement": "Écris une fonction `fusion(L1, L2)` qui prend deux listes **déjà triées** par ordre croissant, et renvoie une nouvelle liste triée contenant tous leurs éléments.\n\n**Principe** : `L1` et `L2` étant déjà triées, on peut construire le résultat en comparant à chaque étape leur premier élément restant, et en prenant toujours le plus petit des deux — un peu comme si on fusionnait deux piles de cartes déjà triées, en retournant toujours la carte la plus petite des deux piles.\n\nExemple : `fusion([1, 4, 7], [2, 3, 9])` renvoie `[1, 2, 3, 4, 7, 9]`.\n\nCette fonction sera réutilisée dans le prochain exercice pour construire le tri fusion.",
+        "kind": "python",
+        "starter_code": "def fusion(L1, L2):\n    pass\n",
+        "function_name": "fusion",
+        "solution_code": "def fusion(L1, L2):\n    resultat = []\n    i, j = 0, 0\n    # Tant qu'il reste des éléments des DEUX côtés, on compare et on prend le plus petit\n    while i < len(L1) and j < len(L2):\n        if L1[i] <= L2[j]:\n            resultat.append(L1[i])\n            i += 1\n        else:\n            resultat.append(L2[j])\n            j += 1\n    # Il reste des éléments dans L1 (L2 est épuisée) : on les ajoute un par un\n    while i < len(L1):\n        resultat.append(L1[i])\n        i += 1\n    # Il reste des éléments dans L2 (L1 est épuisée) : on les ajoute un par un\n    while j < len(L2):\n        resultat.append(L2[j])\n        j += 1\n    return resultat\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 4, 7], [2, 3, 9]]",
+          "[[], [1, 2, 3]]",
+          "[[1, 2, 3], []]",
+          "[[1, 2, 3], [4, 5, 6]]",
+          "[[-5, 0, 2], [-3, 1, 10]]",
+          "[[2, 2], [2, 2]]"
+        ],
+        "hints": [
+          "Utilise deux indices, un pour chaque liste, et avance dans celle dont l'élément courant est le plus petit.",
+          "Une fois qu'une des deux listes est épuisée, il ne reste plus qu'à recopier tous les éléments restants de l'autre liste : ils sont déjà triés."
+        ]
+      },
+      {
+        "title": "Tri fusion (2/2)",
+        "slug": "tri-fusion-2-2",
+        "statement": "Écris une fonction `tri_fusion(L)` qui renvoie une **nouvelle liste** triée par ordre croissant, en utilisant le **tri fusion**. La liste `L` d'origine ne doit pas être modifiée.\n\nTu peux utiliser la fonction `fusion(L1, L2)` écrite dans l'exercice précédent (déjà disponible ci-dessous, tu n'as pas besoin de la réécrire).\n\n**Principe du tri fusion** (diviser pour régner) :\n1. Si `L` contient 0 ou 1 élément, elle est déjà triée : on la renvoie telle quelle.\n2. Sinon, on coupe `L` en deux moitiés à peu près égales.\n3. On trie **récursivement** chacune des deux moitiés (en rappelant `tri_fusion` sur chacune).\n4. On **fusionne** les deux moitiés triées en une seule liste triée, à l'aide de `fusion`.",
+        "kind": "python",
+        "starter_code": "def fusion(L1, L2):\n    resultat = []\n    i, j = 0, 0\n    while i < len(L1) and j < len(L2):\n        if L1[i] <= L2[j]:\n            resultat.append(L1[i])\n            i += 1\n        else:\n            resultat.append(L2[j])\n            j += 1\n    while i < len(L1):\n        resultat.append(L1[i])\n        i += 1\n    while j < len(L2):\n        resultat.append(L2[j])\n        j += 1\n    return resultat\n\n\ndef tri_fusion(L):\n    pass\n",
+        "function_name": "tri_fusion",
+        "solution_code": "def fusion(L1, L2):\n    resultat = []\n    i, j = 0, 0\n    while i < len(L1) and j < len(L2):\n        if L1[i] <= L2[j]:\n            resultat.append(L1[i])\n            i += 1\n        else:\n            resultat.append(L2[j])\n            j += 1\n    while i < len(L1):\n        resultat.append(L1[i])\n        i += 1\n    while j < len(L2):\n        resultat.append(L2[j])\n        j += 1\n    return resultat\n\n\ndef tri_fusion(L):\n    # Cas de base : une liste de 0 ou 1 élément est déjà triée\n    if len(L) <= 1:\n        return L\n    # On coupe la liste en deux moitiés...\n    milieu = len(L) // 2\n    # ...et on trie CHAQUE moitié récursivement (diviser pour régner)\n    gauche = tri_fusion(L[:milieu])\n    droite = tri_fusion(L[milieu:])\n    # On fusionne ensuite les deux moitiés triées en une seule liste triée\n    return fusion(gauche, droite)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[5, 3, 8, 1, 9]]",
+          "[[]]",
+          "[[1]]",
+          "[[3, 3, 3]]",
+          "[[5, 4, 3, 2, 1]]",
+          "[[-2, 0, 5, -1]]"
+        ],
+        "hints": [
+          "Le cas de base (liste de 0 ou 1 élément) est essentiel : sans lui, la récursion ne s'arrêterait jamais.",
+          "Pense à découper la liste en deux avec le slicing : L[:milieu] et L[milieu:]."
+        ]
+      },
+      {
+        "title": "Tri rapide",
+        "slug": "tri-rapide",
+        "statement": "Écris une fonction `tri_rapide(L)` qui renvoie une **nouvelle liste** triée par ordre croissant, en utilisant le **tri rapide (quicksort)**. La liste `L` d'origine ne doit pas être modifiée.\n\n**Principe du tri rapide** (diviser pour régner) :\n1. Si `L` contient 0 ou 1 élément, elle est déjà triée : on la renvoie telle quelle.\n2. Sinon, on choisit un **pivot** (ici, le premier élément de `L`).\n3. On répartit tous les éléments de `L` en trois listes : ceux strictement inférieurs au pivot, ceux égaux au pivot, ceux strictement supérieurs au pivot.\n4. On trie **récursivement** les listes \"inférieurs\" et \"supérieurs\", puis on les recolle dans l'ordre : `inférieurs triés + égaux + supérieurs triés`.\n\n**Point important** : le choix du pivot influence fortement la performance de l'algorithme (voir l'exercice de complexité associé) — un pivot toujours pris comme premier élément est simple à implémenter, mais peut se révéler très défavorable sur certaines listes (par exemple une liste déjà triée).",
+        "kind": "python",
+        "starter_code": "def tri_rapide(L):\n    pass\n",
+        "function_name": "tri_rapide",
+        "solution_code": "def tri_rapide(L):\n    # Cas de base : une liste de 0 ou 1 élément est déjà triée\n    if len(L) <= 1:\n        return L\n    # On choisit le premier élément de L comme pivot\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    # On répartit chaque élément de L selon sa comparaison au pivot\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    # On trie récursivement les deux listes extrêmes, puis on recolle le tout :\n    # inférieurs triés + égaux (déjà à leur place, au milieu) + supérieurs triés\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[5, 3, 8, 1, 9]]",
+          "[[]]",
+          "[[1]]",
+          "[[3, 3, 3]]",
+          "[[5, 4, 3, 2, 1]]",
+          "[[-2, 0, 5, -1]]"
+        ],
+        "hints": [
+          "Le pivot choisi ici est toujours L[0] : pense à ce que ça donne sur une liste déjà triée (dans un sens ou dans l'autre).",
+          "N'oublie pas la liste \"egaux\" : sans elle, les éléments égaux au pivot disparaîtraient du résultat."
+        ]
+      }
+    ]
+  },
+  {
     "name": "Parcours de graphe",
     "slug": "parcours-graphe",
     "description": "Parcourir un graphe",
@@ -872,6 +1165,96 @@
         "hints": [
           "Pars d'un nœud au hasard (par exemple le premier du dictionnaire) et fais un parcours en largeur ou en profondeur depuis ce nœud.",
           "Compte combien de nœuds différents tu as réussi à visiter, puis compare ce nombre au nombre total de nœuds du graphe (`len(graphe)`)."
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Complexité",
+    "slug": "complexite",
+    "description": "Analyser la complexité asymptotique de plusieurs algorithmes de tri.",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Complexité du tri par insertion",
+        "slug": "complexite-tri-insertion",
+        "statement": "Voici le code du tri par insertion étudié précédemment :\n\n```python\ndef tri_insertion(L):\n    Ltriee = []\n    for i in range(len(L)):\n        x = L[i]\n        Ltriee.append(x)\n        j = i\n        while j > 0 and Ltriee[j] < Ltriee[j-1]:\n            Ltriee[j], Ltriee[j-1] = Ltriee[j-1], Ltriee[j]\n            j -= 1\n    return Ltriee\n```\n\nÉcris une fonction `complexite_tri_insertion(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_insertion`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemple : si le meilleur cas est linéaire et le pire cas est quadratique :\n```python\nreturn n, n**2\n```\n\nIndice de raisonnement : que se passe-t-il si `L` est déjà triée (chaque élément \"remonte\"-t-il beaucoup) ? Et si `L` est triée dans l'ordre inverse ?",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_tri_insertion(L):\n    pass\n",
+        "function_name": "complexite_tri_insertion",
+        "solution_code": "from math import log\n\ndef complexite_tri_insertion(L):\n    n = len(L)\n    # Meilleur cas : liste déjà triée, chaque tour de la boucle for ne fait\n    # aucun échange (la condition du while est fausse dès le premier essai) :\n    # seule la boucle for (n tours) compte, donc une complexité linéaire\n    #\n    # Pire cas : liste triée en ordre décroissant, chaque élément doit\n    # remonter jusqu'au tout début : le while s'exécute jusqu'à i fois\n    # pour chaque i, soit au total de l'ordre de n²\n    return n, n**2\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[5]]",
+          "[[]]",
+          "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
+        ],
+        "hints": [
+          "Compte le nombre de comparaisons faites par le `while` dans le meilleur des cas (liste déjà triée) : combien de fois la condition est-elle vérifiée avant d'être fausse ?",
+          "Dans le pire cas (liste triée à l'envers), chaque élément doit remonter tout le chemin jusqu'au début : le nombre total de comparaisons est proche de 1 + 2 + ... + n."
+        ]
+      },
+      {
+        "title": "Complexité du tri par sélection",
+        "slug": "complexite-tri-selection",
+        "statement": "Voici le code du tri par sélection étudié précédemment :\n\n```python\ndef tri_selection(L):\n    for i in range(len(L)):\n        i_min = i\n        for j in range(i + 1, len(L)):\n            if L[j] < L[i_min]:\n                i_min = j\n        L[i], L[i_min] = L[i_min], L[i]\n    return L\n```\n\nÉcris une fonction `complexite_tri_selection(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_selection`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemple : si le meilleur cas est linéaire et le pire cas est quadratique :\n```python\nreturn n, n**2\n```\n\nIndice de raisonnement : la boucle interne (recherche du minimum restant) dépend-elle des valeurs de `L`, ou s'exécute-t-elle toujours en entier, quel que soit l'état initial de la liste ?",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_tri_selection(L):\n    pass\n",
+        "function_name": "complexite_tri_selection",
+        "solution_code": "from math import log\n\ndef complexite_tri_selection(L):\n    n = len(L)\n    # Contrairement au tri par insertion, la boucle interne (recherche du minimum\n    # restant) s'exécute TOUJOURS entièrement, qu'importe l'état de départ de L :\n    # même si L est déjà triée, on doit quand même comparer chaque élément restant\n    # pour confirmer qu'aucun n'est plus petit que le candidat actuel.\n    # Résultat : meilleur cas et pire cas sont tous les deux en n²\n    return n**2, n**2\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[5]]",
+          "[[]]",
+          "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
+        ],
+        "hints": [
+          "Contrairement au tri par insertion, ici il n'y a pas de \"raccourci\" possible : même si L est déjà triée, il faut quand même comparer chaque élément restant pour confirmer le minimum.",
+          "Le nombre de comparaisons de la boucle interne ne dépend jamais des valeurs de L, seulement de sa taille."
+        ]
+      },
+      {
+        "title": "Complexité du tri fusion",
+        "slug": "complexite-tri-fusion",
+        "statement": "Voici le code du tri fusion étudié précédemment :\n\n```python\ndef tri_fusion(L):\n    if len(L) <= 1:\n        return L\n    milieu = len(L) // 2\n    gauche = tri_fusion(L[:milieu])\n    droite = tri_fusion(L[milieu:])\n    return fusion(gauche, droite)\n```\n\nÉcris une fonction `complexite_tri_fusion(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_fusion`, en fonction de `n = len(L)`.\n\n**Contrairement aux deux exercices précédents**, on ne demande pas ici `(meilleur_cas, pire_cas)` mais **`(cas_moyen, pire_cas)`** : le découpage de `tri_fusion` en deux moitiés ne dépend jamais des valeurs contenues dans `L`, seulement de sa taille. Il n'y a donc pas de \"meilleur cas\" avantageux à distinguer — en revanche, la distinction entre cas moyen et pire cas reste pertinente et est celle habituellement retenue pour cet algorithme.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemple : si le meilleur cas est linéaire et le pire cas est quadratique :\n```python\nreturn n, n**2\n```\n\nIndice de raisonnement : combien de niveaux de découpage y a-t-il avant d'atteindre des listes de taille 1 ? Et combien d'opérations coûte la fusion à chaque niveau ?",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_tri_fusion(L):\n    pass\n",
+        "function_name": "complexite_tri_fusion",
+        "solution_code": "from math import log\n\ndef complexite_tri_fusion(L):\n    n = len(L)\n    # La liste est divisée en deux à chaque appel récursif : il y a environ\n    # log(n) \"niveaux\" de division. À chaque niveau, fusion() parcourt\n    # l'ensemble des éléments une fois, soit n opérations par niveau.\n    # Ce découpage ne dépend jamais des valeurs de L, seulement de sa taille :\n    # cas moyen et pire cas sont donc identiques ici\n    # Total : n opérations x log(n) niveaux\n    return n * log(n), n * log(n)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[5]]",
+          "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
+        ],
+        "hints": [
+          "Le découpage en deux moitiés ne dépend jamais des valeurs de L : c'est pour ça que cas moyen et pire cas sont identiques pour cet algorithme.",
+          "Compte le nombre de \"niveaux\" de récursion (division par 2 à chaque fois) et le coût de fusion() à chaque niveau."
+        ]
+      },
+      {
+        "title": "Complexité du tri rapide",
+        "slug": "complexite-tri-rapide",
+        "statement": "Voici le code du tri rapide étudié précédemment :\n\n```python\ndef tri_rapide(L):\n    if len(L) <= 1:\n        return L\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n```\n\nÉcris une fonction `complexite_tri_rapide(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_rapide`, en fonction de `n = len(L)`.\n\n**Comme pour le tri fusion**, on demande ici `(cas_moyen, pire_cas)` plutôt que `(meilleur_cas, pire_cas)` : le pivot étant toujours choisi comme le premier élément de `L`, le \"meilleur cas\" (pivot parfaitement au milieu à chaque appel) est un cas particulier peu représentatif. C'est le **cas moyen** qui est habituellement retenu pour cet algorithme — et c'est justement là que le tri rapide se distingue du tri fusion : leur cas moyen est identique (`n * log(n)`), mais leur pire cas diffère.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemple : si le meilleur cas est linéaire et le pire cas est quadratique :\n```python\nreturn n, n**2\n```\n\nIndice de raisonnement : que se passe-t-il si le pivot (toujours `L[0]`) tombe systématiquement sur le plus petit ou le plus grand élément restant, par exemple sur une liste déjà triée ?",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_tri_rapide(L):\n    pass\n",
+        "function_name": "complexite_tri_rapide",
+        "solution_code": "from math import log\n\ndef complexite_tri_rapide(L):\n    n = len(L)\n    # Cas moyen : le pivot partage la liste en deux parts à peu près égales\n    # à chaque appel -> environ log(n) niveaux de récursion, n opérations\n    # par niveau (comme le tri fusion) : n * log(n)\n    #\n    # Pire cas : le pivot tombe systématiquement sur le plus petit ou le\n    # plus grand élément (ex : une liste déjà triée, avec ce choix de\n    # pivot = premier élément). La liste ne se réduit alors que d'UN\n    # élément à chaque appel récursif : n + (n-1) + ... + 1, de l'ordre de n²\n    return n * log(n), n**2\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[5]]",
+          "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
+        ],
+        "hints": [
+          "Le pivot est toujours L[0] : imagine ce que ça donne sur une liste déjà triée par ordre croissant ou décroissant — combien d'éléments partent dans \"inférieurs\" ou \"supérieurs\" à chaque appel ?",
+          "Dans le pire cas, chaque appel récursif ne réduit la taille du problème que d'un seul élément : la somme des tailles à chaque niveau ressemble à 1+2+...+n."
         ]
       }
     ]

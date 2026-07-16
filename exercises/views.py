@@ -154,11 +154,18 @@ def profile(request):
 
 @login_required
 def exercise_tests(request, exercise_id):
-    """Renvoie le code de test associé à un exercice pour exécution côté navigateur (Pyodide)."""
+    """Renvoie le code de test associé à un exercice pour exécution côté navigateur (Pyodide).
+
+    Renvoie aussi 'solution_code' (Python) ou la requête correcte (SQL) : le corrigé est
+    affiché côté JS dès que l'étudiant réussit tous les tests (voir exercise.js). Ça ne change
+    rien niveau sécurité : comme déjà noté dans le README, un étudiant curieux pouvait de toute
+    façon inspecter cette réponse réseau et y trouver le corrigé, même avant ce changement."""
     exercise = get_object_or_404(Exercise, id=exercise_id)
+    solution = exercise.sql_solution if exercise.kind == exercise.SQL else exercise.solution_code
     return JsonResponse({
         "starter_code": exercise.starter_code,
         "test_code": exercise.build_test_code(),
+        "solution_code": solution,
     })
 
 

@@ -49,7 +49,7 @@ header.site nav a { font-size: .92rem; color: var(--ink-soft); text-decoration: 
 header.site nav a:hover { color: var(--indigo); }
 
 .nav-toggle {
-  display: none; /* réapparaît seulement sur mobile, voir media query plus bas */
+  display: none;
   flex-direction: column; justify-content: center; gap: 5px;
   width: 32px; height: 32px; background: none; border: none; cursor: pointer; padding: 0;
 }
@@ -57,7 +57,6 @@ header.site nav a:hover { color: var(--indigo); }
   display: block; width: 100%; height: 2px; background: var(--indigo-deep); border-radius: 2px;
   transition: transform .15s ease, opacity .15s ease;
 }
-/* Transforme les 3 barres en croix quand le menu est ouvert */
 .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .nav-toggle.open span:nth-child(2) { opacity: 0; }
 .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
@@ -67,9 +66,9 @@ header.site nav a:hover { color: var(--indigo); }
   header.site .brand { font-size: 1.15rem; }
   .nav-toggle { display: flex; }
   header.site nav {
-    display: none; /* replié par défaut, ouvert via la classe .open ajoutée par nav.js */
+    display: none;
     flex-direction: column; align-items: flex-start; gap: 2px;
-    flex: 1 0 100%; /* force le passage à la ligne sous le logo + bouton */
+    flex: 1 0 100%;
     margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--rule);
   }
   header.site nav.open { display: flex; }
@@ -307,6 +306,27 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
   font-family: 'JetBrains Mono', monospace; font-size: .82rem; opacity: .95;
 }
 
+/* --- Corrigé affiché après une réussite : contrairement à .abandon-locked, l'éditeur
+   reste visible et modifiable juste au-dessus, l'étudiant peut continuer à retoucher son
+   code tout en gardant le corrigé sous les yeux --- */
+.solution-reveal {
+  background: var(--paper-alt); border: 1px solid var(--ok); border-radius: var(--radius);
+  padding: 22px 24px; margin-top: 18px;
+}
+.solution-reveal.hidden { display: none; }
+.solution-reveal-title {
+  font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: .06em;
+  font-size: .8rem; color: var(--ok); margin: 0 0 12px;
+}
+.solution-reveal .solution-code { margin-top: 0; }
+/* Le corrigé est affiché via une instance CodeMirror en lecture seule (coloration
+   syntaxique identique à l'éditeur) : on annule la hauteur minimale de 220px prévue
+   pour l'éditeur principal, pour que la boîte s'ajuste à la taille réelle du corrigé. */
+.solution-reveal .solution-code-editor .CodeMirror {
+  min-height: auto;
+  height: auto;
+}
+
 .auth-card {
   max-width: 420px; margin: 60px auto; background: var(--paper-alt); border: 1px solid var(--rule);
   border-radius: var(--radius); padding: 32px;
@@ -394,10 +414,6 @@ table.schema-columns code {
 .CodeMirror-cursor { border-left: 2px solid var(--amber) !important; }
 .CodeMirror-selected { background: rgba(255,255,255,.15) !important; }
 
-/* Couleurs des tokens. !important est nécessaire ici : codemirror.min.css se charge
-   APRÈS ce fichier (le <link> est dans exercise_detail.html, après le <head> de base.html
-   qui charge déjà style.css), donc à spécificité égale ses couleurs par défaut (pensées
-   pour un fond clair) l'emporteraient sinon sur les nôtres. */
 .cm-s-default .cm-keyword    { color: #c792ea !important; }
 .cm-s-default .cm-def        { color: #82aaff !important; }
 .cm-s-default .cm-variable   { color: #e8ecf7 !important; }
