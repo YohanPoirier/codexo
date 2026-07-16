@@ -1046,6 +1046,155 @@
     ]
   },
   {
+    "name": "Dictionnaire",
+    "slug": "dictionnaire",
+    "description": "Créer et manipuler des dictionnaires (clés, valeurs, occurrences).",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Dictionnaire vide",
+        "slug": "dictionnaire-vide",
+        "statement": "Écris une fonction `dictionnaire_vide()` qui renvoie un dictionnaire vide.",
+        "kind": "python",
+        "starter_code": "def dictionnaire_vide():\n    pass\n",
+        "function_name": "dictionnaire_vide",
+        "solution_code": "def dictionnaire_vide():\n    return {}\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Nombre de clés",
+        "slug": "nombre-cles",
+        "statement": "Écris une fonction `nombre_cles(dictionnaire)` qui renvoie le nombre de clés de `dictionnaire`.",
+        "kind": "python",
+        "starter_code": "def nombre_cles(dictionnaire):\n    pass\n",
+        "function_name": "nombre_cles",
+        "solution_code": "def nombre_cles(dictionnaire):\n    # len() sur un dictionnaire renvoie son nombre de clés\n    return len(dictionnaire)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'a': 1, 'b': 2}]",
+          "[{}]",
+          "[{'x': 1}]",
+          "[{'a': 1, 'b': 2, 'c': 3}]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Carnet de notes",
+        "slug": "carnet-de-notes",
+        "statement": "Un professeur a noté les élèves de sa classe et dispose de deux listes : `noms` (les prénoms des élèves, dans l'ordre) et `notes` (leurs notes correspondantes, dans le même ordre). Il aimerait obtenir un dictionnaire `{prénom: note}` pour retrouver facilement la note d'un élève à partir de son prénom.\n\nÉcris une fonction `carnet_de_notes(noms, notes)` qui construit ce dictionnaire.",
+        "kind": "python",
+        "starter_code": "def carnet_de_notes(noms, notes):\n    pass\n",
+        "function_name": "carnet_de_notes",
+        "solution_code": "def carnet_de_notes(noms, notes):\n    dictionnaire = {}\n    # On associe chaque prénom (noms[i]) à la note de MÊME position (notes[i])\n    for i in range(len(noms)):\n        dictionnaire[noms[i]] = notes[i]\n    return dictionnaire\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[['Alice', 'Bob'], [12, 15]]",
+          "[['a', 'b', 'c'], [1, 2, 3]]",
+          "[[], []]",
+          "[['x'], [42]]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Fusionner des emprunts",
+        "slug": "fusionner-emprunts",
+        "statement": "Deux classes ont chacune un dictionnaire recensant les livres empruntés par élève : `{élève: [liste de livres empruntés]}`. À la fin de l'année, on veut fusionner les deux dictionnaires en un seul : si un même élève apparaît dans les deux classes, ses listes de livres doivent être concaténées (celle de `dict1` suivie de celle de `dict2`).\n\nÉcris une fonction `fusionner_emprunts(dict1, dict2)` qui renvoie ce dictionnaire fusionné.",
+        "kind": "python",
+        "starter_code": "def fusionner_emprunts(dict1, dict2):\n    pass\n",
+        "function_name": "fusionner_emprunts",
+        "solution_code": "def fusionner_emprunts(dict1, dict2):\n    fusion = {}\n    for cle, valeur in dict1.items():\n        # list(valeur) fait une COPIE de la liste plutôt que de réutiliser\n        # directement la même : sans ça, fusion[cle] pointerait vers exactement\n        # le même objet liste que dict1[cle], et une modification future du\n        # résultat modifierait aussi dict1 à son insu (effet de bord caché)\n        fusion[cle] = list(valeur)\n    for cle, valeur in dict2.items():\n        if cle in fusion:\n            fusion[cle] = fusion[cle] + valeur\n        else:\n            fusion[cle] = list(valeur)\n    return fusion\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'Alice': ['Livre A'], 'Bob': ['Livre B']}, {'Alice': ['Livre C'], 'Chloe': ['Livre D']}]",
+          "[{}, {'Alice': ['Livre A']}]",
+          "[{'Bob': ['Livre B']}, {}]",
+          "[{'Alice': ['A', 'B']}, {'Alice': ['C']}]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Clé présente dans un dictionnaire",
+        "slug": "cle-presente",
+        "statement": "Écris une fonction `cle_presente(dictionnaire, cle)` qui renvoie `True` si `cle` est une clé de `dictionnaire`, `False` sinon.",
+        "kind": "python",
+        "starter_code": "def cle_presente(dictionnaire, cle):\n    pass\n",
+        "function_name": "cle_presente",
+        "solution_code": "def cle_presente(dictionnaire, cle):\n    # \"in\" sur un dictionnaire teste la présence parmi les CLÉS (pas les valeurs)\n    return cle in dictionnaire\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'a': 1, 'b': 2}, 'a']",
+          "[{'a': 1, 'b': 2}, 'z']",
+          "[{}, 'a']",
+          "[{'x': 1, 'y': 2}, 'y']"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Valeur présente dans un dictionnaire",
+        "slug": "valeur-presente",
+        "statement": "Écris une fonction `valeur_presente(dictionnaire, valeur)` qui renvoie `True` si `valeur` apparaît parmi les valeurs de `dictionnaire`, `False` sinon.",
+        "kind": "python",
+        "starter_code": "def valeur_presente(dictionnaire, valeur):\n    pass\n",
+        "function_name": "valeur_presente",
+        "solution_code": "def valeur_presente(dictionnaire, valeur):\n    # .values() renvoie toutes les valeurs du dictionnaire, sans les clés\n    return valeur in dictionnaire.values()\n\n\n# Autre façon de faire, sans \"in\" : on parcourt les valeurs une par une\ndef valeur_presente_avec_boucle(dictionnaire, valeur):\n    for v in dictionnaire.values():\n        if v == valeur:\n            return True\n    return False\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'a': 1, 'b': 2}, 2]",
+          "[{'a': 1, 'b': 2}, 5]",
+          "[{}, 1]",
+          "[{'x': 'chat', 'y': 'chien'}, 'chien']"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Compter les occurrences",
+        "slug": "compter-occurrences",
+        "statement": "Écris une fonction `compter_occurrences(liste)` qui renvoie un dictionnaire associant chaque élément de `liste` à son nombre d'occurrences.",
+        "kind": "python",
+        "starter_code": "def compter_occurrences(liste):\n    pass\n",
+        "function_name": "compter_occurrences",
+        "solution_code": "def compter_occurrences(liste):\n    compteur = {}\n    for element in liste:\n        if element in compteur:\n            compteur[element] += 1\n        else:\n            compteur[element] = 1\n    return compteur\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 2, 3, 3, 3]]",
+          "[['a', 'b', 'a', 'a']]",
+          "[[]]",
+          "[[1, 1, 1, 1]]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Regrouper des mots par longueur",
+        "slug": "regrouper-par-longueur",
+        "statement": "Écris une fonction `regrouper_par_longueur(mots)` qui renvoie un dictionnaire associant chaque longueur de mot à la liste des mots de `mots` ayant cette longueur.\n\nExemple : `regrouper_par_longueur(['chat', 'chien', 'rat', 'vache'])` renvoie `{4: ['chat'], 5: ['chien', 'vache'], 3: ['rat']}`.",
+        "kind": "python",
+        "starter_code": "def regrouper_par_longueur(mots):\n    pass\n",
+        "function_name": "regrouper_par_longueur",
+        "solution_code": "def regrouper_par_longueur(mots):\n    groupes = {}\n    for mot in mots:\n        longueur = len(mot)\n        if longueur in groupes:\n            groupes[longueur].append(mot)\n        else:\n            groupes[longueur] = [mot]\n    return groupes\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[['chat', 'chien', 'rat', 'vache']]",
+          "[[]]",
+          "[['a', 'b', 'cc']]",
+          "[['abc']]"
+        ],
+        "hints": []
+      }
+    ]
+  },
+  {
     "name": "Tri",
     "slug": "tri",
     "description": "Écrire des algorithmes de tri classiques.",
@@ -1286,13 +1435,13 @@
   {
     "name": "Complexité",
     "slug": "complexite",
-    "description": "Analyser la complexité asymptotique de plusieurs algorithmes de tri.",
+    "description": "Analyser la complexité asymptotique de plusieurs programmes.",
     "sql_setup": "",
     "exercises": [
       {
         "title": "Complexité du tri par insertion",
         "slug": "complexite-tri-insertion",
-        "statement": "Voici le code du tri par insertion étudié précédemment :\n\n```python\ndef tri_insertion(L):\n    Ltriee = []\n    for i in range(len(L)):\n        x = L[i]\n        Ltriee.append(x)\n        j = i\n        while j > 0 and Ltriee[j] < Ltriee[j-1]:\n            Ltriee[j], Ltriee[j-1] = Ltriee[j-1], Ltriee[j]\n            j -= 1\n    return Ltriee\n```\n\nÉcris une fonction `complexite_tri_insertion(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_insertion`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemple : si le meilleur cas est linéaire et le pire cas est quadratique :\n```python\nreturn n, n**2\n```\n\nIndice de raisonnement : que se passe-t-il si `L` est déjà triée (chaque élément \"remonte\"-t-il beaucoup) ? Et si `L` est triée dans l'ordre inverse ?",
+        "statement": "Voici le code du tri par insertion étudié précédemment :\n\n```python\ndef tri_insertion(L):\n    Ltriee = []\n    for i in range(len(L)):\n        x = L[i]\n        Ltriee.append(x)\n        j = i\n        while j > 0 and Ltriee[j] < Ltriee[j-1]:\n            Ltriee[j], Ltriee[j-1] = Ltriee[j-1], Ltriee[j]\n            j -= 1\n    return Ltriee\n```\n\nÉcris une fonction `complexite_tri_insertion(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_insertion`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si `L` est déjà triée (chaque élément \"remonte\"-t-il beaucoup) ? Et si `L` est triée dans l'ordre inverse ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_insertion(L):\n    pass\n",
         "function_name": "complexite_tri_insertion",
@@ -1313,7 +1462,7 @@
       {
         "title": "Complexité du tri par sélection",
         "slug": "complexite-tri-selection",
-        "statement": "Voici le code du tri par sélection étudié précédemment :\n\n```python\ndef tri_selection(L):\n    for i in range(len(L)):\n        i_min = i\n        for j in range(i + 1, len(L)):\n            if L[j] < L[i_min]:\n                i_min = j\n        L[i], L[i_min] = L[i_min], L[i]\n    return L\n```\n\nÉcris une fonction `complexite_tri_selection(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_selection`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemple : si le meilleur cas est linéaire et le pire cas est quadratique :\n```python\nreturn n, n**2\n```\n\nIndice de raisonnement : la boucle interne (recherche du minimum restant) dépend-elle des valeurs de `L`, ou s'exécute-t-elle toujours en entier, quel que soit l'état initial de la liste ?",
+        "statement": "Voici le code du tri par sélection étudié précédemment :\n\n```python\ndef tri_selection(L):\n    for i in range(len(L)):\n        i_min = i\n        for j in range(i + 1, len(L)):\n            if L[j] < L[i_min]:\n                i_min = j\n        L[i], L[i_min] = L[i_min], L[i]\n    return L\n```\n\nÉcris une fonction `complexite_tri_selection(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_selection`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : la boucle interne (recherche du minimum restant) dépend-elle des valeurs de `L`, ou s'exécute-t-elle toujours en entier, quel que soit l'état initial de la liste ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_selection(L):\n    pass\n",
         "function_name": "complexite_tri_selection",
@@ -1334,7 +1483,7 @@
       {
         "title": "Complexité du tri fusion",
         "slug": "complexite-tri-fusion",
-        "statement": "Voici le code du tri fusion étudié précédemment :\n\n```python\ndef tri_fusion(L):\n    if len(L) <= 1:\n        return L\n    milieu = len(L) // 2\n    gauche = tri_fusion(L[:milieu])\n    droite = tri_fusion(L[milieu:])\n    return fusion(gauche, droite)\n```\n\nÉcris une fonction `complexite_tri_fusion(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_fusion`, en fonction de `n = len(L)`.\n\n**Contrairement aux deux exercices précédents**, on ne demande pas ici `(meilleur_cas, pire_cas)` mais **`(cas_moyen, pire_cas)`** : le découpage de `tri_fusion` en deux moitiés ne dépend jamais des valeurs contenues dans `L`, seulement de sa taille. Il n'y a donc pas de \"meilleur cas\" avantageux à distinguer — en revanche, la distinction entre cas moyen et pire cas reste pertinente et est celle habituellement retenue pour cet algorithme.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemple : si le meilleur cas est linéaire et le pire cas est quadratique :\n```python\nreturn n, n**2\n```\n\nIndice de raisonnement : combien de niveaux de découpage y a-t-il avant d'atteindre des listes de taille 1 ? Et combien d'opérations coûte la fusion à chaque niveau ?",
+        "statement": "Voici le code du tri fusion étudié précédemment :\n\n```python\ndef tri_fusion(L):\n    if len(L) <= 1:\n        return L\n    milieu = len(L) // 2\n    gauche = tri_fusion(L[:milieu])\n    droite = tri_fusion(L[milieu:])\n    return fusion(gauche, droite)\n```\n\nÉcris une fonction `complexite_tri_fusion(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_fusion`, en fonction de `n = len(L)`.\n\n**Contrairement aux deux exercices précédents**, on ne demande pas ici `(meilleur_cas, pire_cas)` mais **`(cas_moyen, pire_cas)`** : le découpage de `tri_fusion` en deux moitiés ne dépend jamais des valeurs contenues dans `L`, seulement de sa taille. Il n'y a donc pas de \"meilleur cas\" avantageux à distinguer — en revanche, la distinction entre cas moyen et pire cas reste pertinente et est celle habituellement retenue pour cet algorithme.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : combien de niveaux de découpage y a-t-il avant d'atteindre des listes de taille 1 ? Et combien d'opérations coûte la fusion à chaque niveau ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_fusion(L):\n    pass\n",
         "function_name": "complexite_tri_fusion",
@@ -1354,7 +1503,7 @@
       {
         "title": "Complexité du tri rapide",
         "slug": "complexite-tri-rapide",
-        "statement": "Voici le code du tri rapide étudié précédemment :\n\n```python\ndef tri_rapide(L):\n    if len(L) <= 1:\n        return L\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n```\n\nÉcris une fonction `complexite_tri_rapide(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_rapide`, en fonction de `n = len(L)`.\n\n**Comme pour le tri fusion**, on demande ici `(cas_moyen, pire_cas)` plutôt que `(meilleur_cas, pire_cas)` : le pivot étant toujours choisi comme le premier élément de `L`, le \"meilleur cas\" (pivot parfaitement au milieu à chaque appel) est un cas particulier peu représentatif. C'est le **cas moyen** qui est habituellement retenu pour cet algorithme — et c'est justement là que le tri rapide se distingue du tri fusion : leur cas moyen est identique (`n * log(n)`), mais leur pire cas diffère.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemple : si le meilleur cas est linéaire et le pire cas est quadratique :\n```python\nreturn n, n**2\n```\n\nIndice de raisonnement : que se passe-t-il si le pivot (toujours `L[0]`) tombe systématiquement sur le plus petit ou le plus grand élément restant, par exemple sur une liste déjà triée ?",
+        "statement": "Voici le code du tri rapide étudié précédemment :\n\n```python\ndef tri_rapide(L):\n    if len(L) <= 1:\n        return L\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n```\n\nÉcris une fonction `complexite_tri_rapide(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_rapide`, en fonction de `n = len(L)`.\n\n**Comme pour le tri fusion**, on demande ici `(cas_moyen, pire_cas)` plutôt que `(meilleur_cas, pire_cas)` : le pivot étant toujours choisi comme le premier élément de `L`, le \"meilleur cas\" (pivot parfaitement au milieu à chaque appel) est un cas particulier peu représentatif. C'est le **cas moyen** qui est habituellement retenu pour cet algorithme — et c'est justement là que le tri rapide se distingue du tri fusion : leur cas moyen est identique (`n * log(n)`), mais leur pire cas diffère.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si le pivot (toujours `L[0]`) tombe systématiquement sur le plus petit ou le plus grand élément restant, par exemple sur une liste déjà triée ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_rapide(L):\n    pass\n",
         "function_name": "complexite_tri_rapide",
@@ -1370,6 +1519,103 @@
           "Le pivot est toujours L[0] : imagine ce que ça donne sur une liste déjà triée par ordre croissant ou décroissant — combien d'éléments partent dans \"inférieurs\" ou \"supérieurs\" à chaque appel ?",
           "Dans le pire cas, chaque appel récursif ne réduit la taille du problème que d'un seul élément : la somme des tailles à chaque niveau ressemble à 1+2+...+n."
         ]
+      },
+      {
+        "title": "Complexité de la recherche du minimum",
+        "slug": "complexite-recherche-min",
+        "statement": "Voici le code de la recherche du minimum étudiée précédemment :\n\n```python\ndef recherche_min(L):\n    mini = L[0]\n    for i in range(1, len(L)):\n        if L[i] < mini:\n            mini = L[i]\n    return mini\n```\n\nÉcris une fonction `complexite_recherche_min(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_min`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : la boucle peut-elle jamais s'arrêter avant d'avoir comparé tous les éléments restants, quelles que soient les valeurs de `L` ?",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_recherche_min(L):\n    pass\n",
+        "function_name": "complexite_recherche_min",
+        "solution_code": "from math import log\n\ndef complexite_recherche_min(L):\n    n = len(L)\n    # Que la liste soit déjà triée ou non, la boucle parcourt TOUJOURS tous les\n    # éléments restants : on ne peut être sûr d'avoir trouvé le minimum qu'après\n    # avoir tout comparé, il n'y a donc jamais de \"sortie anticipée\" possible.\n    # Meilleur cas et pire cas sont donc identiques : n\n    return n, n\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[5]]",
+          "[[]]",
+          "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
+        ],
+        "hints": [
+          "Contrairement au tri par insertion, il n'existe ici aucun raccourci : même si le minimum se trouve dès le premier élément, la boucle continue quand même à comparer tous les éléments suivants pour s'en assurer."
+        ]
+      },
+      {
+        "title": "Complexité de la recherche d'un élément (avec boucle)",
+        "slug": "complexite-recherche-element",
+        "statement": "Voici le code d'une recherche d'élément dans une liste, avec une boucle, étudiée précédemment :\n\n```python\ndef recherche_element(L, x):\n    for i in range(len(L)):\n        if L[i] == x:\n            return True\n    return False\n```\n\nÉcris une fonction `complexite_recherche_element(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si l'élément recherché est le tout premier de la liste ? Et s'il ne s'y trouve pas du tout ?",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_recherche_element(L):\n    pass\n",
+        "function_name": "complexite_recherche_element",
+        "solution_code": "from math import log\n\ndef complexite_recherche_element(L):\n    n = len(L)\n    # Meilleur cas : l'élément recherché est trouvé dès la première comparaison\n    # (par exemple s'il est en tout premier dans la liste) : une seule opération,\n    # donc un coût CONSTANT, indépendant de n\n    #\n    # Pire cas : l'élément n'est pas dans la liste (ou se trouve tout à la fin) :\n    # il faut alors comparer tous les éléments un par un, soit n opérations\n    return 1, n\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[5]]",
+          "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]",
+          "[[7, 3, 9, 2, 8]]"
+        ],
+        "hints": [
+          "Le meilleur cas correspond à un coût CONSTANT (voir le second exemple du format de réponse attendu) : une seule comparaison suffit, quelle que soit la taille de la liste."
+        ]
+      },
+      {
+        "title": "Complexité de la recherche d'un élément (avec in)",
+        "slug": "complexite-recherche-element-in",
+        "statement": "Voici la même recherche que dans l'exercice précédent, mais écrite avec l'opérateur `in` :\n\n```python\ndef recherche_element_in(L, x):\n    return x in L\n```\n\nÉcris une fonction `complexite_recherche_element_in(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element_in`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : l'opérateur `in` cache la boucle, mais fait-il vraiment quelque chose de différent \"sous le capot\" par rapport à l'exercice précédent ?",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_recherche_element_in(L):\n    pass\n",
+        "function_name": "complexite_recherche_element_in",
+        "solution_code": "from math import log\n\ndef complexite_recherche_element_in(L):\n    n = len(L)\n    # L'opérateur \"in\" fonctionne de la même façon \"sous le capot\" qu'une boucle\n    # manuelle : il s'arrête dès qu'il trouve une correspondance. Le résultat est\n    # donc identique à la recherche avec boucle de l'exercice précédent :\n    # meilleur cas constant, pire cas linéaire\n    return 1, n\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[5]]",
+          "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]",
+          "[[7, 3, 9, 2, 8]]"
+        ],
+        "hints": [
+          "`in` s'arrête dès qu'il trouve une correspondance, exactement comme le `return True` de la boucle manuelle : la complexité ne change donc pas."
+        ]
+      },
+      {
+        "title": "Complexité de la transposition d'une matrice",
+        "slug": "complexite-transposition",
+        "statement": "Voici le code de la transposition de matrice étudiée précédemment :\n\n```python\ndef transposer(matrice):\n    m = len(matrice)\n    p = len(matrice[0])\n    return [[matrice[i][j] for i in range(m)] for j in range(p)]\n```\n\nÉcris une fonction `complexite_transposition(matrice)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `transposer`, en fonction de `n`, le **nombre total d'éléments** de la matrice (`n = m × p`, où `m` est le nombre de lignes et `p` le nombre de colonnes).\n\n**Format de réponse attendu** : ta fonction doit renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la matrice (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : chaque case de la matrice est-elle toujours visitée, quelles que soient les valeurs qu'elle contient ?",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_transposition(matrice):\n    pass\n",
+        "function_name": "complexite_transposition",
+        "solution_code": "from math import log\n\ndef complexite_transposition(matrice):\n    m = len(matrice)\n    p = len(matrice[0]) if m > 0 else 0\n    n = m * p\n    # Chaque case de la matrice doit être visitée EXACTEMENT une fois, quelles que\n    # soient les valeurs qu'elle contient : il n'existe aucune sortie anticipée\n    # possible. Meilleur cas et pire cas sont donc identiques : n opérations, où n\n    # est le nombre total d'éléments de la matrice\n    return n, n\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[[1, 2], [3, 4]]]",
+          "[[[1, 2, 3], [4, 5, 6]]]",
+          "[[[1]]]",
+          "[[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]]"
+        ],
+        "hints": [
+          "Il n'y a pas de \"sortie anticipée\" possible ici : la transposition doit forcément visiter chaque case de la matrice une fois. Meilleur cas et pire cas sont donc identiques."
+        ]
+      },
+      {
+        "title": "Complexité de la recherche d'une clé dans un dictionnaire",
+        "slug": "complexite-cle-presente",
+        "statement": "Un dictionnaire Python est construit sur une table de hachage. Écris une fonction `complexite_cle_presente(dictionnaire)` qui renvoie la complexité de `cle_presente` (exercice précédent du thème Dictionnaire), en fonction de `n = len(dictionnaire)`.\n\n**Contrairement aux autres exercices de ce thème, on ne distingue pas ici meilleur cas et pire cas** (ils sont toujours identiques pour une recherche par clé dans un dictionnaire) : ta fonction doit renvoyer **une seule valeur**, pas un tuple.\n\nExemple : pour un coût constant, renvoie simplement `1`.",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_cle_presente(dictionnaire):\n    pass\n",
+        "function_name": "complexite_cle_presente",
+        "solution_code": "from math import log\n\ndef complexite_cle_presente(dictionnaire):\n    n = len(dictionnaire)\n    # Recherche par clé dans un dictionnaire : temps constant, quelle que soit\n    # la situation (pas de distinction meilleur/pire cas ici, contrairement à une\n    # recherche dans une liste)\n    return 1\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'a': 1, 'b': 2}]",
+          "[{}]",
+          "[{'x': 1, 'y': 2, 'z': 3}]"
+        ],
+        "hints": []
       }
     ]
   },
