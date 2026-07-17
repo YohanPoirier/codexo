@@ -1552,7 +1552,9 @@
         "sql_solution": "",
         "test_cases": [
           "[[1, 2, 3]]",
-          "[[5]]"
+          "[[5]]",
+          "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]",
+          "[[7, 3, 9, 2, 8]]"
         ],
         "hints": [
           "Le meilleur cas correspond à un coût CONSTANT (voir le second exemple du format de réponse attendu) : une seule comparaison suffit, quelle que soit la taille de la liste."
@@ -1614,6 +1616,256 @@
           "[{'x': 1, 'y': 2, 'z': 3}]"
         ],
         "hints": []
+      }
+    ]
+  },
+  {
+    "name": "Récursivité",
+    "slug": "recursivite",
+    "description": "Écrire des fonctions récursives : identifier le cas de base et l'appel qui rapproche du cas de base.",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Puissance",
+        "slug": "puissance",
+        "statement": "Écris une fonction récursive `puissance(a, n)` qui renvoie `a` élevé à la puissance `n` (avec `n` entier positif ou nul), **sans utiliser `**` ni `pow()`**.\n\nExemple : `puissance(2, 3)` renvoie `8` (car `2 * 2 * 2 = 8`).",
+        "kind": "python",
+        "starter_code": "def puissance(a, n):\n    pass\n",
+        "function_name": "puissance",
+        "solution_code": "def puissance(a, n):\n    # Cas de base : n = 0, a**0 vaut toujours 1, quelle que soit la valeur de a\n    if n == 0:\n        return 1\n    # Cas général : a**n = a * a**(n-1)\n    # L'appel récursif se fait sur n - 1, qui se rapproche du cas de base (n = 0)\n    # à chaque appel\n    return a * puissance(a, n - 1)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[2, 3]",
+          "[5, 0]",
+          "[3, 4]",
+          "[10, 2]",
+          "[1, 10]",
+          "[-2, 3]"
+        ],
+        "hints": [
+          "Le cas de base est `n = 0` : dans ce cas, le résultat vaut toujours 1, quelle que soit la valeur de `a`.",
+          "Pour le cas général, pense à `a**n` comme `a * a**(n-1)` : l'appel récursif se fait sur `n - 1`."
+        ]
+      },
+      {
+        "title": "Factorielle",
+        "slug": "factorielle",
+        "statement": "Écris une fonction récursive `factorielle(n)` qui renvoie la factorielle de `n` (avec `n` entier positif ou nul), c'est-à-dire le produit de tous les entiers de 1 à `n`.\n\nExemple : `factorielle(5)` renvoie `120` (car `5 * 4 * 3 * 2 * 1 = 120`).",
+        "kind": "python",
+        "starter_code": "def factorielle(n):\n    pass\n",
+        "function_name": "factorielle",
+        "solution_code": "def factorielle(n):\n    # Cas de base : par convention, la factorielle de 0 vaut 1\n    if n == 0:\n        return 1\n    # Cas général : n! = n * (n-1)!\n    # L'appel récursif se fait sur n - 1, qui se rapproche du cas de base (n = 0)\n    return n * factorielle(n - 1)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[5]",
+          "[0]",
+          "[1]",
+          "[7]"
+        ],
+        "hints": [
+          "Le cas de base est `n = 0` : la factorielle de 0 vaut 1 par convention.",
+          "Pour le cas général, `n!` s'écrit `n * (n-1)!` : l'appel récursif se fait sur `n - 1`."
+        ]
+      },
+      {
+        "title": "Somme des éléments d'une liste",
+        "slug": "somme-liste-recursif",
+        "statement": "Écris une fonction récursive `somme_liste(liste)` qui renvoie la somme des éléments de `liste` (des nombres), **sans utiliser `sum()`, ni aucune boucle `for`/`while`**.\n\nIndice de raisonnement : la somme de `liste` peut s'écrire comme son premier élément, plus la somme de tout le reste de la liste (`liste[1:]`).",
+        "kind": "python",
+        "starter_code": "def somme_liste(liste):\n    pass\n",
+        "function_name": "somme_liste",
+        "solution_code": "def somme_liste(liste):\n    # Cas de base : une liste vide n'a rien à additionner, sa somme vaut 0\n    if liste == []:\n        return 0\n    # Cas général : la somme de liste = son premier élément + la somme du reste\n    # liste[1:] est une liste plus courte d'un élément : elle se rapproche du\n    # cas de base (liste vide) à chaque appel récursif\n    return liste[0] + somme_liste(liste[1:])\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 2, 3]]",
+          "[[]]",
+          "[[5]]",
+          "[[-1, 2, -3]]"
+        ],
+        "hints": [
+          "Le cas de base est la liste vide : sa somme vaut 0.",
+          "Pour le cas général, sépare le premier élément (`liste[0]`) du reste de la liste (`liste[1:]`) : la somme totale est la somme de ces deux morceaux."
+        ]
+      },
+      {
+        "title": "PGCD (algorithme d'Euclide)",
+        "slug": "pgcd-euclide",
+        "statement": "Écris une fonction récursive `pgcd(a, b)` qui renvoie le plus grand commun diviseur de `a` et `b` (deux entiers positifs ou nuls), en utilisant **l'algorithme d'Euclide** : `pgcd(a, b)` est égal à `pgcd(b, a % b)`, tant que `b` n'est pas nul.\n\n**Différence avec l'exercice du thème Boucles** : cette version utilise le reste de la division euclidienne (`%`) plutôt que des soustractions successives — elle converge en général beaucoup plus vite.\n\nExemple : `pgcd(48, 18)` renvoie `6`.",
+        "kind": "python",
+        "starter_code": "def pgcd(a, b):\n    pass\n",
+        "function_name": "pgcd",
+        "solution_code": "def pgcd(a, b):\n    # Cas de base : quand b vaut 0, le pgcd est a (rappel : pgcd(a, 0) = a)\n    if b == 0:\n        return a\n    # Cas général : pgcd(a, b) = pgcd(b, a % b)\n    # a % b se rapproche de 0 à chaque appel, ce qui garantit d'atteindre\n    # le cas de base au bout d'un nombre fini d'appels\n    return pgcd(b, a % b)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[48, 18]",
+          "[7, 7]",
+          "[0, 5]",
+          "[17, 5]",
+          "[270, 192]"
+        ],
+        "hints": [
+          "Le cas de base est `b = 0` : le résultat est alors `a`.",
+          "Pour le cas général, appelle récursivement `pgcd(b, a % b)` : le reste de la division euclidienne de a par b se rapproche de 0 à chaque appel."
+        ]
+      },
+      {
+        "title": "Ajouter n fois une lettre à un mot",
+        "slug": "ajouter-lettres",
+        "statement": "Écris une fonction récursive `ajouter_lettres(mot, lettre, n)` qui renvoie `mot` suivi de `n` répétitions de `lettre`, **sans utiliser la multiplication de chaîne (`lettre * n`) ni de boucle**.\n\nExemple : `ajouter_lettres(\"bonjour\", \"!\", 3)` renvoie `\"bonjour!!!\"`.",
+        "kind": "python",
+        "starter_code": "def ajouter_lettres(mot, lettre, n):\n    pass\n",
+        "function_name": "ajouter_lettres",
+        "solution_code": "def ajouter_lettres(mot, lettre, n):\n    # Cas de base : n = 0, il ne reste plus aucune lettre à ajouter\n    if n == 0:\n        return mot\n    # Cas général : on ajoute une occurrence de lettre à la fin de mot,\n    # puis on appelle récursivement avec n - 1 (une lettre de moins à ajouter),\n    # ce qui se rapproche du cas de base à chaque appel\n    return ajouter_lettres(mot + lettre, lettre, n - 1)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[\"bonjour\", \"!\", 3]",
+          "[\"chat\", \"s\", 0]",
+          "[\"\", \"a\", 5]",
+          "[\"x\", \"y\", 1]"
+        ],
+        "hints": [
+          "Le cas de base est `n = 0` : on renvoie alors `mot` sans rien y ajouter.",
+          "Pour le cas général, ajoute une seule occurrence de `lettre` à `mot`, puis rappelle la fonction avec `n - 1`."
+        ]
+      },
+      {
+        "title": "Inverser une chaîne",
+        "slug": "inverser-chaine",
+        "statement": "Écris une fonction récursive `inverser_chaine(mot)` qui renvoie `mot` avec ses lettres dans l'ordre inverse, **sans utiliser le slicing `mot[::-1]`, ni `reversed()`, ni de boucle**.\n\nExemple : `inverser_chaine(\"bonjour\")` renvoie `\"ruojnob\"`.",
+        "kind": "python",
+        "starter_code": "def inverser_chaine(mot):\n    pass\n",
+        "function_name": "inverser_chaine",
+        "solution_code": "def inverser_chaine(mot):\n    # Cas de base : une chaîne vide est déjà son propre inverse\n    if mot == \"\":\n        return mot\n    # Cas général : l'inverse de mot est l'inverse de \"mot privé de sa première\n    # lettre\", suivi de cette première lettre placée à la fin\n    # mot[1:] est plus courte d'un caractère : elle se rapproche du cas de\n    # base (chaîne vide) à chaque appel\n    return inverser_chaine(mot[1:]) + mot[0]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[\"bonjour\"]",
+          "[\"\"]",
+          "[\"a\"]",
+          "[\"radar\"]"
+        ],
+        "hints": [
+          "Le cas de base est la chaîne vide : elle reste vide une fois \"inversée\".",
+          "Pour le cas général, place la première lettre (`mot[0]`) tout à la fin, après avoir inversé récursivement le reste (`mot[1:]`)."
+        ]
+      },
+      {
+        "title": "Palindrome",
+        "slug": "palindrome-recursif",
+        "statement": "Écris une fonction récursive `est_palindrome(mot)` qui renvoie `True` si `mot` se lit de la même façon à l'endroit et à l'envers, `False` sinon — **sans boucle**.\n\nIndice de raisonnement : `mot` est un palindrome si sa première et sa dernière lettre sont identiques, **et** si ce qui reste au milieu (`mot` privé de ses deux extrémités) est lui-même un palindrome.",
+        "kind": "python",
+        "starter_code": "def est_palindrome(mot):\n    pass\n",
+        "function_name": "est_palindrome",
+        "solution_code": "def est_palindrome(mot):\n    # Cas de base : une chaîne de 0 ou 1 caractère est toujours un palindrome\n    # (rien à comparer, ou une seule lettre qui se lit forcément pareil dans\n    # les deux sens)\n    if len(mot) <= 1:\n        return True\n    # Si la première et la dernière lettre diffèrent, mot n'est PAS un\n    # palindrome : inutile d'aller plus loin\n    if mot[0] != mot[-1]:\n        return False\n    # Cas général : première et dernière lettre identiques -> mot est un\n    # palindrome SI ET SEULEMENT SI le milieu (mot privé de ses deux\n    # extrémités) en est un aussi. mot[1:-1] est plus court de 2 caractères :\n    # il se rapproche du cas de base à chaque appel\n    return est_palindrome(mot[1:-1])\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[\"radar\"]",
+          "[\"kayak\"]",
+          "[\"bonjour\"]",
+          "[\"\"]",
+          "[\"a\"]",
+          "[\"ab\"]"
+        ],
+        "hints": [
+          "Le cas de base est une chaîne de 0 ou 1 caractère : toujours un palindrome.",
+          "Compare d'abord la première et la dernière lettre : si elles diffèrent, ce n'est pas un palindrome. Sinon, il ne reste plus qu'à vérifier récursivement le milieu (`mot[1:-1]`)."
+        ]
+      },
+      {
+        "title": "Somme des chiffres d'un entier",
+        "slug": "somme-chiffres-recursif",
+        "statement": "Écris une fonction récursive `somme_chiffres(n)` qui renvoie la somme des chiffres de l'entier `n` (positif ou nul), **sans convertir `n` en chaîne de caractères** (contrairement à la version du thème Boucles) et **sans boucle**.\n\nIndice de raisonnement : le dernier chiffre de `n` s'obtient avec `n % 10`, et le nombre privé de son dernier chiffre s'obtient avec `n // 10`.",
+        "kind": "python",
+        "starter_code": "def somme_chiffres(n):\n    pass\n",
+        "function_name": "somme_chiffres",
+        "solution_code": "def somme_chiffres(n):\n    # Cas de base : n a un seul chiffre (n < 10), la somme de ses chiffres\n    # est n lui-même\n    if n < 10:\n        return n\n    # Cas général : n % 10 donne le dernier chiffre de n, et n // 10 donne\n    # n privé de ce dernier chiffre (division entière)\n    # n // 10 est un nombre plus petit : il se rapproche du cas de base\n    # (un seul chiffre) à chaque appel\n    return n % 10 + somme_chiffres(n // 10)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[123]",
+          "[0]",
+          "[45]",
+          "[1000]",
+          "[7]",
+          "[999]"
+        ],
+        "hints": [
+          "Le cas de base est un nombre à un seul chiffre (`n < 10`) : la somme de ses chiffres est `n` lui-même.",
+          "`n % 10` donne le dernier chiffre de `n`, et `n // 10` donne `n` privé de ce dernier chiffre : combine les deux dans l'appel récursif."
+        ]
+      },
+      {
+        "title": "Suite de Fibonacci",
+        "slug": "fibonacci",
+        "statement": "La suite de Fibonacci est définie par : `fibonacci(0) = 0`, `fibonacci(1) = 1`, et pour `n >= 2`, `fibonacci(n) = fibonacci(n-1) + fibonacci(n-2)`.\n\nÉcris une fonction récursive `fibonacci(n)` qui renvoie le n-ième terme de cette suite.\n\n**Particularité de cet exercice** : contrairement aux précédents, il y a ici **deux appels récursifs** dans le cas général, pas un seul.\n\n**À retenir (voir aussi le thème Complexité)** : cette version \"naïve\" recalcule de nombreuses fois les mêmes valeurs (par exemple, `fibonacci(5)` recalcule plusieurs fois `fibonacci(2)`) — son nombre d'appels explose très vite avec `n`. Il existe des versions bien plus efficaces (avec mémorisation, ou itératives), hors programme ici.",
+        "kind": "python",
+        "starter_code": "def fibonacci(n):\n    pass\n",
+        "function_name": "fibonacci",
+        "solution_code": "def fibonacci(n):\n    # Cas de base : les deux premiers termes de la suite sont donnés\n    # directement (0 et 1)\n    if n <= 1:\n        return n\n    # Cas général : DEUX appels récursifs cette fois, sur n-1 et n-2, tous\n    # les deux plus petits que n -> on se rapproche bien du cas de base,\n    # mais par deux chemins différents à chaque étape\n    return fibonacci(n - 1) + fibonacci(n - 2)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[0]",
+          "[1]",
+          "[5]",
+          "[10]",
+          "[2]"
+        ],
+        "hints": [
+          "Les cas de base sont `n = 0` (résultat 0) et `n = 1` (résultat 1), regroupables en un seul test `n <= 1`.",
+          "Le cas général a besoin de DEUX appels récursifs, sur `n - 1` et `n - 2` : ce n'est plus un simple \"un appel qui se rapproche du cas de base\", comme dans les exercices précédents."
+        ]
+      },
+      {
+        "title": "Aplatir une liste imbriquée",
+        "slug": "aplatir-liste",
+        "statement": "Écris une fonction récursive `aplatir(liste)` qui renvoie une nouvelle liste où tous les éléments imbriqués ont été \"remontés\" à un seul niveau, quelle que soit la profondeur d'imbrication — **sans boucle `for`/`while`**.\n\nExemple : `aplatir([1, [2, 3, [4]], 5])` renvoie `[1, 2, 3, 4, 5]`.\n\nIndice de raisonnement : sépare le premier élément (`liste[0]`) du reste (`liste[1:]`). Si ce premier élément est lui-même une liste (teste avec `isinstance(x, list)`), il faut l'aplatir récursivement lui aussi, pas juste le garder tel quel.",
+        "kind": "python",
+        "starter_code": "def aplatir(liste):\n    pass\n",
+        "function_name": "aplatir",
+        "solution_code": "def aplatir(liste):\n    # Cas de base : une liste vide n'a rien à aplatir\n    if liste == []:\n        return []\n    tete = liste[0]\n    reste = liste[1:]\n    # isinstance(tete, list) teste si tete est elle-même une liste (donc à\n    # aplatir aussi), ou une valeur simple (à garder telle quelle)\n    if isinstance(tete, list):\n        # tete est une liste imbriquée : on l'aplatit récursivement, puis on\n        # aplatit le reste, et on concatène les deux résultats (tous les\n        # deux déjà \"à plat\")\n        return aplatir(tete) + aplatir(reste)\n    else:\n        # tete est une valeur simple : on la place dans une liste à un seul\n        # élément, puis on aplatit le reste\n        return [tete] + aplatir(reste)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, [2, 3, [4]], 5]]",
+          "[[]]",
+          "[[[1, 2], [3, 4]]]",
+          "[[1, 2, 3]]",
+          "[[[[1]]]]"
+        ],
+        "hints": [
+          "Le cas de base est la liste vide : elle reste vide une fois \"aplatie\".",
+          "Sépare le premier élément du reste. Si le premier élément est lui-même une liste (`isinstance(x, list)`), aplatis-le récursivement avant de le recoller au reste aplati — ne le garde pas tel quel."
+        ]
+      },
+      {
+        "title": "Recherche dichotomique",
+        "slug": "recherche-dichotomique",
+        "statement": "Écris une fonction récursive `recherche_dichotomique(liste, cible)` qui renvoie l'indice de `cible` dans `liste` (une liste **déjà triée** par ordre croissant), ou `-1` si `cible` ne s'y trouve pas.\n\n**Principe** : on compare `cible` à l'élément du milieu de la portion de liste encore à explorer. S'ils sont égaux, on a trouvé l'indice. Sinon, comme la liste est triée, on sait dans laquelle des deux moitiés continuer à chercher — on élimine ainsi la moitié qui ne peut pas contenir `cible`.\n\nTa fonction peut prendre des paramètres supplémentaires avec des valeurs par défaut, pour délimiter la portion de liste explorée à chaque appel récursif (`borne_inf` et `borne_sup`), sans que l'appelant ait besoin de les préciser.\n\nExemple : `recherche_dichotomique([1, 3, 5, 7, 9, 11], 7)` renvoie `3`.",
+        "kind": "python",
+        "starter_code": "def recherche_dichotomique(liste, cible, borne_inf=0, borne_sup=None):\n    pass\n",
+        "function_name": "recherche_dichotomique",
+        "solution_code": "def recherche_dichotomique(liste, cible, borne_inf=0, borne_sup=None):\n    # borne_sup=None est une astuce classique pour donner une valeur par\n    # défaut qui dépend de liste : on ne peut pas écrire directement\n    # \"borne_sup=len(liste)-1\" dans l'en-tête (liste n'existe pas encore à\n    # ce moment-là). Au premier appel (fait par l'utilisateur), on initialise\n    # donc borne_sup ici, une seule fois.\n    if borne_sup is None:\n        borne_sup = len(liste) - 1\n\n    # Cas de base : la portion à explorer est vide (borne_inf a dépassé\n    # borne_sup) -> cible n'a été trouvée nulle part\n    if borne_inf > borne_sup:\n        return -1\n\n    milieu = (borne_inf + borne_sup) // 2\n\n    if liste[milieu] == cible:\n        # Cas de base : on a trouvé cible exactement au milieu\n        return milieu\n    elif liste[milieu] < cible:\n        # cible est plus grande : elle ne peut être que dans la moitié\n        # DROITE (liste triée), on réduit donc la portion explorée en\n        # excluant le milieu et tout ce qui est à sa gauche\n        return recherche_dichotomique(liste, cible, milieu + 1, borne_sup)\n    else:\n        # cible est plus petite : elle ne peut être que dans la moitié\n        # GAUCHE, on réduit la portion explorée en excluant le milieu et\n        # tout ce qui est à sa droite\n        return recherche_dichotomique(liste, cible, borne_inf, milieu - 1)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[1, 3, 5, 7, 9, 11], 7]",
+          "[[1, 3, 5, 7, 9, 11], 4]",
+          "[[2, 4, 6, 8], 2]",
+          "[[2, 4, 6, 8], 8]",
+          "[[5], 5]",
+          "[[], 1]"
+        ],
+        "hints": [
+          "Le cas de base est une portion vide à explorer (`borne_inf > borne_sup`) : cible n'a pas été trouvée, renvoie -1.",
+          "Si `liste[milieu]` est plus petite que `cible`, la recherche continue uniquement dans la moitié DROITE (`milieu + 1` à `borne_sup`) ; si elle est plus grande, uniquement dans la moitié GAUCHE (`borne_inf` à `milieu - 1`)."
+        ]
       }
     ]
   },
@@ -1812,6 +2064,127 @@
         "sql_solution": "-- COUNT(*) compte le nombre de lignes qui vérifient la condition WHERE\nSELECT COUNT(*) FROM etudiants WHERE age < 18;",
         "test_cases": [],
         "hints": []
+      }
+    ]
+  },
+  {
+    "name": "Calcul numérique (numpy)",
+    "slug": "calcul-numerique",
+    "description": "Manipuler des tableaux numpy et implémenter des méthodes numériques classiques (intégration, résolution d'équations différentielles) — utile pour les enseignements de spécialité Physique-Chimie et Sciences de l'Ingénieur (SII).",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Tableau numpy rempli de zéros",
+        "slug": "tableau-zeros",
+        "statement": "Écris une fonction `tableau_zeros(n)` qui renvoie un tableau **numpy** de taille `n`, rempli de zéros.\n\nIndice : la fonction `np.zeros` fait exactement ça.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef tableau_zeros(n):\n    pass\n",
+        "function_name": "tableau_zeros",
+        "solution_code": "import numpy as np\n\ndef tableau_zeros(n):\n    # np.zeros(n) crée directement un tableau numpy de taille n rempli de 0.0\n    return np.zeros(n)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[5]",
+          "[1]",
+          "[0]"
+        ],
+        "hints": [
+          "`np.zeros(n)` renvoie directement un tableau numpy de taille `n` rempli de zéros — pas besoin de boucle."
+        ]
+      },
+      {
+        "title": "Tableau numpy rempli de uns",
+        "slug": "tableau-uns",
+        "statement": "Écris une fonction `tableau_uns(n)` qui renvoie un tableau **numpy** de taille `n`, rempli de uns.\n\nIndice : la fonction `np.ones` fait exactement ça.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef tableau_uns(n):\n    pass\n",
+        "function_name": "tableau_uns",
+        "solution_code": "import numpy as np\n\ndef tableau_uns(n):\n    # np.ones(n) crée directement un tableau numpy de taille n rempli de 1.0\n    return np.ones(n)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[4]",
+          "[1]",
+          "[0]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Intégration : méthode des rectangles",
+        "slug": "integration-rectangles",
+        "statement": "On dispose des vitesses successives d'un mobile, mesurées à intervalles de temps réguliers `dt`.\n\nÉcris une fonction `integration_rectangles(vitesses, dt, x0)` qui renvoie un tableau numpy des positions correspondantes (même taille que `vitesses`), obtenues par la **méthode des rectangles**, à partir d'une position initiale `x0`.\n\nExemple : `integration_rectangles([2, 4, 6], 1, 0)` renvoie `[0, 2, 6]`.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef integration_rectangles(vitesses, dt, x0):\n    pass\n",
+        "function_name": "integration_rectangles",
+        "solution_code": "import numpy as np\n\ndef integration_rectangles(vitesses, dt, x0):\n    n = len(vitesses)\n    positions = np.zeros(n)\n    positions[0] = x0\n    # Méthode des rectangles : on avance en supposant la vitesse constante\n    # (égale à sa valeur au DÉBUT de l'intervalle) sur toute la durée dt\n    for i in range(1, n):\n        positions[i] = positions[i - 1] + vitesses[i - 1] * dt\n    return positions\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[2, 4, 6], 1, 0]",
+          "[[1, 1, 1, 1], 2, 5]",
+          "[[0, 0, 0], 1, 10]"
+        ],
+        "hints": [
+          "`position[i] = position[i-1] + vitesse[i-1] * dt` : on utilise la vitesse au DÉBUT de l'intervalle, pas celle de la fin."
+        ]
+      },
+      {
+        "title": "Intégration : méthode des trapèzes",
+        "slug": "integration-trapezes",
+        "statement": "Reprends l'exercice précédent, mais cette fois en utilisant la **méthode des trapèzes**.\n\nÉcris une fonction `integration_trapezes(vitesses, dt, x0)` qui renvoie un tableau numpy des positions correspondantes (même taille que `vitesses`), à partir d'une position initiale `x0`.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef integration_trapezes(vitesses, dt, x0):\n    pass\n",
+        "function_name": "integration_trapezes",
+        "solution_code": "import numpy as np\n\ndef integration_trapezes(vitesses, dt, x0):\n    n = len(vitesses)\n    positions = np.zeros(n)\n    positions[0] = x0\n    # Méthode des trapèzes : on prend la MOYENNE des vitesses de début et\n    # de fin d'intervalle, plus précise que la méthode des rectangles\n    for i in range(1, n):\n        positions[i] = positions[i - 1] + (vitesses[i - 1] + vitesses[i]) / 2 * dt\n    return positions\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[2, 4, 6], 1, 0]",
+          "[[1, 1, 1, 1], 2, 5]",
+          "[[0, 0, 0], 1, 10]"
+        ],
+        "hints": [
+          "Contrairement à la méthode des rectangles, on prend ici la moyenne entre `vitesse[i-1]` et `vitesse[i]`."
+        ]
+      },
+      {
+        "title": "Méthode d'Euler — équation différentielle d'ordre 1 (décharge d'un condensateur)",
+        "slug": "euler-ordre-1",
+        "statement": "On étudie la décharge d'un condensateur de capacité `C` dans une résistance `R`. La tension `u(t)` à ses bornes suit l'équation différentielle du premier ordre :\n\n`du/dt = -u / (R*C)`\n\navec `u(0) = u0`.\n\nÉcris une fonction `euler_rc(u0, R, C, dt, n)` qui calcule, avec la **méthode d'Euler explicite**, un tableau numpy des `n+1` valeurs de `u` aux instants `t = 0, dt, 2*dt, ..., n*dt`.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef euler_rc(u0, R, C, dt, n):\n    pass\n",
+        "function_name": "euler_rc",
+        "solution_code": "import numpy as np\n\ndef euler_rc(u0, R, C, dt, n):\n    tau = R * C\n    u = np.zeros(n + 1)\n    u[0] = u0\n    # Méthode d'Euler explicite : on avance pas à pas en utilisant la dérivée\n    # calculée au point courant (ici, la loi du/dt = -u/tau)\n    for k in range(n):\n        u[k + 1] = u[k] + dt * (-u[k] / tau)\n    return u\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[10, 1000, 0.001, 0.1, 5]",
+          "[5, 100, 0.01, 0.1, 3]",
+          "[1, 1, 1, 0.5, 4]"
+        ],
+        "hints": [
+          "`u[k+1] = u[k] + dt * (-u[k] / (R*C))` : c'est la définition même de la méthode d'Euler appliquée à cette équation."
+        ]
+      },
+      {
+        "title": "Méthode d'Euler — équation différentielle d'ordre 2 (oscillateur masse-ressort)",
+        "slug": "euler-ordre-2",
+        "statement": "On étudie un système masse-ressort sans frottement : une masse `m` accrochée à un ressort de raideur `k`, dont la position `x(t)` suit l'équation différentielle du second ordre :\n\n`m * x'' = -k * x`\n\nÉcris une fonction `euler_masse_ressort(x0, v0, k, m, dt, n)` qui calcule, avec la méthode d'Euler explicite, un tableau numpy des `n+1` valeurs de la position `x` aux instants `t = 0, dt, ..., n*dt` (la vitesse `v` est calculée en interne à chaque étape, mais seule la position est renvoyée).",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef euler_masse_ressort(x0, v0, k, m, dt, n):\n    pass\n",
+        "function_name": "euler_masse_ressort",
+        "solution_code": "import numpy as np\n\ndef euler_masse_ressort(x0, v0, k, m, dt, n):\n    x = np.zeros(n + 1)\n    v = np.zeros(n + 1)\n    x[0] = x0\n    v[0] = v0\n    # On met à jour position ET vitesse à CHAQUE pas, en utilisant les valeurs\n    # du pas précédent (x[step], v[step]) : c'est le principe de la méthode\n    # d'Euler appliquée au système d'ordre 1 équivalent (x' = v, v' = -(k/m)*x)\n    for step in range(n):\n        x[step + 1] = x[step] + dt * v[step]\n        v[step + 1] = v[step] + dt * (-(k / m) * x[step])\n    return x\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[1, 0, 10, 1, 0.01, 10]",
+          "[0, 1, 4, 1, 0.1, 5]",
+          "[2, -1, 5, 2, 0.05, 8]"
+        ],
+        "hints": [
+          "Deux tableaux internes (x et v) évoluent en parallèle, mais la fonction ne renvoie que x.",
+          "Attention à utiliser x[step] et v[step] (valeurs du pas précédent) pour calculer x[step+1] et v[step+1], pas les valeurs déjà mises à jour."
+        ]
       }
     ]
   }

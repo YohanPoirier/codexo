@@ -175,8 +175,7 @@ class Exercise(models.Model):
 
         message = (
             f"Cet exercice doit être résolu avec une fonction récursive : {fn} doit "
-            "s'appeler elle-même dans son propre code (remplace toute boucle for/while "
-            "par un appel récursif)."
+            "s'appeler elle-même dans son propre code."
         )
 
         lines = [
@@ -247,7 +246,16 @@ for _case in _cases:
     try:
         with _contextlib.redirect_stdout(_out):
             _obtenu = __FN__(*_args)
-        _ok = _obtenu == _attendu
+        try:
+            _ok = bool(_obtenu == _attendu)
+        except (ValueError, TypeError):
+            # __obtenu/_attendu sont des tableaux (ex: numpy) : la comparaison
+            # élément par élément n'a pas de valeur booléenne unique. On repasse
+            # par des listes Python, dont l'égalité EST un booléen unique.
+            try:
+                _ok = list(_obtenu) == list(_attendu)
+            except Exception:
+                _ok = False
         __RESULTS__.append((_ok, f"__FN__({_args_repr}) doit valoir {_attendu!r} (obtenu : {_obtenu!r})", _out.getvalue()))
     except Exception as e:
         __RESULTS__.append((False, f"__FN__({_args_repr}) a levé une erreur : {e}", _out.getvalue()))

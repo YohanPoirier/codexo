@@ -185,6 +185,14 @@
     runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
     try {
       pyodide = await loadPyodide();
+      // testCode inclut déjà le texte de solution_code (voir Exercise.build_test_code
+      // côté serveur) : si l'exercice utilise numpy, "numpy" apparaît forcément dans
+      // testCode. On ne charge donc le package que pour les exercices qui en ont besoin,
+      // pas systématiquement pour tous (évite d'alourdir le chargement des exercices
+      // qui n'en ont pas l'usage).
+      if (testCode.includes("numpy")) {
+        await pyodide.loadPackage("numpy");
+      }
     } catch (e) {
       runBtn.textContent = "Erreur de chargement de Python";
       return;
