@@ -74,6 +74,12 @@ class Exercise(models.Model):
         (SQL, "SQL (requête)"),
     ]
 
+    # Slug du thème (voir Theme.slug) pour lequel on vérifie automatiquement, en plus des
+    # tests habituels, que la fonction soumise est bien récursive (voir
+    # _build_python_test_code / _build_recursion_check). Le thème "Récursivité" doit donc
+    # être créé avec EXACTEMENT ce slug pour que le contrôle s'applique.
+    RECURSION_THEME_SLUG = "recursivite"
+
     theme = models.ForeignKey(Theme, related_name="exercises", on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     slug = models.SlugField()
@@ -151,6 +157,47 @@ class Exercise(models.Model):
             return self._build_sql_test_code()
         return self._build_python_test_code()
 
+    def _build_recursion_check(self, fn):
+        """Génère le fragment de code (chaîne Python, vide si non applicable) qui vérifie que
+        la fonction __STUDENT_CODE__ soumise par l'étudiant est bien récursive, quand ce
+        contrôle est activé pour ce thème (voir RECURSION_THEME_SLUG).
+
+        Contrôle PUREMENT STATIQUE (analyse du texte du code via le module ast, pas de son
+        exécution) : on cherche, dans le corps de la fonction nommée `fn`, un appel (ast.Call)
+        qui se nomme lui-même. Limite connue et acceptée : un appel récursif placé dans une
+        branche jamais exécutée (ex: 'if False:') validerait quand même ce contrôle — jugé
+        marginal comparé à la simplicité de l'approche pour un usage pédagogique.
+
+        Si la fonction n'est pas jugée récursive, une entrée d'échec est ajoutée à
+        __RESULTS__, au même titre qu'un test raté classique."""
+        if self.theme.slug != self.RECURSION_THEME_SLUG:
+            return ""
+
+        message = (
+            f"Cet exercice doit être résolu avec une fonction récursive : {fn} doit "
+            "s'appeler elle-même dans son propre code (remplace toute boucle for/while "
+            "par un appel récursif)."
+        )
+
+        lines = [
+            "try:",
+            "    _arbre_etudiant = ast.parse(__STUDENT_CODE__)",
+            "except Exception:",
+            "    _arbre_etudiant = None",
+            "_est_recursif = False",
+            "if _arbre_etudiant is not None:",
+            "    for _noeud in ast.walk(_arbre_etudiant):",
+            f"        if isinstance(_noeud, ast.FunctionDef) and _noeud.name == {fn!r}:",
+            "            for _sous_noeud in ast.walk(_noeud):",
+            "                if (isinstance(_sous_noeud, ast.Call)",
+            "                        and isinstance(_sous_noeud.func, ast.Name)",
+            f"                        and _sous_noeud.func.id == {fn!r}):",
+            "                    _est_recursif = True",
+            "if not _est_recursif:",
+            f"    __RESULTS__.append((False, {message!r}, \"\"))",
+        ]
+        return "\n".join(lines) + "\n"
+
     def _build_python_test_code(self):
         """Génère le code de test pour un exercice Python : appelle solution_code pour calculer
         l'attendu de chaque TestCase, puis compare à ce que produit la fonction de l'étudiant.
@@ -177,10 +224,11 @@ class Exercise(models.Model):
         cases_json = _json.dumps(cases_payload, ensure_ascii=False)
         errors_json = _json.dumps(parse_errors, ensure_ascii=False)
         solution_json = _json.dumps(self.solution_code or "", ensure_ascii=False)
+        recursion_check = self._build_recursion_check(fn)
 
         template = '''__RESULTS__ = []
-import json as _json, io as _io, contextlib as _contextlib
-_cases = _json.loads(%(cases_json)r)
+import json as _json, io as _io, contextlib as _contextlib, ast
+%(recursion_check)s_cases = _json.loads(%(cases_json)r)
 _parse_errors = _json.loads(%(errors_json)r)
 for _err in _parse_errors:
     __RESULTS__.append((False, f"Erreur de configuration de l'exercice : {_err}", ""))
@@ -203,7 +251,12 @@ for _case in _cases:
         __RESULTS__.append((_ok, f"__FN__({_args_repr}) doit valoir {_attendu!r} (obtenu : {_obtenu!r})", _out.getvalue()))
     except Exception as e:
         __RESULTS__.append((False, f"__FN__({_args_repr}) a levé une erreur : {e}", _out.getvalue()))
-''' % {"cases_json": cases_json, "errors_json": errors_json, "solution_json": solution_json}
+''' % {
+            "cases_json": cases_json,
+            "errors_json": errors_json,
+            "solution_json": solution_json,
+            "recursion_check": recursion_check,
+        }
 
         return template.replace("__FN__", fn)
 
