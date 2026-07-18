@@ -1,3 +1,4 @@
+import itertools
 import json
 from datetime import timedelta
 
@@ -245,7 +246,8 @@ def _stats_row(user, exercise, label):
 @staff_member_required
 def stats(request):
     """Page de statistiques réservée aux membres de l'équipe (admin/staff), avec bascule
-    "par étudiant" (une ligne par exercice) / "par exercice" (une ligne par étudiant)."""
+    "par étudiant" (une ligne par exercice, regroupées par thème dans un menu déroulant) /
+    "par exercice" (une ligne par étudiant, tableau plat)."""
     mode = request.GET.get("mode", "student")
     if mode not in ("student", "exercise"):
         mode = "student"
@@ -256,13 +258,31 @@ def stats(request):
     selected_student = None
     selected_exercise = None
     rows = []
+    grouped_rows = []
 
     if mode == "student":
         student_id = request.GET.get("student_id")
         if student_id:
             selected_student = get_object_or_404(User, id=student_id)
-            for exercise in exercises:
-                rows.append(_stats_row(selected_student, exercise, label=f"{exercise.theme.name} — {exercise.title}"))
+            exercises_list = list(exercises)
+            # Le label ne contient plus que le titre de l'exercice (pas le nom du thème,
+            # celui-ci devient l'en-tête du groupe déroulant, voir template).
+            student_rows = [
+                _stats_row(selected_student, exercise, label=exercise.title)
+                for exercise in exercises_list
+            ]
+            # itertools.groupby exige que les éléments à regrouper soient déjà consécutifs
+            # pour une même clé : c'est garanti ici puisque exercises_list est trié par
+            # theme__order (voir la queryset "exercises" ci-dessus).
+            paired = zip(exercises_list, student_rows)
+            for theme, group in itertools.groupby(paired, key=lambda pair: pair[0].theme):
+                theme_rows = [row for _exercise, row in group]
+                grouped_rows.append({
+                    "theme_name": theme.name,
+                    "rows": theme_rows,
+                    "total": len(theme_rows),
+                    "done": sum(1 for row in theme_rows if row["reussi"]),
+                })
     else:
         exercise_id = request.GET.get("exercise_id")
         if exercise_id:
@@ -280,5 +300,6 @@ def stats(request):
             "selected_student": selected_student,
             "selected_exercise": selected_exercise,
             "rows": rows,
+            "grouped_rows": grouped_rows,
         },
     )

@@ -44,9 +44,19 @@ header.site .brand {
   color: var(--indigo-deep); text-decoration: none; letter-spacing: -.01em;
 }
 header.site .brand .dot { color: var(--amber); }
-header.site nav { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+header.site nav { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; }
 header.site nav a { font-size: .92rem; color: var(--ink-soft); text-decoration: none; }
 header.site nav a:hover { color: var(--indigo); }
+
+/* --- Bouton "Déconnexion" : visuellement identique à un lien de nav (.header.site nav a),
+   même si c'est un <button> dans un <form> (POST requis par LogoutView, voir base.html) --- */
+.logout-form { display: contents; }
+.nav-link-btn {
+  font-family: inherit; font-size: .92rem; color: var(--ink-soft);
+  background: none; border: none; padding: 0; margin: 0;
+  cursor: pointer; text-decoration: none;
+}
+.nav-link-btn:hover { color: var(--indigo); }
 
 .nav-toggle {
   display: none;
@@ -73,6 +83,7 @@ header.site nav a:hover { color: var(--indigo); }
   }
   header.site nav.open { display: flex; }
   header.site nav a { padding: 8px 0; font-size: .95rem; }
+  .nav-link-btn { padding: 8px 0; font-size: .95rem; }
 }
 
 main { padding: 48px 0 80px; }
@@ -462,4 +473,28 @@ table.schema-columns code {
 .stats-cell-center { text-align: center; }
 .stats-yes { color: var(--ok); font-weight: 600; }
 .stats-no { color: var(--ink-soft); }
+/* Rouge plutôt que vert : contrairement à "Réussi", voir le corrigé après un abandon
+   n'est pas un signal positif à mettre en valeur de la même façon */
+.stats-warn { color: var(--err); font-weight: 600; }
 
+/* --- Regroupement par thème (mode "par étudiant") : un <details> par thème --- */
+.stats-theme-group {
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  margin-bottom: 16px; overflow: hidden; background: var(--paper);
+}
+.stats-theme-summary {
+  cursor: pointer; list-style: none; padding: 14px 20px;
+  background: var(--paper-alt); font-family: 'JetBrains Mono', monospace;
+  font-size: .85rem; font-weight: 600; color: var(--indigo-deep);
+  display: flex; align-items: center; gap: 8px;
+}
+.stats-theme-summary::-webkit-details-marker { display: none; }
+.stats-theme-count { color: var(--ink-soft); font-weight: 400; text-transform: none; letter-spacing: normal; }
+.stats-theme-summary::marker { content: ""; }
+.stats-theme-summary::before {
+  content: "▸"; color: var(--amber); transition: transform .12s ease; flex-shrink: 0;
+}
+.stats-theme-group[open] .stats-theme-summary::before { transform: rotate(90deg); }
+.stats-theme-group[open] .stats-theme-summary { border-bottom: 1px solid var(--rule); }
+.stats-theme-group .stats-table { margin: 0; }
+.stats-theme-group .table-scroll { padding: 4px 6px; }

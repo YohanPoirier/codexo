@@ -22,7 +22,10 @@
           <a href="/admin/">Administration</a>
           <a href="{% url 'stats' %}">Statistiques</a>
         {% endif %}
-        <a href="{% url 'logout' %}">Déconnexion</a>
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+          {% csrf_token %}
+          <button type="submit" class="nav-link-btn">Déconnexion</button>
+        </form>
       {% else %}
         <a href="{% url 'login' %}">Connexion</a>
         <a href="{% url 'signup' %}">Inscription</a>
