@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Theme, Exercise, Result, TestCase, Hint, Abandonment
+from .models import Theme, Exercise, TestCase, Hint
 
 
 class ExerciseInline(admin.TabularInline):
@@ -75,19 +75,6 @@ class ExerciseAdmin(admin.ModelAdmin):
         ),
     )
 
-
-@admin.register(Result)
-class ResultAdmin(admin.ModelAdmin):
-    list_display = ("user", "exercise", "success", "created_at")
-    list_filter = ("success", "exercise__theme", "created_at")
-    search_fields = ("user__email",)
-    readonly_fields = ("user", "exercise", "submitted_code", "success", "created_at")
-
-
-@admin.register(Abandonment)
-class AbandonmentAdmin(admin.ModelAdmin):
-    list_display = ("user", "exercise", "created_at")
-    list_filter = ("exercise__theme", "created_at")
-    search_fields = ("user__email",)
-    # Pas de readonly_fields : supprimer une ligne ici lève le verrou de 48h manuellement,
-    # pratique si un étudiant a un empêchement légitime.
+# Result, Abandonment et HintReveal ne sont plus enregistrés ici : leurs données restent en
+# base et alimentent la page /stats/, mais elles n'ont plus besoin d'être gérées à la main
+# depuis l'admin (pas de create/edit/delete pertinent pour ces journaux de suivi).

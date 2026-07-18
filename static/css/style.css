@@ -434,3 +434,32 @@ table.schema-columns code {
 .cm-s-default .cm-property   { color: #d6deeb !important; }
 .cm-s-default .cm-operator   { color: #e8ecf7 !important; }
 .cm-s-default .cm-error      { color: #ff5370 !important; }
+
+
+/* --- Page de statistiques (admin) --- */
+.stats-filters {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+  background: var(--paper-alt); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 18px 20px; margin: 24px 0 28px;
+}
+.stats-mode { display: flex; gap: 18px; font-size: .92rem; }
+.stats-mode label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.stats-filters select {
+  padding: 8px 12px; border: 1px solid var(--rule); border-radius: 6px; font-size: .92rem;
+  background: white; min-width: 220px;
+}
+.stats-select-hidden { display: none; }
+
+.stats-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.stats-table th, .stats-table td {
+  text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--rule);
+}
+.stats-table th {
+  font-family: 'JetBrains Mono', monospace; font-size: .74rem; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--ink-soft); font-weight: 500;
+}
+.stats-table tbody tr:hover { background: var(--paper-alt); }
+.stats-cell-center { text-align: center; }
+.stats-yes { color: var(--ok); font-weight: 600; }
+.stats-no { color: var(--ink-soft); }
+

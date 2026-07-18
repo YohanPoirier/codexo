@@ -402,6 +402,23 @@ class Result(models.Model):
     submitted_code = models.TextField()
     success = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_attempt = models.BooleanField(
+        default=False,
+        help_text=(
+            "True uniquement si cette ligne vient d'un clic sur \"Vérifier\" (une vraie tentative "
+            "de résolution). False pour les sauvegardes automatiques (départ de page) ou manuelles "
+            "(bouton disquette), qui créent aussi une ligne Result mais ne comptent pas comme un essai."
+        ),
+    )
+    time_seconds = models.PositiveIntegerField(
+        default=0,
+        help_text=(
+            "Temps écoulé (en secondes), mesuré côté navigateur, depuis le dernier enregistrement "
+            "pour cet exercice (ou depuis le chargement de la page si c'est le premier). Sommer ce "
+            "champ sur toutes les lignes Result d'un couple (user, exercise) donne le temps total "
+            "passé, même si l'étudiant a quitté puis repris l'exercice plusieurs fois."
+        ),
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -409,3 +426,22 @@ class Result(models.Model):
     def __str__(self):
         status = "réussi" if self.success else "échoué"
         return f"{self.user} — {self.exercise} ({status})"
+
+
+class HintReveal(models.Model):
+    """Enregistre qu'un étudiant a révélé un indice donné (clic sur le bouton "Indice"),
+    pour pouvoir compter combien d'indices il a consultés sur un exercice. unique_together
+    évite qu'un même indice compte plusieurs fois si le clic est renvoyé plus d'une fois
+    (l'étudiant ne peut de toute façon pas re-révéler un indice déjà affiché côté interface,
+    mais cette contrainte protège aussi contre un double envoi réseau)."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="hint_reveals", on_delete=models.CASCADE)
+    hint = models.ForeignKey(Hint, related_name="reveals", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        unique_together = ("user", "hint")
+
+    def __str__(self):
+        return f"{self.user} a vu l'indice #{self.hint.order} de {self.hint.exercise}"

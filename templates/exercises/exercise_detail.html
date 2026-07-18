@@ -12,7 +12,7 @@
     <button id="hint-btn" type="button" class="hint-btn">Indice</button>
     <div id="hints-list">
       {% for hint in hints %}
-        <div class="hint-item hidden">
+        <div class="hint-item hidden" data-hint-id="{{ hint.id }}">
           <span class="hint-icon">💡</span>
           <div class="hint-text">{{ hint.text|render_statement }}</div>
         </div>
@@ -76,6 +76,9 @@
   const EXERCISE_KIND = "{{ exercise.kind }}";
   const TESTS_URL = "{% url 'exercise_tests' exercise.id %}";
   const SUBMIT_URL = "{% url 'submit_result' exercise.id %}";
+  // Contient un "0" à la place de l'id d'indice : exercise.js remplace "/0/" par
+  // "/<vrai_id>/" au moment du clic (voir hint-btn dans exercise.js).
+  const HINT_VIEWED_URL_TEMPLATE = "{% url 'hint_viewed' 0 %}";
   const LAST_SUBMITTED_CODE = {% if last_result %}"{{ last_result.submitted_code|escapejs }}"{% else %}null{% endif %};
   </script>
   <script src="{% static 'js/exercise.js' %}"></script>

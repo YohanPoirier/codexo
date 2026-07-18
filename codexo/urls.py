@@ -11,9 +11,11 @@ urlpatterns = [
     path('signup/', signup, name='signup'),
     path('', ex_views.theme_list, name='theme_list'),
     path('profil/', ex_views.profile, name='profile'),
+    path('stats/', ex_views.stats, name='stats'),
     path('theme/<slug:theme_slug>/', ex_views.exercise_list, name='exercise_list'),
     path('theme/<slug:theme_slug>/<slug:exercise_slug>/', ex_views.exercise_detail, name='exercise_detail'),
     path('api/exercise/<int:exercise_id>/tests/', ex_views.exercise_tests, name='exercise_tests'),
     path('api/exercise/<int:exercise_id>/submit/', ex_views.submit_result, name='submit_result'),
     path('api/exercise/<int:exercise_id>/abandon/', ex_views.abandon_exercise, name='abandon_exercise'),
+    path('api/hint/<int:hint_id>/viewed/', ex_views.hint_viewed, name='hint_viewed'),
 ]

@@ -11,6 +11,16 @@
   let cm = null; // instance CodeMirror de l'éditeur, créée dans init()
   let solutionCM = null; // instance CodeMirror (lecture seule) du corrigé, créée à la 1ère réussite
 
+  // --- Suivi du temps passé : voir submitResult() plus bas pour le détail du calcul ---
+  let lastCheckpoint = Date.now();
+
+  function elapsedSecondsSinceCheckpoint() {
+    const now = Date.now();
+    const seconds = Math.max(0, Math.round((now - lastCheckpoint) / 1000));
+    lastCheckpoint = now;
+    return seconds;
+  }
+
   function getCode() {
     return cm ? cm.getValue() : editor.value;
   }
@@ -127,7 +137,22 @@
 
     hintBtn.addEventListener("click", function () {
       if (revealedCount < hintItems.length) {
-        hintItems[revealedCount].classList.remove("hidden");
+        const item = hintItems[revealedCount];
+        item.classList.remove("hidden");
+
+        // Signale au serveur que cet indice a été vu (voir HintReveal côté Django),
+        // pour la page de stats. HINT_VIEWED_URL_TEMPLATE contient un "0" à la place
+        // de l'id, injecté par le template (voir exercise_detail.html).
+        const hintId = item.dataset.hintId;
+        if (hintId && typeof HINT_VIEWED_URL_TEMPLATE !== "undefined") {
+          fetch(HINT_VIEWED_URL_TEMPLATE.replace("/0/", "/" + hintId + "/"), {
+            method: "POST",
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+          }).catch(() => {
+            /* silencieux : un indice non comptabilisé ne doit pas gêner l'étudiant */
+          });
+        }
+
         revealedCount++;
         if (revealedCount >= hintItems.length) {
           hintBtn.classList.add("hidden");
@@ -201,7 +226,14 @@
     runBtn.textContent = "Vérifier";
   }
 
-  async function submitResult(code, success) {
+  async function submitResult(code, success, isAttempt) {
+    // Temps écoulé depuis le dernier enregistrement (ou depuis le chargement de la page
+    // si c'est le premier) : voir Result.time_seconds côté serveur. En sommant ce champ sur
+    // toutes les lignes d'un couple (user, exercise), on obtient le temps total passé, même
+    // si l'étudiant a quitté puis repris l'exercice plusieurs fois (chaque retour recharge la
+    // page, donc lastCheckpoint repart de zéro, mais rien n'est compté pendant que l'onglet
+    // était fermé, puisqu'aucun événement ne se déclenche à ce moment-là).
+    const timeSeconds = elapsedSecondsSinceCheckpoint();
     try {
       await fetch(SUBMIT_URL, {
         method: "POST",
@@ -209,7 +241,7 @@
           "Content-Type": "application/json",
           "X-CSRFToken": getCookie("csrftoken"),
         },
-        body: JSON.stringify({ code, success }),
+        body: JSON.stringify({ code, success, is_attempt: !!isAttempt, time_seconds: timeSeconds }),
       });
     } catch (e) {
       /* silencieux : l'échec de sauvegarde ne doit pas bloquer le retour visuel */
@@ -274,7 +306,7 @@ finally:
       if (runtimeError) {
         showRuntimeError("Erreur dans ton code :\n\n" + runtimeError);
         showSolutionIfSuccess(false);
-        await submitResult(code, false);
+        await submitResult(code, false, true);
       } else {
         const resultsProxy = pyodide.globals.get("__RESULTS__");
         const results = resultsProxy ? resultsProxy.toJs() : [];
@@ -289,7 +321,7 @@ finally:
           showResultLines(items);
         }
         showSolutionIfSuccess(allOk);
-        await submitResult(code, allOk);
+        await submitResult(code, allOk, true);
       }
     } catch (e) {
       showRuntimeError("Erreur inattendue : " + e.message);
@@ -337,9 +369,15 @@ finally:
     if (code === lastSavedCode) return; // déjà sauvegardé (ex: pagehide juste après visibilitychange)
     lastSavedCode = code;
 
+    // is_attempt="" (donc False côté serveur, voir submit_result) : une sauvegarde au départ
+    // de la page n'est pas un "essai" au sens propre, l'étudiant n'a pas cliqué sur "Vérifier".
+    const timeSeconds = elapsedSecondsSinceCheckpoint();
+
     const payload = new URLSearchParams();
     payload.set("code", code);
     payload.set("success", "");
+    payload.set("is_attempt", "");
+    payload.set("time_seconds", String(timeSeconds));
     payload.set("csrfmiddlewaretoken", getCookie("csrftoken"));
 
     const sent = navigator.sendBeacon && navigator.sendBeacon(SUBMIT_URL, payload);
@@ -352,7 +390,7 @@ finally:
           "Content-Type": "application/json",
           "X-CSRFToken": getCookie("csrftoken"),
         },
-        body: JSON.stringify({ code, success: false }),
+        body: JSON.stringify({ code, success: false, is_attempt: false, time_seconds: timeSeconds }),
       }).catch(() => {});
     }
   }
@@ -367,7 +405,7 @@ finally:
   const saveConfirm = document.getElementById("save-confirm");
   if (saveBtn) {
     saveBtn.addEventListener("click", async function () {
-      await submitResult(getCode(), false);
+      await submitResult(getCode(), false, false);
       if (saveConfirm) {
         saveConfirm.classList.add("visible");
         setTimeout(() => saveConfirm.classList.remove("visible"), 1500);

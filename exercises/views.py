@@ -3,13 +3,16 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 
-from .models import Theme, Exercise, Result, Abandonment
+from accounts.models import User
+from .models import Theme, Exercise, Result, Abandonment, Hint, HintReveal
 
 # Durée pendant laquelle un exercice est verrouillé après un abandon (voir abandon_exercise
 # ci-dessous). Passé ce délai, l'étudiant peut retenter l'exercice normalement.
@@ -122,7 +125,10 @@ def abandon_exercise(request, exercise_id):
     """Enregistre l'abandon d'un exercice (l'étudiant a confirmé vouloir voir la solution).
     Verrouille l'exercice pendant ABANDON_LOCK_DURATION : il ne sera alors même plus
     consultable (voir exercise_detail), à l'exception de cet instant précis, où la solution
-    s'affiche une seule fois (drapeau de session 'just_abandoned_exercise_id')."""
+    s'affiche une seule fois (drapeau de session 'just_abandoned_exercise_id').
+
+    Cette ligne Abandonment sert aussi, indépendamment de tout le reste (réussite ou non), de
+    trace fiable de "l'étudiant a vu le corrigé" pour la page de stats (voir la vue stats)."""
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
     exercise = get_object_or_404(Exercise, id=exercise_id)
@@ -180,6 +186,8 @@ def submit_result(request, exercise_id):
         payload = json.loads(request.body.decode("utf-8"))
         submitted_code = payload.get("code", "")
         success = bool(payload.get("success", False))
+        is_attempt = bool(payload.get("is_attempt", False))
+        time_seconds = int(payload.get("time_seconds") or 0)
     else:
         # navigator.sendBeacon() envoie les données au format formulaire classique
         # (application/x-www-form-urlencoded), pas en JSON — utilisé pour la sauvegarde
@@ -188,11 +196,89 @@ def submit_result(request, exercise_id):
         # même si la page se ferme juste après l'appel.
         submitted_code = request.POST.get("code", "")
         success = request.POST.get("success") in ("true", "1", "True")
+        is_attempt = request.POST.get("is_attempt") in ("true", "1", "True")
+        time_seconds = int(request.POST.get("time_seconds") or 0)
 
     Result.objects.create(
         user=request.user,
         exercise=exercise,
         submitted_code=submitted_code,
         success=success,
+        is_attempt=is_attempt,
+        time_seconds=time_seconds,
     )
     return JsonResponse({"ok": True})
+
+
+@login_required
+def hint_viewed(request, hint_id):
+    """Enregistre qu'un indice a été révélé à l'étudiant (clic sur le bouton "Indice"),
+    voir HintReveal. get_or_create plutôt que create : si le même clic est renvoyé deux fois
+    (ex: double appel réseau), on ne compte l'indice qu'une seule fois."""
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    hint = get_object_or_404(Hint, id=hint_id)
+    HintReveal.objects.get_or_create(user=request.user, hint=hint)
+    return JsonResponse({"ok": True})
+
+
+def _stats_row(user, exercise, label):
+    """Construit une ligne de la page de stats pour un couple (user, exercise) donné.
+    Chaque indicateur est calculé INDÉPENDAMMENT des autres (pas de logique croisée du
+    type "réussi si a vu le corrigé") : ce sont des faits distincts qu'on affiche côte à côte."""
+    results = Result.objects.filter(user=user, exercise=exercise)
+    reussi = results.filter(success=True).exists()
+    nb_essais = results.filter(is_attempt=True).count()
+    temps_total = results.aggregate(total=Sum("time_seconds"))["total"] or 0
+    nb_indices = HintReveal.objects.filter(user=user, hint__exercise=exercise).count()
+    corrige_vu = Abandonment.objects.filter(user=user, exercise=exercise).exists()
+    return {
+        "label": label,
+        "reussi": reussi,
+        "nb_essais": nb_essais,
+        "temps_total": temps_total,
+        "nb_indices": nb_indices,
+        "corrige_vu": corrige_vu,
+    }
+
+
+@staff_member_required
+def stats(request):
+    """Page de statistiques réservée aux membres de l'équipe (admin/staff), avec bascule
+    "par étudiant" (une ligne par exercice) / "par exercice" (une ligne par étudiant)."""
+    mode = request.GET.get("mode", "student")
+    if mode not in ("student", "exercise"):
+        mode = "student"
+
+    students = User.objects.filter(is_superuser=False).order_by("email")
+    exercises = Exercise.objects.select_related("theme").order_by("theme__order", "order")
+
+    selected_student = None
+    selected_exercise = None
+    rows = []
+
+    if mode == "student":
+        student_id = request.GET.get("student_id")
+        if student_id:
+            selected_student = get_object_or_404(User, id=student_id)
+            for exercise in exercises:
+                rows.append(_stats_row(selected_student, exercise, label=f"{exercise.theme.name} — {exercise.title}"))
+    else:
+        exercise_id = request.GET.get("exercise_id")
+        if exercise_id:
+            selected_exercise = get_object_or_404(Exercise, id=exercise_id)
+            for student in students:
+                rows.append(_stats_row(student, selected_exercise, label=student.display_name or student.email))
+
+    return render(
+        request,
+        "exercises/stats.html",
+        {
+            "mode": mode,
+            "students": students,
+            "exercises": exercises,
+            "selected_student": selected_student,
+            "selected_exercise": selected_exercise,
+            "rows": rows,
+        },
+    )
