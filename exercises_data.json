@@ -2187,5 +2187,131 @@
         ]
       }
     ]
+  },
+  {
+    "name": "IA",
+    "slug": "ia",
+    "description": "Découvrir deux algorithmes classiques de l'intelligence artificielle : la classification supervisée (KNN) et le clustering non supervisé (k-means).",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "KNN (1/3)",
+        "slug": "knn-1-3",
+        "statement": "Le KNN (k plus proches voisins) est un algorithme de **classification supervisée** : on dispose d'exemples déjà étiquetés, et on classe un nouvel élément en regardant à quels exemples connus il ressemble le plus.\n\n**Contexte** : une exploitation trie ses fruits automatiquement. Chaque fruit est décrit par son poids (en grammes) et son diamètre (en mm). Pour comparer deux fruits, on utilise la **distance euclidienne** entre leurs deux points de coordonnées (poids, diamètre).\n\nÉcris une fonction `distance(fruit1, fruit2)` qui renvoie la distance euclidienne entre `fruit1` et `fruit2`, deux listes `[poids, diamètre]`.\n\nCette fonction sera réutilisée dans les deux prochains exercices pour construire un classifieur KNN complet.",
+        "kind": "python",
+        "starter_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    pass\n",
+        "function_name": "distance",
+        "solution_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    # On récupère le poids et le diamètre de chaque fruit\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    # Distance euclidienne : racine carrée de la somme des carrés des écarts\n    # sur chaque coordonnée (théorème de Pythagore en 2 dimensions)\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[150, 72], [130, 68]]",
+          "[[0, 0], [3, 4]]",
+          "[[100, 50], [100, 50]]",
+          "[[200, 80], [150, 60]]"
+        ],
+        "hints": [
+          "La distance euclidienne entre deux points s'obtient avec `sqrt((x1-x2)**2 + (y1-y2)**2)`."
+        ]
+      },
+      {
+        "title": "KNN (2/3)",
+        "slug": "knn-2-3",
+        "statement": "On dispose maintenant d'une base de fruits déjà étiquetés : chaque fruit connu est un tuple `(poids, diamètre, étiquette)`, où `étiquette` vaut `'pomme'`, `'orange'` ou `'citron'`.\n\nÉcris une fonction `plus_proches_voisins(fruit, echantillons, k)` qui renvoie la liste des étiquettes des `k` fruits connus les plus proches de `fruit` (au sens de la distance euclidienne), **triée du plus proche au plus éloigné**.\n\n**Tu ne dois pas utiliser `sort()` ni `sorted()`** dans cet exercice : sélectionne le plus proche restant, `k` fois de suite (un peu comme le tri par sélection vu précédemment).\n\nTu peux réutiliser la fonction `distance` de l'exercice précédent (déjà disponible dans le code de départ).\n\nExemple : avec `echantillons = [(150, 72, 'pomme'), (60, 42, 'citron')]` et `fruit = [140, 70]`, `plus_proches_voisins(fruit, echantillons, 2)` renvoie `['pomme', 'citron']` (le fruit connu (150, 72) est plus proche que (60, 42)).",
+        "kind": "python",
+        "starter_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n\n\ndef plus_proches_voisins(fruit, echantillons, k):\n    pass\n",
+        "function_name": "plus_proches_voisins",
+        "solution_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n\n\ndef plus_proches_voisins(fruit, echantillons, k):\n    # On calcule la distance entre \"fruit\" et chaque échantillon connu, en gardant\n    # sa distance ET son étiquette ensemble dans un tuple (distance, etiquette)\n    distances = []\n    for poids, diametre, etiquette in echantillons:\n        d = distance(fruit, [poids, diametre])\n        distances.append((d, etiquette))\n\n    resultat = []\n    # On sélectionne k fois le plus proche restant, exactement comme le tri par\n    # sélection : à chaque tour, on cherche le minimum parmi ce qu'il reste,\n    # on le retient, puis on le retire (.pop) pour ne plus le reconsidérer\n    for _ in range(k):\n        indice_min = 0\n        for i in range(1, len(distances)):\n            if distances[i][0] < distances[indice_min][0]:\n                indice_min = i\n        _, etiquette = distances.pop(indice_min)\n        resultat.append(etiquette)\n    return resultat\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[140, 70], [(150, 72, 'pomme'), (130, 68, 'pomme'), (300, 90, 'orange'), (280, 85, 'orange'), (50, 40, 'citron'), (60, 42, 'citron')], 3]",
+          "[[140, 70], [(150, 72, 'pomme'), (130, 68, 'pomme'), (300, 90, 'orange'), (280, 85, 'orange'), (50, 40, 'citron'), (60, 42, 'citron')], 5]",
+          "[[150, 72], [(150, 72, 'pomme'), (130, 68, 'pomme'), (300, 90, 'orange'), (280, 85, 'orange'), (50, 40, 'citron'), (60, 42, 'citron')], 1]"
+        ],
+        "hints": [
+          "Comme tu ne peux pas utiliser sort()/sorted() ici, inspire-toi du tri par sélection : cherche à chaque tour l'élément restant qui a la plus petite distance.",
+          "Retire l'élément trouvé de la liste des distances restantes (avec `.pop(indice)`), pour ne pas le sélectionner deux fois."
+        ]
+      },
+      {
+        "title": "KNN (3/3)",
+        "slug": "knn-3-3",
+        "statement": "Dernière étape : transformer les k plus proches voisins (exercice précédent) en une vraie prédiction, en votant.\n\nÉcris une fonction `classifier_fruit(fruit, echantillons, k)` qui renvoie l'étiquette prédite pour `fruit` : celle qui est la **plus fréquente** parmi ses `k` plus proches voisins (vote majoritaire).\n\nTu peux réutiliser la fonction `plus_proches_voisins` de l'exercice précédent (déjà disponible dans le code de départ).\n\n**Cas d'égalité** : si plusieurs étiquettes sont à égalité pour la première place, renvoie celle qui appartient au voisin **le plus proche** parmi celles à égalité.",
+        "kind": "python",
+        "starter_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n\n\ndef plus_proches_voisins(fruit, echantillons, k):\n    distances = []\n    for poids, diametre, etiquette in echantillons:\n        d = distance(fruit, [poids, diametre])\n        distances.append((d, etiquette))\n    resultat = []\n    for _ in range(k):\n        indice_min = 0\n        for i in range(1, len(distances)):\n            if distances[i][0] < distances[indice_min][0]:\n                indice_min = i\n        _, etiquette = distances.pop(indice_min)\n        resultat.append(etiquette)\n    return resultat\n\n\ndef classifier_fruit(fruit, echantillons, k):\n    pass\n",
+        "function_name": "classifier_fruit",
+        "solution_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n\n\ndef plus_proches_voisins(fruit, echantillons, k):\n    distances = []\n    for poids, diametre, etiquette in echantillons:\n        d = distance(fruit, [poids, diametre])\n        distances.append((d, etiquette))\n    resultat = []\n    for _ in range(k):\n        indice_min = 0\n        for i in range(1, len(distances)):\n            if distances[i][0] < distances[indice_min][0]:\n                indice_min = i\n        _, etiquette = distances.pop(indice_min)\n        resultat.append(etiquette)\n    return resultat\n\n\ndef classifier_fruit(fruit, echantillons, k):\n    voisins = plus_proches_voisins(fruit, echantillons, k)\n    # On compte le nombre d'occurrences de chaque étiquette parmi les voisins\n    compteur = {}\n    for etiquette in voisins:\n        if etiquette in compteur:\n            compteur[etiquette] += 1\n        else:\n            compteur[etiquette] = 1\n    # On cherche l'étiquette dont le compteur est le plus élevé, en parcourant\n    # les voisins DANS L'ORDRE (du plus proche au plus éloigné). Ainsi, en cas\n    # d'égalité entre deux étiquettes, celle qui atteint la première ce score\n    # maximal est celle du voisin le plus proche parmi les deux — exactement\n    # la règle de départage demandée dans l'énoncé.\n    meilleure_etiquette = None\n    meilleur_compte = -1\n    for etiquette in voisins:\n        if compteur[etiquette] > meilleur_compte:\n            meilleur_compte = compteur[etiquette]\n            meilleure_etiquette = etiquette\n    return meilleure_etiquette\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[140, 70], [(150, 72, 'pomme'), (130, 68, 'pomme'), (300, 90, 'orange'), (280, 85, 'orange'), (50, 40, 'citron'), (60, 42, 'citron')], 3]",
+          "[[140, 70], [(150, 72, 'pomme'), (130, 68, 'pomme'), (300, 90, 'orange'), (280, 85, 'orange'), (50, 40, 'citron'), (60, 42, 'citron')], 5]",
+          "[[55, 41], [(150, 72, 'pomme'), (130, 68, 'pomme'), (300, 90, 'orange'), (280, 85, 'orange'), (50, 40, 'citron'), (60, 42, 'citron')], 3]",
+          "[[150, 72], [(150, 72, 'pomme'), (130, 68, 'pomme'), (300, 90, 'orange'), (280, 85, 'orange'), (50, 40, 'citron'), (60, 42, 'citron')], 1]"
+        ],
+        "hints": [
+          "Réutilise `plus_proches_voisins` pour obtenir la liste triée des étiquettes voisines, puis compte les occurrences de chaque étiquette avec un dictionnaire."
+        ]
+      },
+      {
+        "title": "K-means (1/3)",
+        "slug": "kmeans-1-3",
+        "statement": "Le k-means est un algorithme de **clustering** (regroupement) : contrairement au KNN, on ne connaît pas de catégories à l'avance — l'algorithme les découvre lui-même à partir des données.\n\n**Contexte** : une boutique en ligne veut regrouper ses clients selon leur comportement d'achat, pour adapter ses campagnes marketing (relance, fidélisation, promotions...). C'est ce qu'on appelle la **segmentation client**, une application classique du k-means en entreprise, souvent basée sur l'analyse RFM (Récence, Fréquence, Montant). Ici, on utilise une version simplifiée à deux critères : le montant total dépensé et le nombre de commandes passées. L'algorithme regroupe automatiquement les clients qui se ressemblent (par exemple des \"gros acheteurs réguliers\", des \"acheteurs occasionnels\", des \"clients inactifs\"), sans qu'on lui dise à l'avance quels groupes chercher.\n\nLe k-means répète deux étapes : (1) assigner chaque point au centroïde (le \"centre\") le plus proche, (2) recalculer chaque centroïde comme le barycentre des points qui lui sont assignés — jusqu'à ce que les groupes se stabilisent.\n\n**Cette première étape** : écris une fonction `assigner_client(client, centroides)` qui renvoie l'**indice** (la position dans la liste `centroides`) du centroïde le plus proche de `client`, au sens de la distance euclidienne. `client` est une liste `[montant, nombre_commandes]`, et `centroides` une liste de points de même forme.\n\nExemple : `assigner_client([500, 10], [[100, 2], [600, 12], [50, 1]])` renvoie `1` (le centroïde `[600, 12]`, à l'indice 1, est le plus proche).",
+        "kind": "python",
+        "starter_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    pass\n",
+        "function_name": "assigner_client",
+        "solution_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    # On part du premier centroïde comme meilleur candidat...\n    meilleur_indice = 0\n    meilleure_distance = distance(client, centroides[0])\n    # ...puis on compare aux suivants : si l'un d'eux est plus proche, on\n    # met à jour l'indice ET la distance de référence\n    for i in range(1, len(centroides)):\n        d = distance(client, centroides[i])\n        if d < meilleure_distance:\n            meilleure_distance = d\n            meilleur_indice = i\n    return meilleur_indice\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[500, 10], [[100, 2], [600, 12], [50, 1]]]",
+          "[[10, 1], [[100, 2], [600, 12], [50, 1]]]",
+          "[[100, 2], [[100, 2], [600, 12]]]"
+        ],
+        "hints": [
+          "Compare la distance du client à chaque centroïde un par un, en retenant l'indice de celui qui donne la plus petite distance jusqu'ici."
+        ]
+      },
+      {
+        "title": "K-means (2/3)",
+        "slug": "kmeans-2-3",
+        "statement": "Une fois chaque client assigné à un groupe (exercice précédent), il faut recalculer la position du centroïde de ce groupe : son nouveau centre est le **barycentre** (la moyenne) des points qui lui appartiennent.\n\nÉcris une fonction `recalculer_centroide(clients)` qui renvoie le nouveau centroïde `[montant_moyen, nombre_commandes_moyen]` d'un groupe de clients (liste de points `[montant, nombre_commandes]`).",
+        "kind": "python",
+        "starter_code": "def recalculer_centroide(clients):\n    pass\n",
+        "function_name": "recalculer_centroide",
+        "solution_code": "def recalculer_centroide(clients):\n    n = len(clients)\n    # On additionne d'un côté tous les montants, de l'autre tous les nombres\n    # de commandes, en parcourant les clients un par un\n    total_montant = 0\n    total_commandes = 0\n    for client in clients:\n        total_montant += client[0]\n        total_commandes += client[1]\n    # La moyenne de chaque coordonnée : le total divisé par le nombre de clients\n    return [total_montant / n, total_commandes / n]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[[100, 2], [200, 4]]]",
+          "[[[500, 10], [300, 6], [400, 8]]]",
+          "[[[0, 0]]]"
+        ],
+        "hints": [
+          "Additionne les montants d'un côté, les nombres de commandes de l'autre, puis divise chaque total par le nombre de clients du groupe."
+        ]
+      },
+      {
+        "title": "K-means (3/3)",
+        "slug": "kmeans-3-3",
+        "statement": "Combine les deux fonctions précédentes (déjà fournies dans le code de départ) pour implémenter l'algorithme k-means complet.\n\nÉcris une fonction `kmeans(clients, centroides_initiaux, nb_iterations)` qui répète `nb_iterations` fois l'assignation des clients puis le recalcul des centroïdes, et renvoie la liste finale des centroïdes.\n\n`centroides_initiaux` ne doit pas être modifiée par ta fonction : construis une nouvelle liste de centroïdes à faire évoluer.",
+        "kind": "python",
+        "starter_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    meilleur_indice = 0\n    meilleure_distance = distance(client, centroides[0])\n    for i in range(1, len(centroides)):\n        d = distance(client, centroides[i])\n        if d < meilleure_distance:\n            meilleure_distance = d\n            meilleur_indice = i\n    return meilleur_indice\n\n\ndef recalculer_centroide(clients):\n    n = len(clients)\n    total_montant = 0\n    total_commandes = 0\n    for client in clients:\n        total_montant += client[0]\n        total_commandes += client[1]\n    return [total_montant / n, total_commandes / n]\n\n\ndef kmeans(clients, centroides_initiaux, nb_iterations):\n    pass\n",
+        "function_name": "kmeans",
+        "solution_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    meilleur_indice = 0\n    meilleure_distance = distance(client, centroides[0])\n    for i in range(1, len(centroides)):\n        d = distance(client, centroides[i])\n        if d < meilleure_distance:\n            meilleure_distance = d\n            meilleur_indice = i\n    return meilleur_indice\n\n\ndef recalculer_centroide(clients):\n    n = len(clients)\n    total_montant = 0\n    total_commandes = 0\n    for client in clients:\n        total_montant += client[0]\n        total_commandes += client[1]\n    return [total_montant / n, total_commandes / n]\n\n\ndef kmeans(clients, centroides_initiaux, nb_iterations):\n    # On part d'une COPIE des centroïdes initiaux, pour ne jamais modifier\n    # centroides_initiaux (comme pour les tris \"non en place\")\n    centroides = [list(c) for c in centroides_initiaux]\n\n    for _ in range(nb_iterations):\n        # On répartit chaque client dans le groupe de son centroïde le plus\n        # proche. groupes[i] contient les clients assignés au centroïde d'indice i\n        groupes = [[] for _ in centroides]\n        for client in clients:\n            indice = assigner_client(client, centroides)\n            groupes[indice].append(client)\n\n        # Chaque centroïde devient le barycentre de son groupe. On ne\n        # recalcule que les groupes non vides, pour éviter une division par\n        # zéro dans recalculer_centroide (cas non rencontré dans les tests de\n        # cet exercice, mais qui évite un plantage si un centroïde se\n        # retrouve sans aucun client assigné)\n        for i in range(len(centroides)):\n            if groupes[i]:\n                centroides[i] = recalculer_centroide(groupes[i])\n\n    return centroides\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[[900, 18], [850, 16], [350, 6], [320, 5], [80, 1], [60, 2]], [[1000, 20], [400, 7], [100, 2]], 1]",
+          "[[[900, 18], [850, 16], [350, 6], [320, 5], [80, 1], [60, 2]], [[1000, 20], [400, 7], [100, 2]], 5]",
+          "[[[900, 18], [850, 16], [80, 1], [60, 2]], [[1000, 20], [100, 2]], 3]"
+        ],
+        "hints": [
+          "Réutilise `assigner_client` pour répartir les clients en groupes, puis `recalculer_centroide` sur chaque groupe non vide — répète ces deux étapes `nb_iterations` fois.",
+          "Pense à partir d'une copie de `centroides_initiaux` (par exemple avec une liste en compréhension) : ne modifie jamais la liste reçue en argument."
+        ]
+      }
+    ]
   }
 ]

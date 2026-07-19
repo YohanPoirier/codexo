@@ -17,7 +17,7 @@ from .models import Theme, Exercise, Result, Abandonment, Hint, HintReveal
 
 # Durée pendant laquelle un exercice est verrouillé après un abandon (voir abandon_exercise
 # ci-dessous). Passé ce délai, l'étudiant peut retenter l'exercice normalement.
-ABANDON_LOCK_DURATION = timedelta(hours=48)
+ABANDON_LOCK_DURATION = timedelta(hours=2)
 
 # En local (DEBUG=True), le verrou est désactivé pour ne pas gêner les tests/débogage :
 # un abandon est toujours enregistré en base, mais il ne bloque jamais l'accès à l'exercice.
@@ -124,7 +124,7 @@ def exercise_detail(request, theme_slug, exercise_slug):
 @login_required
 def abandon_exercise(request, exercise_id):
     """Enregistre l'abandon d'un exercice (l'étudiant a confirmé vouloir voir la solution).
-    Verrouille l'exercice pendant ABANDON_LOCK_DURATION : il ne sera alors même plus
+    Verrouille l'exercice pendant ABANDON_LOCK_DURATION (2h) : il ne sera alors même plus
     consultable (voir exercise_detail), à l'exception de cet instant précis, où la solution
     s'affiche une seule fois (drapeau de session 'just_abandoned_exercise_id').
 

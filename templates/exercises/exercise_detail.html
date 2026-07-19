@@ -27,7 +27,7 @@
     <p class="abandon-locked-title">Solution de l'exercice</p>
     <p>Voici la solution. Prends le temps de bien la comprendre (ligne par ligne si besoin) avant de continuer.</p>
     <pre class="solution-code"><code>{% if exercise.kind == "sql" %}{{ exercise.sql_solution }}{% else %}{{ exercise.solution_code }}{% endif %}</code></pre>
-    <p>Tu pourras retenter cet exercice à partir du <strong>{{ retry_at|date:"d/m/Y à H:i" }}</strong>. En attendant, il ne sera plus consultable — retiens bien ce que tu viens de voir !</p>
+    <p>Tu pourras retenter cet exercice à partir du <strong>{{ retry_at|date:"d/m/Y à H:i" }}</strong>. En attendant, il ne sera plus consultable.</p>
   </div>
 {% else %}
   <div class="editor-panel">
@@ -54,7 +54,7 @@
   <div id="abandon-modal" class="modal-overlay">
     <div class="modal-box">
       <p>Avant de regarder la solution, nous vous conseillons d'user et abuser de <code>print()</code> afin de comprendre ce que fait votre programme actuel.</p>
-      <p>Si vous confirmez abandonner, vous pourrez tenter l'exercice dans 48h.</p>
+      <p>Si vous confirmez abandonner, vous pourrez tenter l'exercice dans 2h.</p>
       <form method="post" action="{% url 'abandon_exercise' exercise.id %}">
         {% csrf_token %}
         <div class="modal-actions">
