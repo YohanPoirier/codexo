@@ -2313,5 +2313,238 @@
         ]
       }
     ]
+  },
+  {
+    "name": "Programmation dynamique",
+    "slug": "programmation-dynamique",
+    "description": "Éviter de recalculer plusieurs fois les mêmes sous-problèmes : mémoïsation (top-down) et tableaux (bottom-up), avec quelques exemples où une approche gloutonne échoue.",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Fibonacci — top-down (mémoïsation)",
+        "slug": "fibonacci-top-down",
+        "statement": "On reprend la suite de Fibonacci (vue dans le thème Récursivité), mais cette fois en évitant de recalculer plusieurs fois les mêmes valeurs.\n\nRappel : `fibonacci(0) = 0`, `fibonacci(1) = 1`, et pour `n >= 2`, `fibonacci(n) = fibonacci(n-1) + fibonacci(n-2)`.\n\nÉcris une fonction `fibonacci_top_down(n)` qui calcule ce terme avec la technique du **top-down (mémoïsation)** : on garde la même structure récursive que la version naïve, mais on stocke chaque résultat déjà calculé dans un cache, pour ne jamais refaire le même calcul deux fois.\n\n**Rappel : pourquoi la version naïve est lente**\n\nLa version récursive naïve de `fibonacci` recalcule de nombreuses fois les mêmes valeurs : par exemple, `fibonacci(5)` appelle `fibonacci(3)` deux fois, qui lui-même rappelle `fibonacci(1)` et `fibonacci(2)` à chaque fois... Le nombre d'appels explose de façon exponentielle avec `n`.\n\n**Principe de la mémoïsation** : avant de calculer `fibonacci(k)`, on vérifie s'il est déjà dans le cache. S'il y est, on renvoie directement cette valeur (aucun nouveau calcul). Sinon, on le calcule normalement, puis on le stocke dans le cache avant de le renvoyer.",
+        "kind": "python",
+        "starter_code": "def fibonacci_top_down(n):\n    pass\n",
+        "function_name": "fibonacci_top_down",
+        "solution_code": "# --- Version 1 : cache défini EN DEHORS de la fonction (variable globale) ---\n_cache_fibonacci_top_down = {}\n\n\ndef fibonacci_top_down_v1(n):\n    if n in _cache_fibonacci_top_down:\n        return _cache_fibonacci_top_down[n]\n\n    if n <= 1:\n        resultat = n\n    else:\n        resultat = fibonacci_top_down_v1(n - 1) + fibonacci_top_down_v1(n - 2)\n\n    _cache_fibonacci_top_down[n] = resultat\n    return resultat\n\n\n# --- Version 2 (recommandée) : cache défini À L'INTÉRIEUR de la fonction ---\n# Le cache n'a aucune utilité en dehors de cet appel précis à\n# fibonacci_top_down : pas besoin de le laisser traîner comme variable\n# globale. En le créant à l'intérieur (ici via une fonction auxiliaire\n# imbriquée, qui y accède par fermeture), on évite de polluer l'espace de\n# noms global, et tout risque d'oublier de le remettre à zéro entre deux\n# appels qui n'ont rien à voir l'un avec l'autre.\ndef fibonacci_top_down(n):\n    cache = {}\n\n    def aux(k):\n        if k in cache:\n            return cache[k]\n        if k <= 1:\n            resultat = k\n        else:\n            resultat = aux(k - 1) + aux(k - 2)\n        cache[k] = resultat\n        return resultat\n\n    return aux(n)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[0]",
+          "[1]",
+          "[2]",
+          "[5]",
+          "[10]",
+          "[20]"
+        ],
+        "hints": [
+          "Le cache doit être créé une seule fois (par exemple avec un dictionnaire), pour qu'il persiste entre tous les appels récursifs d'un même calcul.",
+          "Avant de calculer fibonacci_top_down(k), vérifie toujours si k est déjà dans le cache : si oui, renvoie directement cette valeur sans rien recalculer."
+        ]
+      },
+      {
+        "title": "Fibonacci — bottom-up (tabulation)",
+        "slug": "fibonacci-bottom-up",
+        "statement": "Reprends le calcul de la suite de Fibonacci, mais cette fois avec la technique du **bottom-up (tabulation)** : au lieu de partir de `n` et de descendre par récursion vers les cas de base (comme en top-down), on part des cas de base et on remonte vers `n`, en remplissant un tableau étape par étape, sans aucune récursion.\n\nÉcris une fonction `fibonacci_bottom_up(n)` qui construit un tableau `table` où `table[i]` contient `fibonacci(i)`, en le remplissant dans l'ordre croissant des indices, puis renvoie `table[n]`.",
+        "kind": "python",
+        "starter_code": "def fibonacci_bottom_up(n):\n    pass\n",
+        "function_name": "fibonacci_bottom_up",
+        "solution_code": "def fibonacci_bottom_up(n):\n    # Cas de base à part : un tableau de taille n+1 nécessite au moins 2 cases\n    # (indices 0 et 1) pour s'initialiser correctement juste après\n    if n <= 1:\n        return n\n\n    # table[i] contiendra fibonacci(i), pour i allant de 0 à n\n    table = [0] * (n + 1)\n    table[1] = 1\n\n    # On remonte du plus petit vers le plus grand : chaque case ne dépend\n    # que des deux précédentes, déjà calculées à ce stade\n    for i in range(2, n + 1):\n        table[i] = table[i - 1] + table[i - 2]\n\n    return table[n]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[0]",
+          "[1]",
+          "[2]",
+          "[5]",
+          "[10]",
+          "[20]"
+        ],
+        "hints": [
+          "Initialise un tableau de taille n+1 avec table[0] = 0 et table[1] = 1, puis remplis les cases suivantes une par une, dans l'ordre croissant.",
+          "Contrairement au top-down, il n'y a ici aucun appel récursif : juste une boucle qui avance du début vers la fin du tableau."
+        ]
+      },
+      {
+        "title": "Chemin dans une grille — top-down (mémoïsation)",
+        "slug": "chemin-grille-top-down",
+        "statement": "On se déplace sur une grille de `m` lignes et `n` colonnes, en partant de la case en haut à gauche (`(0, 0)`) pour arriver à la case en bas à droite (`(m-1, n-1)`), en ne pouvant se déplacer que vers le bas ou vers la droite à chaque étape.\n\nÉcris une fonction `chemin_grille_top_down(m, n)` qui calcule, avec la technique du **top-down (mémoïsation)**, le nombre total de chemins distincts permettant d'aller du coin haut-gauche au coin bas-droite.\n\n**Indice de raisonnement** : pour atteindre une grille de `m` lignes et `n` colonnes, on vient forcément soit d'une grille avec une ligne de moins, soit d'une grille avec une colonne de moins. Le nombre de chemins est donc la somme du nombre de chemins de ces deux sous-grilles.\n\n**Cas de base** : une grille d'une seule ligne (`m = 1`) ou d'une seule colonne (`n = 1`) n'offre qu'un seul chemin possible (tout droit).\n\nExemple : `chemin_grille_top_down(3, 3)` renvoie `6`.",
+        "kind": "python",
+        "starter_code": "def chemin_grille_top_down(m, n):\n    pass\n",
+        "function_name": "chemin_grille_top_down",
+        "solution_code": "# --- Version 1 : cache défini EN DEHORS de la fonction (variable globale) ---\n_cache_chemin_grille_top_down = {}\n\n\ndef chemin_grille_top_down_v1(m, n):\n    if (m, n) in _cache_chemin_grille_top_down:\n        return _cache_chemin_grille_top_down[(m, n)]\n\n    if m == 1 or n == 1:\n        resultat = 1\n    else:\n        resultat = chemin_grille_top_down_v1(m - 1, n) + chemin_grille_top_down_v1(m, n - 1)\n\n    _cache_chemin_grille_top_down[(m, n)] = resultat\n    return resultat\n\n\n# --- Version 2 (recommandée) : cache défini À L'INTÉRIEUR de la fonction ---\n# Comme pour Fibonacci, le cache ne sert à rien une fois l'appel terminé :\n# le créer à l'intérieur (via une fonction auxiliaire imbriquée) évite de le\n# laisser traîner inutilement en variable globale.\ndef chemin_grille_top_down(m, n):\n    cache = {}\n\n    def aux(i, j):\n        if (i, j) in cache:\n            return cache[(i, j)]\n        if i == 0 or j == 0:\n            resultat = 1\n        else:\n            resultat = aux(i - 1, j) + aux(i, j - 1)\n        cache[(i, j)] = resultat\n        return resultat\n\n    return aux(m - 1, n - 1)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[1, 1]",
+          "[2, 2]",
+          "[3, 3]",
+          "[3, 7]",
+          "[1, 5]",
+          "[5, 1]"
+        ],
+        "hints": [
+          "Le cache doit associer à chaque grille (m, n) déjà rencontrée le nombre de chemins déjà calculé.",
+          "N'oublie pas le cas de base : une grille d'une seule ligne ou d'une seule colonne n'offre qu'un seul chemin possible."
+        ]
+      },
+      {
+        "title": "Chemin dans une grille — bottom-up (tabulation)",
+        "slug": "chemin-grille-bottom-up",
+        "statement": "Reprends l'exercice précédent, mais cette fois avec la technique du **bottom-up (tabulation)** : construis directement un tableau 2D `table`, où `table[i][j]` contient le nombre de chemins menant à la case `(i, j)`, en le remplissant ligne par ligne (puis colonne par colonne), sans aucune récursion.\n\nÉcris une fonction `chemin_grille_bottom_up(m, n)` qui renvoie le nombre total de chemins distincts entre le coin haut-gauche et le coin bas-droite d'une grille de `m` lignes et `n` colonnes.",
+        "kind": "python",
+        "starter_code": "def chemin_grille_bottom_up(m, n):\n    pass\n",
+        "function_name": "chemin_grille_bottom_up",
+        "solution_code": "def chemin_grille_bottom_up(m, n):\n    # On initialise toute la première ligne et la première colonne à 1 (un\n    # seul chemin possible pour les atteindre)\n    table = [[1] * n for _ in range(m)]\n\n    for i in range(1, m):\n        for j in range(1, n):\n            # Comme en top-down : le nombre de chemins vers (i, j) est la\n            # somme du nombre de chemins vers la case du dessus et vers\n            # celle de gauche, déjà calculées à ce stade (on parcourt les\n            # lignes puis les colonnes dans l'ordre croissant)\n            table[i][j] = table[i - 1][j] + table[i][j - 1]\n\n    return table[m - 1][n - 1]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[1, 1]",
+          "[2, 2]",
+          "[3, 3]",
+          "[3, 7]",
+          "[1, 5]",
+          "[5, 1]"
+        ],
+        "hints": [
+          "Initialise la première ligne et la première colonne du tableau à 1 : un seul chemin possible pour les atteindre.",
+          "Remplis ensuite le tableau case par case, dans l'ordre croissant des lignes puis des colonnes : chaque case ne dépend que de celle du dessus et de celle de gauche, déjà calculées."
+        ]
+      },
+      {
+        "title": "Rendu de monnaie — glouton",
+        "slug": "rendu-monnaie-glouton",
+        "statement": "On veut rendre la monnaie sur un montant donné, en utilisant le moins de pièces possible parmi un ensemble de valeurs disponibles (illimitées en quantité).\n\nÉcris une fonction `rendu_glouton(montant, pieces)` qui calcule, avec un **algorithme glouton**, le nombre de pièces utilisées pour rendre exactement `montant`. `pieces` est la liste des valeurs de pièces disponibles (des entiers, donnée dans l'ordre décroissant).\n\n**Principe glouton** : on utilise autant que possible la plus grande pièce restante, avant de passer à la suivante, sans jamais revenir en arrière sur un choix déjà fait.\n\nExemple : `rendu_glouton(67, [50, 20, 10, 5, 2, 1])` renvoie `4` (50 + 10 + 5 + 2 = 67, avec 4 pièces).",
+        "kind": "python",
+        "starter_code": "def rendu_glouton(montant, pieces):\n    pass\n",
+        "function_name": "rendu_glouton",
+        "solution_code": "def rendu_glouton(montant, pieces):\n    # pieces est déjà donnée dans l'ordre décroissant : pas besoin de la\n    # retrier avant de l'utiliser\n    nb_pieces = 0\n    reste = montant\n\n    for piece in pieces:\n        if piece <= reste:\n            # reste // piece donne directement le nombre de fois qu'on peut\n            # utiliser cette pièce sans dépasser reste (pas besoin d'une\n            # boucle qui la soustrairait une par une)\n            nb_pieces += reste // piece\n            reste -= (reste // piece) * piece\n\n    return nb_pieces\n\n\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\n# donne le résultat optimal pour un système de pièces classique (comme\n# l'euro), mais pas pour n'importe quel système. Exemple concret avec les\n# pièces [4, 3, 1] pour un montant de 6 : le glouton choisit 4 + 1 + 1 = 3\n# pièces, alors que 3 + 3 = 2 pièces suffiraient (essaie rendu_glouton(6,\n# [4, 3, 1]) pour t'en convaincre). C'est exactement pour corriger ce genre\n# de cas que la programmation dynamique (top-down et bottom-up, voir la\n# suite) est nécessaire : elle explore toutes les combinaisons possibles,\n# au lieu de s'engager sans retour possible sur le plus grand choix\n# immédiat.\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[0, [50, 20, 10, 5, 2, 1]]",
+          "[67, [50, 20, 10, 5, 2, 1]]",
+          "[99, [50, 20, 10, 5, 2, 1]]",
+          "[30, [25, 10, 5, 1]]",
+          "[6, [4, 3, 1]]"
+        ],
+        "hints": [
+          "pieces est déjà triée par ordre décroissant : parcours-la simplement dans cet ordre, sans avoir besoin de la trier toi-même.",
+          "Utilise reste // piece pour savoir directement combien de fois une pièce peut être utilisée, sans boucle supplémentaire.",
+          "Le glouton ne revient jamais en arrière : une fois qu'il a choisi d'utiliser une pièce autant de fois que possible, il ne reconsidère jamais ce choix."
+        ]
+      },
+      {
+        "title": "Rendu de monnaie — top-down (mémoïsation)",
+        "slug": "rendu-monnaie-top-down",
+        "statement": "Reprends le problème du rendu de monnaie, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours le nombre minimal de pièces, contrairement à l'algorithme glouton de l'exercice précédent.\n\nÉcris une fonction `rendu_top_down(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible avec les pièces disponibles. Comme dans l'exercice précédent, `pieces` est donnée dans l'ordre décroissant (mais cette technique fonctionnerait tout aussi bien si ce n'était pas le cas, contrairement au glouton).\n\n**Indice de raisonnement** : pour rendre un montant `m`, on essaie chaque pièce disponible (si elle est inférieure ou égale à `m`) : utiliser cette pièce revient à ajouter 1 pièce au résultat optimal pour rendre `m - piece`. Le résultat pour `m` est le minimum obtenu en testant ainsi toutes les pièces possibles.\n\n**Cas de base** : rendre un montant de 0 nécessite 0 pièce.\n\nExemple : `rendu_top_down(6, [4, 3, 1])` renvoie `2` (3 + 3), là où le glouton de l'exercice précédent donnait 3 pièces (4 + 1 + 1).",
+        "kind": "python",
+        "starter_code": "def rendu_top_down(montant, pieces):\n    pass\n",
+        "function_name": "rendu_top_down",
+        "solution_code": "# --- Version 1 : cache défini EN DEHORS de la fonction (variable globale) ---\n_cache_rendu_top_down = {}\n\n\ndef rendu_top_down_v1(montant, pieces):\n    if montant == 0:\n        return 0\n\n    # Le cache est partagé par TOUS les appels à rendu_top_down_v1, y compris\n    # ceux faits avec des pieces différentes : on inclut donc pieces\n    # (converti en tuple, pour être utilisable comme clé de dictionnaire)\n    # dans la clé, sinon deux appels avec des systèmes de pièces différents\n    # mais le même montant se marcheraient dessus par erreur\n    cle = (montant, tuple(pieces))\n    if cle in _cache_rendu_top_down:\n        return _cache_rendu_top_down[cle]\n\n    # -1 sert de sentinelle \"impossible\", aussi bien pendant la récursion\n    # qu'à la sortie de la fonction : pas besoin d'une valeur différente\n    # (comme None) réservée à l'interne\n    meilleur = -1\n    for piece in pieces:\n        if piece <= montant:\n            sous_resultat = rendu_top_down_v1(montant - piece, pieces)\n            if sous_resultat != -1:\n                candidat = sous_resultat + 1\n                if meilleur == -1 or candidat < meilleur:\n                    meilleur = candidat\n\n    _cache_rendu_top_down[cle] = meilleur\n    return meilleur\n\n\n# --- Version 2 (recommandée) : cache défini À L'INTÉRIEUR de la fonction ---\n# Ici l'avantage est encore plus net que pour Fibonacci : comme pieces peut\n# changer d'un appel à l'autre, un cache global doit obligatoirement inclure\n# pieces dans sa clé pour rester correct (voir Version 1). Avec un cache créé\n# à l'intérieur de la fonction, ce problème disparaît totalement : chaque\n# appel à rendu_top_down travaille avec SON PROPRE cache, tout neuf, donc\n# plus besoin d'y penser.\ndef rendu_top_down(montant, pieces):\n    cache = {}\n\n    def aux(reste):\n        if reste == 0:\n            return 0\n        if reste in cache:\n            return cache[reste]\n\n        meilleur = None\n        for piece in pieces:\n            if piece <= reste:\n                sous_resultat = aux(reste - piece)\n                if sous_resultat is not None:\n                    candidat = sous_resultat + 1\n                    if meilleur is None or candidat < meilleur:\n                        meilleur = candidat\n\n        cache[reste] = meilleur\n        return meilleur\n\n    resultat = aux(montant)\n    return resultat if resultat is not None else -1\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[6, [4, 3, 1]]",
+          "[67, [50, 20, 10, 5, 2, 1]]",
+          "[11, [5, 2, 1]]",
+          "[3, [2]]",
+          "[0, [4, 3, 1]]"
+        ],
+        "hints": [
+          "Le cas de base est reste = 0 : 0 pièce nécessaire. Traite-le avant de regarder le cache.",
+          "Si aucune pièce ne permet d'atteindre exactement le montant restant, c'est que ce montant est impossible à rendre : propage cette information (par exemple via None, ou via une sentinelle comme -1) plutôt que de renvoyer une valeur au hasard."
+        ]
+      },
+      {
+        "title": "Rendu de monnaie — bottom-up (tabulation)",
+        "slug": "rendu-monnaie-bottom-up",
+        "statement": "Reprends le problème du rendu de monnaie avec la technique du **bottom-up (tabulation)** : construis un tableau `table` où `table[m]` contient le nombre minimal de pièces pour rendre le montant `m`, en le remplissant dans l'ordre croissant de `0` à `montant`.\n\nÉcris une fonction `rendu_bottom_up(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible. Comme dans les deux exercices précédents, `pieces` est donnée dans l'ordre décroissant.\n\n**Indice d'initialisation** : `table[0] = 0` (rendre 0, c'est 0 pièce). Pour représenter une case pas encore résolue, initialise les autres cases à une valeur volontairement très grande (par exemple `float('inf')`), qui sera remplacée dès qu'une combinaison de pièces est trouvée.",
+        "kind": "python",
+        "starter_code": "def rendu_bottom_up(montant, pieces):\n    pass\n",
+        "function_name": "rendu_bottom_up",
+        "solution_code": "def rendu_bottom_up(montant, pieces):\n    INFINI = float('inf')\n    # table[m] contiendra le nombre minimal de pièces pour rendre m\n    table = [0] + [INFINI] * montant\n\n    for m in range(1, montant + 1):\n        for piece in pieces:\n            if piece <= m and table[m - piece] + 1 < table[m]:\n                # Utiliser cette pièce donne un résultat meilleur que ce\n                # qu'on avait trouvé jusqu'ici pour ce montant m\n                table[m] = table[m - piece] + 1\n\n    # Si table[montant] est resté à l'infini, aucune combinaison de pièces\n    # ne permet de l'atteindre exactement\n    return table[montant] if table[montant] != INFINI else -1\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[6, [4, 3, 1]]",
+          "[67, [50, 20, 10, 5, 2, 1]]",
+          "[11, [5, 2, 1]]",
+          "[3, [2]]",
+          "[0, [4, 3, 1]]"
+        ],
+        "hints": [
+          "Initialise table[0] = 0 et toutes les autres cases à l'infini (float('inf')), en attendant de trouver une meilleure valeur.",
+          "Pour chaque montant m de 1 à montant, teste chaque pièce disponible : si elle est utilisable (piece <= m) et qu'elle améliore le résultat actuel, mets à jour table[m]."
+        ]
+      },
+      {
+        "title": "Sac à dos — glouton",
+        "slug": "sac-a-dos-glouton",
+        "statement": "Le problème du sac à dos (0/1 knapsack) : on dispose d'objets, chacun avec un poids et une valeur, et d'un sac ayant une capacité maximale. On veut choisir un sous-ensemble d'objets (chaque objet est pris en entier ou pas du tout, jamais fractionné) qui maximise la valeur totale, sans dépasser la capacité en poids.\n\nÉcris une fonction `sac_a_dos_glouton(objets, capacite)` qui calcule, avec un **algorithme glouton**, la valeur totale obtenue. `objets` est une liste de tuples `(poids, valeur)`.\n\n**Principe glouton** : on trie les objets par ordre décroissant de rapport valeur/poids (le meilleur rapport qualité-prix en premier), puis on ajoute chaque objet au sac tant qu'il y a encore assez de place, sans jamais revenir en arrière.\n\nExemple : `sac_a_dos_glouton([(10, 60), (20, 100), (30, 120)], 50)` : les rapports sont 6, 5 et 4 — on prend donc l'objet (10, 60) puis (20, 100) (poids total 30, valeur 160), et (30, 120) ne rentre plus (30 + 30 > 50). Résultat : `160`.",
+        "kind": "python",
+        "starter_code": "def sac_a_dos_glouton(objets, capacite):\n    pass\n",
+        "function_name": "sac_a_dos_glouton",
+        "solution_code": "def sac_a_dos_glouton(objets, capacite):\n    # Contrairement aux pièces de l'exercice précédent, les objets ne sont\n    # PAS donnés triés ici (leur \"meilleur ordre\" dépend du rapport\n    # valeur/poids, propre à chaque objet) : on les trie donc nous-mêmes,\n    # par rapport valeur/poids décroissant, pour privilégier les objets les\n    # plus rentables au kilo\n    objets_tries = sorted(objets, key=lambda o: o[1] / o[0], reverse=True)\n\n    poids_total = 0\n    valeur_totale = 0\n\n    for poids, valeur in objets_tries:\n        # On ajoute l'objet seulement s'il reste assez de place ; sinon on\n        # l'ignore définitivement (pas de retour en arrière possible)\n        if poids_total + poids <= capacite:\n            poids_total += poids\n            valeur_totale += valeur\n\n    return valeur_totale\n\n\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\n# n'est pas toujours optimal pour le sac à dos 0/1. Sur l'exemple de\n# l'énoncé ([(10, 60), (20, 100), (30, 120)], 50), le glouton s'arrête à\n# une valeur de 160, alors que la meilleure solution possible est en\n# réalité de prendre les objets (20, 100) et (30, 120) (poids total 50,\n# valeur 220). Ce regroupement n'est jamais considéré par le glouton, qui\n# prend l'objet (10, 60) dès le départ pour son bon rapport valeur/poids,\n# sans jamais revenir sur ce choix ensuite.\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[(10, 60), (20, 100), (30, 120)], 50]",
+          "[[(2, 3), (3, 4), (4, 5), (5, 6)], 5]",
+          "[[(1, 1), (2, 2), (3, 3)], 0]",
+          "[[(5, 10)], 5]",
+          "[[(5, 10)], 4]"
+        ],
+        "hints": [
+          "Contrairement aux pièces de l'exercice précédent, les objets ne sont pas fournis pré-triés ici : trie-les toi-même par rapport valeur/poids décroissant.",
+          "Le glouton ne revient jamais sur un choix : une fois qu'un objet est ignoré (faute de place), il ne sera jamais reconsidéré."
+        ]
+      },
+      {
+        "title": "Sac à dos — top-down (mémoïsation)",
+        "slug": "sac-a-dos-top-down",
+        "statement": "Reprends le problème du sac à dos, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours la valeur totale maximale possible, contrairement à l'algorithme glouton de l'exercice précédent.\n\nÉcris une fonction `sac_a_dos_top_down(objets, capacite)` qui renvoie la valeur maximale atteignable, en considérant les objets un par un, et en explorant à chaque étape les deux possibilités : ne pas prendre l'objet courant, ou le prendre (si son poids le permet).\n\n**Cas de base** : quand on a examiné tous les objets, ou qu'il ne reste plus de capacité disponible, la valeur ajoutée est 0.\n\nExemple : `sac_a_dos_top_down([(10, 60), (20, 100), (30, 120)], 50)` renvoie `220` (en prenant les objets (20, 100) et (30, 120)), contrairement au glouton de l'exercice précédent qui ne trouvait que 160.",
+        "kind": "python",
+        "starter_code": "def sac_a_dos_top_down(objets, capacite):\n    pass\n",
+        "function_name": "sac_a_dos_top_down",
+        "solution_code": "# --- Version 1 : cache défini EN DEHORS de la fonction (variable globale) ---\n_cache_sac_a_dos_top_down = {}\n\n\ndef sac_a_dos_top_down_v1(objets, capacite, i=0):\n    # i (l'indice de l'objet en cours d'examen) est ajouté comme PARAMÈTRE\n    # avec une valeur par défaut, plutôt que géré par une fonction\n    # auxiliaire imbriquée : la même astuce que pour recherche_dichotomique\n    # (thème Récursivité). L'appelant n'a jamais besoin de le préciser.\n    if i == len(objets) or capacite == 0:\n        return 0\n\n    # objets peut varier d'un appel à l'autre : comme pour rendu_top_down_v1,\n    # on l'inclut (converti en tuple) dans la clé du cache, sinon deux\n    # appels avec des objets différents mais les mêmes (i, capacite) se\n    # marcheraient dessus par erreur\n    cle = (i, capacite, tuple(objets))\n    if cle in _cache_sac_a_dos_top_down:\n        return _cache_sac_a_dos_top_down[cle]\n\n    poids, valeur = objets[i]\n\n    meilleur = sac_a_dos_top_down_v1(objets, capacite, i + 1)\n    if poids <= capacite:\n        avec_objet = valeur + sac_a_dos_top_down_v1(objets, capacite - poids, i + 1)\n        if avec_objet > meilleur:\n            meilleur = avec_objet\n\n    _cache_sac_a_dos_top_down[cle] = meilleur\n    return meilleur\n\n\n# --- Version 2 (recommandée) : cache défini À L'INTÉRIEUR de la fonction ---\n# Comme pour rendu_top_down, un cache global doit ici inclure à la fois i,\n# capacite ET objets dans sa clé pour rester correct d'un appel à l'autre\n# (voir Version 1). Avec le cache créé à l'intérieur de la fonction, la\n# fonction auxiliaire imbriquée accède directement à objets par fermeture,\n# sans avoir besoin de le remettre dans la clé à chaque fois : la clé peut\n# se limiter à (i, capacite_restante), plus simple et moins sujette à\n# erreur.\ndef sac_a_dos_top_down(objets, capacite):\n    cache = {}\n\n    def aux(i, capacite_restante):\n        if i == len(objets) or capacite_restante == 0:\n            return 0\n        if (i, capacite_restante) in cache:\n            return cache[(i, capacite_restante)]\n\n        poids, valeur = objets[i]\n\n        meilleur = aux(i + 1, capacite_restante)\n        if poids <= capacite_restante:\n            avec_objet = valeur + aux(i + 1, capacite_restante - poids)\n            if avec_objet > meilleur:\n                meilleur = avec_objet\n\n        cache[(i, capacite_restante)] = meilleur\n        return meilleur\n\n    return aux(0, capacite)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[(10, 60), (20, 100), (30, 120)], 50]",
+          "[[(2, 3), (3, 4), (4, 5), (5, 6)], 5]",
+          "[[(1, 1), (2, 2), (3, 3)], 0]",
+          "[[(5, 10)], 5]",
+          "[[(5, 10)], 4]"
+        ],
+        "hints": [
+          "À chaque objet, il y a exactement deux choix possibles : le laisser de côté, ou le prendre (uniquement s'il reste assez de capacité) — calcule les deux et garde le meilleur.",
+          "Le cache doit être indexé par les informations qui déterminent entièrement le sous-problème à résoudre : au minimum l'indice de l'objet courant et la capacité restante."
+        ]
+      },
+      {
+        "title": "Sac à dos — bottom-up (tabulation)",
+        "slug": "sac-a-dos-bottom-up",
+        "statement": "Reprends le problème du sac à dos avec la technique du **bottom-up (tabulation)** : construis un tableau 2D `table`, où `table[i][c]` représente la valeur maximale atteignable en ne considérant que les `i` premiers objets, avec une capacité de `c`.\n\nÉcris une fonction `sac_a_dos_bottom_up(objets, capacite)` qui renvoie la valeur maximale atteignable avec l'ensemble des objets et la capacité donnée.\n\n**Indice de construction** : pour chaque objet `i` (numéroté à partir de 1 dans le tableau, mais `objets[i-1]` dans la liste) et chaque capacité `c`, deux choix sont possibles, comme en top-down : ne pas le prendre (`table[i][c] = table[i-1][c]`), ou le prendre si son poids le permet (`table[i][c] = valeur + table[i-1][c - poids]`). `table[i][c]` vaut le meilleur des deux.",
+        "kind": "python",
+        "starter_code": "def sac_a_dos_bottom_up(objets, capacite):\n    pass\n",
+        "function_name": "sac_a_dos_bottom_up",
+        "solution_code": "def sac_a_dos_bottom_up(objets, capacite):\n    n = len(objets)\n    # table[i][c] : valeur maximale en ne considérant que les i premiers\n    # objets, avec une capacité c. table[0][c] = 0 pour toute capacité c\n    # (aucun objet considéré) : déjà garanti par l'initialisation à 0\n    table = [[0] * (capacite + 1) for _ in range(n + 1)]\n\n    for i in range(1, n + 1):\n        # objets[i - 1] : le i-ème objet correspond à l'indice i-1 dans la\n        # liste (le tableau, lui, réserve la ligne 0 au cas aucun objet)\n        poids, valeur = objets[i - 1]\n        for c in range(capacite + 1):\n            # Option 1 par défaut : ne pas prendre l'objet i\n            table[i][c] = table[i - 1][c]\n            # Option 2 : le prendre, si son poids le permet, si c'est meilleur\n            if poids <= c:\n                avec_objet = valeur + table[i - 1][c - poids]\n                if avec_objet > table[i][c]:\n                    table[i][c] = avec_objet\n\n    return table[n][capacite]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[(10, 60), (20, 100), (30, 120)], 50]",
+          "[[(2, 3), (3, 4), (4, 5), (5, 6)], 5]",
+          "[[(1, 1), (2, 2), (3, 3)], 0]",
+          "[[(5, 10)], 5]",
+          "[[(5, 10)], 4]"
+        ],
+        "hints": [
+          "table[0][c] vaut 0 pour toute capacité c : sans aucun objet à disposition, la valeur maximale est nulle — c'est déjà le cas si tu initialises le tableau à 0 partout.",
+          "Remplis le tableau objet par objet (ligne par ligne) : pour chaque case table[i][c], compare la valeur obtenue en ignorant l'objet i à celle obtenue en le prenant (si son poids le permet)."
+        ]
+      }
+    ]
   }
 ]
