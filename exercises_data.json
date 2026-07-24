@@ -1817,11 +1817,11 @@
       {
         "title": "Fibonacci — top-down",
         "slug": "fibonacci-top-down",
-        "statement": "On reprend la suite de Fibonacci (vue dans le thème Récursivité), mais cette fois en évitant de recalculer plusieurs fois les mêmes valeurs.\r\n\r\nRappel : `fibonacci(0) = 0`, `fibonacci(1) = 1`, et pour `n >= 2`, `fibonacci(n) = fibonacci(n-1) + fibonacci(n-2)`.\r\n\r\nÉcris une fonction `fibonacci_top_down(n)` qui calcule ce terme avec la technique du **top-down (mémoïsation)** : on garde la même structure récursive que la version naïve, mais on stocke chaque résultat déjà calculé dans un cache, pour ne jamais refaire le même calcul deux fois.\r\n\r\n**Rappel : pourquoi la version naïve est lente**\r\n\r\nLa version récursive naïve de `fibonacci` recalcule de nombreuses fois les mêmes valeurs : par exemple, `fibonacci(5)` appelle `fibonacci(3)` deux fois, qui lui-même rappelle `fibonacci(1)` et `fibonacci(2)` à chaque fois... Le nombre d'appels explose de façon exponentielle avec `n`.\r\n\r\n**Principe de la mémoïsation** : avant de calculer `fibonacci(k)`, on vérifie s'il est déjà dans le cache. S'il y est, on renvoie directement cette valeur (aucun nouveau calcul). Sinon, on le calcule normalement, puis on le stocke dans le cache avant de le renvoyer.",
+        "statement": "On rappelle la définition de la suite de Fibonacci : `fibonacci(0) = 0`, `fibonacci(1) = 1`, et pour `n >= 2`, `fibonacci(n) = fibonacci(n-1) + fibonacci(n-2)`.\r\n\r\nDans la méthode récursive naïve (voir le thème \"Récursivité\"), de nombreux termes sont calculés plusieurs fois ce qui augmente la complexité. On souhaite résoudre ce problème en utilisant la programmation dynamique - version top-down (mémoïsation).\r\n\r\nCompléter la fonction récursive auxiliaire  `aux(k)` afin celle-ci renvoie le la valeur de  `fibonacci(k)` en utilisant la variable `cache` dans le programme à compléter.",
         "kind": "python",
-        "starter_code": "def fibonacci_top_down(n):\r\n    pass",
-        "function_name": "fibonacci_top_down",
-        "solution_code": "# --- Version 1 : cache défini EN DEHORS de la fonction (variable globale) ---\r\n_cache_fibonacci_top_down = {}\r\n\r\n\r\ndef fibonacci_top_down_v1(n):\r\n    if n in _cache_fibonacci_top_down:\r\n        return _cache_fibonacci_top_down[n]\r\n\r\n    if n <= 1:\r\n        resultat = n\r\n    else:\r\n        resultat = fibonacci_top_down_v1(n - 1) + fibonacci_top_down_v1(n - 2)\r\n\r\n    _cache_fibonacci_top_down[n] = resultat\r\n    return resultat\r\n\r\n\r\n# --- Version 2 (recommandée) : cache défini À L'INTÉRIEUR de la fonction ---\r\n# Le cache n'a aucune utilité en dehors de cet appel précis à\r\n# fibonacci_top_down : pas besoin de le laisser traîner comme variable\r\n# globale. En le créant à l'intérieur (ici via une fonction auxiliaire\r\n# imbriquée, qui y accède par fermeture), on évite de polluer l'espace de\r\n# noms global, et tout risque d'oublier de le remettre à zéro entre deux\r\n# appels qui n'ont rien à voir l'un avec l'autre.\r\ndef fibonacci_top_down(n):\r\n    cache = {}\r\n\r\n    def aux(k):\r\n        if k in cache:\r\n            return cache[k]\r\n        if k <= 1:\r\n            resultat = k\r\n        else:\r\n            resultat = aux(k - 1) + aux(k - 2)\r\n        cache[k] = resultat\r\n        return resultat\r\n\r\n    return aux(n)",
+        "starter_code": "def fibonacci_td(n):\r\n    cache = {}\r\n\r\n    def aux(k):\r\n        pass\r\n        \r\n    return aux(n)",
+        "function_name": "fibonacci_td",
+        "solution_code": "def fibonacci_td(n):\r\n    cache = {}\r\n\r\n    def aux(k):\r\n        if k in cache:\r\n            return cache[k]\r\n        if k <= 1:\r\n            resultat = k\r\n        else:\r\n            resultat = aux(k - 1) + aux(k - 2)\r\n        cache[k] = resultat\r\n        return resultat\r\n\r\n    return aux(n)",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1833,18 +1833,18 @@
           "[20]"
         ],
         "hints": [
-          "Le cache doit être créé une seule fois (par exemple avec un dictionnaire), pour qu'il persiste entre tous les appels récursifs d'un même calcul.",
-          "Avant de calculer fibonacci_top_down(k), vérifie toujours si k est déjà dans le cache : si oui, renvoie directement cette valeur sans rien recalculer."
+          "A chaque appel, de la fonction, on doit vérifier si le résultat n'a pas déjà été stocké dans le cache.",
+          "A chaque appel, si un résultat n'est pas stocké dans le cache, il doit y être ajouté."
         ]
       },
       {
         "title": "Fibonacci — bottom-up",
         "slug": "fibonacci-bottom-up",
-        "statement": "Reprends le calcul de la suite de Fibonacci, mais cette fois avec la technique du **bottom-up (tabulation)** : au lieu de partir de `n` et de descendre par récursion vers les cas de base (comme en top-down), on part des cas de base et on remonte vers `n`, en remplissant un tableau étape par étape, sans aucune récursion.\n\nÉcris une fonction `fibonacci_bottom_up(n)` qui construit un tableau `table` où `table[i]` contient `fibonacci(i)`, en le remplissant dans l'ordre croissant des indices, puis renvoie `table[n]`.",
+        "statement": "On rappelle la définition de la suite de Fibonacci : `fibonacci(0) = 0`, `fibonacci(1) = 1`, et pour `n >= 2`, `fibonacci(n) = fibonacci(n-1) + fibonacci(n-2)`.\r\n\r\nDans la méthode récursive naïve (voir le thème \"Récursivité\"), de nombreux termes sont calculés plusieurs fois ce qui augmente la complexité. On souhaite résoudre ce problème en utilisant la programmation dynamique - version bottom_up.\r\n\r\nCompléter la fonction  `fibonacci_bu(n)`.",
         "kind": "python",
-        "starter_code": "def fibonacci_bottom_up(n):\n    pass\n",
-        "function_name": "fibonacci_bottom_up",
-        "solution_code": "def fibonacci_bottom_up(n):\n    # Cas de base à part : un tableau de taille n+1 nécessite au moins 2 cases\n    # (indices 0 et 1) pour s'initialiser correctement juste après\n    if n <= 1:\n        return n\n\n    # table[i] contiendra fibonacci(i), pour i allant de 0 à n\n    table = [0] * (n + 1)\n    table[1] = 1\n\n    # On remonte du plus petit vers le plus grand : chaque case ne dépend\n    # que des deux précédentes, déjà calculées à ce stade\n    for i in range(2, n + 1):\n        table[i] = table[i - 1] + table[i - 2]\n\n    return table[n]\n",
+        "starter_code": "def fibonacci_bu(n):\r\n    pass",
+        "function_name": "fibonacci_bu",
+        "solution_code": "def fibonacci_bu(n):\r\n    # Cas évident\r\n    if n <= 1:\r\n        return n\r\n\r\n    # table[i] contiendra fibonacci(i), pour i allant de 0 à n\r\n    table = [0] * (n + 1)\r\n    table[1] = 1\r\n\r\n    # On remonte du plus petit vers le plus grand : chaque case ne dépend\r\n    # que des deux précédentes, déjà calculées à ce stade\r\n    for i in range(2, n + 1):\r\n        table[i] = table[i - 1] + table[i - 2]\r\n\r\n    return table[n]",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1856,18 +1856,18 @@
           "[20]"
         ],
         "hints": [
-          "Initialise un tableau de taille n+1 avec table[0] = 0 et table[1] = 1, puis remplis les cases suivantes une par une, dans l'ordre croissant.",
-          "Contrairement au top-down, il n'y a ici aucun appel récursif : juste une boucle qui avance du début vers la fin du tableau."
+          "Contrairement au top-down, il n'y a ici aucun appel récursif : on calcule les termes en partant de n=0 et n=1 et en les stockant au fur et à mesure.",
+          "Initialise un liste de taille `n+1 avec table[0] = 0 et table[1] = 1, puis remplis les cases suivantes une par une, dans l'ordre croissant."
         ]
       },
       {
         "title": "Chemin dans une grille — top-down",
         "slug": "chemin-grille-top-down",
-        "statement": "On se déplace sur une grille de `m` lignes et `n` colonnes, en partant de la case en haut à gauche (`(0, 0)`) pour arriver à la case en bas à droite (`(m-1, n-1)`), en ne pouvant se déplacer que vers le bas ou vers la droite à chaque étape.\n\nÉcris une fonction `chemin_grille_top_down(m, n)` qui calcule, avec la technique du **top-down (mémoïsation)**, le nombre total de chemins distincts permettant d'aller du coin haut-gauche au coin bas-droite.\n\n**Indice de raisonnement** : pour atteindre une grille de `m` lignes et `n` colonnes, on vient forcément soit d'une grille avec une ligne de moins, soit d'une grille avec une colonne de moins. Le nombre de chemins est donc la somme du nombre de chemins de ces deux sous-grilles.\n\n**Cas de base** : une grille d'une seule ligne (`m = 1`) ou d'une seule colonne (`n = 1`) n'offre qu'un seul chemin possible (tout droit).\n\nExemple : `chemin_grille_top_down(3, 3)` renvoie `6`.",
+        "statement": "On se déplace sur une grille de `m` lignes et `n` colonnes, en partant de la case en haut à gauche (`(0, 0)`) pour arriver à la case en bas à droite (`(m-1, n-1)`), en ne pouvant se déplacer que vers le bas ou vers la droite à chaque étape.\r\n\r\nPour atteindre la case `(m,n)` , on vient forcément de la case de gauche ou de la case du dessus. En notant `N(m,n)` le nombre de chemin permettant d'accéder à la case `(m,n)` : `N(m,n) = N(m-1,n) + N(m,n-1)`.\r\n\r\nÉcris une fonction `chemin_grille_td(m, n)` qui calcule, avec la technique du **top-down (mémoïsation)**, le nombre total de chemins distincts permettant d'aller du coin haut-gauche au coin bas-droite.\r\n\r\n\r\n**Cas de base** : une grille d'une seule ligne (`m = 1`) ou d'une seule colonne (`n = 1`) n'offre qu'un seul chemin possible (tout droit).\r\n\r\nExemple : `chemin_grille_td(3, 3)` renvoie `6`.",
         "kind": "python",
-        "starter_code": "def chemin_grille_top_down(m, n):\n    pass\n",
-        "function_name": "chemin_grille_top_down",
-        "solution_code": "# --- Version 1 : cache défini EN DEHORS de la fonction (variable globale) ---\n_cache_chemin_grille_top_down = {}\n\n\ndef chemin_grille_top_down_v1(m, n):\n    if (m, n) in _cache_chemin_grille_top_down:\n        return _cache_chemin_grille_top_down[(m, n)]\n\n    if m == 1 or n == 1:\n        resultat = 1\n    else:\n        resultat = chemin_grille_top_down_v1(m - 1, n) + chemin_grille_top_down_v1(m, n - 1)\n\n    _cache_chemin_grille_top_down[(m, n)] = resultat\n    return resultat\n\n\n# --- Version 2 (recommandée) : cache défini À L'INTÉRIEUR de la fonction ---\n# Comme pour Fibonacci, le cache ne sert à rien une fois l'appel terminé :\n# le créer à l'intérieur (via une fonction auxiliaire imbriquée) évite de le\n# laisser traîner inutilement en variable globale.\ndef chemin_grille_top_down(m, n):\n    cache = {}\n\n    def aux(i, j):\n        if (i, j) in cache:\n            return cache[(i, j)]\n        if i == 0 or j == 0:\n            resultat = 1\n        else:\n            resultat = aux(i - 1, j) + aux(i, j - 1)\n        cache[(i, j)] = resultat\n        return resultat\n\n    return aux(m - 1, n - 1)\n",
+        "starter_code": "def chemin_grille_td(m, n):\r\n    cache = {}\r\n\r\n    def aux(i, j):\r\n        pass\r\n\r\n    return aux(m - 1, n - 1)",
+        "function_name": "chemin_grille_td",
+        "solution_code": "def chemin_grille_td(m, n):\r\n    cache = {}\r\n\r\n    def aux(i, j):\r\n        if (i, j) in cache:\r\n            return cache[(i, j)]\r\n        if i == 0 or j == 0:\r\n            resultat = 1\r\n        else:\r\n            resultat = aux(i - 1, j) + aux(i, j - 1)\r\n        cache[(i, j)] = resultat\r\n        return resultat\r\n\r\n    return aux(m - 1, n - 1)",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1879,18 +1879,18 @@
           "[5, 1]"
         ],
         "hints": [
-          "Le cache doit associer à chaque grille (m, n) déjà rencontrée le nombre de chemins déjà calculé.",
-          "N'oublie pas le cas de base : une grille d'une seule ligne ou d'une seule colonne n'offre qu'un seul chemin possible."
+          "Une grille d'une seule ligne ou d'une seule colonne n'offre qu'un seul chemin possible.",
+          "Le cache doit associer à chaque grille (m, n) déjà rencontrée le nombre de chemins déjà calculé."
         ]
       },
       {
         "title": "Chemin dans une grille — bottom-up",
         "slug": "chemin-grille-bottom-up",
-        "statement": "Reprends l'exercice précédent, mais cette fois avec la technique du **bottom-up (tabulation)** : construis directement un tableau 2D `table`, où `table[i][j]` contient le nombre de chemins menant à la case `(i, j)`, en le remplissant ligne par ligne (puis colonne par colonne), sans aucune récursion.\n\nÉcris une fonction `chemin_grille_bottom_up(m, n)` qui renvoie le nombre total de chemins distincts entre le coin haut-gauche et le coin bas-droite d'une grille de `m` lignes et `n` colonnes.",
+        "statement": "Écris une fonction `chemin_grille_bu(m, n)` qui renvoie le nombre total de chemins distincts entre le coin haut-gauche et le coin bas-droite d'une grille de `m` lignes et `n` colonnes en utilisant la technique du **bottom-up (tabulation)**",
         "kind": "python",
-        "starter_code": "def chemin_grille_bottom_up(m, n):\n    pass\n",
-        "function_name": "chemin_grille_bottom_up",
-        "solution_code": "def chemin_grille_bottom_up(m, n):\n    # On initialise toute la première ligne et la première colonne à 1 (un\n    # seul chemin possible pour les atteindre)\n    table = [[1] * n for _ in range(m)]\n\n    for i in range(1, m):\n        for j in range(1, n):\n            # Comme en top-down : le nombre de chemins vers (i, j) est la\n            # somme du nombre de chemins vers la case du dessus et vers\n            # celle de gauche, déjà calculées à ce stade (on parcourt les\n            # lignes puis les colonnes dans l'ordre croissant)\n            table[i][j] = table[i - 1][j] + table[i][j - 1]\n\n    return table[m - 1][n - 1]\n",
+        "starter_code": "def chemin_grille_bu(m, n):\r\n    pass",
+        "function_name": "chemin_grille_bu",
+        "solution_code": "def chemin_grille_bu(m, n):\r\n    # On initialise toute la première ligne et la première colonne à 1 (un\r\n    # seul chemin possible pour les atteindre)\r\n    table = [[1] * n for _ in range(m)]\r\n\r\n    for i in range(1, m):\r\n        for j in range(1, n):\r\n            # Comme en top-down : le nombre de chemins vers (i, j) est la\r\n            # somme du nombre de chemins vers la case du dessus et vers\r\n            # celle de gauche, déjà calculées à ce stade (on parcourt les\r\n            # lignes puis les colonnes dans l'ordre croissant)\r\n            table[i][j] = table[i - 1][j] + table[i][j - 1]\r\n\r\n    return table[m - 1][n - 1]",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1902,6 +1902,7 @@
           "[5, 1]"
         ],
         "hints": [
+          "Dans la méthode bottom-up, on crée un tableau dans lequel seront stockés les différents nombre de chemins en commençant par les cas \"simples\".",
           "Initialise la première ligne et la première colonne du tableau à 1 : un seul chemin possible pour les atteindre.",
           "Remplis ensuite le tableau case par case, dans l'ordre croissant des lignes puis des colonnes : chaque case ne dépend que de celle du dessus et de celle de gauche, déjà calculées."
         ]
@@ -1909,11 +1910,11 @@
       {
         "title": "Rendu de monnaie — glouton",
         "slug": "rendu-monnaie-glouton",
-        "statement": "On veut rendre la monnaie sur un montant donné, en utilisant le moins de pièces possible parmi un ensemble de valeurs disponibles (illimitées en quantité).\n\nÉcris une fonction `rendu_glouton(montant, pieces)` qui calcule, avec un **algorithme glouton**, le nombre de pièces utilisées pour rendre exactement `montant`. `pieces` est la liste des valeurs de pièces disponibles (des entiers, donnée dans l'ordre décroissant).\n\n**Principe glouton** : on utilise autant que possible la plus grande pièce restante, avant de passer à la suivante, sans jamais revenir en arrière sur un choix déjà fait.\n\nExemple : `rendu_glouton(67, [50, 20, 10, 5, 2, 1])` renvoie `4` (50 + 10 + 5 + 2 = 67, avec 4 pièces).",
+        "statement": "On veut rendre la monnaie sur un montant donné, en utilisant le moins de pièces possible parmi un ensemble de valeurs disponibles (illimitées en quantité).\r\n\r\n**Principe glouton** : on utilise autant que possible la plus grande pièce restante, avant de passer à la suivante, sans jamais revenir en arrière sur un choix déjà fait.\r\n\r\nExemple : `rendu_glouton(67, [50, 20, 10, 5, 2, 1])` renvoie `4` (50 + 10 + 5 + 2 = 67, avec 4 pièces).\r\n\r\nÉcris une fonction `rendu_glouton(montant, pieces)` qui calcule, avec un **algorithme glouton**, le nombre de pièces utilisées pour rendre exactement `montant`. `pieces` est la liste des valeurs de pièces disponibles (des entiers, donnée dans l'ordre décroissant).",
         "kind": "python",
-        "starter_code": "def rendu_glouton(montant, pieces):\n    pass\n",
+        "starter_code": "def rendu_glouton(montant, pieces):\r\n    pass",
         "function_name": "rendu_glouton",
-        "solution_code": "def rendu_glouton(montant, pieces):\n    # pieces est déjà donnée dans l'ordre décroissant : pas besoin de la\n    # retrier avant de l'utiliser\n    nb_pieces = 0\n    reste = montant\n\n    for piece in pieces:\n        if piece <= reste:\n            # reste // piece donne directement le nombre de fois qu'on peut\n            # utiliser cette pièce sans dépasser reste (pas besoin d'une\n            # boucle qui la soustrairait une par une)\n            nb_pieces += reste // piece\n            reste -= (reste // piece) * piece\n\n    return nb_pieces\n\n\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\n# donne le résultat optimal pour un système de pièces classique (comme\n# l'euro), mais pas pour n'importe quel système. Exemple concret avec les\n# pièces [4, 3, 1] pour un montant de 6 : le glouton choisit 4 + 1 + 1 = 3\n# pièces, alors que 3 + 3 = 2 pièces suffiraient (essaie rendu_glouton(6,\n# [4, 3, 1]) pour t'en convaincre). C'est exactement pour corriger ce genre\n# de cas que la programmation dynamique (top-down et bottom-up, voir la\n# suite) est nécessaire : elle explore toutes les combinaisons possibles,\n# au lieu de s'engager sans retour possible sur le plus grand choix\n# immédiat.\n",
+        "solution_code": "def rendu_glouton(montant, pieces):\r\n    # pieces est déjà donnée dans l'ordre décroissant : pas besoin de la\r\n    # retrier avant de l'utiliser\r\n    nb_pieces = 0\r\n    reste = montant\r\n\r\n    for piece in pieces:\r\n        if piece <= reste:\r\n            # reste // piece donne directement le nombre de fois qu'on peut\r\n            # utiliser cette pièce sans dépasser reste (pas besoin d'une\r\n            # boucle qui la soustrairait une par une)\r\n            nb_pieces += reste // piece\r\n            reste -= (reste // piece) * piece\r\n\r\n    return nb_pieces\r\n\r\n\r\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\r\n# donne le résultat optimal pour un système de pièces classique (comme\r\n# l'euro), mais pas pour n'importe quel système. Exemple concret avec les\r\n# pièces [4, 3, 1] pour un montant de 6 : le glouton choisit 4 + 1 + 1 = 3\r\n# pièces, alors que 3 + 3 = 2 pièces suffiraient (essaie rendu_glouton(6,\r\n# [4, 3, 1]) pour t'en convaincre). C'est exactement pour corriger ce genre\r\n# de cas que la programmation dynamique (top-down et bottom-up, voir la\r\n# suite) est nécessaire : elle explore toutes les combinaisons possibles,\r\n# au lieu de s'engager sans retour possible sur le plus grand choix\r\n# immédiat.",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1924,19 +1925,17 @@
           "[6, [4, 3, 1]]"
         ],
         "hints": [
-          "pieces est déjà triée par ordre décroissant : parcours-la simplement dans cet ordre, sans avoir besoin de la trier toi-même.",
-          "Utilise reste // piece pour savoir directement combien de fois une pièce peut être utilisée, sans boucle supplémentaire.",
-          "Le glouton ne revient jamais en arrière : une fois qu'il a choisi d'utiliser une pièce autant de fois que possible, il ne reconsidère jamais ce choix."
+          "Utilise reste // piece pour savoir directement combien de fois une pièce peut être utilisée, sans boucle supplémentaire."
         ]
       },
       {
         "title": "Rendu de monnaie — top-down",
         "slug": "rendu-monnaie-top-down",
-        "statement": "Reprends le problème du rendu de monnaie, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours le nombre minimal de pièces, contrairement à l'algorithme glouton de l'exercice précédent.\n\nÉcris une fonction `rendu_top_down(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible avec les pièces disponibles. Comme dans l'exercice précédent, `pieces` est donnée dans l'ordre décroissant (mais cette technique fonctionnerait tout aussi bien si ce n'était pas le cas, contrairement au glouton).\n\n**Indice de raisonnement** : pour rendre un montant `m`, on essaie chaque pièce disponible (si elle est inférieure ou égale à `m`) : utiliser cette pièce revient à ajouter 1 pièce au résultat optimal pour rendre `m - piece`. Le résultat pour `m` est le minimum obtenu en testant ainsi toutes les pièces possibles.\n\n**Cas de base** : rendre un montant de 0 nécessite 0 pièce.\n\nExemple : `rendu_top_down(6, [4, 3, 1])` renvoie `2` (3 + 3), là où le glouton de l'exercice précédent donnait 3 pièces (4 + 1 + 1).",
+        "statement": "Reprenons le problème du rendu de monnaie, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours le nombre minimal de pièces, contrairement à l'algorithme glouton de l'exercice précédent.\r\n\r\nPour rendre un montant `m`, on essaie chaque valeurs `p` des pièces disponibles (si elle est inférieure ou égale à `m`) : utiliser cette pièce revient à ajouter 1 pièce au résultat optimal pour rendre `m - p`. Le résultat pour `m` est le minimum obtenu en testant ainsi toutes les pièces possibles.\r\n\r\nEn notant `C(m)` le **nombre minimal de pièces nécessaires pour rendre le montant** `m`, on a donc :\r\n\r\n$$\r\nC(m)=\r\n\\begin{cases}\r\n0 & \\text{si } m=0, \\\\\r\n\\displaystyle \\min_{p\\in P,\\;p\\le m}\\left(1+C(m-p)\\right) & \\text{si } m>0,\r\n\\end{cases}\r\n$$\r\n\r\noù `P` est l'ensemble des valeurs des pièces disponibles.\r\n\r\nÉcris une fonction `rendu_td(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible avec les pièces disponibles. La fonction devra utiliser une méthode top-down (mémoïsation).",
         "kind": "python",
-        "starter_code": "def rendu_top_down(montant, pieces):\n    pass\n",
-        "function_name": "rendu_top_down",
-        "solution_code": "# --- Version 1 : cache défini EN DEHORS de la fonction (variable globale) ---\n_cache_rendu_top_down = {}\n\n\ndef rendu_top_down_v1(montant, pieces):\n    if montant == 0:\n        return 0\n\n    # Le cache est partagé par TOUS les appels à rendu_top_down_v1, y compris\n    # ceux faits avec des pieces différentes : on inclut donc pieces\n    # (converti en tuple, pour être utilisable comme clé de dictionnaire)\n    # dans la clé, sinon deux appels avec des systèmes de pièces différents\n    # mais le même montant se marcheraient dessus par erreur\n    cle = (montant, tuple(pieces))\n    if cle in _cache_rendu_top_down:\n        return _cache_rendu_top_down[cle]\n\n    # -1 sert de sentinelle \"impossible\", aussi bien pendant la récursion\n    # qu'à la sortie de la fonction : pas besoin d'une valeur différente\n    # (comme None) réservée à l'interne\n    meilleur = -1\n    for piece in pieces:\n        if piece <= montant:\n            sous_resultat = rendu_top_down_v1(montant - piece, pieces)\n            if sous_resultat != -1:\n                candidat = sous_resultat + 1\n                if meilleur == -1 or candidat < meilleur:\n                    meilleur = candidat\n\n    _cache_rendu_top_down[cle] = meilleur\n    return meilleur\n\n\n# --- Version 2 (recommandée) : cache défini À L'INTÉRIEUR de la fonction ---\n# Ici l'avantage est encore plus net que pour Fibonacci : comme pieces peut\n# changer d'un appel à l'autre, un cache global doit obligatoirement inclure\n# pieces dans sa clé pour rester correct (voir Version 1). Avec un cache créé\n# à l'intérieur de la fonction, ce problème disparaît totalement : chaque\n# appel à rendu_top_down travaille avec SON PROPRE cache, tout neuf, donc\n# plus besoin d'y penser.\ndef rendu_top_down(montant, pieces):\n    cache = {}\n\n    def aux(reste):\n        if reste == 0:\n            return 0\n        if reste in cache:\n            return cache[reste]\n\n        meilleur = None\n        for piece in pieces:\n            if piece <= reste:\n                sous_resultat = aux(reste - piece)\n                if sous_resultat is not None:\n                    candidat = sous_resultat + 1\n                    if meilleur is None or candidat < meilleur:\n                        meilleur = candidat\n\n        cache[reste] = meilleur\n        return meilleur\n\n    resultat = aux(montant)\n    return resultat if resultat is not None else -1\n",
+        "starter_code": "def rendu_td(montant, pieces):\r\n    pass",
+        "function_name": "rendu_td",
+        "solution_code": "def rendu_td(montant, pieces):\r\n    cache = {}\r\n\r\n    def aux(m):\r\n        if m == 0:\r\n            return 0\r\n        if m in cache:\r\n            return cache[m]\r\n\r\n        meilleur = None\r\n        for p in pieces:\r\n            if p <= m:\r\n                sous_resultat = aux(m - p)\r\n                if sous_resultat is not None:\r\n                    candidat = sous_resultat + 1\r\n                    if meilleur is None or candidat < meilleur:\r\n                        meilleur = candidat\r\n\r\n        cache[m] = meilleur\r\n        return meilleur\r\n\r\n    resultat = aux(montant)\r\n    return resultat if resultat is not None else -1",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1947,18 +1946,17 @@
           "[0, [4, 3, 1]]"
         ],
         "hints": [
-          "Le cas de base est reste = 0 : 0 pièce nécessaire. Traite-le avant de regarder le cache.",
-          "Si aucune pièce ne permet d'atteindre exactement le montant restant, c'est que ce montant est impossible à rendre : propage cette information (par exemple via None, ou via une sentinelle comme -1) plutôt que de renvoyer une valeur au hasard."
+          "Il faut penser à tester le cas où toutes les pièces disponibles sont trop grandes pour rendre la somme voulue."
         ]
       },
       {
         "title": "Rendu de monnaie — bottom-up",
         "slug": "rendu-monnaie-bottom-up",
-        "statement": "Reprends le problème du rendu de monnaie avec la technique du **bottom-up (tabulation)** : construis un tableau `table` où `table[m]` contient le nombre minimal de pièces pour rendre le montant `m`, en le remplissant dans l'ordre croissant de `0` à `montant`.\n\nÉcris une fonction `rendu_bottom_up(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible. Comme dans les deux exercices précédents, `pieces` est donnée dans l'ordre décroissant.\n\n**Indice d'initialisation** : `table[0] = 0` (rendre 0, c'est 0 pièce). Pour représenter une case pas encore résolue, initialise les autres cases à une valeur volontairement très grande (par exemple `float('inf')`), qui sera remplacée dès qu'une combinaison de pièces est trouvée.",
+        "statement": "Reprenons le problème du rendu de monnaie, mais cette fois avec la technique du **bottom_up**. \r\n\r\nOn rappelle que `C(m)`, le nombre minimal de pièces nécessaires pour rendre le montant `m`, vérifie :\r\n\r\n$$\r\nC(m)=\r\n\\begin{cases}\r\n0 & \\text{si } m=0, \\\\\r\n\\displaystyle \\min_{p\\in P,\\;p\\le m}\\left(1+C(m-p)\\right) & \\text{si } m>0,\r\n\\end{cases}\r\n$$\r\n\r\noù `P` est l'ensemble des valeurs des pièces disponibles.\r\n\r\nÉcris une fonction `rendu_bu(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible.",
         "kind": "python",
-        "starter_code": "def rendu_bottom_up(montant, pieces):\n    pass\n",
-        "function_name": "rendu_bottom_up",
-        "solution_code": "def rendu_bottom_up(montant, pieces):\n    INFINI = float('inf')\n    # table[m] contiendra le nombre minimal de pièces pour rendre m\n    table = [0] + [INFINI] * montant\n\n    for m in range(1, montant + 1):\n        for piece in pieces:\n            if piece <= m and table[m - piece] + 1 < table[m]:\n                # Utiliser cette pièce donne un résultat meilleur que ce\n                # qu'on avait trouvé jusqu'ici pour ce montant m\n                table[m] = table[m - piece] + 1\n\n    # Si table[montant] est resté à l'infini, aucune combinaison de pièces\n    # ne permet de l'atteindre exactement\n    return table[montant] if table[montant] != INFINI else -1\n",
+        "starter_code": "def rendu_bu(montant, pieces):\r\n    pass",
+        "function_name": "rendu_bu",
+        "solution_code": "def rendu_bu(montant, pieces):\r\n    INFINI = float('inf')\r\n    # table[m] contiendra le nombre minimal de pièces pour rendre m\r\n    table = [0] + [INFINI] * montant\r\n\r\n    for m in range(1, montant + 1):\r\n        for p in pieces:\r\n            if p <= m and table[m - p] + 1 < table[m]:\r\n                # Utiliser cette pièce donne un résultat meilleur que ce\r\n                # qu'on avait trouvé jusqu'ici pour ce montant m\r\n                table[m] = table[m - p] + 1\r\n\r\n    # Si table[montant] est resté à l'infini, aucune combinaison de pièces\r\n    # ne permet de l'atteindre exactement\r\n    return table[montant] if table[montant] != INFINI else -1",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1970,17 +1968,18 @@
         ],
         "hints": [
           "Initialise table[0] = 0 et toutes les autres cases à l'infini (float('inf')), en attendant de trouver une meilleure valeur.",
-          "Pour chaque montant m de 1 à montant, teste chaque pièce disponible : si elle est utilisable (piece <= m) et qu'elle améliore le résultat actuel, mets à jour table[m]."
+          "Pour chaque montant m de 1 à montant, teste chaque pièce disponible : si elle est utilisable (piece <= m) et qu'elle améliore le résultat actuel, mets à jour table[m].",
+          "Si la case finale n'a jamais été mise à jour à la fin des boucles, alors, aucune combinaison de pièce ne permet le rendu de monnaie."
         ]
       },
       {
         "title": "Sac à dos — glouton",
         "slug": "sac-a-dos-glouton",
-        "statement": "Le problème du sac à dos (0/1 knapsack) : on dispose d'objets, chacun avec un poids et une valeur, et d'un sac ayant une capacité maximale. On veut choisir un sous-ensemble d'objets (chaque objet est pris en entier ou pas du tout, jamais fractionné) qui maximise la valeur totale, sans dépasser la capacité en poids.\n\nÉcris une fonction `sac_a_dos_glouton(objets, capacite)` qui calcule, avec un **algorithme glouton**, la valeur totale obtenue. `objets` est une liste de tuples `(poids, valeur)`.\n\n**Principe glouton** : on trie les objets par ordre décroissant de rapport valeur/poids (le meilleur rapport qualité-prix en premier), puis on ajoute chaque objet au sac tant qu'il y a encore assez de place, sans jamais revenir en arrière.\n\nExemple : `sac_a_dos_glouton([(10, 60), (20, 100), (30, 120)], 50)` : les rapports sont 6, 5 et 4 — on prend donc l'objet (10, 60) puis (20, 100) (poids total 30, valeur 160), et (30, 120) ne rentre plus (30 + 30 > 50). Résultat : `160`.",
+        "statement": "Le **problème du sac à dos** est le suivant : on dispose d'objets, chacun avec un poids et une valeur, et d'un sac ayant une capacité maximale. On veut choisir un sous-ensemble d'objets (chaque objet est pris en entier ou pas du tout, jamais fractionné) qui maximise la valeur totale, sans dépasser la capacité en poids.\r\n\r\nÉcris une fonction `sac_a_dos_glouton(objets, capacite)` qui calcule, avec un **algorithme glouton**, la valeur totale obtenue. `objets` est une liste de tuples `(poids, valeur)`.\r\n\r\n**Principe glouton** : on trie les objets par ordre décroissant de rapport valeur/poids (le meilleur rapport qualité-prix en premier), puis on ajoute chaque objet au sac tant qu'il y a encore assez de place, sans jamais revenir en arrière.\r\n\r\nExemple : `sac_a_dos_glouton([(10, 60), (20, 100), (30, 120)], 50)` : les rapports sont 6, 5 et 4 — on prend donc l'objet (10, 60) puis (20, 100) (poids total 30, valeur 160), et (30, 120) ne rentre plus (30 + 30 > 50). Résultat : `160`.",
         "kind": "python",
-        "starter_code": "def sac_a_dos_glouton(objets, capacite):\n    pass\n",
+        "starter_code": "def sac_a_dos_glouton(objets, capacite):\r\n    pass",
         "function_name": "sac_a_dos_glouton",
-        "solution_code": "def sac_a_dos_glouton(objets, capacite):\n    # Contrairement aux pièces de l'exercice précédent, les objets ne sont\n    # PAS donnés triés ici (leur \"meilleur ordre\" dépend du rapport\n    # valeur/poids, propre à chaque objet) : on les trie donc nous-mêmes,\n    # par rapport valeur/poids décroissant, pour privilégier les objets les\n    # plus rentables au kilo\n    objets_tries = sorted(objets, key=lambda o: o[1] / o[0], reverse=True)\n\n    poids_total = 0\n    valeur_totale = 0\n\n    for poids, valeur in objets_tries:\n        # On ajoute l'objet seulement s'il reste assez de place ; sinon on\n        # l'ignore définitivement (pas de retour en arrière possible)\n        if poids_total + poids <= capacite:\n            poids_total += poids\n            valeur_totale += valeur\n\n    return valeur_totale\n\n\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\n# n'est pas toujours optimal pour le sac à dos 0/1. Sur l'exemple de\n# l'énoncé ([(10, 60), (20, 100), (30, 120)], 50), le glouton s'arrête à\n# une valeur de 160, alors que la meilleure solution possible est en\n# réalité de prendre les objets (20, 100) et (30, 120) (poids total 50,\n# valeur 220). Ce regroupement n'est jamais considéré par le glouton, qui\n# prend l'objet (10, 60) dès le départ pour son bon rapport valeur/poids,\n# sans jamais revenir sur ce choix ensuite.\n",
+        "solution_code": "def sac_a_dos_glouton(objets, capacite):\r\n    # Contrairement aux pièces de l'exercice précédent, les objets ne sont\r\n    # PAS donnés triés ici (leur \"meilleur ordre\" dépend du rapport\r\n    # valeur/poids, propre à chaque objet) : on les trie donc nous-mêmes,\r\n    # par rapport valeur/poids décroissant, pour privilégier les objets les\r\n    # plus rentables au kilo\r\n    objets_tries = sorted(objets, key=lambda o: o[1] / o[0], reverse=True)\r\n\r\n    poids_total = 0\r\n    valeur_totale = 0\r\n\r\n    for poids, valeur in objets_tries:\r\n        # On ajoute l'objet seulement s'il reste assez de place ; sinon on\r\n        # l'ignore définitivement (pas de retour en arrière possible)\r\n        if poids_total + poids <= capacite:\r\n            poids_total += poids\r\n            valeur_totale += valeur\r\n\r\n    return valeur_totale\r\n\r\n\r\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\r\n# n'est pas toujours optimal pour le sac à dos 0/1. Sur l'exemple de\r\n# l'énoncé ([(10, 60), (20, 100), (30, 120)], 50), le glouton s'arrête à\r\n# une valeur de 160, alors que la meilleure solution possible est en\r\n# réalité de prendre les objets (20, 100) et (30, 120) (poids total 50,\r\n# valeur 220). Ce regroupement n'est jamais considéré par le glouton, qui\r\n# prend l'objet (10, 60) dès le départ pour son bon rapport valeur/poids,\r\n# sans jamais revenir sur ce choix ensuite.",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1998,11 +1997,11 @@
       {
         "title": "Sac à dos — top-down",
         "slug": "sac-a-dos-top-down",
-        "statement": "Reprends le problème du sac à dos, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours la valeur totale maximale possible, contrairement à l'algorithme glouton de l'exercice précédent.\n\nÉcris une fonction `sac_a_dos_top_down(objets, capacite)` qui renvoie la valeur maximale atteignable, en considérant les objets un par un, et en explorant à chaque étape les deux possibilités : ne pas prendre l'objet courant, ou le prendre (si son poids le permet).\n\n**Cas de base** : quand on a examiné tous les objets, ou qu'il ne reste plus de capacité disponible, la valeur ajoutée est 0.\n\nExemple : `sac_a_dos_top_down([(10, 60), (20, 100), (30, 120)], 50)` renvoie `220` (en prenant les objets (20, 100) et (30, 120)), contrairement au glouton de l'exercice précédent qui ne trouvait que 160.",
+        "statement": "Reprenons le problème du sac à dos, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours la valeur totale maximale possible, contrairement à l'algorithme glouton de l'exercice précédent.\r\n\r\nOn note \\(V(i,m)\\) la valeur maximale que l'on peut obtenir en utilisant uniquement les \\(i\\) premiers objets, avec une capacité de sac restante égale à \\(m\\).\r\n\r\nOn considère les deux possibilités pour le dernier objet :\r\n\r\n- soit on ne prend pas l'objet \\(i\\) ;\r\n- soit on prend l'objet \\(i\\) (si son poids \\(p_i\\) ne dépasse pas la capacité disponible).\r\n\r\nOn obtient donc :\r\n\r\n$$\r\nV(i,m)=\r\n\\max\\left(\r\nV(i-1,m),\r\nv_i+V(i-1,m-p_i)\r\n\\right)\r\n$$\r\n\r\nÉcris une fonction `sac_a_dos_td(objets, capacite)` qui renvoie la valeur maximale atteignable, en utilisant une approche top-bottom.",
         "kind": "python",
-        "starter_code": "def sac_a_dos_top_down(objets, capacite):\n    pass\n",
-        "function_name": "sac_a_dos_top_down",
-        "solution_code": "# --- Version 1 : cache défini EN DEHORS de la fonction (variable globale) ---\n_cache_sac_a_dos_top_down = {}\n\n\ndef sac_a_dos_top_down_v1(objets, capacite, i=0):\n    # i (l'indice de l'objet en cours d'examen) est ajouté comme PARAMÈTRE\n    # avec une valeur par défaut, plutôt que géré par une fonction\n    # auxiliaire imbriquée : la même astuce que pour recherche_dichotomique\n    # (thème Récursivité). L'appelant n'a jamais besoin de le préciser.\n    if i == len(objets) or capacite == 0:\n        return 0\n\n    # objets peut varier d'un appel à l'autre : comme pour rendu_top_down_v1,\n    # on l'inclut (converti en tuple) dans la clé du cache, sinon deux\n    # appels avec des objets différents mais les mêmes (i, capacite) se\n    # marcheraient dessus par erreur\n    cle = (i, capacite, tuple(objets))\n    if cle in _cache_sac_a_dos_top_down:\n        return _cache_sac_a_dos_top_down[cle]\n\n    poids, valeur = objets[i]\n\n    meilleur = sac_a_dos_top_down_v1(objets, capacite, i + 1)\n    if poids <= capacite:\n        avec_objet = valeur + sac_a_dos_top_down_v1(objets, capacite - poids, i + 1)\n        if avec_objet > meilleur:\n            meilleur = avec_objet\n\n    _cache_sac_a_dos_top_down[cle] = meilleur\n    return meilleur\n\n\n# --- Version 2 (recommandée) : cache défini À L'INTÉRIEUR de la fonction ---\n# Comme pour rendu_top_down, un cache global doit ici inclure à la fois i,\n# capacite ET objets dans sa clé pour rester correct d'un appel à l'autre\n# (voir Version 1). Avec le cache créé à l'intérieur de la fonction, la\n# fonction auxiliaire imbriquée accède directement à objets par fermeture,\n# sans avoir besoin de le remettre dans la clé à chaque fois : la clé peut\n# se limiter à (i, capacite_restante), plus simple et moins sujette à\n# erreur.\ndef sac_a_dos_top_down(objets, capacite):\n    cache = {}\n\n    def aux(i, capacite_restante):\n        if i == len(objets) or capacite_restante == 0:\n            return 0\n        if (i, capacite_restante) in cache:\n            return cache[(i, capacite_restante)]\n\n        poids, valeur = objets[i]\n\n        meilleur = aux(i + 1, capacite_restante)\n        if poids <= capacite_restante:\n            avec_objet = valeur + aux(i + 1, capacite_restante - poids)\n            if avec_objet > meilleur:\n                meilleur = avec_objet\n\n        cache[(i, capacite_restante)] = meilleur\n        return meilleur\n\n    return aux(0, capacite)\n",
+        "starter_code": "def sac_a_dos_td(objets, capacite):\r\n    pass",
+        "function_name": "sac_a_dos_td",
+        "solution_code": "def sac_a_dos_td(objets, capacite):\r\n    cache = {}\r\n\r\n    def aux(i, capacite_restante):\r\n        if i == len(objets) or capacite_restante == 0:\r\n            return 0\r\n        if (i, capacite_restante) in cache:\r\n            return cache[(i, capacite_restante)]\r\n\r\n        poids, valeur = objets[i]\r\n\r\n        meilleur = aux(i + 1, capacite_restante)\r\n        if poids <= capacite_restante:\r\n            avec_objet = valeur + aux(i + 1, capacite_restante - poids)\r\n            if avec_objet > meilleur:\r\n                meilleur = avec_objet\r\n\r\n        cache[(i, capacite_restante)] = meilleur\r\n        return meilleur\r\n\r\n    return aux(0, capacite)",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2013,18 +2012,18 @@
           "[[(5, 10)], 4]"
         ],
         "hints": [
-          "À chaque objet, il y a exactement deux choix possibles : le laisser de côté, ou le prendre (uniquement s'il reste assez de capacité) — calcule les deux et garde le meilleur.",
+          "Le cas de base correspond au cas où la capacité restante est nulle : on ne peut mettre aucun objet supplémentaire.",
           "Le cache doit être indexé par les informations qui déterminent entièrement le sous-problème à résoudre : au minimum l'indice de l'objet courant et la capacité restante."
         ]
       },
       {
         "title": "Sac à dos — bottom-up",
         "slug": "sac-a-dos-bottom-up",
-        "statement": "Reprends le problème du sac à dos avec la technique du **bottom-up (tabulation)** : construis un tableau 2D `table`, où `table[i][c]` représente la valeur maximale atteignable en ne considérant que les `i` premiers objets, avec une capacité de `c`.\n\nÉcris une fonction `sac_a_dos_bottom_up(objets, capacite)` qui renvoie la valeur maximale atteignable avec l'ensemble des objets et la capacité donnée.\n\n**Indice de construction** : pour chaque objet `i` (numéroté à partir de 1 dans le tableau, mais `objets[i-1]` dans la liste) et chaque capacité `c`, deux choix sont possibles, comme en top-down : ne pas le prendre (`table[i][c] = table[i-1][c]`), ou le prendre si son poids le permet (`table[i][c] = valeur + table[i-1][c - poids]`). `table[i][c]` vaut le meilleur des deux.",
+        "statement": "Reprenons le problème du sac à dos, mais cette fois avec la technique du **bottom-up (tabulation)**, qui garantit toujours la valeur totale maximale possible, contrairement à l'algorithme glouton de l'exercice précédent.\r\n\r\nOn rappelle que \\(V(i,m)\\), la valeur maximale que l'on peut obtenir en utilisant uniquement les \\(i\\) premiers objets, avec une capacité de sac restante égale à \\(m\\), vérifie :\r\n$$\r\nV(i,m)=\r\n\\max\\left(\r\nV(i-1,m),\r\nv_i+V(i-1,m-p_i)\r\n\\right)\r\n$$\r\n\r\nÉcris une fonction `sac_a_dos_bu(objets, capacite)` qui renvoie la valeur maximale atteignable, en utilisant une approche bottom-up.",
         "kind": "python",
-        "starter_code": "def sac_a_dos_bottom_up(objets, capacite):\n    pass\n",
-        "function_name": "sac_a_dos_bottom_up",
-        "solution_code": "def sac_a_dos_bottom_up(objets, capacite):\n    n = len(objets)\n    # table[i][c] : valeur maximale en ne considérant que les i premiers\n    # objets, avec une capacité c. table[0][c] = 0 pour toute capacité c\n    # (aucun objet considéré) : déjà garanti par l'initialisation à 0\n    table = [[0] * (capacite + 1) for _ in range(n + 1)]\n\n    for i in range(1, n + 1):\n        # objets[i - 1] : le i-ème objet correspond à l'indice i-1 dans la\n        # liste (le tableau, lui, réserve la ligne 0 au cas aucun objet)\n        poids, valeur = objets[i - 1]\n        for c in range(capacite + 1):\n            # Option 1 par défaut : ne pas prendre l'objet i\n            table[i][c] = table[i - 1][c]\n            # Option 2 : le prendre, si son poids le permet, si c'est meilleur\n            if poids <= c:\n                avec_objet = valeur + table[i - 1][c - poids]\n                if avec_objet > table[i][c]:\n                    table[i][c] = avec_objet\n\n    return table[n][capacite]\n",
+        "starter_code": "def sac_a_dos_bu(objets, capacite):\r\n    pass",
+        "function_name": "sac_a_dos_bu",
+        "solution_code": "def sac_a_dos_bu(objets, capacite):\r\n    n = len(objets)\r\n    # table[i][c] : valeur maximale en ne considérant que les i premiers\r\n    # objets, avec une capacité c. table[0][c] = 0 pour toute capacité c\r\n    # (aucun objet considéré) : déjà garanti par l'initialisation à 0\r\n    table = [[0] * (capacite + 1) for _ in range(n + 1)]\r\n\r\n    for i in range(1, n + 1):\r\n        # objets[i - 1] : le i-ème objet correspond à l'indice i-1 dans la\r\n        # liste (le tableau, lui, réserve la ligne 0 au cas aucun objet)\r\n        poids, valeur = objets[i - 1]\r\n        for c in range(capacite + 1):\r\n            # Option 1 par défaut : ne pas prendre l'objet i\r\n            table[i][c] = table[i - 1][c]\r\n            # Option 2 : le prendre, si son poids le permet, si c'est meilleur\r\n            if poids <= c:\r\n                avec_objet = valeur + table[i - 1][c - poids]\r\n                if avec_objet > table[i][c]:\r\n                    table[i][c] = avec_objet\r\n\r\n    return table[n][capacite]",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2035,12 +2034,139 @@
           "[[(5, 10)], 4]"
         ],
         "hints": [
-          "table[0][c] vaut 0 pour toute capacité c : sans aucun objet à disposition, la valeur maximale est nulle — c'est déjà le cas si tu initialises le tableau à 0 partout.",
+          "Dans l'approche bottom_up, on calcule les valeurs de V(i,m) en partant du cas le plus simple. On crée donc un tableau qui contiendra ces valeurs et que l'on remplit au fur et à mesure.",
+          "V[0][c] vaut 0 pour toute capacité c : sans aucun objet à disposition, la valeur maximale est nulle.\r\nV[i][0] vaut 0 quel que soit la quantité d'objet utilisables : dans un sac de capacité nulle, la valeur maximale est nulle.",
           "Remplis le tableau objet par objet (ligne par ligne) : pour chaque case table[i][c], compare la valeur obtenue en ignorant l'objet i à celle obtenue en le prenant (si son poids le permet)."
         ]
       }
     ]
   },
+{
+  "name": "Théorie des jeux",
+  "slug": "theorie-des-jeux",
+  "description": "Explorer le minimax et le négamax sur le jeu du Nim, jusqu'à la recherche à profondeur limitée avec fonction d'évaluation.",
+  "sql_setup": "",
+  "exercises": [
+    {
+      "title": "Nim (1/4)",
+      "slug": "minimax-nim",
+      "statement": "Le **minimax** est un algorithme permettant de déterminer le résultat optimal d'un jeu à deux joueurs, à somme nulle (ce que gagne l'un, l'autre le perd) et à information complète (pas de hasard, chaque joueur voit l'état du jeu en entier).\n\n**Principe** : à chaque étape, on explore récursivement tous les coups possibles. Un des deux joueurs, dit **maximisant**, cherche à obtenir la valeur la plus grande possible ; l'autre, dit **minimisant**, cherche au contraire la valeur la plus petite possible (le jeu étant à somme nulle, ce qui est bon pour l'un est mauvais pour l'autre). Selon le joueur dont c'est le tour, on prend donc le MAXIMUM ou le MINIMUM des valeurs obtenues pour chaque coup possible.\n\n**Jeu utilisé pour ce thème : le jeu du Nim, à une seule pile**\n\nDeux joueurs, A et B, s'affrontent autour d'une pile de `n` allumettes. A joue en premier. À tour de rôle, chaque joueur retire 1, 2 ou 3 allumettes de la pile (sans jamais en retirer plus qu'il n'en reste). **Le joueur qui retire la toute dernière allumette gagne.**\n\nÉcris une fonction `minimax_nim(n, maximise)` qui renvoie, du point de vue du joueur A (le joueur maximisant) :\n\n- `1` si A peut forcer sa victoire, en supposant que les deux joueurs jouent de façon optimale à chaque tour ;\n- `-1` si c'est B qui peut forcer sa victoire.\n\n`n` est le nombre d'allumettes restantes, et `maximise` vaut `True` si c'est au tour de A de jouer (le joueur maximisant), `False` si c'est au tour de B (le joueur minimisant).\n\nExemple : `minimax_nim(1, True)` renvoie `1` (A retire la seule allumette restante et gagne immédiatement).",
+      "kind": "python",
+      "starter_code": "def minimax_nim(n, maximise):\n    pass\n",
+      "function_name": "minimax_nim",
+      "solution_code": "def minimax_nim(n, maximise):\n    # Cas de base : il ne reste plus d'allumette à prendre. Le joueur dont\n    # c'est le tour ne peut donc pas jouer : c'est l'ADVERSAIRE qui vient de\n    # prendre la dernière allumette au coup précédent, et qui a donc gagné.\n    if n == 0:\n        # Si c'est le tour de A (maximise) mais qu'il ne peut pas jouer,\n        # c'est B qui a gagné : la valeur (du point de vue de A) est -1.\n        # Si c'est le tour de B, c'est A qui a gagné : la valeur est +1.\n        return -1 if maximise else 1\n\n    if maximise:\n        # Le joueur A cherche à MAXIMISER la valeur : on essaie chaque coup\n        # possible (retirer 1, 2 ou 3 allumettes, sans dépasser n), et on\n        # garde la meilleure valeur trouvée parmi tous les coups\n        meilleure_valeur = -2  # plus petit que toute valeur possible (-1 au minimum)\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de B (maximise devient False)\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        # Le joueur B cherche à MINIMISER la valeur (du point de vue de A) :\n        # on garde cette fois la PIRE valeur trouvée parmi tous les coups\n        pire_valeur = 2  # plus grand que toute valeur possible (1 au maximum)\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de A (maximise devient True)\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n",
+      "sql_setup": "",
+      "sql_solution": "",
+      "test_cases": [
+        "[0, True]",
+        "[0, False]",
+        "[1, True]",
+        "[2, True]",
+        "[3, True]",
+        "[4, True]",
+        "[4, False]",
+        "[5, True]",
+        "[7, True]",
+        "[8, True]"
+      ],
+      "hints": [
+        "Cas de base : que se passe-t-il quand n vaut 0 ? Réfléchis à qui vient de gagner dans cette situation (celui qui vient de jouer, pas celui dont c'est le tour), selon que c'est alors le tour de A (maximise=True) ou de B (maximise=False), puis renvoie la valeur correspondante (1 ou -1) pour chacun des deux cas.",
+        "Quand c'est au tour du joueur maximisant, prends le MAXIMUM des valeurs obtenues pour chaque coup possible ; quand c'est au tour du joueur minimisant, prends le MINIMUM."
+      ]
+    },
+    {
+      "title": "Nim (2/4)",
+      "slug": "minimax-nim-meilleur-coup",
+      "statement": "Dans l'exercice précédent, `minimax_nim(n, maximise)` renvoie seulement la VALEUR du jeu (`1` si A gagne, `-1` si B gagne), mais pas le coup à jouer pour y arriver. Or au tout premier coup — c'est-à-dire la vraie décision que le joueur A doit prendre en pratique — c'est justement CE COUP qui nous intéresse, pas seulement le résultat final.\n\n**Principe** : pour connaître le meilleur premier coup, il suffit d'essayer chacun des coups possibles (retirer 1, 2 ou 3 allumettes), d'évaluer la position obtenue avec `minimax_nim` (déjà disponible dans le code de départ, tu n'as pas besoin de la réécrire), et de retenir le coup qui mène à la MEILLEURE valeur pour A.\n\nÉcris une fonction `meilleur_coup_nim(n)` qui renvoie le nombre d'allumettes à retirer (1, 2 ou 3) que le joueur A doit jouer en premier, pour une partie commençant avec `n` allumettes.\n\nExemple : `meilleur_coup_nim(5)` renvoie `1` (en retirant 1 allumette, A ramène B à une position perdante de 4 allumettes).\n\n**Remarque** : si `n` est une position déjà perdante pour A (un multiple de 4), aucun coup ne permet réellement de gagner : tous se valent en théorie. Ce cas n'est volontairement pas testé ici (plusieurs réponses seraient également correctes).",
+      "kind": "python",
+      "starter_code": "def minimax_nim(n, maximise):\n    if n == 0:\n        return -1 if maximise else 1\n    if maximise:\n        meilleure_valeur = -2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        pire_valeur = 2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n\n\ndef meilleur_coup_nim(n):\n    pass\n",
+      "function_name": "meilleur_coup_nim",
+      "solution_code": "def minimax_nim(n, maximise):\n    if n == 0:\n        return -1 if maximise else 1\n    if maximise:\n        meilleure_valeur = -2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        pire_valeur = 2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n\n\ndef meilleur_coup_nim(n):\n    # On part du principe qu'il s'agit du tout premier coup : c'est donc à A\n    # de jouer (le joueur maximisant). meilleur_coup mémorise le coup retenu\n    # jusqu'ici, meilleure_valeur la valeur (du point de vue de A) qu'il procure\n    meilleur_coup = None\n    meilleure_valeur = -2  # plus petit que toute valeur possible (-1 au minimum)\n\n    for coup in (1, 2, 3):\n        if coup <= n:\n            # Après ce coup, la pile passe à n - coup et c'est au tour de B\n            # (maximise=False) : minimax_nim nous dit ce que VAUT cette position\n            # pour A, en supposant que les deux joueurs jouent ensuite parfaitement\n            valeur = minimax_nim(n - coup, False)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n\n    return meilleur_coup\n",
+      "sql_setup": "",
+      "sql_solution": "",
+      "test_cases": [
+        "[1]",
+        "[2]",
+        "[3]",
+        "[5]",
+        "[6]",
+        "[7]",
+        "[9]",
+        "[10]",
+        "[11]"
+      ],
+      "hints": [
+        "Le premier coup, c'est à A de jouer : évalue chaque position résultante avec minimax_nim(n - coup, False) (c'est ensuite au tour de B), et garde le coup qui donne la meilleure valeur pour A.",
+        "Retiens à la fois le meilleur coup ET sa valeur au fil de la boucle : dès qu'un coup fait mieux que le meilleur trouvé jusqu'ici, mets à jour les deux."
+      ]
+    },
+    {
+      "title": "Nim (3/4)",
+      "slug": "minimax-nim-profondeur-limitee-meilleur-coup",
+      "statement": "Sur le jeu du Nim, la recherche complète (jusqu'à la victoire de l'un des deux joueurs) reste faisable, mais elle devient vite très coûteuse dès que `n` grandit : sans mémorisation, le nombre d'appels récursifs explose. Dans la plupart des jeux réels (échecs, puissance 4...), il est tout simplement impossible d'aller jusqu'au bout de la partie à chaque coup : il faut s'arrêter après quelques coups seulement, et **estimer** la position obtenue avec une **fonction d'évaluation** (une heuristique), plutôt que de connaître sa valeur exacte.\n\nOn te fournit une fonction d'évaluation toute faite (déjà présente dans le code de départ, tu n'as pas besoin de la modifier) :\n\n```python\ndef evaluation_nim(n):\n    # Heuristique simple (et volontairement approximative) : on suppose\n    # qu'un nombre impair d'allumettes restantes est plutôt favorable au\n    # joueur dont c'est le TOUR DE JOUER (pas forcément à A !) : cette valeur\n    # est donc exprimée du point de vue du joueur au trait.\n    return 1 if n % 2 == 1 else -1\n```\n\nÉcris une fonction `meilleur_coup_minimax_profondeur(n, profondeur)` qui renvoie le meilleur premier coup (1, 2 ou 3) que doit jouer A, en limitant la recherche à `profondeur` coups d'avance.\n\nPour cela, définis à l'intérieur de ta fonction un minimax classique `score(n, maximise, profondeur)`, avec TROIS cas :\n\n- si `n` vaut 0 : la partie est réellement terminée — cas de base habituel, valeur EXACTE (`VALEUR_DEFAITE` si c'est le tour de A qui ne peut plus jouer, `VALEUR_VICTOIRE` sinon — ces deux constantes sont déjà définies dans le code de départ) ;\n- sinon, si `profondeur` vaut 0 : on s'arrête là et on renvoie une ESTIMATION donnée par `evaluation_nim(n)` ;\n- sinon, on explore normalement chaque coup possible, en diminuant `profondeur` de 1 à chaque appel récursif, en prenant le MAXIMUM ou le MINIMUM des valeurs selon le joueur au trait — exactement comme dans le tout premier exercice de ce thème.\n\n**Point important sur les valeurs** : `VALEUR_VICTOIRE` et `VALEUR_DEFAITE` valent `10` et `-10`, très supérieures en valeur absolue aux `1`/`-1` renvoyés par `evaluation_nim`. C'est volontaire : une victoire ou une défaite CONFIRMÉE (une vraie fin de partie observée dans l'arbre de recherche) doit toujours l'emporter sur une simple estimation, aussi bonne soit-elle — sans cet écart d'échelle, une estimation optimiste pourrait faire ignorer à tort une victoire certaine trouvée un peu plus loin dans l'arbre.\n\n**Piège à éviter** : `evaluation_nim(n)` est exprimée du point de vue du joueur qui a le trait à ce moment précis (comme `VALEUR_DEFAITE`/`VALEUR_VICTOIRE` d'ailleurs) — pas forcément du point de vue de A ! Si c'est au tour de B (`maximise = False`) quand la profondeur est épuisée, il faut donc INVERSER le signe de `evaluation_nim(n)` avant de la renvoyer, pour ramener la valeur au point de vue de A (le joueur maximisant), exactement comme on le fait déjà pour `VALEUR_VICTOIRE`/`VALEUR_DEFAITE` selon `maximise`.\n\nExemple : avec une profondeur suffisante, `meilleur_coup_minimax_profondeur(5, 6)` renvoie `1` (le même résultat que `meilleur_coup_nim(5)`, la profondeur étant assez grande pour explorer toute la partie).",
+      "kind": "python",
+      "starter_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    # Heuristique simple (et volontairement approximative) : un nombre impair\n    # d'allumettes restantes est supposé favorable au joueur qui a le trait\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    pass\n",
+      "function_name": "meilleur_coup_minimax_profondeur",
+      "solution_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    # Minimax classique (comme dans le premier exercice), mais avec DEUX\n    # cas de base au lieu d'un seul : la vraie fin de partie (n == 0, valeur\n    # exacte) et l'arrêt anticipé faute de profondeur (valeur estimée)\n    def score(n, maximise, profondeur):\n        if n == 0:\n            # Fin de partie réelle : valeur exacte, garantie correcte\n            return VALEUR_DEFAITE if maximise else VALEUR_VICTOIRE\n        if profondeur == 0:\n            # On s'arrête là : on renvoie une ESTIMATION plutôt que la vraie\n            # valeur. evaluation_nim(n) est exprimée du point de vue du joueur\n            # au trait : si ce joueur est A (maximise), on la garde telle\n            # quelle ; si c'est B, on l'inverse pour revenir au point de vue\n            # de A — exactement comme pour VALEUR_VICTOIRE/VALEUR_DEFAITE\n            # juste au-dessus\n            return evaluation_nim(n) if maximise else -evaluation_nim(n)\n        if maximise:\n            meilleure_valeur = float('-inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, False, profondeur - 1)\n                    if valeur > meilleure_valeur:\n                        meilleure_valeur = valeur\n            return meilleure_valeur\n        else:\n            pire_valeur = float('inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, True, profondeur - 1)\n                    if valeur < pire_valeur:\n                        pire_valeur = valeur\n            return pire_valeur\n\n    # Au tout premier coup, c'est à A de jouer : on essaie chaque coup et on\n    # garde celui qui donne la meilleure valeur (du point de vue de A)\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = score(n - coup, False, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n",
+      "sql_setup": "",
+      "sql_solution": "",
+      "test_cases": [
+        "[1, 6]",
+        "[2, 6]",
+        "[3, 6]",
+        "[5, 6]",
+        "[6, 6]",
+        "[7, 6]",
+        "[9, 6]",
+        "[10, 6]",
+        "[11, 6]",
+        "[10, 1]",
+        "[6, 1]",
+        "[5, 0]",
+        "[4, 1]",
+        "[8, 1]"
+      ],
+      "hints": [
+        "Il y a trois cas à distinguer, dans cet ordre : n == 0 (fin de partie réelle, valeur exacte), puis profondeur == 0 (on s'arrête, on renvoie une estimation), puis le cas général (on explore les coups en prenant le max ou le min selon maximise).",
+        "N'oublie pas de convertir evaluation_nim(n) au point de vue de A quand profondeur == 0 : inverse son signe si maximise vaut False, exactement comme pour VALEUR_VICTOIRE/VALEUR_DEFAITE.",
+        "VALEUR_VICTOIRE et VALEUR_DEFAITE valent 10 et -10, bien plus grands en valeur absolue que les ±1 d'evaluation_nim : ainsi un résultat certain l'emporte toujours sur une simple estimation."
+      ]
+    },
+    {
+      "title": "Nim (4/4)",
+      "slug": "negamax-nim-profondeur-limitee-meilleur-coup",
+      "statement": "On reprend le principe du minimax de l'exercice précédent, mais avec le **négamax**, une réécriture équivalente utilisable dès que le jeu est à somme nulle et symétrique (la valeur d'un état, vue par le joueur dont c'est le tour, est toujours l'exacte opposée de sa valeur vue par l'autre joueur — c'est le cas ici). Cette propriété permet de se passer complètement de la distinction \"joueur maximisant / joueur minimisant\" : à CHAQUE appel récursif, le joueur dont c'est le tour cherche simplement à maximiser SA PROPRE valeur, et la valeur d'un coup pour lui est l'opposé de la valeur renvoyée par l'appel récursif sur l'état résultant.\n\nComme dans l'exercice précédent, on limite la recherche à un nombre de coups donné (`profondeur`), et on utilise la même fonction d'évaluation heuristique, déjà fournie dans le code de départ :\n\n```python\ndef evaluation_nim(n):\n    return 1 if n % 2 == 1 else -1\n```\n\nÉcris une fonction `meilleur_coup_negamax_profondeur(n, profondeur)` qui renvoie le meilleur premier coup (1, 2 ou 3) à jouer, en limitant la recherche à `profondeur` coups d'avance.\n\nPour cela, définis à l'intérieur de ta fonction un négamax `score(n, profondeur)`, avec les mêmes trois cas que pour le minimax de l'exercice précédent :\n\n- si `n` vaut 0 : la partie est réellement terminée — valeur EXACTE, `VALEUR_DEFAITE` (déjà définie dans le code de départ, vaut `-10`) : le joueur dont c'est le tour ne peut pas jouer, il a donc perdu ;\n- sinon, si `profondeur` vaut 0 : on s'arrête là et on renvoie l'ESTIMATION `evaluation_nim(n)` ;\n- sinon, on explore chaque coup possible, en diminuant `profondeur` de 1 à chaque appel récursif, et en prenant l'opposé (`-`) de la valeur retournée par l'appel récursif sur l'état résultant.\n\n**Remarque, en écho à l'exercice précédent** : contrairement au minimax, il n'y a ICI aucune conversion de point de vue à faire sur `evaluation_nim(n)` ! Puisque cette fonction est déjà exprimée du point de vue du joueur au trait — exactement la convention qu'utilise le négamax à chaque étage — elle peut être renvoyée telle quelle, sans inversion de signe. C'est précisément ce que le négamax simplifie par rapport au minimax.\n\nExemple : avec une profondeur suffisante, `meilleur_coup_negamax_profondeur(5, 6)` renvoie `1`.",
+      "kind": "python",
+      "starter_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    pass\n",
+      "function_name": "meilleur_coup_negamax_profondeur",
+      "solution_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    # Négamax, avec les deux mêmes cas de base que pour le minimax de\n    # l'exercice précédent : la vraie fin de partie (n == 0) et l'arrêt\n    # anticipé faute de profondeur (estimation)\n    def score(n, profondeur):\n        if n == 0:\n            # Fin de partie réelle : le joueur au trait ne peut pas jouer,\n            # il a donc perdu — valeur exacte\n            return VALEUR_DEFAITE\n        if profondeur == 0:\n            # On s'arrête là : evaluation_nim(n) est déjà exprimée du point\n            # de vue du joueur au trait, exactement la convention du\n            # négamax — pas besoin de l'adapter, contrairement au minimax\n            return evaluation_nim(n)\n        meilleure_valeur = float('-inf')\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de l'adversaire : sa valeur\n                # est l'opposée de la nôtre\n                valeur = -score(n - coup, profondeur - 1)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = -score(n - coup, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n",
+      "sql_setup": "",
+      "sql_solution": "",
+      "test_cases": [
+        "[1, 6]",
+        "[2, 6]",
+        "[3, 6]",
+        "[5, 6]",
+        "[6, 6]",
+        "[7, 6]",
+        "[9, 6]",
+        "[10, 6]",
+        "[11, 6]",
+        "[10, 1]",
+        "[6, 1]",
+        "[5, 0]",
+        "[4, 1]",
+        "[8, 1]"
+      ],
+      "hints": [
+        "Même ordre de cas que pour le minimax : n == 0 (fin de partie réelle) avant profondeur == 0 (estimation).",
+        "Contrairement au minimax, evaluation_nim(n) peut être renvoyée telle quelle quand profondeur == 0 : elle est déjà exprimée du point de vue du joueur au trait, ce que le négamax utilise directement partout.",
+        "N'oublie pas le signe \"-\" devant l'appel récursif score(n - coup, profondeur - 1) : c'est lui qui remplace toute la distinction maximisant/minimisant du minimax."
+      ]
+    }
+  ]
+}
+,
   {
     "name": "Complexité",
     "slug": "complexite",
@@ -2544,6 +2670,222 @@
           "Deux tableaux internes (x et v) évoluent en parallèle, mais la fonction ne renvoie que x.",
           "Attention à utiliser x[step] et v[step] (valeurs du pas précédent) pour calculer x[step+1] et v[step+1], pas les valeurs déjà mises à jour."
         ]
+      }
+    ]
+  },
+  {
+    "name": "SQL — Club sportif",
+    "slug": "sql-club-sportif",
+    "description": "Requêtes SQL sur une base sportive : équipes, joueurs, matchs et buts marqués.",
+    "sql_setup": "CREATE TABLE equipes (\n    id INTEGER PRIMARY KEY,\n    nom TEXT,\n    ville TEXT\n);\nINSERT INTO equipes VALUES (1, 'FC Lumière', 'Paris');\nINSERT INTO equipes VALUES (2, 'AS Verte', 'Lyon');\nINSERT INTO equipes VALUES (3, 'Racing Club', 'Marseille');\nINSERT INTO equipes VALUES (4, 'Étoile Bleue', 'Lille');\nINSERT INTO equipes VALUES (5, 'Union Sportive', 'Nantes');\n\nCREATE TABLE joueurs (\n    id INTEGER PRIMARY KEY,\n    nom TEXT,\n    prenom TEXT,\n    poste TEXT,\n    equipe_id INTEGER\n);\nINSERT INTO joueurs VALUES (1, 'Dubois', 'Julien', 'attaquant', 1);\nINSERT INTO joueurs VALUES (2, 'Haddad', 'Karim', 'milieu', 1);\nINSERT INTO joueurs VALUES (3, 'Roy', 'Nathan', 'gardien', 1);\nINSERT INTO joueurs VALUES (4, 'Bernard', 'Hugo', 'attaquant', 1);\nINSERT INTO joueurs VALUES (5, 'Dubois', 'Antoine', 'milieu', 2);\nINSERT INTO joueurs VALUES (6, 'Girard', 'Chloé', 'défenseur', 2);\nINSERT INTO joueurs VALUES (7, 'Lefevre', 'Paul', 'gardien', 2);\nINSERT INTO joueurs VALUES (8, 'Moreau', 'Sarah', 'attaquant', 2);\nINSERT INTO joueurs VALUES (9, 'Moreau', 'Louis', 'défenseur', 3);\nINSERT INTO joueurs VALUES (10, 'Girard', 'Mathis', 'milieu', 3);\nINSERT INTO joueurs VALUES (11, 'Fabre', 'Nina', 'gardien', 3);\nINSERT INTO joueurs VALUES (12, 'Bertrand', 'Léo', 'attaquant', 3);\nINSERT INTO joueurs VALUES (13, 'Faure', 'Louis', 'milieu', 4);\nINSERT INTO joueurs VALUES (14, 'Petit', 'Emma', 'défenseur', 4);\nINSERT INTO joueurs VALUES (15, 'Robert', 'Zoé', 'gardien', 4);\nINSERT INTO joueurs VALUES (16, 'Simon', 'Adam', 'milieu', 4);\nINSERT INTO joueurs VALUES (17, 'Petit', 'Hugo', 'attaquant', 5);\nINSERT INTO joueurs VALUES (18, 'Lambert', 'Julie', 'milieu', 5);\nINSERT INTO joueurs VALUES (19, 'Roy', 'Camille', 'défenseur', 5);\nINSERT INTO joueurs VALUES (20, 'Perrin', 'Noah', 'gardien', 5);\n\nCREATE TABLE matchs (\n    id INTEGER PRIMARY KEY,\n    equipe_domicile_id INTEGER,\n    equipe_exterieur_id INTEGER,\n    score_domicile INTEGER,\n    score_exterieur INTEGER,\n    date TEXT\n);\nINSERT INTO matchs VALUES (1, 1, 2, 2, 1, '2026-01-10');\nINSERT INTO matchs VALUES (2, 3, 4, 1, 1, '2026-01-10');\nINSERT INTO matchs VALUES (3, 5, 1, 0, 2, '2026-01-17');\nINSERT INTO matchs VALUES (4, 2, 3, 3, 2, '2026-01-17');\nINSERT INTO matchs VALUES (5, 4, 5, 1, 0, '2026-01-24');\nINSERT INTO matchs VALUES (6, 1, 3, 1, 1, '2026-02-07');\nINSERT INTO matchs VALUES (7, 2, 5, 2, 2, '2026-02-07');\nINSERT INTO matchs VALUES (8, 4, 1, 0, 3, '2026-02-14');\nINSERT INTO matchs VALUES (9, 3, 5, 2, 0, '2026-02-14');\nINSERT INTO matchs VALUES (10, 2, 4, 1, 2, '2026-02-21');\n\nCREATE TABLE buts (\n    id INTEGER PRIMARY KEY,\n    joueur_id INTEGER,\n    match_id INTEGER,\n    minute INTEGER\n);\nINSERT INTO buts VALUES (1, 1, 1, 23);\nINSERT INTO buts VALUES (2, 1, 1, 55);\nINSERT INTO buts VALUES (3, 8, 1, 70);\nINSERT INTO buts VALUES (4, 12, 2, 30);\nINSERT INTO buts VALUES (5, 16, 2, 60);\nINSERT INTO buts VALUES (6, 4, 3, 15);\nINSERT INTO buts VALUES (7, 2, 3, 80);\nINSERT INTO buts VALUES (8, 8, 4, 10);\nINSERT INTO buts VALUES (9, 8, 4, 45);\nINSERT INTO buts VALUES (10, 5, 4, 70);\nINSERT INTO buts VALUES (11, 12, 4, 30);\nINSERT INTO buts VALUES (12, 9, 4, 85);\nINSERT INTO buts VALUES (13, 16, 5, 40);\nINSERT INTO buts VALUES (14, 1, 6, 20);\nINSERT INTO buts VALUES (15, 10, 6, 77);\nINSERT INTO buts VALUES (16, 8, 7, 5);\nINSERT INTO buts VALUES (17, 5, 7, 50);\nINSERT INTO buts VALUES (18, 17, 7, 30);\nINSERT INTO buts VALUES (19, 18, 7, 85);\nINSERT INTO buts VALUES (20, 1, 8, 12);\nINSERT INTO buts VALUES (21, 1, 8, 47);\nINSERT INTO buts VALUES (22, 4, 8, 90);\nINSERT INTO buts VALUES (23, 12, 9, 22);\nINSERT INTO buts VALUES (24, 10, 9, 68);\nINSERT INTO buts VALUES (25, 5, 10, 35);\nINSERT INTO buts VALUES (26, 16, 10, 10);\nINSERT INTO buts VALUES (27, 13, 10, 75);",
+    "exercises": [
+      {
+        "title": "Équipes d'une ville",
+        "slug": "equipes-ville",
+        "statement": "Écris une requête qui affiche le nom des équipes situées à Lyon.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- Filtre simple par égalité sur une colonne texte\nSELECT nom FROM equipes WHERE ville = 'Lyon';",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Joueurs à un poste donné",
+        "slug": "joueurs-poste",
+        "statement": "Écris une requête qui affiche le nom et le prénom de tous les joueurs au poste d'attaquant, triés par nom.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "SELECT nom, prenom FROM joueurs WHERE poste = 'attaquant' ORDER BY nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Joueurs dont le nom commence par D",
+        "slug": "joueurs-nom-d",
+        "statement": "Écris une requête qui affiche le nom et le prénom de tous les joueurs dont le nom commence par la lettre \"D\", triés par nom puis par prénom.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- % est un joker représentant n'importe quelle suite de caractères :\n-- 'D%' signifie \"commence par D\"\nSELECT nom, prenom FROM joueurs WHERE nom LIKE 'D%' ORDER BY nom, prenom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Joueurs et leur équipe",
+        "slug": "joueurs-et-equipe",
+        "statement": "Écris une requête qui affiche, pour chaque joueur, son nom, son prénom et le nom de son équipe, triés par nom d'équipe puis par nom de joueur.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- JOIN relie joueurs.equipe_id (clé étrangère) à equipes.id (clé primaire)\nSELECT j.nom, j.prenom, e.nom\nFROM joueurs AS j\nJOIN equipes AS e ON j.equipe_id = e.id\nORDER BY e.nom, j.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Buts d'un match donné",
+        "slug": "buts-dun-match",
+        "statement": "Écris une requête qui affiche, pour le match dont l'identifiant est 4, le nom et le prénom du buteur ainsi que la minute de chaque but marqué, triés par minute croissante.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "SELECT j.nom, j.prenom, b.minute\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nWHERE b.match_id = 4\nORDER BY b.minute;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Nombre de buts par joueur",
+        "slug": "buts-par-joueur",
+        "statement": "Écris une requête qui affiche, pour chaque joueur ayant marqué au moins un but, son nom, son prénom et son nombre total de buts, triés par nom.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- GROUP BY regroupe les lignes de \"buts\" par joueur ; COUNT(*) compte alors\n-- le nombre de buts DANS CHAQUE groupe (un joueur qui n'a jamais marqué\n-- n'apparaît dans aucun groupe, donc n'apparaît pas dans le résultat)\nSELECT j.nom, j.prenom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nGROUP BY j.id\nORDER BY j.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Nombre de buts par équipe",
+        "slug": "buts-par-equipe",
+        "statement": "Écris une requête qui affiche, pour chaque équipe, son nom et son nombre total de buts marqués (tous joueurs confondus), triés par nom d'équipe.\n\nUn but est associé à une équipe via l'équipe du joueur buteur (table `joueurs`), pas via la table `matchs`.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- Double jointure : buts -> joueurs (pour connaître le buteur), puis\n-- joueurs -> equipes (pour connaître son équipe), avant de regrouper par équipe\nSELECT e.nom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nGROUP BY e.id\nORDER BY e.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Buts par équipe depuis une date",
+        "slug": "buts-equipe-depuis-date",
+        "statement": "Écris une requête qui affiche, pour chaque équipe, son nombre de buts marqués lors des matchs joués à partir du 1er février 2026 inclus, triés par nom d'équipe.\n\n**Rappel sur les dates (hors-programme)** : dans cette base, les dates sont stockées comme du simple texte, au format `AAAA-MM-JJ` (par exemple `'2026-02-01'`). Avec ce format précis, comparer des dates avec `<`, `>`, `>=`, etc. fonctionne correctement : une comparaison alphabétique de texte donne exactement le même résultat qu'une comparaison chronologique. Tu peux donc écrire `m.date >= '2026-02-01'` comme tu écrirais une comparaison de nombres, sans fonction spéciale.\n\n**Point clé de cet exercice** : le filtre sur la date doit s'appliquer AVANT le regroupement par équipe, avec `WHERE` — pas avec `HAVING`, qui filtre des groupes déjà constitués.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- WHERE filtre les LIGNES de buts (via leur match) AVANT le regroupement\n-- par équipe : seuls les buts marqués à partir du 1er février comptent\nSELECT e.nom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nJOIN matchs AS m ON b.match_id = m.id\nWHERE m.date >= '2026-02-01'\nGROUP BY e.id\nORDER BY e.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Équipes très buteuses",
+        "slug": "equipes-tres-buteuses",
+        "statement": "Écris une requête qui affiche le nom des équipes ayant marqué strictement plus de 5 buts au total, triées par nom.\n\nContrairement à l'exercice précédent, il ne s'agit pas ici de filtrer des LIGNES avant le regroupement, mais de filtrer les GROUPES eux-mêmes, une fois le total de buts par équipe calculé : c'est à ça que sert `HAVING`, utilisé après un `GROUP BY`, là où `WHERE` ne peut pas s'appliquer (`WHERE` ne connaît pas encore la valeur de `COUNT(*)` au moment où il s'exécute, puisque les groupes n'existent pas encore).",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- HAVING filtre les GROUPES formés par GROUP BY, après leur calcul :\n-- on ne garde que les équipes dont le COUNT(*) dépasse 5\nSELECT e.nom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nGROUP BY e.id\nHAVING COUNT(*) > 5\nORDER BY e.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Buteurs prolifiques à domicile",
+        "slug": "buteurs-domicile",
+        "statement": "Écris une requête qui affiche le nom, le prénom et le nombre de buts des joueurs ayant marqué au moins 2 buts lors de matchs joués À DOMICILE par leur équipe (c'est-à-dire des matchs où leur équipe était l'équipe qui recevait), triés par nom.\n\nCet exercice combine les trois clauses : `WHERE` pour ne garder que les buts marqués à domicile, `GROUP BY` pour regrouper par joueur, et `HAVING` pour ne garder que les joueurs totalisant au moins 2 buts dans ces conditions précises.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- WHERE : un but compte seulement si l'équipe du buteur était l'équipe\n-- qui recevait pour CE match (m.equipe_domicile_id = j.equipe_id)\n-- GROUP BY : on regroupe ensuite ces buts filtrés, par joueur\n-- HAVING : on ne garde que les joueurs atteignant au moins 2 buts\n-- dans ces conditions précises\nSELECT j.nom, j.prenom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN matchs AS m ON b.match_id = m.id\nWHERE m.equipe_domicile_id = j.equipe_id\nGROUP BY j.id\nHAVING COUNT(*) >= 2\nORDER BY j.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Joueurs ayant marqué dans plusieurs matchs",
+        "slug": "buteurs-plusieurs-matchs",
+        "statement": "Écris une requête qui affiche le nom, le prénom et le nombre de matchs DIFFÉRENTS dans lesquels chaque joueur a marqué (au moins un but), en ne gardant que les joueurs ayant marqué dans au moins 2 matchs différents, triés par nom.\n\nAttention : un même joueur peut marquer plusieurs buts dans le même match (un doublé, par exemple). Si tu comptes simplement avec `COUNT(*)`, tu compteras le nombre de buts, pas le nombre de matchs distincts. Utilise `COUNT(DISTINCT ...)` pour ne compter chaque match qu'une seule fois, même si le joueur y a marqué plusieurs buts.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- COUNT(DISTINCT b.match_id) : ne compte chaque match_id qu'UNE SEULE\n-- fois par joueur, même si ce joueur a marqué plusieurs buts dans le\n-- même match (contrairement à COUNT(*), qui compterait chaque but)\nSELECT j.nom, j.prenom, COUNT(DISTINCT b.match_id)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nGROUP BY j.id\nHAVING COUNT(DISTINCT b.match_id) >= 2\nORDER BY j.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Homonymes parmi les joueurs",
+        "slug": "homonymes-joueurs",
+        "statement": "Certains joueurs de clubs différents portent le même nom de famille, sans être la même personne. Écris une requête qui affiche les paires de joueurs homonymes (même nom, mais joueurs différents) : le nom commun, puis le prénom de chacun des deux joueurs, triés par nom.\n\nIndice : il s'agit d'une AUTOJOINTURE, une jointure de la table `joueurs` avec elle-même. Pense à utiliser deux alias différents (par exemple `a` et `b`), et à comparer `a.id < b.id` plutôt que `a.id != b.id` : sinon chaque paire apparaîtrait deux fois (une fois dans chaque sens), et un joueur serait même apparié avec lui-même (puisqu'il porte forcément le même nom que lui-même).",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- Autojointure : on joint \"joueurs\" avec elle-même via deux alias (a et b)\n-- a.nom = b.nom : les deux joueurs partagent le même nom\n-- a.id < b.id : évite qu'un joueur soit apparié avec lui-même (id = id),\n-- et évite d'obtenir chaque paire en double (une fois (a,b), une fois (b,a))\nSELECT a.nom, a.prenom, b.prenom\nFROM joueurs AS a\nJOIN joueurs AS b ON a.nom = b.nom AND a.id < b.id\nORDER BY a.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Coéquipiers au même poste",
+        "slug": "coequipiers-meme-poste",
+        "statement": "Écris une requête qui affiche les paires de joueurs qui jouent dans la même équipe ET au même poste (par exemple deux attaquants dans la même équipe) : le nom de l'équipe, le poste concerné, puis le prénom de chacun des deux joueurs, triés par nom d'équipe.\n\nComme dans l'exercice précédent, il s'agit d'une autojointure sur `joueurs` — mais cette fois avec DEUX conditions de correspondance (même équipe ET même poste), en plus de la condition `a.id < b.id` pour éviter les doublons.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- Même principe que l'autojointure précédente, avec DEUX conditions\n-- de correspondance cette fois : même équipe ET même poste\nSELECT e.nom, a.poste, a.prenom, b.prenom\nFROM joueurs AS a\nJOIN joueurs AS b ON a.equipe_id = b.equipe_id AND a.poste = b.poste AND a.id < b.id\nJOIN equipes AS e ON a.equipe_id = e.id\nORDER BY e.nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Joueurs n'ayant jamais marqué",
+        "slug": "joueurs-jamais-marque",
+        "statement": "Écris une requête qui affiche le nom et le prénom des joueurs n'ayant jamais marqué le moindre but, triés par nom.\n\nIndice : une sous-requête `SELECT joueur_id FROM buts` donne la liste de tous les joueurs ayant marqué au moins une fois. Il te reste à sélectionner les joueurs dont l'`id` n'apparaît PAS dans cette liste.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- La sous-requête (SELECT joueur_id FROM buts) donne l'ensemble des\n-- identifiants de joueurs ayant marqué AU MOINS une fois\n-- NOT IN exclut alors tous les joueurs présents dans cette liste\nSELECT nom, prenom\nFROM joueurs\nWHERE id NOT IN (SELECT joueur_id FROM buts)\nORDER BY nom;",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "L'équipe la plus buteuse",
+        "slug": "equipe-plus-buteuse",
+        "statement": "Écris une requête qui affiche le nom de l'équipe ayant marqué le plus de buts au total, ainsi que son nombre de buts.\n\nIndice de méthode : calcule d'abord, pour chaque équipe, son nombre total de buts (comme à l'exercice \"Nombre de buts par équipe\"). Le maximum de cette liste de totaux peut ensuite être obtenu avec une sous-requête imbriquée : `SELECT MAX(...) FROM (une requête qui calcule un total par équipe)`. Il ne reste plus qu'à ne garder, avec `HAVING`, que l'équipe (ou les équipes, en cas d'égalité) dont le total est égal à ce maximum.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- Sous-requête interne : calcule le nombre de buts de CHAQUE équipe\n-- (une ligne par equipe_id), exactement comme l'exercice \"buts par équipe\"\n-- MAX(cnt) : le plus grand de ces totaux, tous équipes confondues\n-- HAVING COUNT(*) = ce maximum : ne garde que l'équipe (ou les équipes,\n-- en cas d'égalité) qui atteint exactement ce total\nSELECT e.nom, COUNT(*) AS total\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nGROUP BY e.id\nHAVING COUNT(*) = (\n    SELECT MAX(cnt)\n    FROM (\n        SELECT COUNT(*) AS cnt\n        FROM buts AS b2\n        JOIN joueurs AS j2 ON b2.joueur_id = j2.id\n        GROUP BY j2.equipe_id\n    )\n);",
+        "test_cases": [],
+        "hints": []
+      },
+      {
+        "title": "Matchs au-dessus de la moyenne",
+        "slug": "matchs-au-dessus-moyenne",
+        "statement": "On appelle **score total d'un match** la somme des buts marqués par les deux équipes lors de ce match, c'est-à-dire `score_domicile + score_exterieur`.\n\nÉcris une requête qui affiche les matchs (identifiant, score à domicile, score à l'extérieur) dont le score total est strictement supérieur à la MOYENNE des scores totaux de tous les matchs de la base, triés par identifiant.\n\nIndice : une sous-requête `SELECT AVG(score_domicile + score_exterieur) FROM matchs` calcule cette moyenne globale sur l'ensemble des matchs. Compare ensuite le score total de chaque match à cette valeur, directement dans la clause `WHERE`.",
+        "kind": "sql",
+        "starter_code": "-- Écris ta requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- La sous-requête calcule la moyenne des scores totaux, sur TOUS les\n-- matchs (une seule valeur renvoyée, réutilisable dans une comparaison)\nSELECT id, score_domicile, score_exterieur\nFROM matchs\nWHERE (score_domicile + score_exterieur) > (\n    SELECT AVG(score_domicile + score_exterieur) FROM matchs\n)\nORDER BY id;",
+        "test_cases": [],
+        "hints": []
       }
     ]
   }
