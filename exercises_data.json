@@ -19,7 +19,7 @@
           "[]"
         ],
         "hints": [
-          "N'utilise pas print() : la fonction doit RENVOYER la chaîne avec return, pas l'afficher.",
+          "N'utilise pas `print()` : la fonction doit **renvoyer** la chaîne avec `return`, pas l'afficher.",
           "Attention à respecter exactement la casse et la ponctuation : \"Hello world!\", avec un H majuscule et un w minuscule pour \"world\", et un point d'exclamation final."
         ]
       },
@@ -81,8 +81,8 @@
           "[32, 32]"
         ],
         "hints": [
-          "Appelle fahrenheit_vers_celsius sur f1 ET sur f2 séparément, stocke les deux résultats dans deux variables, puis calcule l'écart entre les deux.",
-          "N'oublie pas abs() pour que le résultat soit toujours positif, quel que soit l'ordre des deux températures fournies."
+          "Appelle `fahrenheit_vers_celsius` sur `f1` **et** sur `f2` séparément, stocke les deux résultats dans deux variables, puis calcule l'écart entre les deux.",
+          "N'oublie pas `abs()` pour que le résultat soit toujours positif, quel que soit l'ordre des deux températures fournies."
         ]
       },
       {
@@ -103,7 +103,7 @@
           "[[-10, -3, -20, 0]]"
         ],
         "hints": [
-          "Récupère les deux valeurs renvoyées par min_et_max en une seule ligne : minimum, maximum = min_et_max(temperatures).",
+          "Récupère les deux valeurs renvoyées par `min_et_max` en une seule ligne : `minimum, maximum = min_et_max(temperatures)`.",
           "L'amplitude est simplement maximum - minimum, une fois ces deux variables récupérées."
         ]
       },
@@ -125,7 +125,7 @@
           "[0]"
         ],
         "hints": [
-          "L'opérateur ** élève un nombre à une puissance : cote ** 3 donne cote au cube."
+          "L'opérateur `**` élève un nombre à une puissance : `cote ** 3` donne `cote` au cube."
         ]
       },
       {
@@ -146,7 +146,7 @@
           "[100, 7]"
         ],
         "hints": [
-          "L'opérateur // donne le quotient d'une division entière, sans la partie décimale."
+          "L'opérateur `//` donne le quotient d'une division entière, sans la partie décimale."
         ]
       },
       {
@@ -530,7 +530,7 @@
           "[100000]"
         ],
         "hints": [
-          "Pour chaque tranche à partir de la deuxième, l'impôt total est la somme de l'impôt COMPLET des tranches précédentes (déjà pleines) et de l'impôt de la tranche actuelle, calculé uniquement sur la portion du revenu qui s'y trouve."
+          "Pour chaque tranche à partir de la deuxième, l'impôt total est la somme de l'impôt **complet** des tranches précédentes (déjà pleines) et de l'impôt de la tranche actuelle, calculé uniquement sur la portion du revenu qui s'y trouve."
         ]
       },
       {
@@ -573,7 +573,7 @@
           "[4, 0, '/']"
         ],
         "hints": [
-          "Traite le cas de la division par zéro À L'INTÉRIEUR de la branche `operation == \"/\"`, avec un `if`/`else` imbriqué : ça n'a de sens que pour cette opération précise."
+          "Traite le cas de la division par zéro **à l'intérieur** de la branche `operation == \"/\"`, avec un `if`/`else` imbriqué : ça n'a de sens que pour cette opération précise."
         ]
       }
     ]
@@ -1178,7 +1178,7 @@
           "[2, 0]"
         ],
         "hints": [
-          "Attention si tu es tenté d'écrire `[[0] * n] * m` : ça semble plus court, mais ça crée `m` fois la MÊME liste en mémoire (pas `m` listes indépendantes) — modifier une ligne modifierait alors toutes les autres. Utilise plutôt une liste en compréhension imbriquée."
+          "Attention si tu es tenté d'écrire `[[0] * n] * m` : ça semble plus court, mais ça crée `m` fois la **même** liste en mémoire (pas `m` listes indépendantes) — modifier une ligne modifierait alors toutes les autres. Utilise plutôt une liste en compréhension imbriquée."
         ]
       },
       {
@@ -1219,7 +1219,7 @@
     ]
   },
   {
-    "name": "Dictionnaire",
+    "name": "Dictionnaires",
     "slug": "dictionnaire",
     "description": "Créer et manipuler des dictionnaires (clés, valeurs, occurrences).",
     "sql_setup": "",
@@ -1368,7 +1368,7 @@
     ]
   },
   {
-    "name": "Tri",
+    "name": "Tris",
     "slug": "tri",
     "description": "Écrire des algorithmes de tri classiques.",
     "sql_setup": "",
@@ -1462,7 +1462,7 @@
         ],
         "hints": [
           "Le cas de base (liste de 0 ou 1 élément) est essentiel : sans lui, la récursion ne s'arrêterait jamais.",
-          "Pense à découper la liste en deux avec le slicing : L[:milieu] et L[milieu:]."
+          "Pense à découper la liste en deux avec le slicing : `L[:milieu]` et `L[milieu:]`."
         ]
       },
       {
@@ -1484,7 +1484,7 @@
           "[[-2, 0, 5, -1]]"
         ],
         "hints": [
-          "Le pivot choisi ici est toujours L[0] : pense à ce que ça donne sur une liste déjà triée (dans un sens ou dans l'autre).",
+          "Le pivot choisi ici est toujours `L[0]` : pense à ce que ça donne sur une liste déjà triée (dans un sens ou dans l'autre).",
           "N'oublie pas la liste \"egaux\" : sans elle, les éléments égaux au pivot disparaîtraient du résultat."
         ]
       }
@@ -1514,7 +1514,7 @@
         ],
         "hints": [
           "Utilise une file (FIFO) : ajoute les voisins non visités à la fin, retire toujours le premier élément (avec `file.pop(0)`).",
-          "Marque un nœud comme visité DÈS que tu l'ajoutes à la file, pas seulement quand tu le traites — sinon il risque d'être ajouté plusieurs fois si plusieurs nœuds pointent vers lui."
+          "Marque un nœud comme visité **dès** que tu l'ajoutes à la file, pas seulement quand tu le traites — sinon il risque d'être ajouté plusieurs fois si plusieurs nœuds pointent vers lui."
         ]
       },
       {
@@ -1576,9 +1576,9 @@
           "[{'X': []}]"
         ],
         "hints": [
-          "Piège classique : si tu te contentes de marquer un nœud comme \"déjà visité\" sans retenir PAR QUI tu y es arrivé (son parent), tu vas détecter un faux cycle sur une simple arête A-B. En effet, le graphe étant non orienté, B a A dans sa liste de voisins : quand tu traites B juste après A, tu retombes sur A qui est déjà \"visité\", alors qu'il n'y a aucun cycle — c'est juste l'arête par laquelle tu es arrivé. Il faut donc mémoriser le parent de chaque nœud, et ignorer ce cas précis.",
+          "Piège classique : si tu te contentes de marquer un nœud comme \"déjà visité\" sans retenir **par qui** tu y es arrivé (son parent), tu vas détecter un faux cycle sur une simple arête A-B. En effet, le graphe étant non orienté, B a A dans sa liste de voisins : quand tu traites B juste après A, tu retombes sur A qui est déjà \"visité\", alors qu'il n'y a aucun cycle — c'est juste l'arête par laquelle tu es arrivé. Il faut donc mémoriser le parent de chaque nœud, et ignorer ce cas précis.",
           "Fais un parcours (parcours en largeur ou en profondeur) en mémorisant, pour chaque nœud visité, par quel nœud tu y es arrivé (son \"parent\").",
-          "Si tu rencontres un voisin déjà visité qui n'est PAS le parent direct du nœud courant, c'est qu'il existe un autre chemin vers lui : il y a un cycle.",
+          "Si tu rencontres un voisin déjà visité qui n'est **pas** le parent direct du nœud courant, c'est qu'il existe un autre chemin vers lui : il y a un cycle.",
           "N'oublie pas de vérifier toutes les composantes du graphe, pas seulement celle du premier nœud (un graphe non connexe peut avoir un cycle dans une composante et pas dans une autre)."
         ]
       },
@@ -1805,7 +1805,7 @@
         ],
         "hints": [
           "Les cas de base sont `n = 0` (résultat 0) et `n = 1` (résultat 1), regroupables en un seul test `n <= 1`.",
-          "Le cas général a besoin de DEUX appels récursifs, sur `n - 1` et `n - 2` : ce n'est plus un simple \"un appel qui se rapproche du cas de base\", comme dans les exercices précédents."
+          "Le cas général a besoin de **deux** appels récursifs, sur `n - 1` et `n - 2` : ce n'est plus un simple \"un appel qui se rapproche du cas de base\", comme dans les exercices précédents."
         ]
       },
       {
@@ -1850,7 +1850,7 @@
         ],
         "hints": [
           "Le cas de base est une portion vide à explorer (`borne_inf > borne_sup`) : cible n'a pas été trouvée, renvoie -1.",
-          "Si `liste[milieu]` est plus petite que `cible`, la recherche continue uniquement dans la moitié DROITE (`milieu + 1` à `borne_sup`) ; si elle est plus grande, uniquement dans la moitié GAUCHE (`borne_inf` à `milieu - 1`)."
+          "Si `liste[milieu]` est plus petite que `cible`, la recherche continue uniquement dans la moitié **droite** (`milieu + 1` à `borne_sup`) ; si elle est plus grande, uniquement dans la moitié **gauche** (`borne_inf` à `milieu - 1`)."
         ]
       }
     ]
@@ -1897,7 +1897,7 @@
           "[[150, 72], [(150, 72, 'pomme'), (130, 68, 'pomme'), (300, 90, 'orange'), (280, 85, 'orange'), (50, 40, 'citron'), (60, 42, 'citron')], 1]"
         ],
         "hints": [
-          "Comme tu ne peux pas utiliser sort()/sorted() ici, inspire-toi du tri par sélection : cherche à chaque tour l'élément restant qui a la plus petite distance.",
+          "Comme tu ne peux pas utiliser `sort()`/`sorted()` ici, inspire-toi du tri par sélection : cherche à chaque tour l'élément restant qui a la plus petite distance.",
           "Retire l'élément trouvé de la liste des distances restantes (avec `.pop(indice)`), pour ne pas le sélectionner deux fois."
         ]
       },
@@ -2030,7 +2030,7 @@
         ],
         "hints": [
           "Contrairement au top-down, il n'y a ici aucun appel récursif : on calcule les termes en partant de n=0 et n=1 et en les stockant au fur et à mesure.",
-          "Initialise un liste de taille `n+1 avec table[0] = 0 et table[1] = 1, puis remplis les cases suivantes une par une, dans l'ordre croissant."
+          "Initialise un tableau de taille `n+1` avec `table[0] = 0` et `table[1] = 1`, puis remplis les cases suivantes une par une, dans l'ordre croissant."
         ]
       },
       {
@@ -2098,7 +2098,7 @@
           "[6, [4, 3, 1]]"
         ],
         "hints": [
-          "Utilise reste // piece pour savoir directement combien de fois une pièce peut être utilisée, sans boucle supplémentaire."
+          "Utilise `reste // piece` pour savoir directement combien de fois une pièce peut être utilisée, sans boucle supplémentaire."
         ]
       },
       {
@@ -2140,8 +2140,8 @@
           "[0, [4, 3, 1]]"
         ],
         "hints": [
-          "Initialise table[0] = 0 et toutes les autres cases à l'infini (float('inf')), en attendant de trouver une meilleure valeur.",
-          "Pour chaque montant m de 1 à montant, teste chaque pièce disponible : si elle est utilisable (piece <= m) et qu'elle améliore le résultat actuel, mets à jour table[m].",
+          "Initialise `table[0] = 0` et toutes les autres cases à l'infini (`float('inf')`), en attendant de trouver une meilleure valeur.",
+          "Pour chaque montant `m` de 1 à `montant`, teste chaque pièce disponible : si elle est utilisable (`piece <= m`) et qu'elle améliore le résultat actuel, mets à jour `table[m]`.",
           "Si la case finale n'a jamais été mise à jour à la fin des boucles, alors, aucune combinaison de pièce ne permet le rendu de monnaie."
         ]
       },
@@ -2207,9 +2207,9 @@
           "[[(5, 10)], 4]"
         ],
         "hints": [
-          "Dans l'approche bottom_up, on calcule les valeurs de V(i,m) en partant du cas le plus simple. On crée donc un tableau qui contiendra ces valeurs et que l'on remplit au fur et à mesure.",
-          "V[0][c] vaut 0 pour toute capacité c : sans aucun objet à disposition, la valeur maximale est nulle.\r\nV[i][0] vaut 0 quel que soit la quantité d'objet utilisables : dans un sac de capacité nulle, la valeur maximale est nulle.",
-          "Remplis le tableau objet par objet (ligne par ligne) : pour chaque case table[i][c], compare la valeur obtenue en ignorant l'objet i à celle obtenue en le prenant (si son poids le permet)."
+          "Dans l'approche bottom-up, on calcule les valeurs de `V(i, m)` en partant du cas le plus simple. On crée donc un tableau qui contiendra ces valeurs et que l'on remplit au fur et à mesure.",
+          "`V[0][c]` vaut 0 pour toute capacité `c` : sans aucun objet à disposition, la valeur maximale est nulle.\r\n`V[i][0]` vaut 0 quel que soit la quantité d'objets utilisables : dans un sac de capacité nulle, la valeur maximale est nulle.",
+          "Remplis le tableau objet par objet (ligne par ligne) : pour chaque case `table[i][c]`, compare la valeur obtenue en ignorant l'objet `i` à celle obtenue en le prenant (si son poids le permet)."
         ]
       }
     ]
@@ -2244,7 +2244,7 @@
         ],
         "hints": [
           "Cas de base : que se passe-t-il quand n vaut 0 ? Réfléchis à qui vient de gagner dans cette situation (celui qui vient de jouer, pas celui dont c'est le tour), selon que c'est alors le tour de A (maximise=True) ou de B (maximise=False), puis renvoie la valeur correspondante (1 ou -1) pour chacun des deux cas.",
-          "Quand c'est au tour du joueur maximisant, prends le MAXIMUM des valeurs obtenues pour chaque coup possible ; quand c'est au tour du joueur minimisant, prends le MINIMUM."
+          "Quand c'est au tour du joueur maximisant, prends le **maximum** des valeurs obtenues pour chaque coup possible ; quand c'est au tour du joueur minimisant, prends le **minimum**."
         ]
       },
       {
@@ -2269,7 +2269,7 @@
           "[11]"
         ],
         "hints": [
-          "Le premier coup, c'est à A de jouer : évalue chaque position résultante avec minimax_nim(n - coup, False) (c'est ensuite au tour de B), et garde le coup qui donne la meilleure valeur pour A.",
+          "Le premier coup, c'est à A de jouer : évalue chaque position résultante avec `minimax_nim(n - coup, False)` (c'est ensuite au tour de B), et garde le coup qui donne la meilleure valeur pour A.",
           "Retiens à la fois le meilleur coup ET sa valeur au fil de la boucle : dès qu'un coup fait mieux que le meilleur trouvé jusqu'ici, mets à jour les deux."
         ]
       },
@@ -2301,8 +2301,8 @@
         ],
         "hints": [
           "Il y a trois cas à distinguer, dans cet ordre : n == 0 (fin de partie réelle, valeur exacte), puis profondeur == 0 (on s'arrête, on renvoie une estimation), puis le cas général (on explore les coups en prenant le max ou le min selon maximise).",
-          "N'oublie pas de convertir evaluation_nim(n) au point de vue de A quand profondeur == 0 : inverse son signe si maximise vaut False, exactement comme pour VALEUR_VICTOIRE/VALEUR_DEFAITE.",
-          "VALEUR_VICTOIRE et VALEUR_DEFAITE valent 10 et -10, bien plus grands en valeur absolue que les ±1 d'evaluation_nim : ainsi un résultat certain l'emporte toujours sur une simple estimation."
+          "N'oublie pas de convertir `evaluation_nim(n)` au point de vue de A quand `profondeur == 0` : inverse son signe si `maximise` vaut `False`, exactement comme pour `VALEUR_VICTOIRE`/`VALEUR_DEFAITE`.",
+          "`VALEUR_VICTOIRE` et `VALEUR_DEFAITE` valent 10 et -10, bien plus grands en valeur absolue que les ±1 d'`evaluation_nim` : ainsi un résultat certain l'emporte toujours sur une simple estimation."
         ]
       },
       {
@@ -2333,8 +2333,8 @@
         ],
         "hints": [
           "Même ordre de cas que pour le minimax : n == 0 (fin de partie réelle) avant profondeur == 0 (estimation).",
-          "Contrairement au minimax, evaluation_nim(n) peut être renvoyée telle quelle quand profondeur == 0 : elle est déjà exprimée du point de vue du joueur au trait, ce que le négamax utilise directement partout.",
-          "N'oublie pas le signe \"-\" devant l'appel récursif score(n - coup, profondeur - 1) : c'est lui qui remplace toute la distinction maximisant/minimisant du minimax."
+          "Contrairement au minimax, `evaluation_nim(n)` peut être renvoyée telle quelle quand `profondeur == 0` : elle est déjà exprimée du point de vue du joueur au trait, ce que le négamax utilise directement partout.",
+          "N'oublie pas le signe \"-\" devant l'appel récursif `score(n - coup, profondeur - 1)` : c'est lui qui remplace toute la distinction maximisant/minimisant du minimax."
         ]
       }
     ]
@@ -2404,7 +2404,7 @@
         ],
         "hints": [
           "Le découpage en deux moitiés ne dépend jamais des valeurs de L : c'est pour ça que cas moyen et pire cas sont identiques pour cet algorithme.",
-          "Compte le nombre de \"niveaux\" de récursion (division par 2 à chaque fois) et le coût de fusion() à chaque niveau."
+          "Compte le nombre de \"niveaux\" de récursion (division par 2 à chaque fois) et le coût de `fusion()` à chaque niveau."
         ]
       },
       {
@@ -2423,7 +2423,7 @@
           "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
         ],
         "hints": [
-          "Le pivot est toujours L[0] : imagine ce que ça donne sur une liste déjà triée par ordre croissant ou décroissant — combien d'éléments partent dans \"inférieurs\" ou \"supérieurs\" à chaque appel ?",
+          "Le pivot est toujours `L[0]` : imagine ce que ça donne sur une liste déjà triée par ordre croissant ou décroissant — combien d'éléments partent dans \"inférieurs\" ou \"supérieurs\" à chaque appel ?",
           "Dans le pire cas, chaque appel récursif ne réduit la taille du problème que d'un seul élément : la somme des tailles à chaque niveau ressemble à 1+2+...+n."
         ]
       },
@@ -2464,7 +2464,7 @@
           "[[7, 3, 9, 2, 8]]"
         ],
         "hints": [
-          "Le meilleur cas correspond à un coût CONSTANT (voir le second exemple du format de réponse attendu) : une seule comparaison suffit, quelle que soit la taille de la liste."
+          "Le meilleur cas correspond à un coût **constant** (voir le second exemple du format de réponse attendu) : une seule comparaison suffit, quelle que soit la taille de la liste."
         ]
       },
       {
@@ -2691,165 +2691,10 @@
     ]
   },
   {
-    "name": "SQL — BDD Etudiants",
-    "slug": "sql-selection",
-    "description": "Écrire des requêtes SQL",
-    "sql_setup": "CREATE TABLE etudiants (id INTEGER PRIMARY KEY, nom TEXT, age INTEGER);\r\nINSERT INTO etudiants (id, nom, age) VALUES (1, 'Alice', 22);\r\nINSERT INTO etudiants (id, nom, age) VALUES (2, 'Bob', 17);\r\nINSERT INTO etudiants (id, nom, age) VALUES (3, 'Chloé', 18);",
-    "exercises": [
-      {
-        "title": "Étudiants majeurs",
-        "slug": "etudiants-majeurs",
-        "statement": "Écris une requête qui sélectionne le nom des étudiants majeurs (age >= 18).",
-        "kind": "sql",
-        "starter_code": "-- Écris ta requête ici\nSELECT ",
-        "function_name": "",
-        "solution_code": "",
-        "sql_setup": "",
-        "sql_solution": "-- Sélectionne uniquement la colonne nom, pour les lignes où age >= 18\nSELECT nom FROM etudiants WHERE age >= 18;",
-        "test_cases": [],
-        "hints": []
-      },
-      {
-        "title": "Nombre d'étudiants mineurs",
-        "slug": "nb-mineurs",
-        "statement": "Écris une requête qui compte le nombre d'étudiants mineurs (age < 18).",
-        "kind": "sql",
-        "starter_code": "-- Écris ta requête ici\nSELECT ",
-        "function_name": "",
-        "solution_code": "",
-        "sql_setup": "",
-        "sql_solution": "-- COUNT(*) compte le nombre de lignes qui vérifient la condition WHERE\nSELECT COUNT(*) FROM etudiants WHERE age < 18;",
-        "test_cases": [],
-        "hints": []
-      }
-    ]
-  },
-  {
-    "name": "Calcul numérique (numpy)",
-    "slug": "calcul-numerique",
-    "description": "Manipuler des tableaux numpy et implémenter des méthodes numériques classiques (intégration, résolution d'équations différentielles) — utile pour les enseignements de spécialité Physique-Chimie et Sciences de l'Ingénieur (SII).",
-    "sql_setup": "",
-    "exercises": [
-      {
-        "title": "Tableau numpy rempli de zéros",
-        "slug": "tableau-zeros",
-        "statement": "Écris une fonction `tableau_zeros(n)` qui renvoie un tableau **numpy** de taille `n`, rempli de zéros.\n\nIndice : la fonction `np.zeros` fait exactement ça.",
-        "kind": "python",
-        "starter_code": "import numpy as np\n\ndef tableau_zeros(n):\n    pass\n",
-        "function_name": "tableau_zeros",
-        "solution_code": "import numpy as np\n\ndef tableau_zeros(n):\n    # np.zeros(n) crée directement un tableau numpy de taille n rempli de 0.0\n    return np.zeros(n)\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[5]",
-          "[1]",
-          "[0]"
-        ],
-        "hints": [
-          "`np.zeros(n)` renvoie directement un tableau numpy de taille `n` rempli de zéros — pas besoin de boucle."
-        ]
-      },
-      {
-        "title": "Tableau numpy rempli de uns",
-        "slug": "tableau-uns",
-        "statement": "Écris une fonction `tableau_uns(n)` qui renvoie un tableau **numpy** de taille `n`, rempli de uns.\n\nIndice : la fonction `np.ones` fait exactement ça.",
-        "kind": "python",
-        "starter_code": "import numpy as np\n\ndef tableau_uns(n):\n    pass\n",
-        "function_name": "tableau_uns",
-        "solution_code": "import numpy as np\n\ndef tableau_uns(n):\n    # np.ones(n) crée directement un tableau numpy de taille n rempli de 1.0\n    return np.ones(n)\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[4]",
-          "[1]",
-          "[0]"
-        ],
-        "hints": []
-      },
-      {
-        "title": "Intégration : méthode des rectangles",
-        "slug": "integration-rectangles",
-        "statement": "On dispose des vitesses successives d'un mobile, mesurées à intervalles de temps réguliers `dt`.\n\nÉcris une fonction `integration_rectangles(vitesses, dt, x0)` qui renvoie un tableau numpy des positions correspondantes (même taille que `vitesses`), obtenues par la **méthode des rectangles**, à partir d'une position initiale `x0`.\n\nExemple : `integration_rectangles([2, 4, 6], 1, 0)` renvoie `[0, 2, 6]`.",
-        "kind": "python",
-        "starter_code": "import numpy as np\n\ndef integration_rectangles(vitesses, dt, x0):\n    pass\n",
-        "function_name": "integration_rectangles",
-        "solution_code": "import numpy as np\n\ndef integration_rectangles(vitesses, dt, x0):\n    n = len(vitesses)\n    positions = np.zeros(n)\n    positions[0] = x0\n    # Méthode des rectangles : on avance en supposant la vitesse constante\n    # (égale à sa valeur au DÉBUT de l'intervalle) sur toute la durée dt\n    for i in range(1, n):\n        positions[i] = positions[i - 1] + vitesses[i - 1] * dt\n    return positions\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[[2, 4, 6], 1, 0]",
-          "[[1, 1, 1, 1], 2, 5]",
-          "[[0, 0, 0], 1, 10]"
-        ],
-        "hints": [
-          "`position[i] = position[i-1] + vitesse[i-1] * dt` : on utilise la vitesse au DÉBUT de l'intervalle, pas celle de la fin."
-        ]
-      },
-      {
-        "title": "Intégration : méthode des trapèzes",
-        "slug": "integration-trapezes",
-        "statement": "Reprends l'exercice précédent, mais cette fois en utilisant la **méthode des trapèzes**.\n\nÉcris une fonction `integration_trapezes(vitesses, dt, x0)` qui renvoie un tableau numpy des positions correspondantes (même taille que `vitesses`), à partir d'une position initiale `x0`.",
-        "kind": "python",
-        "starter_code": "import numpy as np\n\ndef integration_trapezes(vitesses, dt, x0):\n    pass\n",
-        "function_name": "integration_trapezes",
-        "solution_code": "import numpy as np\n\ndef integration_trapezes(vitesses, dt, x0):\n    n = len(vitesses)\n    positions = np.zeros(n)\n    positions[0] = x0\n    # Méthode des trapèzes : on prend la MOYENNE des vitesses de début et\n    # de fin d'intervalle, plus précise que la méthode des rectangles\n    for i in range(1, n):\n        positions[i] = positions[i - 1] + (vitesses[i - 1] + vitesses[i]) / 2 * dt\n    return positions\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[[2, 4, 6], 1, 0]",
-          "[[1, 1, 1, 1], 2, 5]",
-          "[[0, 0, 0], 1, 10]"
-        ],
-        "hints": [
-          "Contrairement à la méthode des rectangles, on prend ici la moyenne entre `vitesse[i-1]` et `vitesse[i]`."
-        ]
-      },
-      {
-        "title": "Méthode d'Euler — équation différentielle d'ordre 1 (décharge d'un condensateur)",
-        "slug": "euler-ordre-1",
-        "statement": "On étudie la décharge d'un condensateur de capacité `C` dans une résistance `R`. La tension `u(t)` à ses bornes suit l'équation différentielle du premier ordre :\n\n`du/dt = -u / (R*C)`\n\navec `u(0) = u0`.\n\nÉcris une fonction `euler_rc(u0, R, C, dt, n)` qui calcule, avec la **méthode d'Euler explicite**, un tableau numpy des `n+1` valeurs de `u` aux instants `t = 0, dt, 2*dt, ..., n*dt`.",
-        "kind": "python",
-        "starter_code": "import numpy as np\n\ndef euler_rc(u0, R, C, dt, n):\n    pass\n",
-        "function_name": "euler_rc",
-        "solution_code": "import numpy as np\n\ndef euler_rc(u0, R, C, dt, n):\n    tau = R * C\n    u = np.zeros(n + 1)\n    u[0] = u0\n    # Méthode d'Euler explicite : on avance pas à pas en utilisant la dérivée\n    # calculée au point courant (ici, la loi du/dt = -u/tau)\n    for k in range(n):\n        u[k + 1] = u[k] + dt * (-u[k] / tau)\n    return u\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[10, 1000, 0.001, 0.1, 5]",
-          "[5, 100, 0.01, 0.1, 3]",
-          "[1, 1, 1, 0.5, 4]"
-        ],
-        "hints": [
-          "`u[k+1] = u[k] + dt * (-u[k] / (R*C))` : c'est la définition même de la méthode d'Euler appliquée à cette équation."
-        ]
-      },
-      {
-        "title": "Méthode d'Euler — équation différentielle d'ordre 2 (oscillateur masse-ressort)",
-        "slug": "euler-ordre-2",
-        "statement": "On étudie un système masse-ressort sans frottement : une masse `m` accrochée à un ressort de raideur `k`, dont la position `x(t)` suit l'équation différentielle du second ordre :\n\n`m * x'' = -k * x`\n\nÉcris une fonction `euler_masse_ressort(x0, v0, k, m, dt, n)` qui calcule, avec la méthode d'Euler explicite, un tableau numpy des `n+1` valeurs de la position `x` aux instants `t = 0, dt, ..., n*dt` (la vitesse `v` est calculée en interne à chaque étape, mais seule la position est renvoyée).",
-        "kind": "python",
-        "starter_code": "import numpy as np\n\ndef euler_masse_ressort(x0, v0, k, m, dt, n):\n    pass\n",
-        "function_name": "euler_masse_ressort",
-        "solution_code": "import numpy as np\n\ndef euler_masse_ressort(x0, v0, k, m, dt, n):\n    x = np.zeros(n + 1)\n    v = np.zeros(n + 1)\n    x[0] = x0\n    v[0] = v0\n    # On met à jour position ET vitesse à CHAQUE pas, en utilisant les valeurs\n    # du pas précédent (x[step], v[step]) : c'est le principe de la méthode\n    # d'Euler appliquée au système d'ordre 1 équivalent (x' = v, v' = -(k/m)*x)\n    for step in range(n):\n        x[step + 1] = x[step] + dt * v[step]\n        v[step + 1] = v[step] + dt * (-(k / m) * x[step])\n    return x\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[1, 0, 10, 1, 0.01, 10]",
-          "[0, 1, 4, 1, 0.1, 5]",
-          "[2, -1, 5, 2, 0.05, 8]"
-        ],
-        "hints": [
-          "Deux tableaux internes (x et v) évoluent en parallèle, mais la fonction ne renvoie que x.",
-          "Attention à utiliser x[step] et v[step] (valeurs du pas précédent) pour calculer x[step+1] et v[step+1], pas les valeurs déjà mises à jour."
-        ]
-      }
-    ]
-  },
-  {
     "name": "SQL — Club sportif",
     "slug": "sql-club-sportif",
     "description": "Requêtes SQL sur une base sportive : équipes, joueurs, matchs et buts marqués.",
-    "sql_setup": "CREATE TABLE equipes (\n    id INTEGER PRIMARY KEY,\n    nom TEXT,\n    ville TEXT\n);\nINSERT INTO equipes VALUES (1, 'FC Lumière', 'Paris');\nINSERT INTO equipes VALUES (2, 'AS Verte', 'Lyon');\nINSERT INTO equipes VALUES (3, 'Racing Club', 'Marseille');\nINSERT INTO equipes VALUES (4, 'Étoile Bleue', 'Lille');\nINSERT INTO equipes VALUES (5, 'Union Sportive', 'Nantes');\n\nCREATE TABLE joueurs (\n    id INTEGER PRIMARY KEY,\n    nom TEXT,\n    prenom TEXT,\n    poste TEXT,\n    equipe_id INTEGER\n);\nINSERT INTO joueurs VALUES (1, 'Dubois', 'Julien', 'attaquant', 1);\nINSERT INTO joueurs VALUES (2, 'Haddad', 'Karim', 'milieu', 1);\nINSERT INTO joueurs VALUES (3, 'Roy', 'Nathan', 'gardien', 1);\nINSERT INTO joueurs VALUES (4, 'Bernard', 'Hugo', 'attaquant', 1);\nINSERT INTO joueurs VALUES (5, 'Dubois', 'Antoine', 'milieu', 2);\nINSERT INTO joueurs VALUES (6, 'Girard', 'Chloé', 'défenseur', 2);\nINSERT INTO joueurs VALUES (7, 'Lefevre', 'Paul', 'gardien', 2);\nINSERT INTO joueurs VALUES (8, 'Moreau', 'Sarah', 'attaquant', 2);\nINSERT INTO joueurs VALUES (9, 'Moreau', 'Louis', 'défenseur', 3);\nINSERT INTO joueurs VALUES (10, 'Girard', 'Mathis', 'milieu', 3);\nINSERT INTO joueurs VALUES (11, 'Fabre', 'Nina', 'gardien', 3);\nINSERT INTO joueurs VALUES (12, 'Bertrand', 'Léo', 'attaquant', 3);\nINSERT INTO joueurs VALUES (13, 'Faure', 'Louis', 'milieu', 4);\nINSERT INTO joueurs VALUES (14, 'Petit', 'Emma', 'défenseur', 4);\nINSERT INTO joueurs VALUES (15, 'Robert', 'Zoé', 'gardien', 4);\nINSERT INTO joueurs VALUES (16, 'Simon', 'Adam', 'milieu', 4);\nINSERT INTO joueurs VALUES (17, 'Petit', 'Hugo', 'attaquant', 5);\nINSERT INTO joueurs VALUES (18, 'Lambert', 'Julie', 'milieu', 5);\nINSERT INTO joueurs VALUES (19, 'Roy', 'Camille', 'défenseur', 5);\nINSERT INTO joueurs VALUES (20, 'Perrin', 'Noah', 'gardien', 5);\n\nCREATE TABLE matchs (\n    id INTEGER PRIMARY KEY,\n    equipe_domicile_id INTEGER,\n    equipe_exterieur_id INTEGER,\n    score_domicile INTEGER,\n    score_exterieur INTEGER,\n    date TEXT\n);\nINSERT INTO matchs VALUES (1, 1, 2, 2, 1, '2026-01-10');\nINSERT INTO matchs VALUES (2, 3, 4, 1, 1, '2026-01-10');\nINSERT INTO matchs VALUES (3, 5, 1, 0, 2, '2026-01-17');\nINSERT INTO matchs VALUES (4, 2, 3, 3, 2, '2026-01-17');\nINSERT INTO matchs VALUES (5, 4, 5, 1, 0, '2026-01-24');\nINSERT INTO matchs VALUES (6, 1, 3, 1, 1, '2026-02-07');\nINSERT INTO matchs VALUES (7, 2, 5, 2, 2, '2026-02-07');\nINSERT INTO matchs VALUES (8, 4, 1, 0, 3, '2026-02-14');\nINSERT INTO matchs VALUES (9, 3, 5, 2, 0, '2026-02-14');\nINSERT INTO matchs VALUES (10, 2, 4, 1, 2, '2026-02-21');\n\nCREATE TABLE buts (\n    id INTEGER PRIMARY KEY,\n    joueur_id INTEGER,\n    match_id INTEGER,\n    minute INTEGER\n);\nINSERT INTO buts VALUES (1, 1, 1, 23);\nINSERT INTO buts VALUES (2, 1, 1, 55);\nINSERT INTO buts VALUES (3, 8, 1, 70);\nINSERT INTO buts VALUES (4, 12, 2, 30);\nINSERT INTO buts VALUES (5, 16, 2, 60);\nINSERT INTO buts VALUES (6, 4, 3, 15);\nINSERT INTO buts VALUES (7, 2, 3, 80);\nINSERT INTO buts VALUES (8, 8, 4, 10);\nINSERT INTO buts VALUES (9, 8, 4, 45);\nINSERT INTO buts VALUES (10, 5, 4, 70);\nINSERT INTO buts VALUES (11, 12, 4, 30);\nINSERT INTO buts VALUES (12, 9, 4, 85);\nINSERT INTO buts VALUES (13, 16, 5, 40);\nINSERT INTO buts VALUES (14, 1, 6, 20);\nINSERT INTO buts VALUES (15, 10, 6, 77);\nINSERT INTO buts VALUES (16, 8, 7, 5);\nINSERT INTO buts VALUES (17, 5, 7, 50);\nINSERT INTO buts VALUES (18, 17, 7, 30);\nINSERT INTO buts VALUES (19, 18, 7, 85);\nINSERT INTO buts VALUES (20, 1, 8, 12);\nINSERT INTO buts VALUES (21, 1, 8, 47);\nINSERT INTO buts VALUES (22, 4, 8, 90);\nINSERT INTO buts VALUES (23, 12, 9, 22);\nINSERT INTO buts VALUES (24, 10, 9, 68);\nINSERT INTO buts VALUES (25, 5, 10, 35);\nINSERT INTO buts VALUES (26, 16, 10, 10);\nINSERT INTO buts VALUES (27, 13, 10, 75);",
+    "sql_setup": "CREATE TABLE equipes (\r\n    id INTEGER PRIMARY KEY,\r\n    nom TEXT,\r\n    ville TEXT\r\n);\r\nINSERT INTO equipes VALUES (1, 'FC Lumière', 'Paris');\r\nINSERT INTO equipes VALUES (2, 'AS Verte', 'Lyon');\r\nINSERT INTO equipes VALUES (3, 'Racing Club', 'Marseille');\r\nINSERT INTO equipes VALUES (4, 'Étoile Bleue', 'Lille');\r\nINSERT INTO equipes VALUES (5, 'Union Sportive', 'Nantes');\r\n\r\nCREATE TABLE joueurs (\r\n    id INTEGER PRIMARY KEY,\r\n    nom TEXT,\r\n    prenom TEXT,\r\n    poste TEXT,\r\n    equipe_id INTEGER\r\n);\r\nINSERT INTO joueurs VALUES (1, 'Dubois', 'Julien', 'attaquant', 1);\r\nINSERT INTO joueurs VALUES (2, 'Haddad', 'Karim', 'milieu', 1);\r\nINSERT INTO joueurs VALUES (3, 'Roy', 'Nathan', 'gardien', 1);\r\nINSERT INTO joueurs VALUES (4, 'Bernard', 'Hugo', 'attaquant', 1);\r\nINSERT INTO joueurs VALUES (5, 'Dubois', 'Antoine', 'milieu', 2);\r\nINSERT INTO joueurs VALUES (6, 'Girard', 'Chloé', 'défenseur', 2);\r\nINSERT INTO joueurs VALUES (7, 'Lefevre', 'Paul', 'gardien', 2);\r\nINSERT INTO joueurs VALUES (8, 'Moreau', 'Sarah', 'attaquant', 2);\r\nINSERT INTO joueurs VALUES (9, 'Moreau', 'Louis', 'défenseur', 3);\r\nINSERT INTO joueurs VALUES (10, 'Girard', 'Mathis', 'milieu', 3);\r\nINSERT INTO joueurs VALUES (11, 'Fabre', 'Nina', 'gardien', 3);\r\nINSERT INTO joueurs VALUES (12, 'Bertrand', 'Léo', 'attaquant', 3);\r\nINSERT INTO joueurs VALUES (13, 'Faure', 'Louis', 'milieu', 4);\r\nINSERT INTO joueurs VALUES (14, 'Petit', 'Emma', 'défenseur', 4);\r\nINSERT INTO joueurs VALUES (15, 'Robert', 'Zoé', 'gardien', 4);\r\nINSERT INTO joueurs VALUES (16, 'Simon', 'Adam', 'milieu', 4);\r\nINSERT INTO joueurs VALUES (17, 'Petit', 'Hugo', 'attaquant', 5);\r\nINSERT INTO joueurs VALUES (18, 'Lambert', 'Julie', 'milieu', 5);\r\nINSERT INTO joueurs VALUES (19, 'Roy', 'Camille', 'défenseur', 5);\r\nINSERT INTO joueurs VALUES (20, 'Perrin', 'Noah', 'gardien', 5);\r\n\r\nCREATE TABLE matchs (\r\n    id INTEGER PRIMARY KEY,\r\n    equipe_domicile_id INTEGER,\r\n    equipe_exterieur_id INTEGER,\r\n    score_domicile INTEGER,\r\n    score_exterieur INTEGER,\r\n    date TEXT\r\n);\r\nINSERT INTO matchs VALUES (1, 1, 2, 2, 1, '2026-01-10');\r\nINSERT INTO matchs VALUES (2, 3, 4, 1, 1, '2026-01-10');\r\nINSERT INTO matchs VALUES (3, 5, 1, 0, 2, '2026-01-17');\r\nINSERT INTO matchs VALUES (4, 2, 3, 3, 2, '2026-01-17');\r\nINSERT INTO matchs VALUES (5, 4, 5, 1, 0, '2026-01-24');\r\nINSERT INTO matchs VALUES (6, 1, 3, 1, 1, '2026-02-07');\r\nINSERT INTO matchs VALUES (7, 2, 5, 2, 2, '2026-02-07');\r\nINSERT INTO matchs VALUES (8, 4, 1, 0, 3, '2026-02-14');\r\nINSERT INTO matchs VALUES (9, 3, 5, 2, 0, '2026-02-14');\r\nINSERT INTO matchs VALUES (10, 2, 4, 1, 2, '2026-02-21');\r\n\r\nCREATE TABLE buts (\r\n    id INTEGER PRIMARY KEY,\r\n    joueur_id INTEGER,\r\n    match_id INTEGER,\r\n    minute INTEGER\r\n);\r\nINSERT INTO buts VALUES (1, 1, 1, 23);\r\nINSERT INTO buts VALUES (2, 1, 1, 55);\r\nINSERT INTO buts VALUES (3, 8, 1, 70);\r\nINSERT INTO buts VALUES (4, 12, 2, 30);\r\nINSERT INTO buts VALUES (5, 16, 2, 60);\r\nINSERT INTO buts VALUES (6, 4, 3, 15);\r\nINSERT INTO buts VALUES (7, 2, 3, 80);\r\nINSERT INTO buts VALUES (8, 8, 4, 10);\r\nINSERT INTO buts VALUES (9, 8, 4, 45);\r\nINSERT INTO buts VALUES (10, 5, 4, 70);\r\nINSERT INTO buts VALUES (11, 12, 4, 30);\r\nINSERT INTO buts VALUES (12, 9, 4, 85);\r\nINSERT INTO buts VALUES (13, 16, 5, 40);\r\nINSERT INTO buts VALUES (14, 1, 6, 20);\r\nINSERT INTO buts VALUES (15, 10, 6, 77);\r\nINSERT INTO buts VALUES (16, 8, 7, 5);\r\nINSERT INTO buts VALUES (17, 5, 7, 50);\r\nINSERT INTO buts VALUES (18, 17, 7, 30);\r\nINSERT INTO buts VALUES (19, 18, 7, 85);\r\nINSERT INTO buts VALUES (20, 1, 8, 12);\r\nINSERT INTO buts VALUES (21, 1, 8, 47);\r\nINSERT INTO buts VALUES (22, 4, 8, 90);\r\nINSERT INTO buts VALUES (23, 12, 9, 22);\r\nINSERT INTO buts VALUES (24, 10, 9, 68);\r\nINSERT INTO buts VALUES (25, 5, 10, 35);\r\nINSERT INTO buts VALUES (26, 16, 10, 10);\r\nINSERT INTO buts VALUES (27, 13, 10, 75);",
     "exercises": [
       {
         "title": "Équipes d'une ville",
@@ -3058,6 +2903,127 @@
         "sql_solution": "-- La sous-requête calcule la moyenne des scores totaux, sur TOUS les\n-- matchs (une seule valeur renvoyée, réutilisable dans une comparaison)\nSELECT id, score_domicile, score_exterieur\nFROM matchs\nWHERE (score_domicile + score_exterieur) > (\n    SELECT AVG(score_domicile + score_exterieur) FROM matchs\n)\nORDER BY id;",
         "test_cases": [],
         "hints": []
+      }
+    ]
+  },
+  {
+    "name": "Calcul numérique (numpy)",
+    "slug": "calcul-numerique",
+    "description": "Manipuler des tableaux numpy et implémenter des méthodes numériques classiques (intégration, résolution d'équations différentielles) — utile pour les enseignements de spécialité Physique-Chimie et Sciences de l'Ingénieur (SII).",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Tableau numpy rempli de zéros",
+        "slug": "tableau-zeros",
+        "statement": "Écris une fonction `tableau_zeros(n)` qui renvoie un tableau **numpy** de taille `n`, rempli de zéros.\n\nIndice : la fonction `np.zeros` fait exactement ça.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef tableau_zeros(n):\n    pass\n",
+        "function_name": "tableau_zeros",
+        "solution_code": "import numpy as np\n\ndef tableau_zeros(n):\n    # np.zeros(n) crée directement un tableau numpy de taille n rempli de 0.0\n    return np.zeros(n)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[5]",
+          "[1]",
+          "[0]"
+        ],
+        "hints": [
+          "`np.zeros(n)` renvoie directement un tableau numpy de taille `n` rempli de zéros — pas besoin de boucle."
+        ]
+      },
+      {
+        "title": "Tableau numpy rempli de uns",
+        "slug": "tableau-uns",
+        "statement": "Écris une fonction `tableau_uns(n)` qui renvoie un tableau **numpy** de taille `n`, rempli de uns.\n\nIndice : la fonction `np.ones` fait exactement ça.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef tableau_uns(n):\n    pass\n",
+        "function_name": "tableau_uns",
+        "solution_code": "import numpy as np\n\ndef tableau_uns(n):\n    # np.ones(n) crée directement un tableau numpy de taille n rempli de 1.0\n    return np.ones(n)\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[4]",
+          "[1]",
+          "[0]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Intégration : méthode des rectangles",
+        "slug": "integration-rectangles",
+        "statement": "On dispose des vitesses successives d'un mobile, mesurées à intervalles de temps réguliers `dt`.\n\nÉcris une fonction `integration_rectangles(vitesses, dt, x0)` qui renvoie un tableau numpy des positions correspondantes (même taille que `vitesses`), obtenues par la **méthode des rectangles**, à partir d'une position initiale `x0`.\n\nExemple : `integration_rectangles([2, 4, 6], 1, 0)` renvoie `[0, 2, 6]`.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef integration_rectangles(vitesses, dt, x0):\n    pass\n",
+        "function_name": "integration_rectangles",
+        "solution_code": "import numpy as np\n\ndef integration_rectangles(vitesses, dt, x0):\n    n = len(vitesses)\n    positions = np.zeros(n)\n    positions[0] = x0\n    # Méthode des rectangles : on avance en supposant la vitesse constante\n    # (égale à sa valeur au DÉBUT de l'intervalle) sur toute la durée dt\n    for i in range(1, n):\n        positions[i] = positions[i - 1] + vitesses[i - 1] * dt\n    return positions\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[2, 4, 6], 1, 0]",
+          "[[1, 1, 1, 1], 2, 5]",
+          "[[0, 0, 0], 1, 10]"
+        ],
+        "hints": [
+          "`position[i] = position[i-1] + vitesse[i-1] * dt` : on utilise la vitesse au **début** de l'intervalle, pas celle de la fin."
+        ]
+      },
+      {
+        "title": "Intégration : méthode des trapèzes",
+        "slug": "integration-trapezes",
+        "statement": "Reprends l'exercice précédent, mais cette fois en utilisant la **méthode des trapèzes**.\n\nÉcris une fonction `integration_trapezes(vitesses, dt, x0)` qui renvoie un tableau numpy des positions correspondantes (même taille que `vitesses`), à partir d'une position initiale `x0`.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef integration_trapezes(vitesses, dt, x0):\n    pass\n",
+        "function_name": "integration_trapezes",
+        "solution_code": "import numpy as np\n\ndef integration_trapezes(vitesses, dt, x0):\n    n = len(vitesses)\n    positions = np.zeros(n)\n    positions[0] = x0\n    # Méthode des trapèzes : on prend la MOYENNE des vitesses de début et\n    # de fin d'intervalle, plus précise que la méthode des rectangles\n    for i in range(1, n):\n        positions[i] = positions[i - 1] + (vitesses[i - 1] + vitesses[i]) / 2 * dt\n    return positions\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[[2, 4, 6], 1, 0]",
+          "[[1, 1, 1, 1], 2, 5]",
+          "[[0, 0, 0], 1, 10]"
+        ],
+        "hints": [
+          "Contrairement à la méthode des rectangles, on prend ici la moyenne entre `vitesse[i-1]` et `vitesse[i]`."
+        ]
+      },
+      {
+        "title": "Méthode d'Euler — équation différentielle d'ordre 1 (décharge d'un condensateur)",
+        "slug": "euler-ordre-1",
+        "statement": "On étudie la décharge d'un condensateur de capacité `C` dans une résistance `R`. La tension `u(t)` à ses bornes suit l'équation différentielle du premier ordre :\n\n`du/dt = -u / (R*C)`\n\navec `u(0) = u0`.\n\nÉcris une fonction `euler_rc(u0, R, C, dt, n)` qui calcule, avec la **méthode d'Euler explicite**, un tableau numpy des `n+1` valeurs de `u` aux instants `t = 0, dt, 2*dt, ..., n*dt`.",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef euler_rc(u0, R, C, dt, n):\n    pass\n",
+        "function_name": "euler_rc",
+        "solution_code": "import numpy as np\n\ndef euler_rc(u0, R, C, dt, n):\n    tau = R * C\n    u = np.zeros(n + 1)\n    u[0] = u0\n    # Méthode d'Euler explicite : on avance pas à pas en utilisant la dérivée\n    # calculée au point courant (ici, la loi du/dt = -u/tau)\n    for k in range(n):\n        u[k + 1] = u[k] + dt * (-u[k] / tau)\n    return u\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[10, 1000, 0.001, 0.1, 5]",
+          "[5, 100, 0.01, 0.1, 3]",
+          "[1, 1, 1, 0.5, 4]"
+        ],
+        "hints": [
+          "`u[k+1] = u[k] + dt * (-u[k] / (R*C))` : c'est la définition même de la méthode d'Euler appliquée à cette équation."
+        ]
+      },
+      {
+        "title": "Méthode d'Euler — équation différentielle d'ordre 2 (oscillateur masse-ressort)",
+        "slug": "euler-ordre-2",
+        "statement": "On étudie un système masse-ressort sans frottement : une masse `m` accrochée à un ressort de raideur `k`, dont la position `x(t)` suit l'équation différentielle du second ordre :\n\n`m * x'' = -k * x`\n\nÉcris une fonction `euler_masse_ressort(x0, v0, k, m, dt, n)` qui calcule, avec la méthode d'Euler explicite, un tableau numpy des `n+1` valeurs de la position `x` aux instants `t = 0, dt, ..., n*dt` (la vitesse `v` est calculée en interne à chaque étape, mais seule la position est renvoyée).",
+        "kind": "python",
+        "starter_code": "import numpy as np\n\ndef euler_masse_ressort(x0, v0, k, m, dt, n):\n    pass\n",
+        "function_name": "euler_masse_ressort",
+        "solution_code": "import numpy as np\n\ndef euler_masse_ressort(x0, v0, k, m, dt, n):\n    x = np.zeros(n + 1)\n    v = np.zeros(n + 1)\n    x[0] = x0\n    v[0] = v0\n    # On met à jour position ET vitesse à CHAQUE pas, en utilisant les valeurs\n    # du pas précédent (x[step], v[step]) : c'est le principe de la méthode\n    # d'Euler appliquée au système d'ordre 1 équivalent (x' = v, v' = -(k/m)*x)\n    for step in range(n):\n        x[step + 1] = x[step] + dt * v[step]\n        v[step + 1] = v[step] + dt * (-(k / m) * x[step])\n    return x\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[1, 0, 10, 1, 0.01, 10]",
+          "[0, 1, 4, 1, 0.1, 5]",
+          "[2, -1, 5, 2, 0.05, 8]"
+        ],
+        "hints": [
+          "Deux tableaux internes (x et v) évoluent en parallèle, mais la fonction ne renvoie que x.",
+          "Attention à utiliser `x[step]` et `v[step]` (valeurs du pas précédent) pour calculer `x[step+1]` et `v[step+1]`, pas les valeurs déjà mises à jour."
+        ]
       }
     ]
   }
