@@ -67,9 +67,30 @@ class Command(BaseCommand):
                         text=hint_text,
                         order=i,
                     )
-        if settings.DEBUG:
-            admin_email = os.environ.get("DJANGO_SUPERUSER_EMAIL")
-            admin_password = os.environ.get("DJANGO_SUPERUSER_PASSWORD")
+
+        # Comptes admin recréés automatiquement à chaque démarrage (local ET
+        # production) : utile car le plan gratuit de Render ne persiste pas le
+        # système de fichiers/la base de données (voir README). Ce bloc tourne
+        # désormais aussi en production (contrairement à avant, où il était limité
+        # à DEBUG=True) : il remplace donc le "createsuperuser --noinput" du
+        # Procfile, qui ne gérait qu'un seul admin et ne mettait jamais à jour son
+        # mot de passe s'il existait déjà.
+        #
+        # Chaque admin est défini par une paire de variables d'environnement :
+        # DJANGO_SUPERUSER_EMAIL / DJANGO_SUPERUSER_PASSWORD pour le premier, puis
+        # DJANGO_SUPERUSER2_EMAIL / DJANGO_SUPERUSER2_PASSWORD pour le deuxième,
+        # DJANGO_SUPERUSER3_... pour le troisième, etc. On s'arrête dès qu'un
+        # numéro n'a NI l'email NI le mot de passe définis.
+        admin_trouve = False
+        numero = 1
+        suffixe = ""
+        while True:
+            admin_email = os.environ.get(f"DJANGO_SUPERUSER{suffixe}_EMAIL")
+            admin_password = os.environ.get(f"DJANGO_SUPERUSER{suffixe}_PASSWORD")
+            if not admin_email and not admin_password:
+                break
+
+            admin_trouve = True
             if admin_email and admin_password:
                 admin, created = User.objects.get_or_create(
                     email=admin_email,
@@ -81,12 +102,23 @@ class Command(BaseCommand):
                 admin.save()
                 action = "créé" if created else "mis à jour"
                 self.stdout.write(self.style.SUCCESS(
-                    f"Compte admin local {action} : {admin_email}"
+                    f"Compte admin {action} : {admin_email}"
                 ))
             else:
                 self.stdout.write(self.style.WARNING(
-                    "DJANGO_SUPERUSER_EMAIL / DJANGO_SUPERUSER_PASSWORD non définis "
-                    "(vérifie ton fichier .env) : compte admin non créé automatiquement."
+                    f"DJANGO_SUPERUSER{suffixe}_EMAIL / DJANGO_SUPERUSER{suffixe}_PASSWORD "
+                    "incomplet (une seule des deux variables est définie) : ce compte "
+                    "admin n'a pas été créé."
                 ))
+
+            numero += 1
+            suffixe = str(numero)
+
+        if not admin_trouve:
+            self.stdout.write(self.style.WARNING(
+                "Aucune variable DJANGO_SUPERUSER_EMAIL / DJANGO_SUPERUSER_PASSWORD "
+                "définie (vérifie ton fichier .env, ou les variables d'environnement "
+                "Render) : aucun compte admin créé automatiquement."
+            ))
 
         self.stdout.write(self.style.SUCCESS("Thèmes et exercices créés avec succès."))
