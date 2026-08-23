@@ -121,4 +121,27 @@ class Command(BaseCommand):
                 "Render) : aucun compte admin créé automatiquement."
             ))
 
+        # Compte élève de test, recréé automatiquement au même titre que les admins
+        # ci-dessus (même raison : persistance sur le plan gratuit de Render).
+        # Contrairement aux admins, ce compte n'a NI is_staff NI is_superuser : un
+        # élève normal, juste pratique pour tester rapidement le parcours étudiant
+        # sans repasser par le formulaire d'inscription à chaque redémarrage.
+        #
+        # Optionnel : si DJANGO_TEST_STUDENT_EMAIL / DJANGO_TEST_STUDENT_PASSWORD
+        # ne sont pas définies, ce bloc ne fait simplement rien (pas de warning,
+        # contrairement aux admins : un compte élève de test n'est pas obligatoire).
+        student_email = os.environ.get("DJANGO_TEST_STUDENT_EMAIL")
+        student_password = os.environ.get("DJANGO_TEST_STUDENT_PASSWORD")
+        if student_email and student_password:
+            student, created = User.objects.get_or_create(
+                email=student_email,
+                defaults={"display_name": "Élève test"},
+            )
+            student.set_password(student_password)
+            student.save()
+            action = "créé" if created else "mis à jour"
+            self.stdout.write(self.style.SUCCESS(
+                f"Compte élève de test {action} : {student_email}"
+            ))
+
         self.stdout.write(self.style.SUCCESS("Thèmes et exercices créés avec succès."))
