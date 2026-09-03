@@ -7,7 +7,7 @@ from exercises.models import Theme, Exercise, TestCase, Hint
 from accounts.models import User
 import os
 
-DATA_FILE = Path(settings.BASE_DIR) / "exercises_data.json"
+DATA_FILE = Path(settings.DATA_DIR) / "exercises_data.json"
 
 
 class Command(BaseCommand):

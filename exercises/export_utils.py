@@ -3,7 +3,7 @@ from pathlib import Path
 
 from django.conf import settings
 
-DATA_FILE = Path(settings.BASE_DIR) / "exercises_data.json"
+DATA_FILE = Path(settings.DATA_DIR) / "exercises_data.json"
 
 
 def export_exercises_to_json():
