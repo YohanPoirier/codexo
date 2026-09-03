@@ -93,7 +93,10 @@ WSGI_APPLICATION = 'codexo.wsgi.application'
 # Dossier où vivent les fichiers que le serveur web doit pouvoir écrire (la base
 # SQLite notamment). Séparé du code pour ne donner l'écriture qu'à cet endroit
 # précis en production, jamais sur le reste du projet.
-DATA_DIR = Path(os.environ.get('DJANGO_DATA_DIR', BASE_DIR))
+
+DATA_DIR = Path(os.environ.get('DJANGO_DATA_DIR', BASE_DIR / 'codexo-data'))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 
 import dj_database_url
 
