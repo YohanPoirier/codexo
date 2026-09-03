@@ -1,0 +1,131 @@
+- Créer une instance (un VPS). A peu près tout est mis en "par défaut"
+
+
+#On met bien Ubuntu
+- ssh ubuntu@57.130.29.106
+- sudo apt update
+- sudo apt upgrade -y
+- sudo reboot
+- ssh ubuntu@57.130.29.106
+
+#On installe Python
+- sudo apt install git python3-venv python3-pip -y
+
+#On clone
+
+- sudo mkdir -p /var/www
+- sudo chown ubuntu:ubuntu /var/www
+- cd /var/www
+- git clone https://github.com/YohanPoirier/codexo.git
+- cd codexo (si pas déjà fait)
+
+#On crée un environnement virtuel
+
+- python3 -m venv venv
+- source venv/bin/activate
+- pip install -r requirements.txt
+- python manage.py check
+
+#On crée la base
+- python manage.py migrate
+
+
+#On ajoute l'adresse du serveur dans settings.py
+- ALLOWED_HOSTS = ['localhost', '127.0.0.1', '57.130.29.106']
+
+à ce stade le site doit fonctionner sur : http://57.130.29.106:8000/ (à adapter bien-sûr)
+
+#On ajoute unicorn
+
+gunicorn --bind 0.0.0.0:8000 codexo.wsgi:application
+
+à ce stade le site doit continuer de fonctionner sur : http://57.130.29.106:8000/ (à adapter bien-sûr)
+
+#On ajoute Nginx
+
+- sudo apt install nginx
+- sudo nano /etc/nginx/sites-available/codexo
+- copier :
+	
+server {
+    listen 80;
+    server_name 57.130.29.106;
+
+    location /static/ {
+        alias /var/www/codexo/staticfiles/;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+- sudo ln -s /etc/nginx/sites-available/codexo /etc/nginx/sites-enabled/codexo
+- sudo rm /etc/nginx/sites-enabled/default
+
+- sudo systemctl reload nginx
+- python manage.py collectstatic
+
+
+à ce stade le site doit continuer de fonctionner sur : http://57.130.29.106/ (à adapter bien-sûr) (relancer unicorn si besoin)
+
+
+#On ajoute un démarrage auto de unicorn
+
+- sudo nano /etc/systemd/system/codexo.service
+- copier :
+
+[Unit]
+Description=Gunicorn pour Codexo
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/var/www/codexo
+Environment="PATH=/var/www/codexo/venv/bin"
+ExecStart=/var/www/codexo/venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8000 \
+    codexo.wsgi:application
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+- sudo systemctl daemon-reload
+- sudo systemctl enable --now codexo
+
+#On connecte GitHub au serveur en SSH
+
+- cd /var/www/codexo
+ssh-keygen -t ed25519 -C "codexo-vps"
+- cat ~/.ssh/codexo_github.pub (clé à copier)
+- Dans GitHub : Settings → Deploy keys → Add deploy key (pas de allow write)
+- ssh -i ~/.ssh/codexo_github -T git@github.com
+- cd /var/www/codexo
+- git remote set-url origin git@github.com:YohanPoirier/codexo.git
+- nano ~/.ssh/config
+- coller :
+
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/codexo_github
+    IdentitiesOnly yes
+
+- chmod 600 ~/.ssh/config
+- git fetch origin
+- ssh-keygen -t ed25519 -C "github-actions-codexo" -f ~/.ssh/github_actions
+- cat ~/.ssh/github_actions.pub
+- cat ~/.ssh/github_actions.pub >> ~/.ssh/authorized_keys
+- chmod 600 ~/.ssh/authorized_keys
+
+
+- 
+
+

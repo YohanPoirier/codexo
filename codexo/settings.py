@@ -90,11 +90,16 @@ WSGI_APPLICATION = 'codexo.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Dossier où vivent les fichiers que le serveur web doit pouvoir écrire (la base
+# SQLite notamment). Séparé du code pour ne donner l'écriture qu'à cet endroit
+# précis en production, jamais sur le reste du projet.
+DATA_DIR = Path(os.environ.get('DJANGO_DATA_DIR', BASE_DIR))
+
 import dj_database_url
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=f"sqlite:///{DATA_DIR / 'db.sqlite3'}",
         conn_max_age=600,
     )
 }
