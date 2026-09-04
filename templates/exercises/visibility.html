@@ -3,52 +3,103 @@
 {% block content %}
 <span class="eyebrow">Admin</span>
 <h1>Visibilité par classe</h1>
+<p class="visibility-intro">Choisis une classe pour décider quels thèmes et exercices lui sont accessibles.</p>
 
 <form method="get" class="stats-filters">
-  <select name="classe_id" onchange="this.form.submit()">
-    <option value="">— Choisir une classe —</option>
-    {% for c in classes %}
-      <option value="{{ c.id }}" {% if selected_classe.id == c.id %}selected{% endif %}>{{ c.name }}</option>
-    {% endfor %}
-  </select>
+  <div class="filter-field">
+    <label for="classe-select">Classe</label>
+    <select id="classe-select" name="classe_id" onchange="this.form.submit()">
+      <option value="">— Choisir une classe —</option>
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if selected_classe.id == c.id %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
 </form>
 
 {% if selected_classe %}
-  <form method="post" id="visibility-form">
+  <form method="post" id="visibility-form" class="visibility-form">
     {% csrf_token %}
     <input type="hidden" name="classe_id" value="{{ selected_classe.id }}">
 
-    {% for item in themes %}
-      <div class="visibility-theme">
-        <label class="visibility-theme-label">
-          <input type="checkbox" class="theme-checkbox" name="themes" value="{{ item.theme.id }}" {% if item.enabled %}checked{% endif %}>
-          <strong>{{ item.theme.name }}</strong>
-        </label>
-        <div class="visibility-exercises">
-          {% for ex_item in item.exercises %}
-            <label class="visibility-exercise-label">
-              <input type="checkbox" class="exercise-checkbox" data-theme="{{ item.theme.id }}"
-                     name="exercises" value="{{ ex_item.exercise.id }}" {% if ex_item.enabled %}checked{% endif %}>
-              {{ ex_item.exercise.title }}
-            </label>
-          {% empty %}
-            <p class="visibility-empty">Aucun exercice dans ce thème.</p>
-          {% endfor %}
-        </div>
+    <div class="visibility-toolbar">
+      <span class="visibility-summary">
+        <strong id="visibility-global-count">{{ total_enabled }}</strong> / {{ total_exercises }} exercices visibles pour <strong>{{ selected_classe.name }}</strong>
+      </span>
+      <div class="visibility-bulk-actions">
+        <button type="button" class="bulk-btn" data-bulk="on">Tout activer</button>
+        <button type="button" class="bulk-btn" data-bulk="off">Tout désactiver</button>
       </div>
-    {% endfor %}
+    </div>
 
-    <button type="submit" class="run-btn">Enregistrer</button>
+    <div class="visibility-list">
+      {% for item in themes %}
+        <details class="visibility-theme">
+          <summary class="visibility-theme-summary">
+            <label class="visibility-theme-label">
+              <input type="checkbox" class="theme-checkbox" name="themes" value="{{ item.theme.id }}" {% if item.enabled %}checked{% endif %}>
+              <strong>{{ item.theme.name }}</strong>
+            </label>
+            <span class="visibility-theme-spacer"></span>
+            <span class="visibility-theme-count">{{ item.enabled_count }}/{{ item.total_count }} visibles</span>
+          </summary>
+          <div class="visibility-exercises">
+            {% for ex_item in item.exercises %}
+              <label class="visibility-exercise-label">
+                <input type="checkbox" class="exercise-checkbox" data-theme="{{ item.theme.id }}"
+                       name="exercises" value="{{ ex_item.exercise.id }}" {% if ex_item.enabled %}checked{% endif %}>
+                {{ ex_item.exercise.title }}
+              </label>
+            {% empty %}
+              <p class="visibility-empty">Aucun exercice dans ce thème.</p>
+            {% endfor %}
+          </div>
+        </details>
+      {% endfor %}
+    </div>
+
+    <div class="visibility-savebar" id="visibility-savebar">
+      <span class="visibility-savebar-text">Modifications non enregistrées</span>
+      <button type="submit" class="run-btn">Enregistrer</button>
+    </div>
   </form>
 
   <script>
   (function () {
+    var savebar = document.getElementById('visibility-savebar');
+    var globalCount = document.getElementById('visibility-global-count');
+
+    function exercisesOf(themeId) {
+      return document.querySelectorAll('.exercise-checkbox[data-theme="' + themeId + '"]');
+    }
+
+    // Met à jour le compteur de chaque thème et le total, après toute modification.
+    function refreshCounts() {
+      var totalOn = 0, totalAll = 0;
+      document.querySelectorAll('.visibility-theme').forEach(function (block) {
+        var themeId = block.querySelector('.theme-checkbox').value;
+        var boxes = exercisesOf(themeId);
+        var on = Array.from(boxes).filter(function (b) { return b.checked; }).length;
+        var countEl = block.querySelector('.visibility-theme-count');
+        if (countEl) countEl.textContent = on + '/' + boxes.length + ' visibles';
+        totalOn += on;
+        totalAll += boxes.length;
+      });
+      if (globalCount) globalCount.textContent = totalOn;
+    }
+
+    function markDirty() {
+      savebar.classList.add('dirty');
+    }
+
     // Cocher/décocher un thème répercute l'état sur TOUS ses exercices (cascade descendante)
     document.querySelectorAll('.theme-checkbox').forEach(function (themeBox) {
       themeBox.addEventListener('change', function () {
-        document.querySelectorAll('.exercise-checkbox[data-theme="' + themeBox.value + '"]').forEach(function (exBox) {
+        exercisesOf(themeBox.value).forEach(function (exBox) {
           exBox.checked = themeBox.checked;
         });
+        refreshCounts();
+        markDirty();
       });
     });
 
@@ -62,7 +113,7 @@
       exBox.addEventListener('change', function () {
         var themeId = exBox.dataset.theme;
         var themeBox = document.querySelector('.theme-checkbox[value="' + themeId + '"]');
-        var siblings = document.querySelectorAll('.exercise-checkbox[data-theme="' + themeId + '"]');
+        var siblings = exercisesOf(themeId);
         var anyChecked = Array.from(siblings).some(function (b) { return b.checked; });
 
         if (exBox.checked) {
@@ -70,11 +121,31 @@
         } else if (!anyChecked) {
           themeBox.checked = false;
         }
+        refreshCounts();
+        markDirty();
       });
+    });
+
+    // Boutons "Tout activer" / "Tout désactiver" : agissent sur toutes les cases d'un coup.
+    document.querySelectorAll('.bulk-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var on = btn.dataset.bulk === 'on';
+        document.querySelectorAll('.theme-checkbox, .exercise-checkbox').forEach(function (box) {
+          box.checked = on;
+        });
+        refreshCounts();
+        markDirty();
+      });
+    });
+
+    // Cliquer sur la case ou le nom d'un thème ne doit pas plier/déplier le <details> :
+    // seul le chevron / le reste de la ligne s'en charge.
+    document.querySelectorAll('.visibility-theme-label').forEach(function (label) {
+      label.addEventListener('click', function (e) { e.stopPropagation(); });
     });
   })();
   </script>
 {% else %}
-  <p>Sélectionne une classe ci-dessus pour régler la visibilité de ses thèmes et exercices.</p>
+  <p class="visibility-placeholder">Sélectionne une classe ci-dessus pour régler la visibilité de ses thèmes et exercices.</p>
 {% endif %}
 {% endblock %}

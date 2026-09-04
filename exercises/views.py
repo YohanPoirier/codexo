@@ -374,6 +374,9 @@ def classe_visibility(request):
         messages.success(request, f"Visibilité mise à jour pour « {selected_classe.name} ».")
         return redirect(f"{request.path}?classe_id={selected_classe.id}")
 
+    total_enabled = 0
+    total_exercises = 0
+
     classe_id = request.GET.get("classe_id")
     if classe_id:
         selected_classe = get_object_or_404(Classe, id=classe_id)
@@ -387,14 +390,25 @@ def classe_visibility(request):
                 }
                 for ex in theme.exercises.all().prefetch_related("enabled_for_classes")
             ]
+            enabled_count = sum(1 for ex_item in exercises_data if ex_item["enabled"])
+            total_enabled += enabled_count
+            total_exercises += len(exercises_data)
             themes_data.append({
                 "theme": theme,
                 "enabled": selected_classe.id in theme_enabled_ids,
                 "exercises": exercises_data,
+                "enabled_count": enabled_count,
+                "total_count": len(exercises_data),
             })
 
     return render(
         request,
         "exercises/visibility.html",
-        {"classes": classes, "selected_classe": selected_classe, "themes": themes_data},
+        {
+            "classes": classes,
+            "selected_classe": selected_classe,
+            "themes": themes_data,
+            "total_enabled": total_enabled,
+            "total_exercises": total_exercises,
+        },
     )

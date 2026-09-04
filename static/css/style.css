@@ -500,13 +500,99 @@ table.schema-columns code {
 .stats-theme-group .table-scroll { padding: 4px 6px; }
 
 /* --- Page de visibilité par classe (admin) --- */
+.visibility-intro { color: var(--ink-soft); margin: -4px 0 0; max-width: 62ch; }
+
+.filter-field { display: flex; flex-direction: column; gap: 6px; }
+.filter-field label {
+  font-family: 'JetBrains Mono', monospace; font-size: .74rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--ink-soft);
+}
+
+.visibility-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 6px 0 18px;
+}
+.visibility-summary { font-size: .92rem; color: var(--ink-soft); }
+.visibility-summary strong { color: var(--indigo-deep); }
+.visibility-bulk-actions { display: flex; gap: 10px; }
+.bulk-btn {
+  font-family: 'JetBrains Mono', monospace; font-size: .78rem;
+  background: transparent; color: var(--indigo); border: 1px solid var(--rule);
+  border-radius: 8px; padding: 7px 12px; cursor: pointer;
+}
+.bulk-btn:hover { border-color: var(--indigo); background: var(--paper-alt); }
+
+.visibility-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
 .visibility-theme {
   background: var(--paper-alt); border: 1px solid var(--rule); border-radius: var(--radius);
-  padding: 16px 20px; margin-bottom: 14px;
+  overflow: hidden;
 }
-.visibility-theme-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 1.05rem; }
-.visibility-exercises { margin: 12px 0 0 26px; display: flex; flex-direction: column; gap: 8px; }
-.visibility-exercise-label { display: flex; align-items: center; gap: 10px; font-size: .92rem; cursor: pointer; }
-.visibility-empty { margin: 0; font-size: .85rem; color: var(--ink-soft); }
+.visibility-theme-summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center;
+  gap: 10px; padding: 14px 18px;
+}
+.visibility-theme-summary::-webkit-details-marker { display: none; }
+.visibility-theme-summary::marker { content: ""; }
+.visibility-theme-summary::before {
+  content: "▸"; color: var(--amber); transition: transform .12s ease; flex-shrink: 0;
+}
+.visibility-theme[open] .visibility-theme-summary::before { transform: rotate(90deg); }
+.visibility-theme[open] .visibility-theme-summary { border-bottom: 1px solid var(--rule); }
+
+/* Le label (case + nom) ne s'étire pas : seule cette zone bascule la case à cocher.
+   Le reste de la ligne (spacer + compteur) appartient au <summary> et sert à
+   déplier/replier le thème, sans jamais toucher à son état de visibilité. */
+.visibility-theme-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 1.02rem; min-width: 0; }
+.visibility-theme-label strong {
+  font-weight: 600; color: var(--indigo-deep);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+}
+.visibility-theme-spacer { flex: 1; min-width: 12px; }
+.visibility-theme-count {
+  font-family: 'JetBrains Mono', monospace; font-size: .76rem; color: var(--ink-soft);
+  white-space: nowrap; flex-shrink: 0;
+}
+
+.visibility-exercises {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 2px 20px; padding: 8px 20px 16px 44px;
+}
+.visibility-exercise-label {
+  display: flex; align-items: center; gap: 10px; font-size: .9rem; cursor: pointer;
+  padding: 6px 0; color: var(--ink);
+}
+.visibility-empty { grid-column: 1 / -1; margin: 6px 0; font-size: .85rem; color: var(--ink-soft); }
+
+.theme-checkbox, .exercise-checkbox {
+  width: 17px; height: 17px; accent-color: var(--indigo); flex-shrink: 0; cursor: pointer;
+}
+
 #visibility-form { margin-top: 24px; }
-#visibility-form .run-btn { margin-top: 10px; }
+.visibility-savebar {
+  position: sticky; bottom: 20px; z-index: 20;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 14px 18px; box-shadow: 0 10px 28px rgba(28,39,71,.12);
+}
+.visibility-savebar-text {
+  font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--amber);
+  opacity: 0; transition: opacity .15s ease;
+}
+.visibility-savebar.dirty .visibility-savebar-text { opacity: 1; }
+/* Le bouton occupe la colonne centrale : avec deux colonnes 1fr de part et d'autre
+   (la 3e reste vide, il n'y a pas d'élément après le bouton), il se retrouve
+   toujours centré horizontalement dans la barre, texte affiché ou non. */
+.visibility-savebar .run-btn { grid-column: 2; justify-self: center; }
+
+@media (max-width: 480px) {
+  .visibility-savebar { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .visibility-savebar .run-btn { grid-column: 1; }
+}
+
+.visibility-placeholder { color: var(--ink-soft); }
+
+@media (max-width: 640px) {
+  .visibility-exercises { grid-template-columns: 1fr; padding-left: 34px; }
+  .visibility-toolbar { flex-direction: column; align-items: flex-start; }
+}
