@@ -32,9 +32,16 @@ def theme_list(request):
     for theme in themes:
         if not theme.is_visible_for(request.user):
             continue
-        total = theme.exercises.count()
+        # Ne compter que les exercices réellement visibles pour la classe de l'élève :
+        # sinon le total affiché ici (ex: "2 / 8") ne correspond pas à ce qu'il voit
+        # vraiment en ouvrant le thème (exercise_list, qui filtre déjà avec is_visible_for).
+        visible_exercise_ids = [
+            ex.id for ex in theme.exercises.all().prefetch_related("enabled_for_classes")
+            if ex.is_visible_for(request.user)
+        ]
+        total = len(visible_exercise_ids)
         done = (
-            Result.objects.filter(user=request.user, exercise__theme=theme, success=True)
+            Result.objects.filter(user=request.user, exercise_id__in=visible_exercise_ids, success=True)
             .values("exercise_id")
             .distinct()
             .count()
