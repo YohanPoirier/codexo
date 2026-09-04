@@ -17,6 +17,16 @@ class Theme(models.Model):
             "qu'ils apparaissent dans le résumé de schéma affiché aux étudiants."
         ),
     )
+    enabled_for_classes = models.ManyToManyField(
+        "accounts.Classe",
+        related_name="enabled_themes",
+        blank=True,
+        help_text=(
+            "Classes pour lesquelles ce thème est visible. Vide par défaut = invisible "
+            "pour tout le monde (y compris un nouveau thème fraîchement créé) : réglage "
+            "à faire via la page /stats/visibilite/."
+        ),
+    )
 
     class Meta:
         ordering = ["order", "name"]
@@ -64,6 +74,13 @@ class Theme(models.Model):
         partagée de ce thème, pour affichage aux étudiants. Voir schema_utils.py."""
         from .schema_utils import summarize_sql_setup
         return summarize_sql_setup(self.sql_setup)
+
+    def is_visible_for(self, user):
+        """True si ce thème doit être affiché pour `user`. Un prof (pas de classe
+        assignée) voit toujours tout, pour pouvoir prévisualiser/tester le contenu."""
+        if not user.is_authenticated or user.classe_id is None:
+            return True
+        return any(c.id == user.classe_id for c in self.enabled_for_classes.all())
 
 
 class Exercise(models.Model):
@@ -123,6 +140,17 @@ class Exercise(models.Model):
         ),
     )
 
+    enabled_for_classes = models.ManyToManyField(
+        "accounts.Classe",
+        related_name="enabled_exercises",
+        blank=True,
+        help_text=(
+            "Classes pour lesquelles CET exercice précis est visible (en plus du thème, "
+            "qui doit lui aussi être visible). Vide par défaut = invisible pour tout le "
+            "monde : réglage à faire via la page /stats/visibilite/."
+        ),
+    )
+
     class Meta:
         ordering = ["theme__order", "order"]
         unique_together = ("theme", "slug")
@@ -151,6 +179,15 @@ class Exercise(models.Model):
                 )
             if not self.sql_solution:
                 raise ValidationError("Un exercice SQL doit avoir une 'sql_solution'.")
+
+    def is_visible_for(self, user):
+        """True si cet exercice doit être affiché : il faut à la fois que le thème
+        soit visible ET que l'exercice lui-même le soit pour la classe de l'utilisateur."""
+        if not user.is_authenticated or user.classe_id is None:
+            return True
+        if not self.theme.is_visible_for(user):
+            return False
+        return any(c.id == user.classe_id for c in self.enabled_for_classes.all())
 
     def build_test_code(self):
         if self.kind == self.SQL:

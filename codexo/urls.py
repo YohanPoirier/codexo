@@ -12,6 +12,7 @@ urlpatterns = [
     path('', ex_views.theme_list, name='theme_list'),
     path('profil/', ex_views.profile, name='profile'),
     path('stats/', ex_views.stats, name='stats'),
+    path('stats/visibilite/', ex_views.classe_visibility, name='classe_visibility'),
     path('theme/<slug:theme_slug>/', ex_views.exercise_list, name='exercise_list'),
     path('theme/<slug:theme_slug>/<slug:exercise_slug>/', ex_views.exercise_detail, name='exercise_detail'),
     path('api/exercise/<int:exercise_id>/tests/', ex_views.exercise_tests, name='exercise_tests'),

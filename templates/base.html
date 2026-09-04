@@ -23,6 +23,7 @@
         {% if user.is_superuser %}
           <a href="/admin/">Administration</a>
           <a href="{% url 'stats' %}">Statistiques</a>
+          <a href="{% url 'classe_visibility' %}">Visibilité</a>
         {% endif %}
         <form method="post" action="{% url 'logout' %}" class="logout-form">
           {% csrf_token %}

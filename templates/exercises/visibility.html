@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Visibilité par classe — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow">Admin</span>
+<h1>Visibilité par classe</h1>
+
+<form method="get" class="stats-filters">
+  <select name="classe_id" onchange="this.form.submit()">
+    <option value="">— Choisir une classe —</option>
+    {% for c in classes %}
+      <option value="{{ c.id }}" {% if selected_classe.id == c.id %}selected{% endif %}>{{ c.name }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+{% if selected_classe %}
+  <form method="post" id="visibility-form">
+    {% csrf_token %}
+    <input type="hidden" name="classe_id" value="{{ selected_classe.id }}">
+
+    {% for item in themes %}
+      <div class="visibility-theme">
+        <label class="visibility-theme-label">
+          <input type="checkbox" class="theme-checkbox" name="themes" value="{{ item.theme.id }}" {% if item.enabled %}checked{% endif %}>
+          <strong>{{ item.theme.name }}</strong>
+        </label>
+        <div class="visibility-exercises">
+          {% for ex_item in item.exercises %}
+            <label class="visibility-exercise-label">
+              <input type="checkbox" class="exercise-checkbox" data-theme="{{ item.theme.id }}"
+                     name="exercises" value="{{ ex_item.exercise.id }}" {% if ex_item.enabled %}checked{% endif %}>
+              {{ ex_item.exercise.title }}
+            </label>
+          {% empty %}
+            <p class="visibility-empty">Aucun exercice dans ce thème.</p>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="run-btn">Enregistrer</button>
+  </form>
+
+  <script>
+  (function () {
+    // Cocher/décocher un thème répercute l'état sur TOUS ses exercices (cascade descendante)
+    document.querySelectorAll('.theme-checkbox').forEach(function (themeBox) {
+      themeBox.addEventListener('change', function () {
+        document.querySelectorAll('.exercise-checkbox[data-theme="' + themeBox.value + '"]').forEach(function (exBox) {
+          exBox.checked = themeBox.checked;
+        });
+      });
+    });
+
+    // Cocher/décocher un exercice individuel répercute l'état sur son thème dans un seul
+    // sens à la fois, sans jamais toucher aux autres exercices du même thème :
+    // - on coche un exercice -> son thème (s'il était décoché) devient coché (cascade montante)
+    // - on décoche le DERNIER exercice encore coché d'un thème -> le thème redevient décoché
+    //   (symétrie du cas précédent) ; s'il reste au moins un autre exercice coché, le thème
+    //   reste coché tel quel.
+    document.querySelectorAll('.exercise-checkbox').forEach(function (exBox) {
+      exBox.addEventListener('change', function () {
+        var themeId = exBox.dataset.theme;
+        var themeBox = document.querySelector('.theme-checkbox[value="' + themeId + '"]');
+        var siblings = document.querySelectorAll('.exercise-checkbox[data-theme="' + themeId + '"]');
+        var anyChecked = Array.from(siblings).some(function (b) { return b.checked; });
+
+        if (exBox.checked) {
+          themeBox.checked = true;
+        } else if (!anyChecked) {
+          themeBox.checked = false;
+        }
+      });
+    });
+  })();
+  </script>
+{% else %}
+  <p>Sélectionne une classe ci-dessus pour régler la visibilité de ses thèmes et exercices.</p>
+{% endif %}
+{% endblock %}

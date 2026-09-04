@@ -17,6 +17,13 @@
     </label>
   </div>
 
+  <select name="classe_id" onchange="this.form.submit()">
+    <option value="">— Toutes les classes —</option>
+    {% for c in classes %}
+      <option value="{{ c.id }}" {% if selected_classe.id == c.id %}selected{% endif %}>{{ c.name }}</option>
+    {% endfor %}
+  </select>
+
   <select name="student_id" onchange="this.form.submit()" {% if mode != "student" %}class="stats-select-hidden"{% endif %}>
     <option value="">— Choisir un étudiant —</option>
     {% for s in students %}

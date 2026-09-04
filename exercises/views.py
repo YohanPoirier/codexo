@@ -12,7 +12,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 
-from accounts.models import User
+from accounts.models import User, Classe
 from .models import Theme, Exercise, Result, Abandonment, Hint, HintReveal
 
 # Durée pendant laquelle un exercice est verrouillé après un abandon (voir abandon_exercise
@@ -27,9 +27,11 @@ ABANDON_LOCK_ENABLED = not settings.DEBUG
 
 @login_required
 def theme_list(request):
-    themes = Theme.objects.all()
+    themes = Theme.objects.all().prefetch_related("enabled_for_classes")
     data = []
     for theme in themes:
+        if not theme.is_visible_for(request.user):
+            continue
         total = theme.exercises.count()
         done = (
             Result.objects.filter(user=request.user, exercise__theme=theme, success=True)
@@ -44,6 +46,10 @@ def theme_list(request):
 @login_required
 def exercise_list(request, theme_slug):
     theme = get_object_or_404(Theme, slug=theme_slug)
+    if not theme.is_visible_for(request.user):
+        messages.info(request, f"« {theme.name} » n'est pas disponible pour ta classe.")
+        return redirect("theme_list")
+
     solved_ids = set(
         Result.objects.filter(user=request.user, exercise__theme=theme, success=True)
         .values_list("exercise_id", flat=True)
@@ -64,7 +70,13 @@ def exercise_list(request, theme_slug):
     }
     locked_ids = set(locked_retry_at.keys())
 
-    exercises = theme.exercises.all()
+    # On exclut les exercices non visibles pour la classe de l'étudiant (le thème lui-même
+    # vient d'être vérifié ci-dessus via is_visible_for, qui teste aussi le thème ; ici on
+    # revérifie par exercice pour prendre en compte enabled_for_classes propre à l'exercice).
+    exercises = [
+        ex for ex in theme.exercises.all().prefetch_related("enabled_for_classes")
+        if ex.is_visible_for(request.user)
+    ]
     return render(
         request,
         "exercises/exercise_list.html",
@@ -83,6 +95,12 @@ def exercise_list(request, theme_slug):
 def exercise_detail(request, theme_slug, exercise_slug):
     theme = get_object_or_404(Theme, slug=theme_slug)
     exercise = get_object_or_404(Exercise, theme=theme, slug=exercise_slug)
+
+    # Re-vérifié ici (pas seulement dans exercise_list) : un étudiant pourrait accéder
+    # directement à l'URL de l'exercice, en contournant le filtrage de la liste.
+    if not exercise.is_visible_for(request.user):
+        messages.info(request, f"« {exercise.title} » n'est pas disponible pour ta classe.")
+        return redirect("exercise_list", theme_slug=theme.slug)
 
     last_abandonment = (
         Abandonment.objects.filter(user=request.user, exercise=exercise).order_by("-created_at").first()
@@ -247,12 +265,23 @@ def _stats_row(user, exercise, label):
 def stats(request):
     """Page de statistiques réservée aux membres de l'équipe (admin/staff), avec bascule
     "par étudiant" (une ligne par exercice, regroupées par thème dans un menu déroulant) /
-    "par exercice" (une ligne par étudiant, tableau plat)."""
+    "par exercice" (une ligne par étudiant, tableau plat), et un filtre optionnel par classe."""
     mode = request.GET.get("mode", "student")
     if mode not in ("student", "exercise"):
         mode = "student"
 
-    students = User.objects.filter(is_superuser=False).order_by("email")
+    classes = Classe.objects.all()
+    classe_id = request.GET.get("classe_id")
+    selected_classe = get_object_or_404(Classe, id=classe_id) if classe_id else None
+
+    # role=ELEVE plutôt que is_superuser=False : plus fiable maintenant que les
+    # profs sont automatiquement admins (is_superuser=True), et ça n'exclut pas
+    # à tort un compte qu'on aurait manuellement passé staff sans le déclarer prof.
+    students = User.objects.filter(role=User.ELEVE)
+    if selected_classe:
+        students = students.filter(classe=selected_classe)
+    students = students.order_by("email")
+
     exercises = Exercise.objects.select_related("theme").order_by("theme__order", "order")
 
     selected_student = None
@@ -297,9 +326,75 @@ def stats(request):
             "mode": mode,
             "students": students,
             "exercises": exercises,
+            "classes": classes,
+            "selected_classe": selected_classe,
             "selected_student": selected_student,
             "selected_exercise": selected_exercise,
             "rows": rows,
             "grouped_rows": grouped_rows,
         },
+    )
+
+
+@staff_member_required
+def classe_visibility(request):
+    """Page dédiée pour régler, classe par classe, quels thèmes/exercices sont visibles.
+    Cocher un thème coche automatiquement tous ses exercices, et réciproquement décocher un
+    thème décoche tous ses exercices (cascade descendante côté JS). Cocher un exercice isolé
+    recoche aussi son thème (cascade montante) sans toucher aux autres exercices du thème ;
+    décocher le DERNIER exercice encore coché d'un thème décoche également le thème (symétrie).
+    L'état réellement enregistré reste indépendant par thème/exercice (voir
+    Theme/Exercise.enabled_for_classes) : c'est uniquement l'INTERFACE qui applique ces
+    règles de cascade avant l'envoi du formulaire."""
+    classes = Classe.objects.all()
+    selected_classe = None
+    themes_data = None
+
+    if request.method == "POST":
+        classe_id = request.POST.get("classe_id")
+        selected_classe = get_object_or_404(Classe, id=classe_id)
+
+        # Les checkboxes NON cochées n'apparaissent pas du tout dans request.POST :
+        # ce qui est absent de ces deux listes doit donc être désactivé pour cette classe.
+        enabled_theme_ids = set(request.POST.getlist("themes"))
+        enabled_exercise_ids = set(request.POST.getlist("exercises"))
+
+        for theme in Theme.objects.all():
+            if str(theme.id) in enabled_theme_ids:
+                theme.enabled_for_classes.add(selected_classe)
+            else:
+                theme.enabled_for_classes.remove(selected_classe)
+
+        for exercise in Exercise.objects.all():
+            if str(exercise.id) in enabled_exercise_ids:
+                exercise.enabled_for_classes.add(selected_classe)
+            else:
+                exercise.enabled_for_classes.remove(selected_classe)
+
+        messages.success(request, f"Visibilité mise à jour pour « {selected_classe.name} ».")
+        return redirect(f"{request.path}?classe_id={selected_classe.id}")
+
+    classe_id = request.GET.get("classe_id")
+    if classe_id:
+        selected_classe = get_object_or_404(Classe, id=classe_id)
+        themes_data = []
+        for theme in Theme.objects.prefetch_related("exercises", "enabled_for_classes"):
+            theme_enabled_ids = set(theme.enabled_for_classes.values_list("id", flat=True))
+            exercises_data = [
+                {
+                    "exercise": ex,
+                    "enabled": selected_classe.id in set(ex.enabled_for_classes.values_list("id", flat=True)),
+                }
+                for ex in theme.exercises.all().prefetch_related("enabled_for_classes")
+            ]
+            themes_data.append({
+                "theme": theme,
+                "enabled": selected_classe.id in theme_enabled_ids,
+                "exercises": exercises_data,
+            })
+
+    return render(
+        request,
+        "exercises/visibility.html",
+        {"classes": classes, "selected_classe": selected_classe, "themes": themes_data},
     )

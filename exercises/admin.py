@@ -24,6 +24,7 @@ class HintInline(admin.TabularInline):
 class ThemeAdmin(admin.ModelAdmin):
     list_display = ("name", "slug", "order")
     inlines = [ExerciseInline]
+    filter_horizontal = ("enabled_for_classes",)
     fieldsets = (
         (None, {"fields": ("name", "slug", "description", "order")}),
         (
@@ -37,6 +38,17 @@ class ThemeAdmin(admin.ModelAdmin):
                 ),
             },
         ),
+        (
+            "Visibilité par classe",
+            {
+                "fields": ("enabled_for_classes",),
+                "description": (
+                    "Classes pour lesquelles ce thème (et donc tous ses exercices) est visible. "
+                    "Vide par défaut = invisible pour tout le monde. Réglage habituellement fait "
+                    "depuis la page /stats/visibilite/, ce champ sert surtout de secours."
+                ),
+            },
+        ),
     )
 
 
@@ -45,6 +57,7 @@ class ExerciseAdmin(admin.ModelAdmin):
     list_display = ("title", "theme", "kind", "order", "function_name")
     list_filter = ("theme", "kind")
     inlines = [TestCaseInline, HintInline]
+    filter_horizontal = ("enabled_for_classes",)
     fieldsets = (
         (None, {"fields": ("theme", "title", "slug", "order", "kind")}),
         ("Contenu affiché à l'étudiant", {"fields": ("statement", "starter_code")}),
@@ -70,6 +83,18 @@ class ExerciseAdmin(admin.ModelAdmin):
                     "— ne remplis ce champ que si CET exercice a besoin de données différentes. "
                     "'sql_solution' est la requête correcte : le résultat attendu est calculé "
                     "automatiquement en l'exécutant, puis comparé à la requête de l'étudiant."
+                ),
+            },
+        ),
+        (
+            "Visibilité par classe",
+            {
+                "fields": ("enabled_for_classes",),
+                "description": (
+                    "Classes pour lesquelles CET exercice précis est visible (en plus du thème, qui "
+                    "doit lui aussi être visible). Vide par défaut = invisible pour tout le monde. "
+                    "Réglage habituellement fait depuis la page /stats/visibilite/, ce champ sert "
+                    "surtout de secours."
                 ),
             },
         ),
