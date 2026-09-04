@@ -8,7 +8,7 @@
       {
         "title": "Dire bonjour",
         "slug": "dire-bonjour",
-        "statement": "Écrire une fonction `dire_bonjour()` qui ne prend aucun argument et renvoie la chaîne de caractères exacte `\"Hello world!\"`.",
+        "statement": "Écrire une fonction `dire_bonjour()` qui ne prend aucun argument et renvoie la chaîne de caractères `\"Hello world!\"`.",
         "kind": "python",
         "starter_code": "def dire_bonjour():\n    pass\n",
         "function_name": "dire_bonjour",
@@ -19,18 +19,18 @@
           "[]"
         ],
         "hints": [
-          "Ne pas utiliser `print()` : la fonction doit **renvoyer** la chaîne avec `return`, pas l'afficher.",
-          "Attention à respecter exactement la casse et la ponctuation : \"Hello world!\", avec un H majuscule et un w minuscule pour \"world\", et un point d'exclamation final."
+          "Ne pas utiliser `print()` : la fonction doit **renvoyer** la chaîne, pas l'afficher.",
+          "Respecter exactement la casse et les espaces."
         ]
       },
       {
         "title": "Score total",
         "slug": "score-total",
-        "statement": "Dans un petit jeu vidéo, le score total d'un joueur après deux manches est simplement la somme du score obtenu à chaque manche.\n\nÉcrire une fonction `score_total(score_manche_1, score_manche_2)` qui renvoie la somme des deux scores passés en paramètres.",
+        "statement": "Dans un petit jeu vidéo, le score total d'un joueur après deux manches est la somme du score obtenu à chaque manche.\n\nÉcrire une fonction `score_total(score_manche_1, score_manche_2)` qui renvoie la somme des deux scores passés en paramètres.",
         "kind": "python",
         "starter_code": "def score_total(score_manche_1, score_manche_2):\n    pass\n",
         "function_name": "score_total",
-        "solution_code": "def score_total(score_manche_1, score_manche_2):\n    # Les deux paramètres reçoivent directement les valeurs fournies par\n    # l'appelant (ex: score_total(120, 80) donne score_manche_1=120 et\n    # score_manche_2=80) : il suffit de les additionner\n    return score_manche_1 + score_manche_2\n",
+        "solution_code": "def score_total(score_manche_1, score_manche_2):\n    # Les deux paramètres reçoivent directement les valeurs fournies par\n    # le programme appelant (ex: score_total(120, 80) donne score_manche_1=120 et\n    # score_manche_2=80) : il suffit de les additionner\n    return score_manche_1 + score_manche_2\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -40,17 +40,17 @@
           "[100, 100]"
         ],
         "hints": [
-          "Additionner simplement les deux paramètres avec +, et renvoyer le résultat avec return."
+          "Additionner les deux paramètres avec +, et renvoyer le résultat avec return."
         ]
       },
       {
         "title": "Somme et différence",
         "slug": "somme-et-difference",
-        "statement": "En comptabilité, on compare souvent deux montants en calculant à la fois leur somme (le total) et leur différence (l'écart entre les deux).\n\nÉcrire une fonction `somme_et_difference(a, b)` qui renvoie un tuple `(somme, difference)`, où `somme` vaut `a + b` et `difference` vaut `a - b`.",
+        "statement": "Écrire une fonction `somme_et_difference(a, b)` qui renvoie un tuple `(somme, difference)`, où `somme` vaut `a + b` et `difference` vaut `a - b`.",
         "kind": "python",
         "starter_code": "def somme_et_difference(a, b):\n    pass\n",
         "function_name": "somme_et_difference",
-        "solution_code": "def somme_et_difference(a, b):\n    somme = a + b\n    difference = a - b\n    # Séparer les deux valeurs par une virgule après return les regroupe\n    # automatiquement dans un tuple (somme, difference)\n    return somme, difference\n",
+        "solution_code": "def somme_et_difference(a, b):\n    somme = a + b\n    difference = a - b\n    # Séparer les deux valeurs par une virgule après return les regroupe\n    # automatiquement dans un tuple (somme, difference)\n    return somme, difference\n\n\n# Version plus concise, sans variables intermédiaires :\ndef somme_et_difference(a, b):\n    return a + b, a - b",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -66,7 +66,7 @@
       {
         "title": "Écart de température",
         "slug": "ecart-de-temperature",
-        "statement": "Une fonction déjà écrite, `fahrenheit_vers_celsius(f)`, convertit une température de degrés Fahrenheit vers des degrés Celsius (déjà disponible dans le code de départ, pas besoin de la réécrire) :\n\n```python\ndef fahrenheit_vers_celsius(f):\n    return (f - 32) * 5 / 9\n```\n\nÉcrire une fonction `ecart_de_temperature(f1, f2)` qui prend deux températures en Fahrenheit, les convertit chacune en Celsius en appelant `fahrenheit_vers_celsius`, puis renvoie l'écart (la valeur absolue de la différence) entre les deux températures en Celsius.\n\nIndice : la fonction `abs()` renvoie la valeur absolue d'un nombre (`abs(-5)` renvoie `5`).",
+        "statement": "Une fonction déjà écrite, `fahrenheit_vers_celsius(f)`, convertit une température de degrés Fahrenheit vers des degrés Celsius :\n\n```python\ndef fahrenheit_vers_celsius(f):\n    return (f - 32) * 5 / 9\n```\n\nÉcrire une fonction `ecart_de_temperature(f1, f2)` qui prend deux températures en Fahrenheit, les convertit chacune en Celsius en appelant `fahrenheit_vers_celsius`, puis renvoie l'écart (la valeur absolue de la différence) entre les deux températures en Celsius.",
         "kind": "python",
         "starter_code": "def fahrenheit_vers_celsius(f):\n    return (f - 32) * 5 / 9\n\n\ndef ecart_de_temperature(f1, f2):\n    pass\n",
         "function_name": "ecart_de_temperature",
@@ -82,13 +82,13 @@
         ],
         "hints": [
           "Appeler `fahrenheit_vers_celsius` sur `f1` **et** sur `f2` séparément, stocker les deux résultats dans deux variables, puis calculer l'écart entre les deux.",
-          "Ne pas oublier `abs()` pour que le résultat soit toujours positif, quel que soit l'ordre des deux températures fournies."
+          "Utiliser `abs()` pour que le résultat soit toujours positif, quel que soit l'ordre des deux températures fournies."
         ]
       },
       {
         "title": "Amplitude thermique",
         "slug": "amplitude-thermique",
-        "statement": "On relève les températures (en °C) sur plusieurs jours, et on souhaite calculer l'amplitude thermique : l'écart entre le jour le plus chaud et le jour le plus froid.\n\nUne fonction déjà écrite, `min_et_max(liste)`, renvoie un tuple `(minimum, maximum)` d'une liste de nombres (déjà disponible dans le code de départ, pas besoin de la réécrire) :\n\n```python\ndef min_et_max(liste):\n    return min(liste), max(liste)\n```\n\nÉcrire une fonction `amplitude_thermique(temperatures)` qui appelle `min_et_max` sur `temperatures`, puis renvoie l'amplitude thermique (`maximum - minimum`).",
+        "statement": "On relève les températures (en °C) sur plusieurs jours, et on souhaite calculer l'amplitude thermique : l'écart entre le jour le plus chaud et le jour le plus froid.\n\nUne fonction déjà écrite, `min_et_max(liste)`, renvoie un tuple `(minimum, maximum)` d'une liste de nombres.\n\nÉcrire une fonction `amplitude_thermique(temperatures)` qui renvoie l'amplitude thermique (`maximum - minimum`), en utilisant `min_et_max`.",
         "kind": "python",
         "starter_code": "def min_et_max(liste):\n    return min(liste), max(liste)\n\n\ndef amplitude_thermique(temperatures):\n    pass\n",
         "function_name": "amplitude_thermique",
@@ -103,8 +103,7 @@
           "[[-10, -3, -20, 0]]"
         ],
         "hints": [
-          "Récupérer les deux valeurs renvoyées par `min_et_max` en une seule ligne : `minimum, maximum = min_et_max(temperatures)`.",
-          "L'amplitude est simplement maximum - minimum, une fois ces deux variables récupérées."
+          "`min_et_max` renvoie un tuple : ses deux éléments peuvent être récupérés directement dans deux variables différentes."
         ]
       },
       {
@@ -125,7 +124,7 @@
           "[0]"
         ],
         "hints": [
-          "L'opérateur `**` élève un nombre à une puissance : `cote ** 3` donne `cote` au cube."
+          "L'opérateur `**` élève un nombre à une puissance."
         ]
       },
       {
@@ -169,50 +168,6 @@
         "hints": [
           "L'opérateur % donne le reste d'une division entière."
         ]
-      }
-    ]
-  },
-  {
-    "name": "Variables & types",
-    "slug": "variables-types",
-    "description": "Manipuler des nombres, des chaînes et des booléens.",
-    "sql_setup": "",
-    "exercises": [
-      {
-        "title": "Addition simple",
-        "slug": "addition-simple",
-        "statement": "Écrire une fonction `addition(a, b)` qui renvoie la somme de a et b.",
-        "kind": "python",
-        "starter_code": "def addition(a, b):\r\n    pass",
-        "function_name": "addition",
-        "solution_code": "def addition(a, b):\n    # On additionne simplement les deux nombres reçus en paramètre\n    return a + b\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[15, 27]",
-          "[0, 0]",
-          "[-5, 5]"
-        ],
-        "hints": [
-          "Il faut utiliser `+`"
-        ]
-      },
-      {
-        "title": "Conversion en chaîne",
-        "slug": "conversion-chaine",
-        "statement": "Écrire une fonction `phrase(nombre)` qui renvoie le texte \"J'ai {nombre} pommes\" (en remplaçant {nombre} par la valeur reçue), en utilisant str() pour convertir le nombre en texte.",
-        "kind": "python",
-        "starter_code": "def phrase(nombre):\n    pass\n",
-        "function_name": "phrase",
-        "solution_code": "def phrase(nombre):\n    # str(nombre) convertit le nombre en texte pour pouvoir le concaténer\n    # avec les chaînes de caractères qui l'entourent\n    return \"J'ai \" + str(nombre) + \" pommes\"\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[12]",
-          "[0]",
-          "[1]"
-        ],
-        "hints": []
       }
     ]
   },
@@ -276,11 +231,11 @@
       {
         "title": "Tranche de mot",
         "slug": "tranche-mot",
-        "statement": "Écrire une fonction `tranche_mot(mot, a, b)` qui renvoie la partie de `mot` allant de l'indice `a` jusqu'à `b` lettres avant la fin.\n\nExemple : `tranche_mot(\"bonjour\", 1, 2)` renvoie `\"onjo\"`.",
+        "statement": "Écrire une fonction `tranche_mot(mot, deb, fin)` qui renvoie la partie de `mot` allant de l'indice `deb` jusqu'à l'indice `fin` inclus.\n\nExemple : `tranche_mot(\"bonjour\", 1, 4)` renvoie `\"onjo\"`.",
         "kind": "python",
-        "starter_code": "def tranche_mot(mot, a, b):\n    pass\n",
+        "starter_code": "def tranche_mot(mot, deb, fin):\n    pass\n",
         "function_name": "tranche_mot",
-        "solution_code": "def tranche_mot(mot, a, b):\n    # mot[a:-b] extrait la partie du mot depuis l'indice a jusqu'à b\n    # caractères avant la fin\n    return mot[a:-b]\n",
+        "solution_code": "def tranche_mot(mot, deb, fin):\n    # mot[deb:fin+1] : on ajoute 1 car les tranches Python excluent\n    # normalement l'indice de fin, alors qu'ici fin doit être inclus\n    return mot[deb:fin + 1]\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -289,7 +244,45 @@
           "['chat', 1, 1]"
         ],
         "hints": [
-          "`mot[a:-b]` veut dire : \"du caractère d'indice a jusqu'à b caractères avant la fin\"."
+          "`mot[a:b]` veut dire : \"du caractère d'indice a jusqu'au caractère d'indice b-1\"."
+        ]
+      },
+      {
+        "title": "Premières lettres",
+        "slug": "premieres-lettres",
+        "statement": "Écrire une fonction `premieres_lettres(mot, n)` qui renvoie les `n` premières lettres de `mot`.",
+        "kind": "python",
+        "starter_code": "def premieres_lettres(mot, n):\n    pass\n",
+        "function_name": "premieres_lettres",
+        "solution_code": "def premieres_lettres(mot, n):\n    # mot[:n] renvoie tout ce qui précède l'indice n\n    return mot[:n]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bonjour', 3]",
+          "['python', 0]",
+          "['chat', 4]"
+        ],
+        "hints": [
+          "`mot[:b]` veut dire : \"du début jusqu'au caractère d'indice b-1\"."
+        ]
+      },
+      {
+        "title": "Dernières lettres",
+        "slug": "dernieres-lettres",
+        "statement": "Écrire une fonction `dernieres_lettres(mot, n)` qui renvoie les `n` dernières lettres de `mot` (on suppose `n != 0`).",
+        "kind": "python",
+        "starter_code": "def dernieres_lettres(mot, n):\n    pass\n",
+        "function_name": "dernieres_lettres",
+        "solution_code": "def dernieres_lettres(mot, n):\n    # Comme n != 0 (par hypothèse), mot[-n:] fonctionne directement\n    return mot[-n:]\n\n\n# Version alternative, qui fonctionnerait aussi si n pouvait valoir 0 :\ndef dernieres_lettres(mot, n):\n    return mot[len(mot) - n:]\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "['bonjour', 3]",
+          "['python', 2]",
+          "['chat', 4]"
+        ],
+        "hints": [
+          "`mot[a:]` veut dire : \"du caractère d'indice a jusqu'à la fin\"."
         ]
       },
       {
@@ -327,9 +320,29 @@
         "hints": []
       },
       {
+        "title": "Nombre de pas",
+        "slug": "nombre-de-pas",
+        "statement": "Écrire une fonction `message_pas(n)` qui renvoie la phrase \"Vous avez fait {n} pas.\", où {n} est remplacé par la valeur de l'entier `n`.\n\nExemple : `message_pas(12)` renvoie \"Vous avez fait 12 pas.\".",
+        "kind": "python",
+        "starter_code": "def message_pas(n):\n    pass\n",
+        "function_name": "message_pas",
+        "solution_code": "def message_pas(n):\n    # + ne fonctionne qu'entre chaînes de caractères : il faut convertir\n    # n en chaîne avec str() avant de le concaténer au reste de la phrase\n    return \"Vous avez fait \" + str(n) + \" pas.\"\n\n\n# Autre version, avec une f-string : {n} est directement remplacé par la\n# valeur de n, sans conversion explicite avec str()\n# (syntaxe f\"...\" hors programme de CPGE, mais très utile en pratique)\ndef message_pas(n):\n    return f\"Vous avez fait {n} pas.\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[12]",
+          "[0]",
+          "[1]",
+          "[105]"
+        ],
+        "hints": [
+          "Le signe `+` ne fonctionne qu'entre deux chaînes de caractères : il faut convertir `n` avec `str(n)` avant de l'ajouter au reste de la phrase."
+        ]
+      },
+      {
         "title": "Mot à trou",
         "slug": "mot-a-trou",
-        "statement": "Écrire une fonction `mot_a_trou(mot, lettre)` qui renvoie `mot` avec chaque occurrence de `lettre` remplacée par un underscore `_`.",
+        "statement": "Écrire une fonction `mot_a_trou(mot, lettre)` qui renvoie `mot` avec chaque occurrence de `lettre` remplacée par un underscore `_`.\n\nExemple : `mot_a_trou(\"bonjour\", \"o\")` renvoie `\"b_nj_ur\"`.",
         "kind": "python",
         "starter_code": "def mot_a_trou(mot, lettre):\n    pass\n",
         "function_name": "mot_a_trou",
@@ -341,7 +354,10 @@
           "['python', 'z']",
           "['anana', 'a']"
         ],
-        "hints": []
+        "hints": [
+          "Une chaîne de caractères étant immuable, elle ne peut pas être modifiée directement (impossible de faire `mot[i] = \"_\"`).",
+          "Partir d'une chaîne vide et la reconstruire lettre par lettre, par concaténation."
+        ]
       },
       {
         "title": "Retirer les voyelles",
@@ -389,24 +405,6 @@
     "sql_setup": "",
     "exercises": [
       {
-        "title": "Pair ou impair",
-        "slug": "pair-impair",
-        "statement": "Écrire une fonction `parite(n)` qui renvoie la chaîne \"pair\" si n est pair, sinon \"impair\".",
-        "kind": "python",
-        "starter_code": "def parite(n):\n    pass\n",
-        "function_name": "parite",
-        "solution_code": "def parite(n):\n    # n % 2 donne le reste de la division de n par 2 :\n    # ce reste vaut 0 si n est pair, 1 (ou -1) sinon\n    return 'pair' if n % 2 == 0 else 'impair'\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[4]",
-          "[7]",
-          "[0]",
-          "[-3]"
-        ],
-        "hints": []
-      },
-      {
         "title": "Majeur ou mineur",
         "slug": "majeur-ou-mineur",
         "statement": "Écrire une fonction `verifier_majorite(age)` qui renvoie la chaîne \"Majeur\" si `age` est supérieur ou égal à 18, sinon la chaîne \"Mineur\".",
@@ -421,6 +419,24 @@
           "[17]",
           "[0]",
           "[99]"
+        ],
+        "hints": []
+      },
+      {
+        "title": "Pair ou impair",
+        "slug": "pair-impair",
+        "statement": "Écrire une fonction `parite(n)` qui renvoie la chaîne \"pair\" si n est pair, sinon \"impair\".",
+        "kind": "python",
+        "starter_code": "def parite(n):\n    pass\n",
+        "function_name": "parite",
+        "solution_code": "def parite(n):\n    # n % 2 donne le reste de la division de n par 2 :\n    # ce reste vaut 0 si n est pair, 1 (ou -1) sinon\n    if n % 2 == 0:\n        return 'pair'\n    else:\n        return 'impair'\n\n\n# Autre version, sans le else : le if se termine par un return, donc\n# si la condition est vraie la fonction s'arrête là ; sinon on continue\n# et on exécute forcément la ligne suivante.\ndef parite(n):\n    if n % 2 == 0:\n        return 'pair'\n    return 'impair'\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[4]",
+          "[7]",
+          "[0]",
+          "[-3]"
         ],
         "hints": []
       },
@@ -446,7 +462,7 @@
       {
         "title": "Réductions cumulables au cinéma",
         "slug": "reduction-cinema",
-        "statement": "Un cinéma propose plusieurs réductions qui peuvent se **cumuler** entre elles :\n\n- moins de 12 ans : +30%\n- étudiant : +10%\n- séance du mardi : +10%\n\nÉcrire une fonction `reduction_cinema(age, etudiant, jour)` qui renvoie le pourcentage total de réduction, en cumulant TOUS les avantages auxquels la personne a droit.\n\nExemple : une personne étudiante de 10 ans venant un mardi cumule les 3 réductions, soit 30 + 10 + 10 = 50%.\n\n**Attention** : ces trois conditions ne sont pas mutuellement exclusives (on peut être à la fois âgé de moins de 12 ans, étudiant, ET venir un mardi). Utiliser `elif` ici serait une erreur : dès qu'une condition serait vraie, les suivantes ne seraient jamais testées, et certaines réductions seraient perdues.",
+        "statement": "Un cinéma propose plusieurs réductions qui peuvent se **cumuler** entre elles :\n\n- moins de 12 ans : +30%\n- étudiant : +10%\n- séance du mardi : +10%\n\nÉcrire une fonction `reduction_cinema(age, etudiant, jour)` qui renvoie le pourcentage total de réduction, en cumulant TOUS les avantages auxquels la personne a droit.\n\nExemple : une personne étudiante de 10 ans venant un mardi cumule les 3 réductions, soit 30 + 10 + 10 = 50%.",
         "kind": "python",
         "starter_code": "def reduction_cinema(age, etudiant, jour):\n    pass\n",
         "function_name": "reduction_cinema",
@@ -540,7 +556,7 @@
         "kind": "python",
         "starter_code": "def vainqueur(coup1, coup2):\n    pass\n",
         "function_name": "vainqueur",
-        "solution_code": "def vainqueur(coup1, coup2):\n    # Cas particulier à traiter en premier : les deux joueurs ont fait le\n    # même coup, personne ne gagne\n    if coup1 == coup2:\n        return \"égalité\"\n\n    # Liste des combinaisons (coup1, coup2) où le joueur 1 gagne : plutôt\n    # qu'une longue suite de elif pour chaque cas, on teste l'appartenance\n    # du tuple (coup1, coup2) à cette liste avec \"in\"\n    victoires_joueur1 = [(\"pierre\", \"ciseaux\"), (\"feuille\", \"pierre\"), (\"ciseaux\", \"feuille\")]\n\n    if (coup1, coup2) in victoires_joueur1:\n        return \"joueur1\"\n    else:\n        # Le seul cas restant (coups différents, joueur 1 pas gagnant) :\n        # c'est forcément le joueur 2 qui gagne\n        return \"joueur2\"\n",
+        "solution_code": "def vainqueur(coup1, coup2):\n    # Cas particulier à traiter en premier : les deux joueurs ont fait le\n    # même coup, personne ne gagne\n    if coup1 == coup2:\n        return \"égalité\"\n\n    # Liste des combinaisons (coup1, coup2) où le joueur 1 gagne : plutôt\n    # qu'une longue suite de elif pour chaque cas, on teste l'appartenance\n    # du tuple (coup1, coup2) à cette liste avec \"in\"\n    victoires_joueur1 = [(\"pierre\", \"ciseaux\"), (\"feuille\", \"pierre\"), (\"ciseaux\", \"feuille\")]\n\n    if (coup1, coup2) in victoires_joueur1:\n        return \"joueur1\"\n    else:\n        # Le seul cas restant (coups différents, joueur 1 pas gagnant) :\n        # c'est forcément le joueur 2 qui gagne\n        return \"joueur2\"\n\n\n# Autre version, avec plein de if : on énumère explicitement les trois\n# combinaisons où le joueur 1 gagne.\ndef vainqueur(coup1, coup2):\n    if coup1 == coup2:\n        return \"égalité\"\n    if coup1 == \"pierre\" and coup2 == \"ciseaux\":\n        return \"joueur1\"\n    if coup1 == \"feuille\" and coup2 == \"pierre\":\n        return \"joueur1\"\n    if coup1 == \"ciseaux\" and coup2 == \"feuille\":\n        return \"joueur1\"\n    return \"joueur2\"\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -551,14 +567,13 @@
           "['pierre', 'feuille']"
         ],
         "hints": [
-          "Commencer par traiter le cas d'égalité (`coup1 == coup2`) à part, avant de comparer les coups entre eux.",
-          "Plutôt que d'écrire une longue suite de `if`/`elif` pour chaque combinaison possible, il est possible de stocker les combinaisons gagnantes du joueur 1 dans une liste de tuples et d'utiliser `in` pour tester l'appartenance."
+          "Commencer par traiter le cas d'égalité (`coup1 == coup2`) à part, avant de comparer les coups entre eux."
         ]
       },
       {
         "title": "Calculette à 4 opérations",
         "slug": "calculette",
-        "statement": "Écrire une fonction `calculette(a, b, operation)` qui effectue une opération entre `a` et `b` selon la valeur de `operation` : \"+\", \"-\", \"*\" ou \"/\".\n\n`operation` vaudra toujours l'une de ces 4 valeurs (pas besoin de gérer un autre cas).\n\nCas particulier à gérer : si `operation` vaut \"/\" et que `b` vaut 0, renvoyer la chaîne \"Erreur : division par zéro\" plutôt que de laisser Python planter.",
+        "statement": "Écrire une fonction `calculette(a, b, operation)` qui effectue une opération entre `a` et `b` selon la valeur de `operation` : \"+\", \"-\", \"*\" ou \"/\".\n\nCas particulier à gérer : si `operation` vaut \"/\" et que `b` vaut 0, renvoyer la chaîne \"Erreur : division par zéro\".",
         "kind": "python",
         "starter_code": "def calculette(a, b, operation):\n    pass\n",
         "function_name": "calculette",
@@ -659,11 +674,11 @@
       {
         "title": "Réduction (sans or)",
         "slug": "reduction-sans-or",
-        "statement": "Écrire une fonction `reduction(age)` qui renvoie exactement le même résultat que l'exercice précédent (`True` si la personne a moins de 18 ans, ou 60 ans et plus), mais **sans utiliser `or`**.\n\nIndice de méthode : le contraire de \"moins de 18 ans OU 60 ans et plus\" est \"18 ans et plus ET moins de 60 ans\", donc `18 <= age < 60`. Il ne reste plus qu'à inverser ce résultat avec `not`.",
+        "statement": "Écrire une fonction `reduction(age)` qui renvoie exactement le même résultat que l'exercice précédent (`True` si la personne a moins de 18 ans, ou 60 ans et plus), mais **sans utiliser `or`**.",
         "kind": "python",
         "starter_code": "def reduction(age):\n    pass\n",
         "function_name": "reduction",
-        "solution_code": "def reduction(age):\n    # Loi de De Morgan : not (A or B) équivaut à (not A) and (not B)\n    # Le contraire de \"age < 18 ou age >= 60\" est donc \"age >= 18 et age < 60\",\n    # que l'on peut écrire en une seule comparaison : 18 <= age < 60\n    # Il ne reste plus qu'à inverser ce résultat avec not\n    return not (18 <= age < 60)\n",
+        "solution_code": "def reduction(age):\n    # Le contraire de \"age < 18 ou age >= 60\" est \"age >= 18 et age < 60\",\n    # que l'on peut écrire en une seule comparaison : 18 <= age < 60\n    # Il ne reste plus qu'à inverser ce résultat avec not\n    return not (18 <= age < 60)\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -673,7 +688,7 @@
           "[60]"
         ],
         "hints": [
-          "Appliquer la loi de De Morgan : `not (A or B)` équivaut à `not A and not B`. Ici, ça revient à écrire `not (18 <= age < 60)`."
+          "Penser à utiliser `not` pour inverser un résultat booléen."
         ]
       },
       {
@@ -701,7 +716,7 @@
         "kind": "python",
         "starter_code": "def est_voyelle(lettre):\n    pass\n",
         "function_name": "est_voyelle",
-        "solution_code": "def est_voyelle(lettre):\n    # \"in\" teste si lettre est un des caractères présents dans la chaîne\n    # \"aeiouy\" : équivalent à lettre == 'a' or lettre == 'e' or ...\n    return lettre in \"aeiouy\"\n",
+        "solution_code": "def est_voyelle(lettre):\n    # \"in\" teste si lettre est un des caractères présents dans la chaîne\n    # \"aeiouy\" : équivalent à lettre == 'a' or lettre == 'e' or ...\n    return lettre in \"aeiouy\"\n\n\n# Autre version, avec or\ndef est_voyelle(lettre):\n    return (lettre == 'a' or lettre == 'e' or lettre == 'i' or lettre == 'o'\n            or lettre == 'u' or lettre == 'y')\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -828,7 +843,7 @@
           "[100]"
         ],
         "hints": [
-          "Partir de `nb = 1` (soit `2**0`) et double `nb` à chaque tour de boucle, en comptant le nombre de doublements effectués."
+          "On ne connaît pas à l'avance le nombre d'itérations nécessaires : utiliser une boucle `while` plutôt qu'une boucle `for`."
         ]
       },
       {
@@ -848,6 +863,7 @@
           "[7]"
         ],
         "hints": [
+          "`range` accepte un troisième paramètre optionnel, le pas : `range(a, b, c)` parcourt a, a+c, a+2c, ... en s'arrêtant avant b.",
           "`range(0, n, 2)` permet de parcourir directement uniquement les nombres pairs, sans avoir à tester chaque nombre avec `% 2`."
         ]
       },
@@ -867,12 +883,14 @@
           "[45]",
           "[1000]"
         ],
-        "hints": []
+        "hints": [
+          "Convertir n en chaîne de caractères avec `str(n)` permet de parcourir facilement chaque chiffre comme un caractère (à reconvertir ensuite en entier avec `int()` pour l'additionner)."
+        ]
       },
       {
         "title": "PGCD (algorithme des soustractions)",
         "slug": "pgcd",
-        "statement": "Écrire une fonction `pgcd(a, b)` qui renvoie le plus grand commun diviseur de `a` et `b` (deux entiers positifs ou nuls), en utilisant l'algorithme des soustractions successives : tant que `a` et `b` sont différents, on remplace le plus grand des deux par sa différence avec l'autre.\n\nCas particulier à gérer en premier : par définition, `pgcd(0, n) = n`. Sans un traitement à part pour ce cas, la boucle par soustractions successives ne se termine jamais si `a` ou `b` vaut 0.",
+        "statement": "Écrire une fonction `pgcd(a, b)` qui renvoie le plus grand commun diviseur de `a` et `b` (deux entiers positifs ou nuls), en utilisant l'algorithme des soustractions successives : tant que `a` et `b` sont différents, on remplace le plus grand des deux par sa différence avec l'autre.\n\nCas particulier à gérer en premier : par définition, `pgcd(0, n) = n`.",
         "kind": "python",
         "starter_code": "def pgcd(a, b):\n    pass\n",
         "function_name": "pgcd",
@@ -888,7 +906,7 @@
           "[7, 0]"
         ],
         "hints": [
-          "Traiter le cas où `a` ou `b` vaut 0 avant la boucle : sans ça, elle ne se termine jamais."
+          "Traiter le cas où `a` ou `b` vaut 0 avant la boucle : sans cela, elle ne se termine jamais."
         ]
       },
       {
@@ -966,7 +984,7 @@
           "['a']"
         ],
         "hints": [
-          "Il suffit de comparer les caractères deux par deux en partant des deux extrémités vers le centre : pas besoin de reconstruire le mot inversé."
+          "Il suffit de comparer les caractères deux par deux en partant des deux extrémités vers le centre."
         ]
       }
     ]
@@ -1282,7 +1300,7 @@
         "kind": "python",
         "starter_code": "def fusionner_emprunts(dict1, dict2):\n    pass\n",
         "function_name": "fusionner_emprunts",
-        "solution_code": "def fusionner_emprunts(dict1, dict2):\n    fusion = {}\n    for cle, valeur in dict1.items():\n        # list(valeur) fait une COPIE de la liste plutôt que de réutiliser\n        # directement la même : sans ça, fusion[cle] pointerait vers exactement\n        # le même objet liste que dict1[cle], et une modification future du\n        # résultat modifierait aussi dict1 à son insu (effet de bord caché)\n        fusion[cle] = list(valeur)\n    for cle, valeur in dict2.items():\n        if cle in fusion:\n            fusion[cle] = fusion[cle] + valeur\n        else:\n            fusion[cle] = list(valeur)\n    return fusion\n",
+        "solution_code": "def fusionner_emprunts(dict1, dict2):\n    fusion = {}\n    for cle, valeur in dict1.items():\n        # list(valeur) fait une COPIE de la liste plutôt que de réutiliser\n        # directement la même : sans cela, fusion[cle] pointerait vers exactement\n        # le même objet liste que dict1[cle], et une modification future du\n        # résultat modifierait aussi dict1 à son insu (effet de bord caché)\n        fusion[cle] = list(valeur)\n    for cle, valeur in dict2.items():\n        if cle in fusion:\n            fusion[cle] = fusion[cle] + valeur\n        else:\n            fusion[cle] = list(valeur)\n    return fusion\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2108,7 +2126,7 @@
         "kind": "python",
         "starter_code": "def rendu_td(montant, pieces):\r\n    pass",
         "function_name": "rendu_td",
-        "solution_code": "def rendu_td(montant, pieces):\r\n    cache = {}\r\n\r\n    def aux(m):\r\n        if m == 0:\r\n            return 0\r\n        if m in cache:\r\n            return cache[m]\r\n\r\n        meilleur = None\r\n        for p in pieces:\r\n            if p <= m:\r\n                sous_resultat = aux(m - p)\r\n                if sous_resultat is not None:\r\n                    candidat = sous_resultat + 1\r\n                    if meilleur is None or candidat < meilleur:\r\n                        meilleur = candidat\r\n\r\n        cache[m] = meilleur\r\n        return meilleur\r\n\r\n    resultat = aux(montant)\r\n    return resultat if resultat is not None else -1",
+        "solution_code": "def rendu_td(montant, pieces):\r\n    cache = {}\r\n\r\n    def aux(m):\r\n        if m == 0:\r\n            return 0\r\n        if m in cache:\r\n            return cache[m]\r\n\r\n        meilleur = None\r\n        for p in pieces:\r\n            if p <= m:\r\n                sous_resultat = aux(m - p)\r\n                if sous_resultat is not None:\r\n                    candidat = sous_resultat + 1\r\n                    if meilleur is None or candidat < meilleur:\r\n                        meilleur = candidat\r\n\r\n        cache[m] = meilleur\r\n        return meilleur\r\n\r\n    resultat = aux(montant)\r\n    if resultat is not None:\r\n        return resultat\r\n    else:\r\n        return -1",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2129,7 +2147,7 @@
         "kind": "python",
         "starter_code": "def rendu_bu(montant, pieces):\r\n    pass",
         "function_name": "rendu_bu",
-        "solution_code": "def rendu_bu(montant, pieces):\r\n    INFINI = float('inf')\r\n    # table[m] contiendra le nombre minimal de pièces pour rendre m\r\n    table = [0] + [INFINI] * montant\r\n\r\n    for m in range(1, montant + 1):\r\n        for p in pieces:\r\n            if p <= m and table[m - p] + 1 < table[m]:\r\n                # Utiliser cette pièce donne un résultat meilleur que ce\r\n                # qu'on avait trouvé jusqu'ici pour ce montant m\r\n                table[m] = table[m - p] + 1\r\n\r\n    # Si table[montant] est resté à l'infini, aucune combinaison de pièces\r\n    # ne permet de l'atteindre exactement\r\n    return table[montant] if table[montant] != INFINI else -1",
+        "solution_code": "def rendu_bu(montant, pieces):\r\n    INFINI = float('inf')\r\n    # table[m] contiendra le nombre minimal de pièces pour rendre m\r\n    table = [0] + [INFINI] * montant\r\n\r\n    for m in range(1, montant + 1):\r\n        for p in pieces:\r\n            if p <= m and table[m - p] + 1 < table[m]:\r\n                # Utiliser cette pièce donne un résultat meilleur que ce\r\n                # qu'on avait trouvé jusqu'ici pour ce montant m\r\n                table[m] = table[m - p] + 1\r\n\r\n    # Si table[montant] est resté à l'infini, aucune combinaison de pièces\r\n    # ne permet de l'atteindre exactement\r\n    if table[montant] != INFINI:\r\n        return table[montant]\r\n    else:\r\n        return -1",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2227,7 +2245,7 @@
         "kind": "python",
         "starter_code": "def minimax_nim(n, maximise):\n    pass\n",
         "function_name": "minimax_nim",
-        "solution_code": "def minimax_nim(n, maximise):\n    # Cas de base : il ne reste plus d'allumette à prendre. Le joueur dont\n    # c'est le tour ne peut donc pas jouer : c'est l'ADVERSAIRE qui vient de\n    # prendre la dernière allumette au coup précédent, et qui a donc gagné.\n    if n == 0:\n        # Si c'est le tour de A (maximise) mais qu'il ne peut pas jouer,\n        # c'est B qui a gagné : la valeur (du point de vue de A) est -1.\n        # Si c'est le tour de B, c'est A qui a gagné : la valeur est +1.\n        return -1 if maximise else 1\n\n    if maximise:\n        # Le joueur A cherche à MAXIMISER la valeur : on essaie chaque coup\n        # possible (retirer 1, 2 ou 3 allumettes, sans dépasser n), et on\n        # garde la meilleure valeur trouvée parmi tous les coups\n        meilleure_valeur = -2  # plus petit que toute valeur possible (-1 au minimum)\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de B (maximise devient False)\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        # Le joueur B cherche à MINIMISER la valeur (du point de vue de A) :\n        # on garde cette fois la PIRE valeur trouvée parmi tous les coups\n        pire_valeur = 2  # plus grand que toute valeur possible (1 au maximum)\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de A (maximise devient True)\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n",
+        "solution_code": "def minimax_nim(n, maximise):\n    # Cas de base : il ne reste plus d'allumette à prendre. Le joueur dont\n    # c'est le tour ne peut donc pas jouer : c'est l'ADVERSAIRE qui vient de\n    # prendre la dernière allumette au coup précédent, et qui a donc gagné.\n    if n == 0:\n        # Si c'est le tour de A (maximise) mais qu'il ne peut pas jouer,\n        # c'est B qui a gagné : la valeur (du point de vue de A) est -1.\n        # Si c'est le tour de B, c'est A qui a gagné : la valeur est +1.\n        if maximise:\n            return -1\n        else:\n            return 1\n\n    if maximise:\n        # Le joueur A cherche à MAXIMISER la valeur : on essaie chaque coup\n        # possible (retirer 1, 2 ou 3 allumettes, sans dépasser n), et on\n        # garde la meilleure valeur trouvée parmi tous les coups\n        meilleure_valeur = -2  # plus petit que toute valeur possible (-1 au minimum)\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de B (maximise devient False)\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        # Le joueur B cherche à MINIMISER la valeur (du point de vue de A) :\n        # on garde cette fois la PIRE valeur trouvée parmi tous les coups\n        pire_valeur = 2  # plus grand que toute valeur possible (1 au maximum)\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de A (maximise devient True)\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2254,7 +2272,7 @@
         "kind": "python",
         "starter_code": "def minimax_nim(n, maximise):\n    if n == 0:\n        return -1 if maximise else 1\n    if maximise:\n        meilleure_valeur = -2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        pire_valeur = 2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n\n\ndef meilleur_coup_nim(n):\n    pass\n",
         "function_name": "meilleur_coup_nim",
-        "solution_code": "def minimax_nim(n, maximise):\n    if n == 0:\n        return -1 if maximise else 1\n    if maximise:\n        meilleure_valeur = -2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        pire_valeur = 2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n\n\ndef meilleur_coup_nim(n):\n    # On part du principe qu'il s'agit du tout premier coup : c'est donc à A\n    # de jouer (le joueur maximisant). meilleur_coup mémorise le coup retenu\n    # jusqu'ici, meilleure_valeur la valeur (du point de vue de A) qu'il procure\n    meilleur_coup = None\n    meilleure_valeur = -2  # plus petit que toute valeur possible (-1 au minimum)\n\n    for coup in (1, 2, 3):\n        if coup <= n:\n            # Après ce coup, la pile passe à n - coup et c'est au tour de B\n            # (maximise=False) : minimax_nim nous dit ce que VAUT cette position\n            # pour A, en supposant que les deux joueurs jouent ensuite parfaitement\n            valeur = minimax_nim(n - coup, False)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n\n    return meilleur_coup\n",
+        "solution_code": "def minimax_nim(n, maximise):\n    if n == 0:\n        if maximise:\n            return -1\n        else:\n            return 1\n    if maximise:\n        meilleure_valeur = -2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        pire_valeur = 2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n\n\ndef meilleur_coup_nim(n):\n    # On part du principe qu'il s'agit du tout premier coup : c'est donc à A\n    # de jouer (le joueur maximisant). meilleur_coup mémorise le coup retenu\n    # jusqu'ici, meilleure_valeur la valeur (du point de vue de A) qu'il procure\n    meilleur_coup = None\n    meilleure_valeur = -2  # plus petit que toute valeur possible (-1 au minimum)\n\n    for coup in (1, 2, 3):\n        if coup <= n:\n            # Après ce coup, la pile passe à n - coup et c'est au tour de B\n            # (maximise=False) : minimax_nim nous dit ce que VAUT cette position\n            # pour A, en supposant que les deux joueurs jouent ensuite parfaitement\n            valeur = minimax_nim(n - coup, False)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n\n    return meilleur_coup\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2280,7 +2298,7 @@
         "kind": "python",
         "starter_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    # Heuristique simple (et volontairement approximative) : un nombre impair\n    # d'allumettes restantes est supposé favorable au joueur qui a le trait\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    pass\n",
         "function_name": "meilleur_coup_minimax_profondeur",
-        "solution_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    # Minimax classique (comme dans le premier exercice), mais avec DEUX\n    # cas de base au lieu d'un seul : la vraie fin de partie (n == 0, valeur\n    # exacte) et l'arrêt anticipé faute de profondeur (valeur estimée)\n    def score(n, maximise, profondeur):\n        if n == 0:\n            # Fin de partie réelle : valeur exacte, garantie correcte\n            return VALEUR_DEFAITE if maximise else VALEUR_VICTOIRE\n        if profondeur == 0:\n            # On s'arrête là : on renvoie une ESTIMATION plutôt que la vraie\n            # valeur. evaluation_nim(n) est exprimée du point de vue du joueur\n            # au trait : si ce joueur est A (maximise), on la garde telle\n            # quelle ; si c'est B, on l'inverse pour revenir au point de vue\n            # de A — exactement comme pour VALEUR_VICTOIRE/VALEUR_DEFAITE\n            # juste au-dessus\n            return evaluation_nim(n) if maximise else -evaluation_nim(n)\n        if maximise:\n            meilleure_valeur = float('-inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, False, profondeur - 1)\n                    if valeur > meilleure_valeur:\n                        meilleure_valeur = valeur\n            return meilleure_valeur\n        else:\n            pire_valeur = float('inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, True, profondeur - 1)\n                    if valeur < pire_valeur:\n                        pire_valeur = valeur\n            return pire_valeur\n\n    # Au tout premier coup, c'est à A de jouer : on essaie chaque coup et on\n    # garde celui qui donne la meilleure valeur (du point de vue de A)\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = score(n - coup, False, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n",
+        "solution_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    # Minimax classique (comme dans le premier exercice), mais avec DEUX\n    # cas de base au lieu d'un seul : la vraie fin de partie (n == 0, valeur\n    # exacte) et l'arrêt anticipé faute de profondeur (valeur estimée)\n    def score(n, maximise, profondeur):\n        if n == 0:\n            # Fin de partie réelle : valeur exacte, garantie correcte\n            if maximise:\n                return VALEUR_DEFAITE\n            else:\n                return VALEUR_VICTOIRE\n        if profondeur == 0:\n            # On s'arrête là : on renvoie une ESTIMATION plutôt que la vraie\n            # valeur. evaluation_nim(n) est exprimée du point de vue du joueur\n            # au trait : si ce joueur est A (maximise), on la garde telle\n            # quelle ; si c'est B, on l'inverse pour revenir au point de vue\n            # de A — exactement comme pour VALEUR_VICTOIRE/VALEUR_DEFAITE\n            # juste au-dessus\n            if maximise:\n                return evaluation_nim(n)\n            else:\n                return -evaluation_nim(n)\n        if maximise:\n            meilleure_valeur = float('-inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, False, profondeur - 1)\n                    if valeur > meilleure_valeur:\n                        meilleure_valeur = valeur\n            return meilleure_valeur\n        else:\n            pire_valeur = float('inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, True, profondeur - 1)\n                    if valeur < pire_valeur:\n                        pire_valeur = valeur\n            return pire_valeur\n\n    # Au tout premier coup, c'est à A de jouer : on essaie chaque coup et on\n    # garde celui qui donne la meilleure valeur (du point de vue de A)\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = score(n - coup, False, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2312,7 +2330,7 @@
         "kind": "python",
         "starter_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    pass\n",
         "function_name": "meilleur_coup_negamax_profondeur",
-        "solution_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    # Négamax, avec les deux mêmes cas de base que pour le minimax de\n    # l'exercice précédent : la vraie fin de partie (n == 0) et l'arrêt\n    # anticipé faute de profondeur (estimation)\n    def score(n, profondeur):\n        if n == 0:\n            # Fin de partie réelle : le joueur au trait ne peut pas jouer,\n            # il a donc perdu — valeur exacte\n            return VALEUR_DEFAITE\n        if profondeur == 0:\n            # On s'arrête là : evaluation_nim(n) est déjà exprimée du point\n            # de vue du joueur au trait, exactement la convention du\n            # négamax — pas besoin de l'adapter, contrairement au minimax\n            return evaluation_nim(n)\n        meilleure_valeur = float('-inf')\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de l'adversaire : sa valeur\n                # est l'opposée de la nôtre\n                valeur = -score(n - coup, profondeur - 1)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = -score(n - coup, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n",
+        "solution_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    # Négamax, avec les deux mêmes cas de base que pour le minimax de\n    # l'exercice précédent : la vraie fin de partie (n == 0) et l'arrêt\n    # anticipé faute de profondeur (estimation)\n    def score(n, profondeur):\n        if n == 0:\n            # Fin de partie réelle : le joueur au trait ne peut pas jouer,\n            # il a donc perdu — valeur exacte\n            return VALEUR_DEFAITE\n        if profondeur == 0:\n            # On s'arrête là : evaluation_nim(n) est déjà exprimée du point\n            # de vue du joueur au trait, exactement la convention du\n            # négamax — pas besoin de l'adapter, contrairement au minimax\n            return evaluation_nim(n)\n        meilleure_valeur = float('-inf')\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de l'adversaire : sa valeur\n                # est l'opposée de la nôtre\n                valeur = -score(n - coup, profondeur - 1)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = -score(n - coup, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
