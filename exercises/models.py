@@ -91,12 +91,6 @@ class Exercise(models.Model):
         (SQL, "SQL (requête)"),
     ]
 
-    # Slug du thème (voir Theme.slug) pour lequel on vérifie automatiquement, en plus des
-    # tests habituels, que la fonction soumise est bien récursive (voir
-    # _build_python_test_code / _build_recursion_check). Le thème "Récursivité" doit donc
-    # être créé avec EXACTEMENT ce slug pour que le contrôle s'applique.
-    RECURSION_THEME_SLUG = "recursivite"
-
     theme = models.ForeignKey(Theme, related_name="exercises", on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     slug = models.SlugField()
@@ -120,6 +114,25 @@ class Exercise(models.Model):
             "[Python] Code de correction : une implémentation complète et correcte de la fonction. "
             "Le résultat attendu de chaque test (ci-dessous) est calculé automatiquement "
             "en exécutant ce code — tu n'as qu'à indiquer les arguments à tester."
+        ),
+    )
+    require_recursive = models.BooleanField(
+        default=False,
+        help_text=(
+            "[Python] Si coché, on vérifie en plus (analyse statique du code, sans l'exécuter) "
+            "que la fonction de l'étudiant s'appelle bien elle-même — sinon l'exercice est refusé "
+            "même si le résultat renvoyé est correct."
+        ),
+    )
+    extra_test_code = models.TextField(
+        blank=True,
+        help_text=(
+            "[Python] Optionnel : code de test supplémentaire, exécuté après les tests habituels. "
+            "Peut appeler __FN__(...) (remplacé automatiquement par le nom de la fonction de "
+            "l'étudiant) et doit ajouter ses propres résultats à __RESULTS__ sous la forme "
+            "(booléen_reussite, message, sortie_console) — voir les exercices existants pour "
+            "des exemples (ex: vérifier qu'une structure de données n'est pas partagée par erreur, "
+            "ou qu'une construction du langage précise n'est pas utilisée)."
         ),
     )
 
@@ -197,7 +210,7 @@ class Exercise(models.Model):
     def _build_recursion_check(self, fn):
         """Génère le fragment de code (chaîne Python, vide si non applicable) qui vérifie que
         la fonction __STUDENT_CODE__ soumise par l'étudiant est bien récursive, quand ce
-        contrôle est activé pour ce thème (voir RECURSION_THEME_SLUG).
+        contrôle est activé sur CET exercice (champ require_recursive).
 
         Contrôle PUREMENT STATIQUE (analyse du texte du code via le module ast, pas de son
         exécution) : on cherche, dans le corps de la fonction nommée `fn`, un appel (ast.Call)
@@ -207,7 +220,7 @@ class Exercise(models.Model):
 
         Si la fonction n'est pas jugée récursive, une entrée d'échec est ajoutée à
         __RESULTS__, au même titre qu'un test raté classique."""
-        if self.theme.slug != self.RECURSION_THEME_SLUG:
+        if not self.require_recursive:
             return ""
 
         message = (
@@ -261,6 +274,12 @@ class Exercise(models.Model):
         errors_json = _json.dumps(parse_errors, ensure_ascii=False)
         solution_json = _json.dumps(self.solution_code or "", ensure_ascii=False)
         recursion_check = self._build_recursion_check(fn)
+        # extra_test_code est un bout de code écrit à la main pour CET exercice (voir le
+        # help_text du champ) : on l'ajoute tel quel à la fin du test, avant le dernier
+        # remplacement de __FN__ ci-dessous, qui s'applique donc aussi à lui.
+        extra_test_code = self.extra_test_code.strip()
+        if extra_test_code:
+            extra_test_code += "\n"
 
         template = '''__RESULTS__ = []
 import json as _json, io as _io, contextlib as _contextlib, ast
@@ -296,11 +315,12 @@ for _case in _cases:
         __RESULTS__.append((_ok, f"__FN__({_args_repr}) doit valoir {_attendu!r} (obtenu : {_obtenu!r})", _out.getvalue()))
     except Exception as e:
         __RESULTS__.append((False, f"__FN__({_args_repr}) a levé une erreur : {e}", _out.getvalue()))
-''' % {
+%(extra_test_code)s''' % {
             "cases_json": cases_json,
             "errors_json": errors_json,
             "solution_json": solution_json,
             "recursion_check": recursion_check,
+            "extra_test_code": extra_test_code,
         }
 
         return template.replace("__FN__", fn)

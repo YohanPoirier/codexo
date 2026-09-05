@@ -393,8 +393,52 @@
           "['abc', 'abcd']"
         ],
         "hints": [
-          "Le nombre de positions de départ possibles est `n_p - n_m + 1` : ne pas oublier le +1, sinon une position valide en fin de phrase risque d'être ratée."
+          "Comparer `mot` avec toutes les tranches de `phrase` de la même taille."
         ]
+      }
+    ]
+  },
+  {
+    "name": "Variables & types",
+    "slug": "variables-types",
+    "description": "Manipuler des nombres, des chaînes et des booléens.",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Addition simple",
+        "slug": "addition-simple",
+        "statement": "Écrire une fonction `addition(a, b)` qui renvoie la somme de a et b.",
+        "kind": "python",
+        "starter_code": "def addition(a, b):\r\n    pass",
+        "function_name": "addition",
+        "solution_code": "def addition(a, b):\n    # On additionne simplement les deux nombres reçus en paramètre\n    return a + b\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[15, 27]",
+          "[0, 0]",
+          "[-5, 5]"
+        ],
+        "hints": [
+          "Il faut utiliser `+`"
+        ]
+      },
+      {
+        "title": "Conversion en chaîne",
+        "slug": "conversion-chaine",
+        "statement": "Écrire une fonction `phrase(nombre)` qui renvoie le texte \"J'ai {nombre} pommes\" (en remplaçant {nombre} par la valeur reçue), en utilisant str() pour convertir le nombre en texte.",
+        "kind": "python",
+        "starter_code": "def phrase(nombre):\n    pass\n",
+        "function_name": "phrase",
+        "solution_code": "def phrase(nombre):\n    # str(nombre) convertit le nombre en texte pour pouvoir le concaténer\n    # avec les chaînes de caractères qui l'entourent\n    return \"J'ai \" + str(nombre) + \" pommes\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[12]",
+          "[0]",
+          "[1]"
+        ],
+        "hints": []
       }
     ]
   },
@@ -998,11 +1042,11 @@
       {
         "title": "Doubler chaque élément",
         "slug": "doubler-elements",
-        "statement": "Écrire une fonction `doubler(liste)` qui renvoie une nouvelle liste où chaque élément est multiplié par 2. `liste` contient des nombres (entiers ou flottants).",
+        "statement": "Écrire une fonction `doubler(liste)` qui renvoie une nouvelle liste où chaque élément est multiplié par 2. `liste` contient des nombres (entiers ou flottants).\n\nLa fonction ne devra pas modifier `liste`.",
         "kind": "python",
         "starter_code": "def doubler(liste):\n    pass\n",
         "function_name": "doubler",
-        "solution_code": "def doubler(liste):\n    # Liste en compréhension : construit une nouvelle liste en appliquant\n    # \"x * 2\" à chaque élément x de la liste d'origine, sans la modifier\n    return [x * 2 for x in liste]\n",
+        "solution_code": "def doubler(liste):\n    resultat = []\n    for x in liste:\n        resultat.append(x * 2)\n    return resultat\n\n\n# Autre version, avec une liste en compréhension : construit directement la\n# nouvelle liste en appliquant \"x * 2\" à chaque élément x de la liste\n# d'origine, sans la modifier\ndef doubler(liste):\n    return [x * 2 for x in liste]\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1033,11 +1077,11 @@
       {
         "title": "Inverser une liste",
         "slug": "inverser-liste",
-        "statement": "Écrire une fonction `inverser(liste)` qui renvoie une nouvelle liste dont l'ordre des éléments a été inversé. `liste` ne devra pas être modifiée.",
+        "statement": "Écrire une fonction `inverser(liste)` qui renvoie une nouvelle liste dont l'ordre des éléments a été inversé.\n\nLa fonction ne devra pas modifier `liste`.",
         "kind": "python",
         "starter_code": "def inverser(liste):\n    pass\n",
         "function_name": "inverser",
-        "solution_code": "def inverser(liste):\n    inversee = []\n    for i in range(len(liste)):\n        # liste[-1-i] parcourt la liste depuis la fin :\n        # i=0 -> dernier élément (-1), i=1 -> avant-dernier (-2), etc.\n        inversee.append(liste[-1-i])\n    return inversee  # une NOUVELLE liste : liste d'origine jamais modifiée\n",
+        "solution_code": "def inverser(liste):\n    inversee = []\n    for i in range(len(liste)):\n        # liste[-1-i] parcourt la liste depuis la fin :\n        # i=0 -> dernier élément (-1), i=1 -> avant-dernier (-2), etc.\n        inversee.append(liste[-1-i])\n    return inversee  # une NOUVELLE liste : liste d'origine jamais modifiée\n\n\n# Autre version, avec une liste en compréhension\ndef inverser(liste):\n    return [liste[-1-i] for i in range(len(liste))]\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1091,7 +1135,7 @@
         "kind": "python",
         "starter_code": "def deuxieme_maximum(liste):\n    pass\n",
         "function_name": "deuxieme_maximum",
-        "solution_code": "def deuxieme_maximum(liste):\n    # On trouve d'abord le maximum de la liste...\n    maximum = max(liste)\n    # ...puis on exclut TOUTES ses occurrences (pas juste une), pour éviter\n    # de retomber sur la même valeur si le maximum est présent plusieurs fois\n    candidats = [x for x in liste if x != maximum]\n    # Le deuxième plus grand est alors le maximum de ce qui reste\n    return max(candidats)\n",
+        "solution_code": "def deuxieme_maximum(liste):\n    # Premier passage : trouve le maximum de la liste\n    maximum = liste[0]\n    for x in liste:\n        if x > maximum:\n            maximum = x\n\n    # Deuxième passage : trouve le plus grand élément parmi ceux qui sont\n    # strictement inférieurs au maximum, donc en ignorant TOUTES les\n    # occurrences du maximum (même s'il apparaît plusieurs fois)\n    deuxieme = None\n    for x in liste:\n        if x != maximum:\n            if deuxieme is None or x > deuxieme:\n                deuxieme = x\n    return deuxieme\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1130,7 +1174,7 @@
         "kind": "python",
         "starter_code": "def elements_negatifs(liste):\n    pass\n",
         "function_name": "elements_negatifs",
-        "solution_code": "def elements_negatifs(liste):\n    negatifs = []\n    # On parcourt directement les valeurs (pas besoin des indices ici)\n    for x in liste:\n        if x < 0:\n            negatifs.append(x)\n    return negatifs\n",
+        "solution_code": "def elements_negatifs(liste):\n    negatifs = []\n    # On parcourt directement les valeurs (pas besoin des indices ici)\n    for x in liste:\n        if x < 0:\n            negatifs.append(x)\n    return negatifs\n\n\n# Autre version, avec les indices (range) : moins bonne ici, car l'indice i\n# ne sert à rien d'autre qu'à retrouver liste[i] — la version précédente,\n# qui parcourt directement les valeurs, est plus simple et plus lisible\ndef elements_negatifs(liste):\n    negatifs = []\n    for i in range(len(liste)):\n        if liste[i] < 0:\n            negatifs.append(liste[i])\n    return negatifs\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1148,7 +1192,7 @@
         "kind": "python",
         "starter_code": "def element_present(liste, element):\n    pass\n",
         "function_name": "element_present",
-        "solution_code": "def element_present(liste, element):\n    # \"in\" teste directement l'appartenance d'une valeur à une liste\n    return element in liste\n\n\n# Autre façon de faire, sans utiliser \"in\" : on parcourt la liste élément\n# par élément, et on renvoie True dès qu'on trouve une correspondance.\ndef element_present_sans_in(liste, element):\n    for x in liste:\n        if x == element:\n            return True\n    return False\n",
+        "solution_code": "def element_present(liste, element):\n    # \"in\" teste directement l'appartenance d'une valeur à une liste\n    return element in liste\n\n\n# Autre façon de faire, sans utiliser \"in\" : on parcourt la liste élément\n# par élément, et on renvoie True dès qu'on trouve une correspondance.\ndef element_present_sans_in(liste, element):\n    for x in liste:\n        if x == element:\n            return True\n    return False\n\n\n# Remarque sur la complexité : la première version ne fait pas apparaître de\n# boucle explicitement, mais Python doit quand même parcourir la liste en\n# interne pour vérifier la présence de element, donc la complexité des deux\n# versions est exactement la même\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1162,7 +1206,7 @@
       {
         "title": "Les n premiers entiers pairs",
         "slug": "premiers-pairs",
-        "statement": "Écrire une fonction `premiers_pairs(n)` qui renvoie la liste des `n` premiers entiers positifs pairs (dans l'ordre croissant, en commençant à 2).\n\nExemple : `premiers_pairs(5)` renvoie `[2, 4, 6, 8, 10]`.\n\n**Utiliser une liste en compréhension** pour construire cette liste (pas de boucle `for` classique avec `.append()`).\n\n**Rappel : liste en compréhension**\n\nUne liste en compréhension permet de construire une liste en une seule ligne, en appliquant une expression à chaque élément d'un itérable :\n\n```python\n[expression for variable in iterable]\n```\n\nExemple : `[x**2 for x in range(5)]` renvoie `[0, 1, 4, 9, 16]` — pour chaque `x` parcouru par `range(5)` (soit 0, 1, 2, 3, 4), on calcule son carré.\n\nIl est possible de construire directement la liste à partir de `range(...)`, sans avoir besoin de partir d'une liste existante.",
+        "statement": "Écrire une fonction `premiers_pairs(n)` qui renvoie la liste des `n` premiers entiers positifs pairs (dans l'ordre croissant, en commençant à 2).\n\nExemple : `premiers_pairs(5)` renvoie `[2, 4, 6, 8, 10]`.\n\nCette fonction ne devra pas utiliser de boucle `for` mais une liste par compréhension.",
         "kind": "python",
         "starter_code": "def premiers_pairs(n):\n    pass\n",
         "function_name": "premiers_pairs",
@@ -1176,7 +1220,9 @@
           "[3]",
           "[10]"
         ],
-        "hints": []
+        "hints": [
+          "Une liste en compréhension permet de construire une liste en une seule ligne, en appliquant une expression à chaque élément d'un itérable : `[expression for variable in iterable]`. Exemple : `[x**2 for x in range(5)]` renvoie `[0, 1, 4, 9, 16]` — pour chaque `x` parcouru par `range(5)` (soit 0, 1, 2, 3, 4), on calcule son carré."
+        ]
       },
       {
         "title": "Créer une matrice remplie de zéros",

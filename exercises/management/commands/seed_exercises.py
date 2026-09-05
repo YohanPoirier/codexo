@@ -49,6 +49,8 @@ class Command(BaseCommand):
                         "starter_code": ex_data["starter_code"],
                         "function_name": ex_data.get("function_name", ""),
                         "solution_code": ex_data.get("solution_code", ""),
+                        "require_recursive": ex_data.get("require_recursive", False),
+                        "extra_test_code": ex_data.get("extra_test_code", ""),
                         "sql_setup": ex_data.get("sql_setup", ""),
                         "sql_solution": ex_data.get("sql_solution", ""),
                     },
