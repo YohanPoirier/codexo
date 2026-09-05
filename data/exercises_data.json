@@ -1191,7 +1191,7 @@
         "kind": "python",
         "starter_code": "def creer_matrice(m, n):\n    pass\n",
         "function_name": "creer_matrice",
-        "solution_code": "def creer_matrice(m, n):\n    matrice = []\n    for _ in range(m):\n        ligne = []\n        for _ in range(n):\n            ligne.append(0)\n        matrice.append(ligne)\n    return matrice\n\n\n# Autre version, avec des listes en compréhension imbriquées : la liste en\n# compréhension EXTÉRIEURE crée m lignes...\n# ...et pour CHAQUE ligne, la liste en compréhension INTÉRIEURE crée\n# une nouvelle liste de n zéros. \"_\" signifie qu'on n'utilise pas la\n# valeur de la variable de boucle, seulement le nombre de répétitions.\ndef creer_matrice(m, n):\n    return [[0 for _ in range(n)] for _ in range(m)]\n    # ATTENTION, ERREUR CLASSIQUE : écrire à la place \"[[0] * n] * m\" est\n    # FAUX, même si ça donne le même résultat en apparence. Cette écriture\n    # crée m fois la MÊME liste en mémoire (pas m listes indépendantes) :\n    # modifier une valeur dans une ligne modifierait alors TOUTES les\n    # autres lignes en même temps (effet de bord invisible au premier\n    # abord).\n",
+        "solution_code": "def creer_matrice(m, n):\n    matrice = []\n    for _ in range(m):\n        ligne = []\n        for _ in range(n):\n            ligne.append(0)\n        matrice.append(ligne)\n    return matrice\n\n\n# Autre version, avec des listes en compréhension imbriquées : la liste en\n# compréhension EXTÉRIEURE crée m lignes...\n# ...et pour CHAQUE ligne, la liste en compréhension INTÉRIEURE crée\n# une nouvelle liste de n zéros. \"_\" signifie qu'on n'utilise pas la\n# valeur de la variable de boucle, seulement le nombre de répétitions.\ndef creer_matrice(m, n):\n    return [[0 for _ in range(n)] for _ in range(m)]\n\n    # ATTENTION, ERREUR CLASSIQUE : écrire à la place \"[[0] * n] * m\" est\n    # FAUX, bien que le résultat semble identique en apparence. Cette\n    # écriture crée m fois la MÊME liste en mémoire (pas m listes\n    # indépendantes) : modifier une valeur dans une ligne modifierait\n    # alors TOUTES les autres lignes en même temps (effet de bord\n    # invisible au premier abord).\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1213,7 +1213,7 @@
         "kind": "python",
         "starter_code": "def identite(n):\n    pass\n",
         "function_name": "identite",
-        "solution_code": "def identite(n):\n    # On initialise d'abord une matrice de zéros par compréhension...\n    matrice = [[0 for _ in range(n)] for _ in range(n)]\n    # ...puis on balaie la diagonale avec une boucle for classique pour\n    # y placer des 1 (pas de \"if\" dans la compréhension : hors programme)\n    for i in range(n):\n        matrice[i][i] = 1\n    return matrice\n",
+        "solution_code": "def identite(n):\n    # On initialise d'abord une matrice de zéros par compréhension...\n    matrice = [[0 for _ in range(n)] for _ in range(n)]\n    # ...puis on balaie la diagonale avec une boucle for classique pour\n    # y placer des 1.\n    for i in range(n):\n        matrice[i][i] = 1\n    return matrice\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1303,11 +1303,11 @@
       {
         "title": "Fusionner des emprunts",
         "slug": "fusionner-emprunts",
-        "statement": "Deux classes ont chacune un dictionnaire recensant les livres empruntés par élève : `{élève: [liste de livres empruntés]}`. À la fin de l'année, on veut fusionner les deux dictionnaires en un seul : si un même élève apparaît dans les deux classes, ses listes de livres doivent être concaténées (celle de `dict1` suivie de celle de `dict2`).\n\nÉcrire une fonction `fusionner_emprunts(dict1, dict2)` qui renvoie ce dictionnaire fusionné.",
+        "statement": "Deux classes ont chacune un dictionnaire recensant les livres empruntés par chaque élève : `{élève: [liste de livres empruntés]}`. À la fin de l'année, on veut fusionner les deux dictionnaires en un seul : si un même élève apparaît dans les deux classes, ses listes de livres doivent être concaténées (celle de `dict1` suivie de celle de `dict2`).\n\nÉcrire une fonction `fusionner_emprunts(dict1, dict2)` qui renvoie ce dictionnaire fusionné.",
         "kind": "python",
         "starter_code": "def fusionner_emprunts(dict1, dict2):\n    pass\n",
         "function_name": "fusionner_emprunts",
-        "solution_code": "def fusionner_emprunts(dict1, dict2):\n    fusion = {}\n    for cle, valeur in dict1.items():\n        # list(valeur) fait une COPIE de la liste plutôt que de réutiliser\n        # directement la même : sans cela, fusion[cle] pointerait vers exactement\n        # le même objet liste que dict1[cle], et une modification future du\n        # résultat modifierait aussi dict1 à son insu (effet de bord caché)\n        fusion[cle] = list(valeur)\n    for cle, valeur in dict2.items():\n        if cle in fusion:\n            fusion[cle] = fusion[cle] + valeur\n        else:\n            fusion[cle] = list(valeur)\n    return fusion\n",
+        "solution_code": "def fusionner_emprunts(dict1, dict2):\n    fusion = {}\n    for cle, valeur in dict1.items():\n        # valeur.copy() fait une COPIE de la liste plutôt que de réutiliser\n        # directement la même : sans cela, fusion[cle] pointerait vers exactement\n        # le même objet liste que dict1[cle], et une modification future du\n        # résultat modifierait aussi dict1 à son insu (effet de bord caché)\n        fusion[cle] = valeur.copy()\n    for cle, valeur in dict2.items():\n        if cle in fusion:\n            fusion[cle] = fusion[cle] + valeur\n        else:\n            fusion[cle] = valeur.copy()\n    return fusion\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1325,7 +1325,7 @@
         "kind": "python",
         "starter_code": "def cle_presente(dictionnaire, cle):\n    pass\n",
         "function_name": "cle_presente",
-        "solution_code": "def cle_presente(dictionnaire, cle):\n    # \"in\" sur un dictionnaire teste la présence parmi les CLÉS (pas les valeurs)\n    return cle in dictionnaire\n",
+        "solution_code": "def cle_presente(dictionnaire, cle):\n    # \"in\" sur un dictionnaire teste la présence parmi les CLÉS (pas les valeurs),\n    # et le fait à temps constant (grâce à la table de hachage du dictionnaire),\n    # quel que soit le nombre de clés.\n    return cle in dictionnaire\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1343,7 +1343,7 @@
         "kind": "python",
         "starter_code": "def valeur_presente(dictionnaire, valeur):\n    pass\n",
         "function_name": "valeur_presente",
-        "solution_code": "def valeur_presente(dictionnaire, valeur):\n    # .values() renvoie toutes les valeurs du dictionnaire, sans les clés\n    return valeur in dictionnaire.values()\n\n\n# Autre façon de faire, sans \"in\" : on parcourt les valeurs une par une\ndef valeur_presente_avec_boucle(dictionnaire, valeur):\n    for v in dictionnaire.values():\n        if v == valeur:\n            return True\n    return False\n",
+        "solution_code": "def valeur_presente(dictionnaire, valeur):\n    # .values() renvoie toutes les valeurs du dictionnaire, sans les clés.\n    # Contrairement à la recherche d'une clé, cette recherche ne se fait PAS à\n    # temps constant : il faut parcourir toutes les valeurs une par une pour\n    # savoir si \"valeur\" y figure.\n    return valeur in dictionnaire.values()\n\n\n# Autre façon de faire, sans \"in\" : on parcourt les valeurs une par une\ndef valeur_presente_avec_boucle(dictionnaire, valeur):\n    for v in dictionnaire.values():\n        if v == valeur:\n            return True\n    return False\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1357,7 +1357,7 @@
       {
         "title": "Compter les occurrences",
         "slug": "compter-occurrences",
-        "statement": "Écrire une fonction `compter_occurrences(liste)` qui renvoie un dictionnaire associant chaque élément de `liste` à son nombre d'occurrences.",
+        "statement": "Écrire une fonction `compter_occurrences(liste)` qui renvoie un dictionnaire associant chaque élément de `liste` à son nombre d'occurrences.\n\nExemple : `compter_occurrences(['a', 'b', 'a', 'a', 'c', 'b'])` renvoie `{'a': 3, 'b': 2, 'c': 1}`.",
         "kind": "python",
         "starter_code": "def compter_occurrences(liste):\n    pass\n",
         "function_name": "compter_occurrences",
@@ -1370,7 +1370,10 @@
           "[[]]",
           "[[1, 1, 1, 1]]"
         ],
-        "hints": []
+        "hints": [
+          "Lors du parcours de la liste, distinguer deux cas pour chaque élément : soit il est déjà une clé du dictionnaire, soit ce n'est pas encore le cas.",
+          "Dans le premier cas, incrémenter son compteur ; dans le second, l'ajouter avec un compteur initialisé à 1."
+        ]
       },
       {
         "title": "Regrouper des mots par longueur",
@@ -1388,7 +1391,10 @@
           "[['a', 'b', 'cc']]",
           "[['abc']]"
         ],
-        "hints": []
+        "hints": [
+          "Lors du parcours de la liste, distinguer deux cas pour chaque mot : soit sa longueur est déjà une clé du dictionnaire, soit ce n'est pas encore le cas.",
+          "Dans le premier cas, ajouter le mot à la liste existante ; dans le second, créer une nouvelle liste contenant ce mot."
+        ]
       }
     ]
   },
@@ -1401,7 +1407,7 @@
       {
         "title": "Tri par insertion",
         "slug": "tri-insertion",
-        "statement": "Écrire une fonction `tri_insertion(L)` qui renvoie une **nouvelle liste** triée par ordre croissant, en utilisant le **tri par insertion**. La liste `L` d'origine ne doit pas être modifiée.\n\n**Principe du tri par insertion** :\n1. On construit une nouvelle liste `Ltriee`, initialement vide.\n2. On parcourt `L` élément par élément, et on ajoute chaque élément à la fin de `Ltriee`.\n3. On fait ensuite \"remonter\" cet élément vers sa bonne place dans `Ltriee` : tant qu'il est plus petit que son voisin de gauche, on les échange.\n\nExemple pas à pas avec `L = [5, 3, 8, 1]` :\n- On ajoute `5` → `Ltriee = [5]`\n- On ajoute `3`, puis on le fait remonter → `Ltriee = [3, 5]`\n- On ajoute `8` (déjà à sa place, plus grand que tout) → `Ltriee = [3, 5, 8]`\n- On ajoute `1`, puis on le fait remonter jusqu'au début → `Ltriee = [1, 3, 5, 8]`",
+        "statement": "Écrire une fonction `tri_insertion(L)` qui renvoie une **nouvelle liste** triée par ordre croissant, en utilisant le **tri par insertion**. La liste `L` d'origine ne doit pas être modifiée.\n\n**Principe du tri par insertion** :\n\n1. On construit une nouvelle liste `Ltriee`, initialement vide.\n2. Pour chaque élément de `L` :\n    - on l'ajoute à la fin de `Ltriee` ;\n    - on fait ensuite \"remonter\" cet élément vers sa bonne place dans `Ltriee` : tant qu'il est plus petit que son voisin de gauche, on les échange.\n\nExemple pas à pas avec `L = [5, 3, 8, 1]` :\n\n- On ajoute `5` → `Ltriee = [5]`\n- On ajoute `3`, puis on le fait remonter → `Ltriee = [3, 5]`\n- On ajoute `8` (déjà à sa place, plus grand que tout) → `Ltriee = [3, 5, 8]`\n- On ajoute `1`, puis on le fait remonter jusqu'au début → `Ltriee = [1, 3, 5, 8]`",
         "kind": "python",
         "starter_code": "def tri_insertion(L):\n    pass\n",
         "function_name": "tri_insertion",
@@ -1424,7 +1430,7 @@
       {
         "title": "Tri par sélection",
         "slug": "tri-selection",
-        "statement": "Écrire une fonction `tri_selection(L)` qui trie `L` par ordre croissant en utilisant le **tri par sélection**, puis renvoie `L`.\n\n**Attention** : contrairement à certains algorithmes de tri qui construisent une nouvelle liste, celui-ci **modifie `L` directement** (tri \"en place\").\n\n**Principe du tri par sélection** :\n1. Pour chaque position `i` de la liste :\n2. On cherche l'indice du **plus petit élément parmi ceux situés à partir de la position `i`** (les éléments avant `i` sont déjà triés).\n3. On échange cet élément avec celui actuellement en position `i`.\n4. À la fin de cette étape, la position `i` contient définitivement sa valeur triée finale.",
+        "statement": "Écrire une fonction `tri_selection(L)` qui trie `L` par ordre croissant en utilisant le **tri par sélection**, puis renvoie `L`.\n\nDans cet exercice, on choisit de réaliser un tri **en place** : on ne construit pas de nouvelle liste, on modifie directement `L`.\n\n**Principe du tri par sélection** :\n\nPour chaque position `i` de la liste :\n\n1. On cherche l'indice du **plus petit élément parmi ceux situés à partir de la position `i`** (les éléments avant `i` sont déjà triés).\n2. On échange cet élément avec celui actuellement en position `i` : la position `i` contient alors définitivement sa valeur triée finale.",
         "kind": "python",
         "starter_code": "def tri_selection(L):\n    pass\n",
         "function_name": "tri_selection",
@@ -1447,7 +1453,7 @@
       {
         "title": "Tri fusion (1/2)",
         "slug": "tri-fusion-1-2",
-        "statement": "Écrire une fonction `fusion(L1, L2)` qui prend deux listes **déjà triées** par ordre croissant, et renvoie une nouvelle liste triée contenant tous leurs éléments.\n\n**Principe** : `L1` et `L2` étant déjà triées, on peut construire le résultat en comparant à chaque étape leur premier élément restant, et en prenant toujours le plus petit des deux — un peu comme si on fusionnait deux piles de cartes déjà triées, en retournant toujours la carte la plus petite des deux piles.\n\nExemple : `fusion([1, 4, 7], [2, 3, 9])` renvoie `[1, 2, 3, 4, 7, 9]`.\n\nCette fonction sera réutilisée dans le prochain exercice pour construire le tri fusion.",
+        "statement": "Écrire une fonction `fusion(L1, L2)` qui prend deux listes **déjà triées** par ordre croissant, et renvoie une nouvelle liste triée contenant tous leurs éléments.\n\nExemple : `fusion([1, 4, 7], [2, 3, 9])` renvoie `[1, 2, 3, 4, 7, 9]`.\n\nCette fonction sera réutilisée dans le prochain exercice pour construire le tri fusion.",
         "kind": "python",
         "starter_code": "def fusion(L1, L2):\n    pass\n",
         "function_name": "fusion",
@@ -1463,6 +1469,7 @@
           "[[2, 2], [2, 2]]"
         ],
         "hints": [
+          "`L1` et `L2` étant déjà triées, on peut construire le résultat en comparant à chaque étape leur premier élément restant, et en prenant toujours le plus petit des deux — comme si on fusionnait deux piles de cartes déjà triées, en retournant toujours la carte la plus petite des deux piles.",
           "Utiliser deux indices, un pour chaque liste, et avance dans celle dont l'élément courant est le plus petit.",
           "Une fois qu'une des deux listes est épuisée, il ne reste plus qu'à recopier tous les éléments restants de l'autre liste : ils sont déjà triés."
         ]
@@ -1470,7 +1477,7 @@
       {
         "title": "Tri fusion (2/2)",
         "slug": "tri-fusion-2-2",
-        "statement": "Écrire une fonction `tri_fusion(L)` qui renvoie une **nouvelle liste** triée par ordre croissant, en utilisant le **tri fusion**. La liste `L` d'origine ne doit pas être modifiée.\n\nLa fonction `fusion(L1, L2)` écrite dans l'exercice précédent peut être utilisée (déjà disponible ci-dessous, pas besoin de la réécrire).\n\n**Principe du tri fusion** (diviser pour régner) :\n1. Si `L` contient 0 ou 1 élément, elle est déjà triée : on la renvoie telle quelle.\n2. Sinon, on coupe `L` en deux moitiés à peu près égales.\n3. On trie **récursivement** chacune des deux moitiés (en rappelant `tri_fusion` sur chacune).\n4. On **fusionne** les deux moitiés triées en une seule liste triée, à l'aide de `fusion`.",
+        "statement": "Écrire une fonction `tri_fusion(L)` qui renvoie une **nouvelle liste** triée par ordre croissant, en utilisant le **tri fusion**. La liste `L` d'origine ne doit pas être modifiée.\n\nLa fonction `fusion(L1, L2)` écrite dans l'exercice précédent peut être utilisée (déjà disponible ci-dessous, pas besoin de la réécrire).\n\n**Principe du tri fusion** (diviser pour régner) : on coupe `L` en deux parties de taille égale ou presque, qu'on trie **récursivement**, puis qu'on **fusionne**.",
         "kind": "python",
         "starter_code": "def fusion(L1, L2):\n    resultat = []\n    i, j = 0, 0\n    while i < len(L1) and j < len(L2):\n        if L1[i] <= L2[j]:\n            resultat.append(L1[i])\n            i += 1\n        else:\n            resultat.append(L2[j])\n            j += 1\n    while i < len(L1):\n        resultat.append(L1[i])\n        i += 1\n    while j < len(L2):\n        resultat.append(L2[j])\n        j += 1\n    return resultat\n\n\ndef tri_fusion(L):\n    pass\n",
         "function_name": "tri_fusion",
@@ -1493,11 +1500,11 @@
       {
         "title": "Tri rapide",
         "slug": "tri-rapide",
-        "statement": "Écrire une fonction `tri_rapide(L)` qui renvoie une **nouvelle liste** triée par ordre croissant, en utilisant le **tri rapide (quicksort)**. La liste `L` d'origine ne doit pas être modifiée.\n\n**Principe du tri rapide** (diviser pour régner) :\n1. Si `L` contient 0 ou 1 élément, elle est déjà triée : on la renvoie telle quelle.\n2. Sinon, on choisit un **pivot** (ici, le premier élément de `L`).\n3. On répartit tous les éléments de `L` en trois listes : ceux strictement inférieurs au pivot, ceux égaux au pivot, ceux strictement supérieurs au pivot.\n4. On trie **récursivement** les listes \"inférieurs\" et \"supérieurs\", puis on les recolle dans l'ordre : `inférieurs triés + égaux + supérieurs triés`.\n\n**Point important** : le choix du pivot influence fortement la performance de l'algorithme (voir l'exercice de complexité associé) — un pivot toujours pris comme premier élément est simple à implémenter, mais peut se révéler très défavorable sur certaines listes (par exemple une liste déjà triée).",
+        "statement": "Écrire une fonction `tri_rapide(L)` qui renvoie une **nouvelle liste** triée par ordre croissant, en utilisant le **tri rapide (quicksort)**. La liste `L` d'origine ne doit pas être modifiée.\n\n**Principe du tri rapide** (diviser pour régner) :\n\n1. On choisit un **pivot** (par exemple, le premier élément de `L`).\n2. On répartit tous les éléments de `L` en trois listes : ceux strictement inférieurs au pivot, ceux égaux au pivot, ceux strictement supérieurs au pivot.\n3. On trie **récursivement** les listes \"inférieurs\" et \"supérieurs\", puis on les recolle dans l'ordre.",
         "kind": "python",
         "starter_code": "def tri_rapide(L):\n    pass\n",
         "function_name": "tri_rapide",
-        "solution_code": "def tri_rapide(L):\n    # Cas de base : une liste de 0 ou 1 élément est déjà triée\n    if len(L) <= 1:\n        return L\n    # On choisit le premier élément de L comme pivot\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    # On répartit chaque élément de L selon sa comparaison au pivot\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    # On trie récursivement les deux listes extrêmes, puis on recolle le tout :\n    # inférieurs triés + égaux (déjà à leur place, au milieu) + supérieurs triés\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n",
+        "solution_code": "def tri_rapide(L):\n    # Cas de base : une liste de 0 ou 1 élément est déjà triée\n    if len(L) <= 1:\n        return L\n    # On choisit le premier élément de L comme pivot.\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    # On répartit chaque élément de L selon sa comparaison au pivot\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    # On trie récursivement les deux listes extrêmes, puis on recolle le tout :\n    # inférieurs triés + égaux (déjà à leur place, au milieu) + supérieurs triés\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n\n\n# Point important : le choix du pivot influence fortement la performance de\n# l'algorithme (voir l'exercice de complexité associé) — un pivot toujours pris\n# comme premier élément est simple à implémenter, mais peut se révéler très\n# défavorable sur certaines listes (par exemple une liste déjà triée).\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1508,10 +1515,7 @@
           "[[5, 4, 3, 2, 1]]",
           "[[-2, 0, 5, -1]]"
         ],
-        "hints": [
-          "Le pivot choisi ici est toujours `L[0]` : penser à ce que ça donne sur une liste déjà triée (dans un sens ou dans l'autre).",
-          "N'oublie pas la liste \"egaux\" : sans elle, les éléments égaux au pivot disparaîtraient du résultat."
-        ]
+        "hints": []
       }
     ]
   },
@@ -1528,14 +1532,30 @@
         "kind": "python",
         "starter_code": "from collections import deque\n\ndef parcours_largeur(graphe, depart):\n    pass\n",
         "function_name": "parcours_largeur",
-        "solution_code": "from collections import deque\n\ndef parcours_largeur(graphe, depart):\n    # \"visites\" garde la liste des nœuds déjà rencontrés, DANS L'ORDRE de visite\n    visites = [depart]\n    # deque (\"double-ended queue\") permet d'ajouter/retirer efficacement aux\n    # DEUX extrémités : .append() ajoute à la fin, .popleft() retire le\n    # premier élément — une vraie file (FIFO)\n    file = deque([depart])\n    while file:\n        # .popleft() retire ET renvoie le premier élément de la file\n        noeud = file.popleft()\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                # On marque le voisin comme visité DÈS qu'on le découvre,\n                # pas seulement quand on le traite : sinon un même nœud\n                # pourrait être ajouté plusieurs fois à la file\n                visites.append(voisin)\n                file.append(voisin)\n    return visites\n",
+        "solution_code": "from collections import deque\n\ndef parcours_largeur(graphe, depart):\n    # \"visites\" garde la liste des nœuds déjà rencontrés, DANS L'ORDRE de visite\n    visites = [depart]\n    prochain = deque([depart])\n    while prochain:\n        # .popleft() retire ET renvoie le premier élément de la file\n        noeud = prochain.popleft()\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                # On marque le voisin comme visité DÈS qu'on le découvre,\n                # pas seulement quand on le traite : sinon un même nœud\n                # pourrait être ajouté plusieurs fois à la file\n                visites.append(voisin)\n                prochain.append(voisin)\n    return visites\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
           "[{'A': ['B', 'C'], 'B': ['D'], 'C': ['E'], 'D': [], 'E': []}, 'A']",
           "[{'R': ['A', 'B'], 'A': ['C', 'D'], 'B': [], 'C': [], 'D': []}, 'R']",
           "[{'1': ['2', '3', '4'], '2': ['5'], '3': [], '4': ['6'], '5': [], '6': []}, '1']",
-          "[{'X': []}, 'X']"
+          "[{'X': []}, 'X']",
+          [
+            {
+              "A": [
+                "B",
+                "C"
+              ],
+              "B": [
+                "D"
+              ],
+              "C": [
+                "D"
+              ],
+              "D": []
+            },
+            "A"
+          ]
         ],
         "hints": [
           "Utiliser une file (FIFO) : ajouter les voisins non visités à la fin, retirer toujours le premier élément (avec `file.pop(0)`).",
@@ -1545,7 +1565,7 @@
       {
         "title": "Parcours en profondeur",
         "slug": "parcours-profondeur",
-        "statement": "Écrire une fonction `parcours_profondeur(graphe, depart)` qui effectue un **parcours en profondeur** d'un graphe et renvoie la liste des nœuds visités, dans l'ordre de leur visite.\r\n\r\nMême convention que pour le parcours en largeur :\r\n\r\n- `graphe` est un dictionnaire `{noeud: [liste des voisins]}`.\r\n- `depart` est le nœud de départ.\r\n- Visiter toujours les voisins d'un nœud **dans l'ordre où ils apparaissent** dans sa liste d'adjacence.\r\n- Chaque nœud n'apparaît qu'**une seule fois** dans le résultat, à sa première visite.\r\n- Les graphes utilisés dans cet exercice sont **acycliques** (aucun cycle, type arbre ou DAG).\r\n\r\nExemple (même graphe que l'exercice précédent) :\r\n\r\n```python\r\ngraphe = {\"A\": [\"B\", \"C\"], \"B\": [\"D\"], \"C\": [\"E\"], \"D\": [], \"E\": []}\r\nparcours_profondeur(graphe, \"A\")  # renvoie ['A', 'B', 'D', 'C', 'E']\r\n```",
+        "statement": "Écrire une fonction `parcours_profondeur(graphe, depart)` qui effectue un **parcours en profondeur** d'un graphe et renvoie la liste des nœuds visités, dans l'ordre de leur visite.\r\n\r\nMême convention que pour le parcours en largeur :\r\n\r\n- `graphe` est un dictionnaire `{noeud: [liste des voisins]}`.\r\n- `depart` est le nœud de départ.\r\n- Visiter toujours les voisins d'un nœud **dans l'ordre où ils apparaissent** dans sa liste d'adjacence.\r\n- Chaque nœud n'apparaît qu'**une seule fois** dans le résultat, à sa première visite.\r\n- Les graphes utilisés dans cet exercice sont **acycliques**.\r\n\r\nExemple (même graphe que l'exercice précédent) :\r\n\r\n```python\r\ngraphe = {\"A\": [\"B\", \"C\"], \"B\": [\"D\"], \"C\": [\"E\"], \"D\": [], \"E\": []}\r\nparcours_profondeur(graphe, \"A\")  # renvoie ['A', 'B', 'D', 'C', 'E']\r\n```",
         "kind": "python",
         "starter_code": "def parcours_profondeur(graphe, depart):\r\n    pass",
         "function_name": "parcours_profondeur",
@@ -2384,7 +2404,7 @@
       {
         "title": "Complexité du tri par insertion",
         "slug": "complexite-tri-insertion",
-        "statement": "Voici le code du tri par insertion étudié précédemment :\n\n```python\ndef tri_insertion(L):\n    Ltriee = []\n    for i in range(len(L)):\n        x = L[i]\n        Ltriee.append(x)\n        j = i\n        while j > 0 and Ltriee[j] < Ltriee[j-1]:\n            Ltriee[j], Ltriee[j-1] = Ltriee[j-1], Ltriee[j]\n            j -= 1\n    return Ltriee\n```\n\nÉcrire une fonction `complexite_tri_insertion(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_insertion`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si `L` est déjà triée (chaque élément \"remonte\"-t-il beaucoup) ? Et si `L` est triée dans l'ordre inverse ?",
+        "statement": "Voici le code du tri par insertion étudié précédemment :\n\n```python\ndef tri_insertion(L):\n    Ltriee = []\n    for i in range(len(L)):\n        x = L[i]\n        Ltriee.append(x)\n        j = i\n        while j > 0 and Ltriee[j] < Ltriee[j-1]:\n            Ltriee[j], Ltriee[j-1] = Ltriee[j-1], Ltriee[j]\n            j -= 1\n    return Ltriee\n```\n\nÉcrire une fonction `complexite_tri_insertion(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_insertion`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si `L` est déjà triée (chaque élément \"remonte\"-t-il beaucoup) ? Et si `L` est triée dans l'ordre inverse ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_insertion(L):\n    pass\n",
         "function_name": "complexite_tri_insertion",
@@ -2405,7 +2425,7 @@
       {
         "title": "Complexité du tri par sélection",
         "slug": "complexite-tri-selection",
-        "statement": "Voici le code du tri par sélection étudié précédemment :\n\n```python\ndef tri_selection(L):\n    for i in range(len(L)):\n        i_min = i\n        for j in range(i + 1, len(L)):\n            if L[j] < L[i_min]:\n                i_min = j\n        L[i], L[i_min] = L[i_min], L[i]\n    return L\n```\n\nÉcrire une fonction `complexite_tri_selection(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_selection`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : la boucle interne (recherche du minimum restant) dépend-elle des valeurs de `L`, ou s'exécute-t-elle toujours en entier, quel que soit l'état initial de la liste ?",
+        "statement": "Voici le code du tri par sélection étudié précédemment :\n\n```python\ndef tri_selection(L):\n    for i in range(len(L)):\n        i_min = i\n        for j in range(i + 1, len(L)):\n            if L[j] < L[i_min]:\n                i_min = j\n        L[i], L[i_min] = L[i_min], L[i]\n    return L\n```\n\nÉcrire une fonction `complexite_tri_selection(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_selection`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : la boucle interne (recherche du minimum restant) dépend-elle des valeurs de `L`, ou s'exécute-t-elle toujours en entier, quel que soit l'état initial de la liste ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_selection(L):\n    pass\n",
         "function_name": "complexite_tri_selection",
@@ -2426,7 +2446,7 @@
       {
         "title": "Complexité du tri fusion",
         "slug": "complexite-tri-fusion",
-        "statement": "Voici le code du tri fusion étudié précédemment :\n\n```python\ndef tri_fusion(L):\n    if len(L) <= 1:\n        return L\n    milieu = len(L) // 2\n    gauche = tri_fusion(L[:milieu])\n    droite = tri_fusion(L[milieu:])\n    return fusion(gauche, droite)\n```\n\nÉcrire une fonction `complexite_tri_fusion(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_fusion`, en fonction de `n = len(L)`.\n\n**Contrairement aux deux exercices précédents**, on ne demande pas ici `(meilleur_cas, pire_cas)` mais **`(cas_moyen, pire_cas)`** : le découpage de `tri_fusion` en deux moitiés ne dépend jamais des valeurs contenues dans `L`, seulement de sa taille. Il n'y a donc pas de \"meilleur cas\" avantageux à distinguer — en revanche, la distinction entre cas moyen et pire cas reste pertinente et est celle habituellement retenue pour cet algorithme.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : combien de niveaux de découpage y a-t-il avant d'atteindre des listes de taille 1 ? Et combien d'opérations coûte la fusion à chaque niveau ?",
+        "statement": "Voici le code du tri fusion étudié précédemment :\n\n```python\ndef tri_fusion(L):\n    if len(L) <= 1:\n        return L\n    milieu = len(L) // 2\n    gauche = tri_fusion(L[:milieu])\n    droite = tri_fusion(L[milieu:])\n    return fusion(gauche, droite)\n```\n\nÉcrire une fonction `complexite_tri_fusion(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_fusion`, en fonction de `n = len(L)`.\n\n**Contrairement aux deux exercices précédents**, on ne demande pas ici `(meilleur_cas, pire_cas)` mais **`(cas_moyen, pire_cas)`** : le découpage de `tri_fusion` en deux moitiés ne dépend jamais des valeurs contenues dans `L`, seulement de sa taille. Il n'y a donc pas de \"meilleur cas\" avantageux à distinguer — en revanche, la distinction entre cas moyen et pire cas reste pertinente et est celle habituellement retenue pour cet algorithme.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : combien de niveaux de découpage y a-t-il avant d'atteindre des listes de taille 1 ? Et combien d'opérations coûte la fusion à chaque niveau ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_fusion(L):\n    pass\n",
         "function_name": "complexite_tri_fusion",
@@ -2446,7 +2466,7 @@
       {
         "title": "Complexité du tri rapide",
         "slug": "complexite-tri-rapide",
-        "statement": "Voici le code du tri rapide étudié précédemment :\n\n```python\ndef tri_rapide(L):\n    if len(L) <= 1:\n        return L\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n```\n\nÉcrire une fonction `complexite_tri_rapide(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_rapide`, en fonction de `n = len(L)`.\n\n**Comme pour le tri fusion**, on demande ici `(cas_moyen, pire_cas)` plutôt que `(meilleur_cas, pire_cas)` : le pivot étant toujours choisi comme le premier élément de `L`, le \"meilleur cas\" (pivot parfaitement au milieu à chaque appel) est un cas particulier peu représentatif. C'est le **cas moyen** qui est habituellement retenu pour cet algorithme — et c'est justement là que le tri rapide se distingue du tri fusion : leur cas moyen est identique (`n * log(n)`), mais leur pire cas diffère.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si le pivot (toujours `L[0]`) tombe systématiquement sur le plus petit ou le plus grand élément restant, par exemple sur une liste déjà triée ?",
+        "statement": "Voici le code du tri rapide étudié précédemment :\n\n```python\ndef tri_rapide(L):\n    if len(L) <= 1:\n        return L\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n```\n\nÉcrire une fonction `complexite_tri_rapide(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_rapide`, en fonction de `n = len(L)`.\n\n**Comme pour le tri fusion**, on demande ici `(cas_moyen, pire_cas)` plutôt que `(meilleur_cas, pire_cas)` : le pivot étant toujours choisi comme le premier élément de `L`, le \"meilleur cas\" (pivot parfaitement au milieu à chaque appel) est un cas particulier peu représentatif. C'est le **cas moyen** qui est habituellement retenu pour cet algorithme — et c'est justement là que le tri rapide se distingue du tri fusion : leur cas moyen est identique (`n * log(n)`), mais leur pire cas diffère.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si le pivot (toujours `L[0]`) tombe systématiquement sur le plus petit ou le plus grand élément restant, par exemple sur une liste déjà triée ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_rapide(L):\n    pass\n",
         "function_name": "complexite_tri_rapide",
@@ -2466,7 +2486,7 @@
       {
         "title": "Complexité de la recherche du minimum",
         "slug": "complexite-recherche-min",
-        "statement": "Voici le code de la recherche du minimum étudiée précédemment :\n\n```python\ndef recherche_min(L):\n    mini = L[0]\n    for i in range(1, len(L)):\n        if L[i] < mini:\n            mini = L[i]\n    return mini\n```\n\nÉcrire une fonction `complexite_recherche_min(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_min`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : la boucle peut-elle jamais s'arrêter avant d'avoir comparé tous les éléments restants, quelles que soient les valeurs de `L` ?",
+        "statement": "Voici le code de la recherche du minimum étudiée précédemment :\n\n```python\ndef recherche_min(L):\n    mini = L[0]\n    for i in range(1, len(L)):\n        if L[i] < mini:\n            mini = L[i]\n    return mini\n```\n\nÉcrire une fonction `complexite_recherche_min(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_min`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : la boucle peut-elle jamais s'arrêter avant d'avoir comparé tous les éléments restants, quelles que soient les valeurs de `L` ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_recherche_min(L):\n    pass\n",
         "function_name": "complexite_recherche_min",
@@ -2486,7 +2506,7 @@
       {
         "title": "Complexité de la recherche d'un élément (avec boucle)",
         "slug": "complexite-recherche-element",
-        "statement": "Voici le code d'une recherche d'élément dans une liste, avec une boucle, étudiée précédemment :\n\n```python\ndef recherche_element(L, x):\n    for i in range(len(L)):\n        if L[i] == x:\n            return True\n    return False\n```\n\nÉcrire une fonction `complexite_recherche_element(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si l'élément recherché est le tout premier de la liste ? Et s'il ne s'y trouve pas du tout ?",
+        "statement": "Voici le code d'une recherche d'élément dans une liste, avec une boucle, étudiée précédemment :\n\n```python\ndef recherche_element(L, x):\n    for i in range(len(L)):\n        if L[i] == x:\n            return True\n    return False\n```\n\nÉcrire une fonction `complexite_recherche_element(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si l'élément recherché est le tout premier de la liste ? Et s'il ne s'y trouve pas du tout ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_recherche_element(L):\n    pass\n",
         "function_name": "complexite_recherche_element",
@@ -2506,7 +2526,7 @@
       {
         "title": "Complexité de la recherche d'un élément (avec in)",
         "slug": "complexite-recherche-element-in",
-        "statement": "Voici la même recherche que dans l'exercice précédent, mais écrite avec l'opérateur `in` :\n\n```python\ndef recherche_element_in(L, x):\n    return x in L\n```\n\nÉcrire une fonction `complexite_recherche_element_in(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element_in`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : l'opérateur `in` cache la boucle, mais fait-il vraiment quelque chose de différent \"sous le capot\" par rapport à l'exercice précédent ?",
+        "statement": "Voici la même recherche que dans l'exercice précédent, mais écrite avec l'opérateur `in` :\n\n```python\ndef recherche_element_in(L, x):\n    return x in L\n```\n\nÉcrire une fonction `complexite_recherche_element_in(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element_in`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : l'opérateur `in` cache la boucle, mais fait-il vraiment quelque chose de différent \"sous le capot\" par rapport à l'exercice précédent ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_recherche_element_in(L):\n    pass\n",
         "function_name": "complexite_recherche_element_in",
@@ -2526,7 +2546,7 @@
       {
         "title": "Complexité de la transposition d'une matrice",
         "slug": "complexite-transposition",
-        "statement": "Voici le code de la transposition de matrice étudiée précédemment :\n\n```python\ndef transposer(matrice):\n    m = len(matrice)\n    p = len(matrice[0])\n    return [[matrice[i][j] for i in range(m)] for j in range(p)]\n```\n\nÉcrire une fonction `complexite_transposition(matrice)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `transposer`, en fonction de `n`, le **nombre total d'éléments** de la matrice (`n = m × p`, où `m` est le nombre de lignes et `p` le nombre de colonnes).\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la matrice (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : chaque case de la matrice est-elle toujours visitée, quelles que soient les valeurs qu'elle contient ?",
+        "statement": "Voici le code de la transposition de matrice étudiée précédemment :\n\n```python\ndef transposer(matrice):\n    m = len(matrice)\n    p = len(matrice[0])\n    return [[matrice[i][j] for i in range(m)] for j in range(p)]\n```\n\nÉcrire une fonction `complexite_transposition(matrice)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `transposer`, en fonction de `n`, le **nombre total d'éléments** de la matrice (`n = m × p`, où `m` est le nombre de lignes et `p` le nombre de colonnes).\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la matrice (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : chaque case de la matrice est-elle toujours visitée, quelles que soient les valeurs qu'elle contient ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_transposition(matrice):\n    pass\n",
         "function_name": "complexite_transposition",
