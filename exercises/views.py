@@ -275,7 +275,14 @@ def demander_aide(request, exercise_id):
 def mes_demandes_aide(request):
     """Page élève : historique de ses demandes d'aide (en attente puis traitées), avec la
     réponse du prof une fois disponible. Pas de notification par email (comme pour le reste
-    du site) : l'élève doit revenir consulter cette page lui-même."""
+    du site) : l'élève doit revenir consulter cette page lui-même.
+
+    Ouvrir cette page éteint le témoin de notification (voir codexo/context_processors.py) :
+    toute réponse pas encore vue est marquée vue ICI, avant le render, pour que le menu du
+    haut de CETTE page reflète déjà l'état à jour."""
+    DemandeAide.objects.filter(eleve=request.user, traite=True, reponse_vue=False).update(
+        reponse_vue=True
+    )
     demandes = (
         DemandeAide.objects.filter(eleve=request.user)
         .select_related("exercise", "exercise__theme")

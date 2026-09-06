@@ -533,6 +533,15 @@ class DemandeAide(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
+    reponse_vue = models.BooleanField(
+        default=False,
+        help_text=(
+            "True dès que l'élève a ouvert sa page \"Mes demandes d'aide\" après que la "
+            "réponse a été envoyée (voir mes_demandes_aide dans views.py). Sert uniquement "
+            "au petit témoin de notification dans le menu du haut — n'a aucun effet sur "
+            "l'affichage de la réponse elle-même, toujours visible."
+        ),
+    )
 
     class Meta:
         ordering = ["-date_demande"]

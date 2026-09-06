@@ -83,6 +83,13 @@ header.site nav a:hover { color: var(--indigo); }
 .nav-dropdown-toggle .caret { font-size: .75em; transition: transform .15s ease; }
 .nav-dropdown-toggle.open .caret { transform: rotate(180deg); }
 
+/* --- Témoin de notification (ajout du 06/09/2026) : simple point, pas de compte exact ---
+   voir codexo/context_processors.py pour ce qui déclenche chaque témoin. */
+.nav-badge-dot {
+  display: inline-block; width: 7px; height: 7px; margin-left: 6px;
+  border-radius: 50%; background: var(--err); vertical-align: middle;
+}
+
 .nav-dropdown-menu {
   display: none; flex-direction: column;
   position: absolute; top: 100%; left: 0; margin-top: 10px;
