@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Import CSV élèves — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow">Espace prof</span>
+<h1>Import CSV élèves</h1>
+<p>Le mot de passe provisoire de chaque compte créé est sa date de naissance telle
+qu'écrite dans le CSV (ex : 15/03/2007) ; l'élève sera invité à le changer dès sa
+première connexion. Peut être relancé sans dupliquer : un identifiant déjà présent
+est simplement mis à jour.</p>
+
+<div class="auth-card">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <p>
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<br><small>{{ field.help_text }}</small>{% endif %}
+        {% if field.errors %}
+          {{ field.errors }}
+        {% endif %}
+      </p>
+    {% endfor %}
+
+    <button type="submit">Importer</button>
+  </form>
+</div>
+
+{% if resultat %}
+  <h2>Résultat</h2>
+  <p>{{ resultat.crees }} compte(s) créé(s), {{ resultat.mis_a_jour }} mis à jour.</p>
+  {% if resultat.erreurs %}
+    <ul>
+      {% for erreur in resultat.erreurs %}
+        <li class="stats-warn">{{ erreur }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endif %}
+{% endblock %}

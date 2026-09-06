@@ -6,6 +6,7 @@ from accounts.views import (
     demande_mot_de_passe_oublie,
     mot_de_passe_oublie_envoye,
     demandes_reinitialisation,
+    importer_eleves_view,
 )
 from django.contrib.auth.views import LogoutView
 from exercises import views as ex_views
@@ -18,6 +19,7 @@ urlpatterns = [
     path('mot-de-passe-oublie/', demande_mot_de_passe_oublie, name='mot_de_passe_oublie'),
     path('mot-de-passe-oublie/envoye/', mot_de_passe_oublie_envoye, name='mot_de_passe_oublie_envoye'),
     path('demandes-reinitialisation/', demandes_reinitialisation, name='demandes_reinitialisation'),
+    path('importer-eleves/', importer_eleves_view, name='importer_eleves'),
     path('', ex_views.theme_list, name='theme_list'),
     path('profil/', ex_views.profile, name='profile'),
     path('stats/', ex_views.stats, name='stats'),

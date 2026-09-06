@@ -1,10 +1,13 @@
+import io
+
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
-from .forms import DemandeReinitialisationForm
+from .forms import ConnexionThrottleeForm, DemandeReinitialisationForm, ImporterElevesForm
+from .importation import ColonnesManquantes, importer_eleves_depuis_lignes
 from .models import DemandeReinitialisation, User
 
 
@@ -12,9 +15,15 @@ class IdentifiantLoginView(LoginView):
     """Anciennement EmailLoginView : renommée suite au passage de l'email à
     l'identifiant comme USERNAME_FIELD (voir contexte-technique.md, refonte du
     06/09/2026). Redirige vers le changement de mot de passe si le compte doit
-    encore changer son mot de passe provisoire (import CSV)."""
+    encore changer son mot de passe provisoire (import CSV).
+
+    form_class = ConnexionThrottleeForm (accounts/forms.py) : bloque
+    temporairement un identifiant après plusieurs échecs de connexion, pour
+    limiter le brute-force sur les mots de passe provisoires (date de
+    naissance)."""
 
     template_name = "accounts/login.html"
+    form_class = ConnexionThrottleeForm
 
     def get_success_url(self):
         if self.request.user.doit_changer_mot_de_passe:
@@ -92,3 +101,36 @@ def demandes_reinitialisation(request):
         for d in demandes
     ]
     return render(request, "accounts/demandes_reinitialisation.html", {"lignes": lignes})
+
+
+@staff_member_required
+def importer_eleves_view(request):
+    """Formulaire web d'import CSV élèves, réservé aux profs (voir base.html, menu
+    déroulant "Espace prof"). Équivalent web de la commande de gestion
+    "importer_eleves" (voir LISEZ_MOI.md pour l'usage en ligne de commande) : les
+    deux réutilisent exactement la même logique d'import
+    (accounts/importation.py), donc le résultat est identique quelle que soit la
+    façon dont le CSV est importé."""
+    resultat = None
+    if request.method == "POST":
+        form = ImporterElevesForm(request.POST, request.FILES)
+        if form.is_valid():
+            fichier = form.cleaned_data["fichier"]
+            delimiter = form.cleaned_data["delimiter"]
+            # encoding="utf-8-sig" : tolère le BOM ajouté par Excel en tête de
+            # fichier (même remarque que dans la commande en ligne de commande).
+            contenu = fichier.read().decode("utf-8-sig")
+            try:
+                crees, mis_a_jour, erreurs = importer_eleves_depuis_lignes(
+                    io.StringIO(contenu), delimiter=delimiter
+                )
+                resultat = {"crees": crees, "mis_a_jour": mis_a_jour, "erreurs": erreurs}
+                messages.success(
+                    request,
+                    f"Import terminé : {crees} compte(s) créé(s), {mis_a_jour} mis à jour.",
+                )
+            except ColonnesManquantes as exc:
+                form.add_error("fichier", str(exc))
+    else:
+        form = ImporterElevesForm()
+    return render(request, "accounts/importer_eleves.html", {"form": form, "resultat": resultat})
