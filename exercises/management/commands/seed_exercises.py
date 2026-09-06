@@ -128,13 +128,16 @@ class Command(BaseCommand):
             f"Groupe \"Professeurs\" créé/à jour ({len(permissions)} permissions)."
         ))
 
-        # Comptes admin recréés automatiquement à chaque démarrage (local ET
-        # production) : utile car le plan gratuit de Render ne persiste pas le
-        # système de fichiers/la base de données (voir README). Ce bloc tourne
-        # désormais aussi en production (contrairement à avant, où il était limité
-        # à DEBUG=True) : il remplace donc le "createsuperuser --noinput" du
-        # Procfile, qui ne gérait qu'un seul admin et ne mettait jamais à jour son
-        # mot de passe s'il existait déjà.
+        # Comptes admin (re)créés/mis à jour par ce bloc à chaque exécution de la
+        # commande (elle est idempotente : la relancer ne duplique rien, ça remet
+        # juste ces comptes à l'état défini par les variables d'environnement). Ce
+        # bloc tourne aussi bien en local qu'en production, et remplace le
+        # "createsuperuser --noinput" que ferait un Procfile, qui ne gérait qu'un
+        # seul admin et ne mettait jamais à jour son mot de passe s'il existait déjà.
+        #
+        # Sur le VPS de prod, cette commande n'est PAS relancée automatiquement à
+        # chaque redémarrage du service — seulement ponctuellement, à la main (voir
+        # deploiement_checklist.md).
         #
         # Chaque admin est défini par une paire de variables d'environnement :
         # DJANGO_SUPERUSER_EMAIL / DJANGO_SUPERUSER_PASSWORD pour le premier, puis
@@ -184,11 +187,11 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(
                 "Aucune variable DJANGO_SUPERUSER_EMAIL / DJANGO_SUPERUSER_PASSWORD "
                 "définie (vérifie ton fichier .env, ou les variables d'environnement "
-                "Render) : aucun compte admin créé automatiquement."
+                "du serveur) : aucun compte admin créé automatiquement."
             ))
 
-        # Compte élève de test, recréé automatiquement au même titre que les admins
-        # ci-dessus (même raison : persistance sur le plan gratuit de Render).
+        # Compte élève de test, (re)créé/mis à jour au même titre que les admins
+        # ci-dessus, pour les mêmes raisons (voir commentaire plus haut).
         # Contrairement aux admins, ce compte n'a NI is_staff NI is_superuser : un
         # élève normal, juste pratique pour tester rapidement le parcours étudiant
         # sans repasser par le formulaire d'inscription à chaque redémarrage.

@@ -21,7 +21,7 @@ ABANDON_LOCK_DURATION = timedelta(hours=2)
 
 # En local (DEBUG=True), le verrou est désactivé pour ne pas gêner les tests/débogage :
 # un abandon est toujours enregistré en base, mais il ne bloque jamais l'accès à l'exercice.
-# En production (DEBUG=False, sur Render), le verrou reste actif normalement pour les étudiants.
+# En production (DEBUG=False), le verrou reste actif normalement pour les étudiants.
 ABANDON_LOCK_ENABLED = not settings.DEBUG
 
 

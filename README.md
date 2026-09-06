@@ -82,51 +82,154 @@ git push
 Le `.env` local n'est **jamais** poussé sur GitHub (exclu via `.gitignore`) —
 seul `.env.example` (un modèle sans vrai secret) est versionné.
 
-## Déploiement (Render, ou autre hébergeur Python)
+## Déploiement (VPS)
 
-Le projet est prêt pour un déploiement simple :
-- `requirements.txt` : dépendances (Django, gunicorn, whitenoise, python-dotenv).
-- `Procfile` : commande de démarrage (lue automatiquement par certains hébergeurs
-  comme Railway/PythonAnywhere ; sur Render, il faut la recopier manuellement
-  dans le champ "Start Command" de l'interface — voir plus bas).
+Le site tourne en production sur un VPS Ubuntu : Nginx en reverse proxy devant
+Gunicorn, lancé automatiquement au démarrage via un service systemd. Le disque
+y est persistant (contrairement à un hébergeur gratuit type Render/Railway) :
+`seed_exercises` ne doit donc **pas** être relancé automatiquement à chaque
+redémarrage du service — il se lance manuellement, ponctuellement (voir
+`deploiement_checklist.md`).
 
-### Variables d'environnement à définir en production
+Pour la liste complète des variables d'environnement et la checklist à suivre
+à chaque mise à jour de code (`git pull`, migrations, collectstatic, redémarrage
+du service), voir **`deploiement_checklist.md`** — c'est la référence à jour.
+Cette section-ci ne couvre que la mise en place initiale d'un nouveau serveur.
 
-- `DJANGO_SECRET_KEY` : une clé secrète longue et aléatoire (jamais celle du `.env` local).
-- `DJANGO_DEBUG` : `False`
-- `DJANGO_ALLOWED_HOSTS` : ton nom de domaine (ex: `codexo-xxxx.onrender.com`),
-  sans `https://` ni `/` final.
-- `DJANGO_SUPERUSER_EMAIL` / `DJANGO_SUPERUSER_PASSWORD` : identifiants de ton
-  compte admin de production. Recréé automatiquement à chaque démarrage du
-  service (utile si le plan gratuit ne persiste pas la base de données, ou si
-  tu n'as pas accès à un Shell pour lancer `createsuperuser` toi-même).
+### Mise en place initiale d'un nouveau VPS (Ubuntu)
 
-### Exemple pour Render (plan gratuit)
-
-1. Créer un nouveau "Web Service" à partir de ton dépôt GitHub.
-2. Build command : `pip install -r requirements.txt`
-3. Start command (à coller manuellement, le champ ne peut pas rester vide sur Render) :
+1. **Connexion et mise à jour du système**
+   ```bash
+   ssh ubuntu@<IP_DU_SERVEUR>
+   sudo apt update && sudo apt upgrade -y
+   sudo reboot
    ```
-   bash -c "python manage.py migrate && python manage.py collectstatic --noinput && python manage.py seed_exercises && (python manage.py createsuperuser --noinput || true) && gunicorn codexo.wsgi"
+   (remplace `<IP_DU_SERVEUR>` par l'IP ou le nom de domaine réel du serveur)
+
+2. **Dépendances système**
+   ```bash
+   sudo apt install git python3-venv python3-pip -y
    ```
-4. Ajouter les 5 variables d'environnement listées ci-dessus dans la section "Environment".
-5. Déployer — le compte admin et les exercices de démo sont créés automatiquement
-   au premier démarrage, sans avoir besoin d'un accès Shell.
 
-## Limite connue : persistance des données sur le plan gratuit Render
+3. **Cloner le projet**
+   ```bash
+   sudo mkdir -p /var/www
+   sudo chown ubuntu:ubuntu /var/www
+   cd /var/www
+   git clone https://github.com/YohanPoirier/codexo.git
+   cd codexo
+   ```
 
-Sur le plan gratuit de Render, le système de fichiers **n'est pas persistant** :
-le service se met en veille après ~15 minutes d'inactivité, et redémarre ensuite
-avec un disque vierge. Résultat :
-- ✅ **Protégés** (recréés automatiquement à chaque démarrage) : le compte admin
-  et les thèmes/exercices définis dans `seed_exercises.py`.
-- ❌ **Non protégés** : les comptes étudiants et leurs résultats créés en production,
-  qui disparaissent au prochain redémarrage.
+4. **Environnement virtuel + dépendances Python**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   python manage.py check
+   ```
 
-**Solution actuellement retenue** : créer les exercices en local, exporter avec
-`python manage.py dumpdata exercises --indent 2 > exercises_export.json`, et les
-intégrer "en dur" dans `seed_exercises.py` plutôt que de les créer directement en
-production. Une vraie persistance des comptes/résultats étudiants nécessiterait
-PostgreSQL (Render en propose une base gratuite, mais avec une durée de vie
-limitée dans le temps) — non mis en place pour l'instant, à réévaluer si le
-site passe en usage réel avec une classe.
+5. **Base de données et configuration**
+   ```bash
+   python manage.py migrate
+   ```
+   Configurer le `.env` de production (voir `deploiement_checklist.md` pour la
+   liste complète des variables), en particulier `DJANGO_ALLOWED_HOSTS` avec
+   l'IP ou le nom de domaine du serveur.
+
+   À ce stade, un test rapide doit fonctionner :
+   `gunicorn --bind 0.0.0.0:8000 codexo.wsgi:application` (venv activé),
+   accessible sur `http://<IP_DU_SERVEUR>:8000/`.
+
+6. **Fichiers statiques + Nginx en reverse proxy**
+   ```bash
+   sudo apt install nginx
+   sudo nano /etc/nginx/sites-available/codexo
+   ```
+   Contenu :
+   ```nginx
+   server {
+       listen 80;
+       server_name <IP_OU_DOMAINE>;
+
+       location /static/ {
+           alias /var/www/codexo/staticfiles/;
+       }
+
+       location / {
+           proxy_pass http://127.0.0.1:8000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+   }
+   ```
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/codexo /etc/nginx/sites-enabled/codexo
+   sudo rm /etc/nginx/sites-enabled/default
+   sudo systemctl reload nginx
+   python manage.py collectstatic
+   ```
+   Le site doit maintenant être accessible sur `http://<IP_OU_DOMAINE>/` (port 80).
+
+7. **Démarrage automatique de Gunicorn (service systemd)**
+   ```bash
+   sudo nano /etc/systemd/system/codexo.service
+   ```
+   Contenu :
+   ```ini
+   [Unit]
+   Description=Gunicorn pour Codexo
+   After=network.target
+
+   [Service]
+   User=ubuntu
+   Group=www-data
+   WorkingDirectory=/var/www/codexo
+   Environment="PATH=/var/www/codexo/venv/bin"
+   ExecStart=/var/www/codexo/venv/bin/gunicorn \
+       --workers 3 \
+       --bind 127.0.0.1:8000 \
+       codexo.wsgi:application
+   Restart=always
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+   ```bash
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now codexo
+   ```
+   Ce service ne lance que `gunicorn` — pas `migrate`, `collectstatic` ni
+   `seed_exercises` au démarrage (voir `deploiement_checklist.md` pour ce qui
+   doit être fait manuellement, et à quel moment).
+
+8. **Déploiement du code via GitHub (clé SSH dédiée)**
+
+   Pour pouvoir faire `git pull` depuis le serveur sans mot de passe :
+   ```bash
+   cd /var/www/codexo
+   ssh-keygen -t ed25519 -C "codexo-vps" -f ~/.ssh/codexo_github
+   cat ~/.ssh/codexo_github.pub
+   ```
+   Ajouter cette clé publique dans GitHub : Settings → Deploy keys → Add deploy
+   key (pas besoin de "Allow write access").
+   ```bash
+   git remote set-url origin git@github.com:YohanPoirier/codexo.git
+   nano ~/.ssh/config
+   ```
+   Contenu :
+   ```
+   Host github.com
+       HostName github.com
+       User git
+       IdentityFile ~/.ssh/codexo_github
+       IdentitiesOnly yes
+   ```
+   ```bash
+   chmod 600 ~/.ssh/config
+   git fetch origin
+   ```
+
+   Une fois cette étape faite, les mises à jour suivantes se font simplement
+   avec `git pull` + la checklist de `deploiement_checklist.md`.

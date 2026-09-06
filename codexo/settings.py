@@ -15,9 +15,11 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Charge les variables depuis un fichier .env local s'il existe (développement uniquement).
-# En production (Render), ce fichier n'existe pas : load_dotenv() ne fait alors rien,
-# et les vraies variables d'environnement (définies dans l'interface Render) sont utilisées.
+# Charge les variables depuis un fichier .env s'il existe. En développement, ce
+# fichier est propre à ta machine (jamais committé, voir .env.example) ; en
+# production (VPS), il s'agit du .env du serveur (voir deploiement_checklist.md).
+# Si aucun .env n'est trouvé, load_dotenv() ne fait rien et les variables
+# d'environnement doivent alors être définies autrement (ex: par le service systemd).
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
