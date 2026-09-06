@@ -2,12 +2,35 @@ import json
 from pathlib import Path
 
 from django.conf import settings
+from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand, CommandError
 from exercises.models import Theme, Exercise, TestCase, Hint
-from accounts.models import User
+from accounts.models import Classe, User
 import os
 
 DATA_FILE = Path(settings.DATA_DIR) / "exercises_data.json"
+
+# Classes fixes de l'établissement : contrairement aux élèves (qui changent chaque
+# année, importés par CSV), les classes elles-mêmes ne changent jamais — codées en
+# dur ici plutôt que créées à la main dans l'admin (voir contexte-technique.md).
+CLASSES_FIXES = [
+    {"slug": "pcsi", "name": "PCSI"},
+    {"slug": "mpsi", "name": "MPSI"},
+    {"slug": "psi", "name": "PSI"},
+]
+
+# Permissions du groupe "Professeurs" (voir plus bas) : {modèle: [codenames]}.
+# Classe est volontairement en lecture seule (view) : les 3 classes ci-dessus
+# sont fixes et gérées automatiquement par ce script, un prof n'a pas besoin
+# d'en ajouter/supprimer depuis l'admin. Rien sur User/Group/Permission.
+PERMISSIONS_PROFESSEURS = {
+    Theme: ["add", "change", "view", "delete"],
+    Exercise: ["add", "change", "view", "delete"],
+    TestCase: ["add", "change", "view", "delete"],
+    Hint: ["add", "change", "view", "delete"],
+    Classe: ["view"],
+}
 
 
 class Command(BaseCommand):
@@ -69,6 +92,41 @@ class Command(BaseCommand):
                         text=hint_text,
                         order=i,
                     )
+
+        # Classes fixes (voir CLASSES_FIXES en haut du fichier), créées/mises à jour
+        # à chaque lancement comme les thèmes/exercices ci-dessus.
+        for classe_data in CLASSES_FIXES:
+            classe, _ = Classe.objects.get_or_create(
+                slug=classe_data["slug"],
+                defaults={"name": classe_data["name"]},
+            )
+            classe.name = classe_data["name"]
+            classe.save()
+        self.stdout.write(self.style.SUCCESS(
+            "Classes fixes créées/à jour : " + ", ".join(c["name"] for c in CLASSES_FIXES)
+        ))
+
+        # Groupe "Professeurs" (voir PERMISSIONS_PROFESSEURS en haut du fichier) :
+        # permissions.set() remplace la liste existante à chaque lancement, donc un
+        # changement de PERMISSIONS_PROFESSEURS dans le code se répercute tout seul
+        # au prochain seed_exercises — pas besoin de retoucher l'admin à la main.
+        # Fonctionne uniquement parce que ce script tourne APRÈS "migrate" (jamais
+        # dans la même commande) : les Permission de Django ne sont créées qu'à la
+        # toute fin de "migrate" (signal post_migrate), donc elles existent déjà en
+        # base quand seed_exercises est lancé séparément.
+        groupe_profs, _ = Group.objects.get_or_create(name="Professeurs")
+        permissions = []
+        for model, codenames in PERMISSIONS_PROFESSEURS.items():
+            content_type = ContentType.objects.get_for_model(model)
+            for codename in codenames:
+                permissions.append(Permission.objects.get(
+                    content_type=content_type,
+                    codename=f"{codename}_{model._meta.model_name}",
+                ))
+        groupe_profs.permissions.set(permissions)
+        self.stdout.write(self.style.SUCCESS(
+            f"Groupe \"Professeurs\" créé/à jour ({len(permissions)} permissions)."
+        ))
 
         # Comptes admin recréés automatiquement à chaque démarrage (local ET
         # production) : utile car le plan gratuit de Render ne persiste pas le
