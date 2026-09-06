@@ -12,11 +12,18 @@
       <span class="demande-aide-date">{{ demande.date_demande|date:"d/m/Y à H:i" }}</span>
     </div>
     {% if demande.commentaire %}
-      <p class="demande-aide-commentaire">« {{ demande.commentaire }} »</p>
+      <div class="demande-aide-bloc">
+        <p class="demande-aide-label">Ton commentaire :</p>
+        <p class="demande-aide-commentaire">{{ demande.commentaire }}</p>
+      </div>
     {% endif %}
+    <div class="demande-aide-bloc">
+      <p class="demande-aide-label">Code envoyé :</p>
+      <pre class="solution-code"><code>{{ demande.code_soumis }}</code></pre>
+    </div>
     {% if demande.traite %}
-      <div class="demande-aide-reponse">
-        <p class="demande-aide-reponse-label">Réponse du professeur :</p>
+      <div class="demande-aide-bloc">
+        <p class="demande-aide-label">Réponse du professeur :</p>
         <p>{{ demande.reponse|linebreaksbr }}</p>
       </div>
     {% else %}

@@ -669,16 +669,15 @@ table.schema-columns code {
   margin-bottom: 8px;
 }
 .demande-aide-exercice { color: var(--indigo-deep); font-weight: 600; }
-.demande-aide-commentaire { font-style: italic; margin: 0 0 8px; }
+.demande-aide-bloc { margin: 0 0 12px; }
+.demande-aide-bloc .solution-code { margin-top: 0; }
+.demande-aide-commentaire { margin: 0; }
 .demande-aide-statut { color: var(--amber); font-size: .88rem; margin: 0; }
-.demande-aide-reponse {
-  background: var(--paper-alt); border-radius: 8px; padding: 12px 14px; margin-top: 6px;
-}
-.demande-aide-reponse-label {
+.demande-aide-label {
   font-family: 'JetBrains Mono', monospace; font-size: .74rem; text-transform: uppercase;
   letter-spacing: .04em; color: var(--ink-soft); margin: 0 0 6px;
 }
-.demande-aide-reponse p:last-child { margin-bottom: 0; }
+.demande-aide-bloc p:last-child { margin-bottom: 0; }
 
 .stats-table tr.en-attente { background: #fdf3e2; }
 .stats-table tr.en-attente:hover { background: #fbe9c6; }
