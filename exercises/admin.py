@@ -1,4 +1,7 @@
 from django.contrib import admin
+
+from codexo.admin_mixins import SimplifieIndicationCtrlMixin
+
 from .models import Theme, Exercise, TestCase, Hint
 
 
@@ -20,8 +23,14 @@ class HintInline(admin.TabularInline):
     fields = ("text", "order")
 
 
+# SimplifieIndicationCtrlMixin : voir codexo/admin_mixins.py (mutualisé avec accounts/admin.py,
+# où le même souci — le rappel "sur un Mac" hors-sujet — a été retrouvé sur d'autres champs).
+
+
 @admin.register(Theme)
-class ThemeAdmin(admin.ModelAdmin):
+class ThemeAdmin(SimplifieIndicationCtrlMixin, admin.ModelAdmin):
+    CHAMPS_AVEC_INDICATION_CTRL_SIMPLIFIEE = ("enabled_for_classes",)
+
     list_display = ("name", "slug", "order")
     inlines = [ExerciseInline]
     filter_horizontal = ("enabled_for_classes",)
@@ -33,8 +42,7 @@ class ThemeAdmin(admin.ModelAdmin):
                 "fields": ("sql_setup",),
                 "description": (
                     "Instructions SQL (CREATE TABLE + INSERT) utilisées par défaut par tous les "
-                    "exercices SQL de ce thème — pratique pour faire plusieurs questions sur le "
-                    "même jeu de données, sans le recopier à chaque exercice."
+                    "exercices SQL de ce thème."
                 ),
             },
         ),
@@ -53,39 +61,21 @@ class ThemeAdmin(admin.ModelAdmin):
 
 
 @admin.register(Exercise)
-class ExerciseAdmin(admin.ModelAdmin):
+class ExerciseAdmin(SimplifieIndicationCtrlMixin, admin.ModelAdmin):
+    CHAMPS_AVEC_INDICATION_CTRL_SIMPLIFIEE = ("enabled_for_classes",)
+
     list_display = ("title", "theme", "kind", "order", "function_name")
     list_filter = ("theme", "kind")
+    # Ordre naturel (Python avant SQL, il y a plus d'exercices Python) : "Cas de test"
+    # s'affiche quand même juste après "Correction automatique — exercices Python" grâce
+    # au template admin personnalisé (voir templates/admin/exercises/exercise/change_form.html),
+    # qui déplace précisément cet inline — Django ne permet normalement pas d'intercaler un
+    # inline entre deux fieldsets, seulement de les faire tous suivre après tous les autres.
     inlines = [TestCaseInline, HintInline]
     filter_horizontal = ("enabled_for_classes",)
     fieldsets = (
         (None, {"fields": ("theme", "title", "slug", "order", "kind")}),
         ("Contenu affiché à l'étudiant", {"fields": ("statement", "starter_code")}),
-        (
-            "Correction automatique — exercices Python",
-            {
-                "fields": ("function_name", "solution_code"),
-                "description": (
-                    "Uniquement si Type = 'Python (fonction)'. Renseigne le nom de la fonction et un "
-                    "code de correction complet (une vraie implémentation qui fonctionne). Le résultat "
-                    "attendu de chaque test sera calculé automatiquement : ajoute des lignes de test "
-                    "ci-dessous avec juste les arguments à essayer, sans écrire le résultat toi-même."
-                ),
-            },
-        ),
-        (
-            "Correction automatique — exercices SQL",
-            {
-                "fields": ("sql_setup", "sql_solution"),
-                "description": (
-                    "Uniquement si Type = 'SQL (requête)'. 'sql_setup' est OPTIONNEL ici : laisse "
-                    "vide pour réutiliser automatiquement la base de données définie sur le thème "
-                    "— ne remplis ce champ que si CET exercice a besoin de données différentes. "
-                    "'sql_solution' est la requête correcte : le résultat attendu est calculé "
-                    "automatiquement en l'exécutant, puis comparé à la requête de l'étudiant."
-                ),
-            },
-        ),
         (
             "Visibilité par classe",
             {
@@ -95,6 +85,33 @@ class ExerciseAdmin(admin.ModelAdmin):
                     "doit lui aussi être visible). Vide par défaut = invisible pour tout le monde. "
                     "Réglage habituellement fait depuis la page /stats/visibilite/, ce champ sert "
                     "surtout de secours."
+                ),
+            },
+        ),
+        (
+            "Correction automatique — exercices Python",
+            {
+                "fields": (
+                    "function_name", "solution_code", "require_recursive", "extra_test_code",
+                ),
+                "description": (
+                    "Uniquement si Type = 'Python (fonction)'. Renseigner le nom de la fonction et "
+                    "le code de correction ci-dessous, puis ajouter les cas de test (juste en "
+                    "dessous) avec les arguments à essayer. Les deux derniers champs sont "
+                    "optionnels (voir leur propre description)."
+                ),
+            },
+        ),
+        (
+            "Correction automatique — exercices SQL",
+            {
+                "fields": ("sql_setup", "sql_solution"),
+                "description": (
+                    "Uniquement si Type = 'SQL (requête)'. Le champ sql_setup est optionnel ici : "
+                    "laisser vide pour réutiliser automatiquement la base de données définie sur le "
+                    "thème, et ne le remplir que si cet exercice a besoin de données différentes. "
+                    "Le champ sql_solution est la requête correcte : le résultat attendu est calculé "
+                    "automatiquement en l'exécutant, puis comparé à la requête de l'étudiant."
                 ),
             },
         ),

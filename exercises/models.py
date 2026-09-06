@@ -4,33 +4,39 @@ from django.utils import timezone
 
 
 class Theme(models.Model):
-    name = models.CharField(max_length=100)
+    # verbose_name sur chaque champ : sans lui, Django affiche dans l'admin le nom technique
+    # du champ tel quel (ex: "Order", "Sql setup") — en anglais, puisque c'est la langue du
+    # code. Ajouté systématiquement ici pour que la page d'admin soit entièrement en français
+    # (sauf termes usuels en info, ex: "slug", "SQL").
+    name = models.CharField("nom", max_length=100)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
-    order = models.PositiveIntegerField(default=0)
+    order = models.PositiveIntegerField("ordre", default=0)
     sql_setup = models.TextField(
+        "script SQL",
         blank=True,
         help_text=(
             "[SQL] Base de données partagée par défaut pour tous les exercices SQL de ce thème "
             "(instructions CREATE TABLE + INSERT). Un exercice peut définir son propre 'sql_setup' "
             "pour utiliser des données différentes ponctuellement, sinon celui du thème est utilisé. "
-            "Astuce : ajoute des commentaires SQL ('-- texte') après une table ou une colonne pour "
+            "Ajouter des commentaires SQL ('-- texte') après une table ou une colonne pour "
             "qu'ils apparaissent dans le résumé de schéma affiché aux étudiants."
         ),
     )
+    # Pas de help_text ici : la description du bloc "Visibilité par classe" (voir
+    # exercises/admin.py) dit déjà tout — un help_text ici ferait doublon (texte quasi
+    # identique répété une deuxième fois juste sous le champ).
     enabled_for_classes = models.ManyToManyField(
         "accounts.Classe",
+        verbose_name="classes",
         related_name="enabled_themes",
         blank=True,
-        help_text=(
-            "Classes pour lesquelles ce thème est visible. Vide par défaut = invisible "
-            "pour tout le monde (y compris un nouveau thème fraîchement créé) : réglage "
-            "à faire via la page /stats/visibilite/."
-        ),
     )
 
     class Meta:
         ordering = ["order", "name"]
+        verbose_name = "thème"
+        verbose_name_plural = "thèmes"
 
     def __str__(self):
         return self.name
@@ -92,32 +98,38 @@ class Exercise(models.Model):
         (SQL, "SQL (requête)"),
     ]
 
-    theme = models.ForeignKey(Theme, related_name="exercises", on_delete=models.CASCADE)
-    title = models.CharField(max_length=150)
+    theme = models.ForeignKey(Theme, verbose_name="thème", related_name="exercises", on_delete=models.CASCADE)
+    title = models.CharField("titre", max_length=150)
     slug = models.SlugField()
-    order = models.PositiveIntegerField(default=0)
-    statement = models.TextField(help_text="Énoncé de l'exercice (Markdown simple accepté).")
-    kind = models.CharField(max_length=10, choices=KIND_CHOICES, default=PYTHON)
+    order = models.PositiveIntegerField("ordre", default=0)
+    statement = models.TextField(
+        "énoncé", help_text="Énoncé de l'exercice (Markdown simple accepté)."
+    )
+    kind = models.CharField("type", max_length=10, choices=KIND_CHOICES, default=PYTHON)
     starter_code = models.TextField(
+        "code de départ",
         blank=True,
         help_text="Code de départ affiché dans l'éditeur (l'en-tête de la fonction, ou un commentaire SQL).",
     )
 
     # --- Champs pour les exercices Python (kind=PYTHON) ---
     function_name = models.CharField(
+        "nom de la fonction",
         max_length=100,
         blank=True,
         help_text="[Python] Nom de la fonction que l'étudiant doit écrire (ex: 'triple').",
     )
     solution_code = models.TextField(
+        "code de correction",
         blank=True,
         help_text=(
             "[Python] Code de correction : une implémentation complète et correcte de la fonction. "
-            "Le résultat attendu de chaque test (ci-dessous) est calculé automatiquement "
-            "en exécutant ce code — tu n'as qu'à indiquer les arguments à tester."
+            "Le résultat attendu de chaque test (ci-dessous) est calculé automatiquement en "
+            "exécutant ce code."
         ),
     )
     require_recursive = models.BooleanField(
+        "récursivité exigée",
         default=False,
         help_text=(
             "[Python] Si coché, on vérifie en plus (analyse statique du code, sans l'exécuter) "
@@ -126,6 +138,7 @@ class Exercise(models.Model):
         ),
     )
     extra_test_code = models.TextField(
+        "code de test supplémentaire",
         blank=True,
         help_text=(
             "[Python] Optionnel : code de test supplémentaire, exécuté après les tests habituels. "
@@ -139,14 +152,16 @@ class Exercise(models.Model):
 
     # --- Champs pour les exercices SQL (kind=SQL) ---
     sql_setup = models.TextField(
+        "script SQL",
         blank=True,
         help_text=(
             "[SQL] Optionnel : instructions SQL (CREATE TABLE + INSERT) propres à CET exercice, "
-            "si tu veux des données différentes de celles du thème. Laisse vide pour réutiliser "
+            "en cas de données différentes de celles du thème. Laisser vide pour réutiliser "
             "automatiquement le 'sql_setup' défini sur le thème."
         ),
     )
     sql_solution = models.TextField(
+        "solution SQL",
         blank=True,
         help_text=(
             "[SQL] La requête SQL correcte. Le résultat attendu est calculé automatiquement en "
@@ -154,20 +169,20 @@ class Exercise(models.Model):
         ),
     )
 
+    # Pas de help_text ici : la description du bloc "Visibilité par classe" (voir
+    # exercises/admin.py) dit déjà tout — voir la même remarque sur Theme.enabled_for_classes.
     enabled_for_classes = models.ManyToManyField(
         "accounts.Classe",
+        verbose_name="classes",
         related_name="enabled_exercises",
         blank=True,
-        help_text=(
-            "Classes pour lesquelles CET exercice précis est visible (en plus du thème, "
-            "qui doit lui aussi être visible). Vide par défaut = invisible pour tout le "
-            "monde : réglage à faire via la page /stats/visibilite/."
-        ),
     )
 
     class Meta:
         ordering = ["theme__order", "order"]
         unique_together = ("theme", "slug")
+        verbose_name = "exercice"
+        verbose_name_plural = "exercices"
 
     def __str__(self):
         return f"{self.theme.name} — {self.title}"
@@ -395,12 +410,15 @@ class Hint(models.Model):
 
     exercise = models.ForeignKey(Exercise, related_name="hints", on_delete=models.CASCADE)
     text = models.TextField(
+        "texte",
         help_text="Texte de l'indice (Markdown simple accepté, comme pour l'énoncé).",
     )
-    order = models.PositiveIntegerField(default=0)
+    order = models.PositiveIntegerField("ordre", default=0)
 
     class Meta:
         ordering = ["order", "id"]
+        verbose_name = "indice"
+        verbose_name_plural = "indices"
 
     def __str__(self):
         return f"{self.exercise.title} — indice #{self.order}"
@@ -411,16 +429,19 @@ class TestCase(models.Model):
 
     exercise = models.ForeignKey(Exercise, related_name="test_cases", on_delete=models.CASCADE)
     args = models.TextField(
+        "arguments",
         default="[]",
         help_text=(
             "Arguments à passer à la fonction, en syntaxe Python (pas JSON). "
             "Ex : [2, 3]  ou  ['bonjour']  ou  [True, None]  ou  [{'a': 1, 'b': 2}]  ou  [[1, 2, 3]]."
         ),
     )
-    order = models.PositiveIntegerField(default=0)
+    order = models.PositiveIntegerField("ordre", default=0)
 
     class Meta:
         ordering = ["order", "id"]
+        verbose_name = "cas de test"
+        verbose_name_plural = "cas de test"
 
     def clean(self):
         import ast

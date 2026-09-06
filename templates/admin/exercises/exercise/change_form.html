@@ -1,0 +1,38 @@
+{% extends "admin/change_form.html" %}
+{% comment %}
+Surcharge du template d'admin Django pour CET écran précis (ajout/modif d'un Exercise)
+uniquement — voir la discussion du 06/09/2026 : les "cas de test" (inline, une table à
+part car il peut y en avoir plusieurs par exercice — voir exercises/models.py) doivent
+apparaître juste après le bloc "Correction automatique — exercices Python", sans pour
+autant obliger à mettre ce bloc en dernier des fieldsets (ordre naturel restauré dans
+exercises/admin.py : Python avant SQL, puisqu'il y a plus d'exercices Python).
+
+Par défaut, Django rend TOUS les fieldsets d'abord (bloc field_sets), PUIS TOUS les
+inlines ensuite (bloc inline_field_sets) : impossible d'intercaler un inline entre deux
+fieldsets sans surcharger ce template. Ici, on ré-affiche les fieldsets un par un
+(comme le fait le template d'origine) et on insère l'inline "cas de test" juste après
+le fieldset dont le titre est "Correction automatique — exercices Python", puis on
+retire ce même inline de la boucle inline_field_sets pour ne pas l'afficher deux fois
+(les "indices" continuent d'apparaître normalement, à la toute fin).
+{% endcomment %}
+
+{% block field_sets %}
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" with heading_level=2 prefix="fieldset" id_prefix=0 id_suffix=forloop.counter0 %}
+  {% if fieldset.name == "Correction automatique — exercices Python" %}
+    {% for inline_admin_formset in inline_admin_formsets %}
+      {% if inline_admin_formset.opts.verbose_name == "cas de test" %}
+        {% include inline_admin_formset.opts.template %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+{% endblock %}
+
+{% block inline_field_sets %}
+{% for inline_admin_formset in inline_admin_formsets %}
+  {% if inline_admin_formset.opts.verbose_name != "cas de test" %}
+    {% include inline_admin_formset.opts.template %}
+  {% endif %}
+{% endfor %}
+{% endblock %}

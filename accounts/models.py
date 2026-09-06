@@ -28,11 +28,13 @@ class Classe(models.Model):
     """Une classe d'élèves (ex: "Terminale NSI 1"). Uniquement utile pour les
     utilisateurs de rôle ELEVE : un prof n'appartient à aucune classe."""
 
-    name = models.CharField(max_length=100)
+    name = models.CharField("nom", max_length=100)
     slug = models.SlugField(unique=True)
 
     class Meta:
         ordering = ["name"]
+        verbose_name = "classe"
+        verbose_name_plural = "classes"
 
     def __str__(self):
         return self.name
@@ -77,8 +79,8 @@ class User(AbstractUser):
         help_text="Facultatif. Les comptes élèves importés par CSV n'en ont pas.",
     )
 
-    display_name = models.CharField(max_length=80, blank=True)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=ELEVE)
+    display_name = models.CharField("nom affiché", max_length=80, blank=True)
+    role = models.CharField("rôle", max_length=10, choices=ROLE_CHOICES, default=ELEVE)
     classe = models.ForeignKey(
         Classe,
         related_name="eleves",

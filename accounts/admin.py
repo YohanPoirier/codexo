@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Classe, DemandeReinitialisation
+
+from codexo.admin_mixins import SimplifieIndicationCtrlMixin
+
+from .models import User, Classe
 
 
 @admin.register(Classe)
@@ -10,7 +13,14 @@ class ClasseAdmin(admin.ModelAdmin):
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(SimplifieIndicationCtrlMixin, BaseUserAdmin):
+    # "groups" et "user_permissions" sont hérités de BaseUserAdmin (filter_horizontal) :
+    # même rappel "sur un Mac" hors-sujet que sur Theme/Exercise.enabled_for_classes, mais
+    # ici la première phrase du help_text (ex: "Les groupes dont fait partie cet
+    # utilisateur...") est utile et doit être conservée — voir CHAMPS_AVEC_MENTION_MAC_A_RETIRER
+    # dans codexo/admin_mixins.py.
+    CHAMPS_AVEC_MENTION_MAC_A_RETIRER = ("groups", "user_permissions")
+
     ordering = ("identifiant",)
     list_display = (
         "identifiant", "display_name", "role", "classe", "is_staff",
@@ -19,7 +29,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ("role", "classe", "is_staff", "doit_changer_mot_de_passe")
     fieldsets = (
         (None, {"fields": ("identifiant", "password")}),
-        ("Infos", {"fields": ("display_name", "email", "role", "classe")}),
+        ("Informations", {"fields": ("display_name", "email", "role", "classe")}),
         ("Mot de passe", {"fields": ("doit_changer_mot_de_passe",)}),
         (
             "Permissions",
@@ -44,13 +54,6 @@ class UserAdmin(BaseUserAdmin):
     )
     search_fields = ("identifiant", "display_name", "email")
 
-
-@admin.register(DemandeReinitialisation)
-class DemandeReinitialisationAdmin(admin.ModelAdmin):
-    """Enregistré aussi dans l'admin par commodité/secours, même si le circuit
-    normal passe par la page dédiée /demandes-reinitialisation/ (accessible depuis
-    le menu pour tout compte is_staff)."""
-
-    list_display = ("identifiant_saisi", "email_contact", "date_demande", "traite")
-    list_filter = ("traite",)
-    readonly_fields = ("date_demande",)
+# DemandeReinitialisation n'est plus enregistrée ici (retiré le 06/09/2026) : le seul
+# circuit de traitement reste la page dédiée /demandes-reinitialisation/, pour éviter
+# d'avoir deux façons de faire la même chose dans deux endroits différents.

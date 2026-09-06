@@ -166,18 +166,22 @@ LOGGING = {
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
+# Mêmes 4 validateurs que Django, importés depuis accounts/password_validation.py plutôt
+# que django.contrib.auth.password_validation directement : seul le texte d'aide affiché
+# dans l'admin est modifié (vouvoiement "Votre mot de passe..." -> impersonnel "Le mot de
+# passe...", voir ce fichier), la validation elle-même est strictement identique.
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'accounts.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'accounts.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'accounts.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'accounts.password_validation.NumericPasswordValidator',
     },
 ]
 
