@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Demandes de réinitialisation — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow">Admin</span>
+<h1>Demandes de réinitialisation de mot de passe</h1>
+
+<div class="table-scroll">
+  <table class="stats-table">
+    <thead>
+      <tr>
+        <th>Identifiant saisi</th>
+        <th>Email de contact</th>
+        <th>Date de la demande</th>
+        <th>Compte trouvé</th>
+        <th>Statut</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ligne in lignes %}
+        <tr>
+          <td>{{ ligne.demande.identifiant_saisi }}</td>
+          <td>{{ ligne.demande.email_contact }}</td>
+          <td>{{ ligne.demande.date_demande }}</td>
+          <td>
+            {% if ligne.user_id %}
+              <a href="/admin/accounts/user/{{ ligne.user_id }}/change/">Voir la fiche</a>
+            {% else %}
+              <span class="stats-warn">Aucun compte trouvé</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if ligne.demande.traite %}
+              <span class="stats-yes">Traitée</span>
+            {% else %}
+              <span class="stats-no">En attente</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not ligne.demande.traite %}
+              <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="demande_id" value="{{ ligne.demande.id }}">
+                <button type="submit">Marquer comme traitée</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6">Aucune demande pour le moment.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

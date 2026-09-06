@@ -281,13 +281,16 @@ def stats(request):
     classe_id = request.GET.get("classe_id")
     selected_classe = get_object_or_404(Classe, id=classe_id) if classe_id else None
 
-    # role=ELEVE plutôt que is_superuser=False : plus fiable maintenant que les
-    # profs sont automatiquement admins (is_superuser=True), et ça n'exclut pas
-    # à tort un compte qu'on aurait manuellement passé staff sans le déclarer prof.
+    # role=ELEVE plutôt que is_staff=False : plus fiable, et ça n'exclut pas à tort
+    # un compte qu'on aurait manuellement passé staff sans le déclarer prof.
     students = User.objects.filter(role=User.ELEVE)
     if selected_classe:
         students = students.filter(classe=selected_classe)
-    students = students.order_by("email")
+    # Tri par nom d'affichage plutôt que par email : les élèves importés par CSV
+    # n'ont plus d'email du tout depuis la refonte du 06/09/2026 (voir
+    # contexte-technique.md), un tri par email les laisserait dans un ordre non
+    # déterministe (valeurs NULL).
+    students = students.order_by("display_name", "identifiant")
 
     exercises = Exercise.objects.select_related("theme").order_by("theme__order", "order")
 
@@ -324,7 +327,7 @@ def stats(request):
         if exercise_id:
             selected_exercise = get_object_or_404(Exercise, id=exercise_id)
             for student in students:
-                rows.append(_stats_row(student, selected_exercise, label=student.display_name or student.email))
+                rows.append(_stats_row(student, selected_exercise, label=student.display_name or student.identifiant))
 
     return render(
         request,

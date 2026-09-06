@@ -94,10 +94,16 @@ class Command(BaseCommand):
 
             admin_trouve = True
             if admin_email and admin_password:
+                # Depuis la refonte du 06/09/2026 (voir contexte-technique.md),
+                # "identifiant" est le vrai USERNAME_FIELD (email n'est plus unique
+                # ni obligatoire) : on l'utilise donc comme clé de recherche/connexion
+                # pour ce compte de bootstrap, en reprenant l'email comme valeur (ça
+                # reste un identifiant lisible et pratique pour un compte admin).
                 admin, created = User.objects.get_or_create(
-                    email=admin_email,
-                    defaults={"is_staff": True, "is_superuser": True},
+                    identifiant=admin_email,
+                    defaults={"email": admin_email, "is_staff": True, "is_superuser": True},
                 )
+                admin.email = admin_email
                 admin.is_staff = True
                 admin.is_superuser = True
                 admin.set_password(admin_password)
@@ -135,10 +141,13 @@ class Command(BaseCommand):
         student_email = os.environ.get("DJANGO_TEST_STUDENT_EMAIL")
         student_password = os.environ.get("DJANGO_TEST_STUDENT_PASSWORD")
         if student_email and student_password:
+            # Même remarque que pour les admins ci-dessus : "identifiant" (et non
+            # plus "email") est désormais le vrai USERNAME_FIELD.
             student, created = User.objects.get_or_create(
-                email=student_email,
-                defaults={"display_name": "Élève test"},
+                identifiant=student_email,
+                defaults={"email": student_email, "display_name": "Élève test"},
             )
+            student.email = student_email
             student.set_password(student_password)
             student.save()
             action = "créé" if created else "mis à jour"

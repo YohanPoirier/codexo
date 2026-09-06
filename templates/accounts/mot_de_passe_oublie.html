@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Mot de passe oublié — Codexo{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <span class="eyebrow">Besoin d'aide</span>
+  <h2>Mot de passe oublié</h2>
+  <p>Indique ton identifiant et une adresse email où l'on peut te répondre : ton professeur te recontactera avec un nouveau mot de passe.</p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <p>
+        <label>{{ field.label }}</label>
+        {{ field }}
+
+        {% if field.errors %}
+          {{ field.errors }}
+        {% endif %}
+      </p>
+    {% endfor %}
+
+    <button type="submit">Envoyer la demande</button>
+  </form>
+
+  <div class="switch">
+    <a href="{% url 'login' %}">Retour à la connexion</a>
+  </div>
+</div>
+{% endblock %}

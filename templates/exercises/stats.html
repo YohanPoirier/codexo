@@ -27,7 +27,7 @@
   <select name="student_id" onchange="this.form.submit()" {% if mode != "student" %}class="stats-select-hidden"{% endif %}>
     <option value="">— Choisir un étudiant —</option>
     {% for s in students %}
-      <option value="{{ s.id }}" {% if selected_student.id == s.id %}selected{% endif %}>{{ s.display_name|default:s.email }}</option>
+      <option value="{{ s.id }}" {% if selected_student.id == s.id %}selected{% endif %}>{{ s.display_name|default:s.identifiant }}</option>
     {% endfor %}
   </select>
 

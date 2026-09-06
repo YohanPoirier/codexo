@@ -63,6 +63,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # Ajouté le 06/09/2026 (refonte de l'authentification, voir contexte-technique.md) :
+    # doit rester APRÈS AuthenticationMiddleware (a besoin de request.user déjà résolu).
+    'accounts.middleware.ForcerChangementMotDePasseMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

@@ -1,14 +1,23 @@
 from django.contrib import admin
 from django.urls import path
-from accounts.views import EmailLoginView, signup
+from accounts.views import (
+    IdentifiantLoginView,
+    ChangerMotDePasseView,
+    demande_mot_de_passe_oublie,
+    mot_de_passe_oublie_envoye,
+    demandes_reinitialisation,
+)
 from django.contrib.auth.views import LogoutView
 from exercises import views as ex_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', EmailLoginView.as_view(), name='login'),
+    path('login/', IdentifiantLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('signup/', signup, name='signup'),
+    path('changer-mot-de-passe/', ChangerMotDePasseView.as_view(), name='changer_mot_de_passe'),
+    path('mot-de-passe-oublie/', demande_mot_de_passe_oublie, name='mot_de_passe_oublie'),
+    path('mot-de-passe-oublie/envoye/', mot_de_passe_oublie_envoye, name='mot_de_passe_oublie_envoye'),
+    path('demandes-reinitialisation/', demandes_reinitialisation, name='demandes_reinitialisation'),
     path('', ex_views.theme_list, name='theme_list'),
     path('profil/', ex_views.profile, name='profile'),
     path('stats/', ex_views.stats, name='stats'),
@@ -20,3 +29,6 @@ urlpatterns = [
     path('api/exercise/<int:exercise_id>/abandon/', ex_views.abandon_exercise, name='abandon_exercise'),
     path('api/hint/<int:hint_id>/viewed/', ex_views.hint_viewed, name='hint_viewed'),
 ]
+# Suppression de /signup/ (06/09/2026) : plus d'inscription publique, pour aucun
+# rôle. Voir contexte-technique.md — comptes créés uniquement via /admin/ (profs) ou
+# la commande "importer_eleves" (élèves).
