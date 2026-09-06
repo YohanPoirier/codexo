@@ -111,6 +111,57 @@ DATABASES = {
 }
 
 
+# Logging
+# https://docs.djangoproject.com/en/6.0/topics/logging/
+#
+# Ajouté le 06/09/2026 : par défaut, Django n'affiche les erreurs sur la console
+# que si DEBUG=True, et se contente sinon d'essayer de les envoyer par email aux
+# adresses listées dans ADMINS (vide ici) — en prod, une erreur 500 ne laissait
+# donc aujourd'hui absolument aucune trace consultable. Ce réglage remplace ce
+# comportement par : la console (toujours, même en prod — utile si le process
+# est supervisé par systemd/Apache, ses logs finissent dans le journal du
+# service) + un fichier dédié dans DATA_DIR (persistant, lisible avec un simple
+# tail/grep, avec rotation automatique pour ne pas grossir indéfiniment).
+LOG_DIR = DATA_DIR / 'logs'
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} {levelname} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'fichier': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOG_DIR / 'django.log',
+            'maxBytes': 5 * 1024 * 1024,  # 5 Mo par fichier...
+            'backupCount': 5,             # ...avant rotation (django.log.1, .2, ...jusqu'à .5)
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        # Reprend TOUT ce qui passe par le logger "django" (dont les erreurs 500,
+        # via son enfant "django.request" qui remonte ici par défaut) : remplace
+        # entièrement la configuration par défaut de Django pour ce logger (voir
+        # DEFAULT_LOGGING dans le code source de Django, fusionné avec ce
+        # dictionnaire au démarrage).
+        'django': {
+            'handlers': ['console', 'fichier'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+}
+
+
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
