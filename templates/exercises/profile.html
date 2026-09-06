@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load exercise_extras %}
 {% block title %}Ma progression — Codexo{% endblock %}
 {% block content %}
 <span class="eyebrow">Ton parcours</span>
@@ -6,8 +7,15 @@
 <p>{{ results|length }} / {{ total_exercises }} exercices réussis au total.</p>
 {% for r in results %}
   <div class="profile-row">
-    <span>{{ r.exercise.theme.name }} — {{ r.exercise.title }}</span>
-    <span>{{ r.created_at|date:"d/m/Y H:i" }}</span>
+    <div class="profile-row-main">
+      <span>{{ r.exercise.theme.name }} — {{ r.exercise.title }}</span>
+      <span>{{ r.created_at|date:"d/m/Y H:i" }}</span>
+    </div>
+    <div class="profile-row-stats">
+      {{ r.nb_indices }} indice{{ r.nb_indices|pluralize }} utilisé{{ r.nb_indices|pluralize }}
+      · {{ r.nb_abandons }} abandon{{ r.nb_abandons|pluralize }}
+      · Temps passé : {{ r.temps_total|duree_lisible }}
+    </div>
   </div>
 {% empty %}
   <p>Aucun exercice réussi pour l'instant. À toi de jouer !</p>

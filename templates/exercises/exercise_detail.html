@@ -5,6 +5,7 @@
 <span class="eyebrow"><a href="{% url 'exercise_list' theme.slug %}">← {{ theme.name }}</a></span>
 <h1>{{ exercise.title }}</h1>
 
+<span class="section-label">Énoncé</span>
 <div class="statement">
   {{ exercise.statement|render_statement }}
   {% if hints %}
@@ -30,26 +31,31 @@
     <p>Vous pourrez retenter cet exercice à partir du <strong>{{ retry_at|date:"d/m/Y à H:i" }}</strong>. En attendant, il ne sera plus consultable.</p>
   </div>
 {% else %}
-  <div class="editor-panel">
-    <label for="code-editor">{% if exercise.kind == "sql" %}Ta requête SQL{% else %}Ton code{% endif %}</label>
-    <textarea id="code-editor" spellcheck="false"></textarea>
+  <span class="section-label">Code</span>
+  <div class="code-block">
+    <div class="editor-panel">
+      <textarea id="code-editor" spellcheck="false"></textarea>
+    </div>
+
+    <div class="actions">
+      <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
+      <button id="reset-btn" class="reset-btn" type="button" title="Revenir au code de départ">Réinitialiser</button>
+      <button id="save-btn" class="reset-btn" type="button" title="Enregistrer maintenant">Enregistrer</button>
+      <span id="save-confirm" class="save-confirm">Enregistré ✓</span>
+    </div>
+
+    <div class="code-block-secondary">
+      <button id="abandon-btn" class="abandon-link" type="button">Abandonner cet exercice</button>
+      <span class="secondary-sep">·</span>
+      {% if pending_demande_aide %}
+        <p class="aide-pending">Une demande d'aide est déjà en attente pour cet exercice. <a href="{% url 'mes_demandes_aide' %}">Voir mes demandes d'aide</a>.</p>
+      {% else %}
+        <button id="aide-btn" class="abandon-link" type="button">Demander de l'aide à un professeur</button>
+      {% endif %}
+    </div>
   </div>
 
-  <div class="actions">
-    <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
-    <button id="reset-btn" class="reset-btn" type="button" title="Revenir au code de départ">Réinitialiser</button>
-    <button id="save-btn" class="reset-btn" type="button" title="Enregistrer maintenant">Enregistrer</button>
-    <span id="save-confirm" class="save-confirm">Enregistré ✓</span>
-  </div>
-
-  <button id="abandon-btn" class="abandon-link" type="button">Abandonner cet exercice</button>
-
-  {% if pending_demande_aide %}
-    <p class="aide-pending">Une demande d'aide est déjà en attente pour cet exercice. <a href="{% url 'mes_demandes_aide' %}">Voir mes demandes d'aide</a>.</p>
-  {% else %}
-    <button id="aide-btn" class="abandon-link" type="button">Demander de l'aide à un professeur</button>
-  {% endif %}
-
+  <span id="tests-label" class="section-label hidden">Tests</span>
   <div id="result-box" class="result-box hidden"></div>
 
   <div id="solution-reveal" class="solution-reveal" hidden>

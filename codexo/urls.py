@@ -21,6 +21,7 @@ urlpatterns = [
     path('demandes-reinitialisation/', demandes_reinitialisation, name='demandes_reinitialisation'),
     path('importer-eleves/', importer_eleves_view, name='importer_eleves'),
     path('', ex_views.theme_list, name='theme_list'),
+    path('guide/', ex_views.guide, name='guide'),
     path('profil/', ex_views.profile, name='profile'),
     path('mes-demandes-aide/', ex_views.mes_demandes_aide, name='mes_demandes_aide'),
     path('demandes-aide/', ex_views.demandes_aide, name='demandes_aide'),

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Guide — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow">Bien démarrer</span>
+<h1>Guide</h1>
+
+<h2>Choisir un exercice</h2>
+<p>
+  Les exercices sont classés par thème (« Thèmes » dans le menu). Chaque thème affiche sa
+  progression — le nombre d'exercices déjà réussis — et se déplie sur la liste de ses
+  exercices, chacun marqué comme réussi ou non.
+</p>
+
+<h2>Écrire et vérifier son code</h2>
+<p>
+  Chaque exercice a son propre éditeur de code, pré-rempli avec l'en-tête de la fonction, et
+  parfois une ou plusieurs fonctions utiles. Le bouton <strong>Vérifier</strong> exécute le
+  code face à une série de tests : chaque ligne de résultat indique si le test correspondant
+  est réussi ou non, avec un message expliquant ce qui était attendu.
+</p>
+<p>
+  Quand votre programme utilise <code>print()</code>, un menu « Ce qui a été affiché »
+  permet d'en consulter les résultats.
+</p>
+<p>
+  Le code est enregistré automatiquement en quittant la page, et peut aussi être enregistré
+  à la main à tout moment (bouton <strong>Enregistrer</strong>).
+</p>
+<p>
+  Lorsque tous les tests sont réussis, une proposition de correction est affichée. Celle-ci
+  peut parfois sensiblement différer de votre réponse : ce n'est pas grave ! Prenez le temps
+  de lire ces propositions qui peuvent être instructives.
+</p>
+
+<h2>Les indices</h2>
+<p>
+  Quand des indices existent pour un exercice, un bouton <strong>Indice</strong> apparaît
+  sous l'énoncé. Chaque clic révèle l'indice suivant, un par un.
+</p>
+
+<h2>Bloqué sur un exercice ?</h2>
+<p>Deux options, selon la situation :</p>
+<p>
+  <strong>Abandonner cet exercice</strong> affiche une proposition de solution complète.
+  L'exercice reste alors verrouillé pendant 2h (pour éviter de « réciter » la solution vue
+  précédemment).
+</p>
+<p>
+  <strong>Demander de l'aide à un professeur</strong> envoie le code actuel (avec un
+  commentaire optionnel expliquant où ça bloque) à l'équipe de professeurs, sans verrouiller
+  l'exercice. La réponse sera visible sur la page « Mes demandes d'aide ».
+</p>
+
+<h2>Suivre sa progression</h2>
+<p>
+  La page « Progression » liste les exercices réussis, avec pour chacun le nombre d'indices
+  utilisés, le nombre d'abandons et le temps passé dessus.
+</p>
+{% endblock %}

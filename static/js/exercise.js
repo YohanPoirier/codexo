@@ -2,6 +2,7 @@
   const editor = document.getElementById("code-editor");
   const runBtn = document.getElementById("run-btn");
   const resultBox = document.getElementById("result-box");
+  const testsLabel = document.getElementById("tests-label");
   const solutionBox = document.getElementById("solution-reveal");
   const solutionCodeEl = document.getElementById("solution-reveal-code");
 
@@ -41,7 +42,14 @@
       .replace(/>/g, "&gt;");
   }
 
+  // Révèle le petit titre "Tests" (masqué par défaut, voir exercise_detail.html) : n'a
+  // de sens qu'une fois qu'un résultat existe, pas dès le chargement de la page.
+  function revealTestsLabel() {
+    if (testsLabel) testsLabel.classList.remove("hidden");
+  }
+
   function showRuntimeError(text) {
+    revealTestsLabel();
     resultBox.classList.remove("hidden", "all-success", "all-error");
     resultBox.classList.add("all-error");
     resultBox.innerHTML =
@@ -58,11 +66,12 @@
       .join("\n");
   }
 
-  // Mémorise quels menus "Affichages" sont ouverts, pour les garder ouverts
+  // Mémorise quels menus "Ce qui a été affiché" sont ouverts, pour les garder ouverts
   // d'une vérification à l'autre (les tests restent dans le même ordre).
   const openPrintIndices = new Set();
 
   function showResultLines(items) {
+    revealTestsLabel();
     resultBox.classList.remove("hidden", "all-success", "all-error");
     const allOk = items.length > 0 && items.every((it) => it.ok);
     resultBox.classList.add(allOk ? "all-success" : "all-error");
@@ -72,7 +81,7 @@
         const printsBlock = it.printed
           ? '<details class="prints-toggle" data-index="' + i + '"' +
             (openPrintIndices.has(i) ? " open" : "") + ">" +
-            '<summary>Affichages <span class="info-dot" title="Ce que print() a affiché pendant ce test">?</span></summary>' +
+            "<summary>Ce qui a été affiché</summary>" +
             '<pre class="prints-output">' + escapeHtml(prefixLines(it.printed)) + "</pre>" +
             "</details>"
           : "";

@@ -54,7 +54,7 @@
       .map((it) => {
         const printsBlock = it.printed
           ? '<details class="prints-toggle">' +
-            '<summary>Affichages <span class="info-dot" title="Ce que print() a affiché pendant ce test">?</span></summary>' +
+            "<summary>Ce qui a été affiché</summary>" +
             '<pre class="prints-output">' + escapeHtml(prefixLines(it.printed)) + "</pre>" +
             "</details>"
           : "";

@@ -189,6 +189,25 @@ main { padding: 48px 0 80px; }
 
 .editor-panel { margin-bottom: 18px; }
 
+/* --- Bloc code (page exercice) : éditeur + actions + liens "Abandonner"/"Demander de
+   l'aide" réunis dans une même carte, pour qu'ils restent visuellement rattachés à la
+   zone de code plutôt que de sembler flotter en dessous, posés au hasard (retour du
+   06/09/2026). Pas de label au-dessus de l'éditeur ici : le rôle de la zone est évident
+   (seul champ de saisie de la page, juste sous l'énoncé) — voir demande_aide_detail.html
+   pour un cas différent où le label reste utile ("Code soumis par l'élève"). --- */
+.code-block {
+  background: var(--paper-alt); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 22px 24px; margin-bottom: 22px;
+}
+.code-block .editor-panel { margin-bottom: 0; }
+
+.code-block-secondary {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px;
+  margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--rule);
+  font-size: .85rem;
+}
+.secondary-sep { color: var(--rule); }
+
 .hints-panel { margin-top: 16px; }
 .hint-btn {
   font-family: 'JetBrains Mono', monospace; font-size: .82rem;
@@ -212,6 +231,14 @@ main { padding: 48px 0 80px; }
   border: 1px solid var(--rule); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: .92em;
 }
 .editor-panel label { display: block; font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--ink-soft); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .06em; }
+
+/* --- Titres légers de section (page exercice : Énoncé / Code / Tests) : même style que
+   l'ancien label "Ton code" au-dessus de l'éditeur, plutôt que des h2 (trop lourds ici). --- */
+.section-label {
+  display: block; font-family: 'JetBrains Mono', monospace; font-size: .78rem;
+  color: var(--ink-soft); margin: 24px 0 8px; text-transform: uppercase; letter-spacing: .06em;
+}
+.section-label.hidden { display: none; }
 textarea#code-editor {
   width: 100%; min-height: 220px; font-family: 'JetBrains Mono', monospace; font-size: .92rem;
   background: var(--indigo-deep); color: #eef1fb; border: none; border-radius: var(--radius);
@@ -246,9 +273,10 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
   .save-confirm { text-align: center; }
 }
 
-/* --- Abandonner : lien discret, à part de la rangée d'actions du quotidien --- */
+/* --- Abandonner / Demander de l'aide : liens discrets, réunis sur une même ligne dans
+   .code-block-secondary (séparés par .secondary-sep) plutôt qu'empilés --- */
 .abandon-link {
-  display: block; margin-top: 16px; background: none; border: none; padding: 0;
+  display: inline; margin: 0; background: none; border: none; padding: 0;
   font-family: 'Inter', system-ui, sans-serif; font-size: .85rem; color: var(--ink-soft);
   text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
 }
@@ -346,11 +374,6 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
   cursor: pointer; color: inherit; opacity: .75; user-select: none;
 }
 .prints-toggle summary:hover { opacity: 1; }
-.info-dot {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 14px; height: 14px; border-radius: 50%; border: 1px solid currentColor;
-  font-size: .7rem; font-weight: 700; margin-left: 4px; cursor: help; opacity: .8;
-}
 .prints-output {
   background: rgba(255,255,255,.6); border: 1px solid currentColor; border-radius: 6px;
   padding: 8px 10px; margin: 6px 0 0; white-space: pre-wrap; word-break: break-word;
@@ -395,7 +418,9 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
 .auth-card .switch { margin-top: 18px; font-size: .88rem; text-align: center; color: var(--ink-soft); }
 .errorlist { color: var(--err); font-size: .82rem; list-style: none; padding: 0; margin: 4px 0 0; }
 
-.profile-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed var(--rule); }
+.profile-row { padding: 12px 0; border-bottom: 1px dashed var(--rule); }
+.profile-row-main { display: flex; justify-content: space-between; }
+.profile-row-stats { font-size: .85rem; color: var(--ink-soft); margin-top: 4px; }
 .starter-hint { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--ink-soft); margin-top: -6px; margin-bottom: 18px; }
 
 /* --- Résumé de schéma SQL (auto-généré depuis sql_setup) --- */
@@ -639,7 +664,7 @@ table.schema-columns code {
 
 /* --- Demandes d'aide (élève <-> profs) --- */
 .aide-pending {
-  margin-top: 16px; font-size: .85rem; color: var(--ink-soft);
+  margin: 0; font-size: .85rem; color: var(--ink-soft);
 }
 .aide-pending a { color: var(--indigo); }
 .aide-label {

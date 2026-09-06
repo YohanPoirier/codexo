@@ -168,6 +168,14 @@ def abandon_exercise(request, exercise_id):
 
 
 @login_required
+def guide(request):
+    """Page statique expliquant le fonctionnement du site aux étudiants (thèmes/exercices,
+    éditeur et bouton Vérifier, indices, abandon vs demande d'aide, page Progression).
+    Pas de contenu dynamique : le texte vit entièrement dans le template."""
+    return render(request, "exercises/guide.html")
+
+
+@login_required
 def profile(request):
     all_success = (
         Result.objects.filter(user=request.user, success=True)
@@ -180,6 +188,14 @@ def profile(request):
         if r.exercise_id not in seen:
             seen.add(r.exercise_id)
             results.append(r)
+    # Indices utilisés / abandons / temps passé, par exercice réussi (voir _stats_row,
+    # plus bas — même fonction que pour la page de stats réservée aux profs, réutilisée
+    # ici pour rester cohérent sur la façon dont chaque indicateur est calculé).
+    for r in results:
+        row = _stats_row(request.user, r.exercise, label=r.exercise.title)
+        r.nb_indices = row["nb_indices"]
+        r.nb_abandons = row["nb_abandons"]
+        r.temps_total = row["temps_total"]
     total_exercises = Exercise.objects.count()
     return render(
         request,
@@ -322,20 +338,26 @@ def demande_aide_detail(request, demande_id):
 def _stats_row(user, exercise, label):
     """Construit une ligne de la page de stats pour un couple (user, exercise) donné.
     Chaque indicateur est calculé INDÉPENDAMMENT des autres (pas de logique croisée du
-    type "réussi si a vu le corrigé") : ce sont des faits distincts qu'on affiche côte à côte."""
+    type "réussi si a vu le corrigé") : ce sont des faits distincts qu'on affiche côte à côte.
+
+    Réutilisée aussi par la vue `profile` (page "Ma progression" de l'élève, voir plus haut) :
+    nb_indices/nb_abandons/temps_total y sont affichés par exercice réussi."""
     results = Result.objects.filter(user=user, exercise=exercise)
     reussi = results.filter(success=True).exists()
     nb_essais = results.filter(is_attempt=True).count()
     temps_total = results.aggregate(total=Sum("time_seconds"))["total"] or 0
     nb_indices = HintReveal.objects.filter(user=user, hint__exercise=exercise).count()
-    corrige_vu = Abandonment.objects.filter(user=user, exercise=exercise).exists()
+    nb_abandons = Abandonment.objects.filter(user=user, exercise=exercise).count()
     return {
         "label": label,
         "reussi": reussi,
         "nb_essais": nb_essais,
         "temps_total": temps_total,
         "nb_indices": nb_indices,
-        "corrige_vu": corrige_vu,
+        "nb_abandons": nb_abandons,
+        # Gardé pour stats.html (colonne "Corrigé vu"), maintenant dérivé de nb_abandons
+        # plutôt que d'une requête .exists() séparée sur la même table.
+        "corrige_vu": nb_abandons > 0,
     }
 
 
