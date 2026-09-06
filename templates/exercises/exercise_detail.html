@@ -44,6 +44,12 @@
 
   <button id="abandon-btn" class="abandon-link" type="button">Abandonner cet exercice</button>
 
+  {% if pending_demande_aide %}
+    <p class="aide-pending">Une demande d'aide est déjà en attente pour cet exercice. <a href="{% url 'mes_demandes_aide' %}">Voir mes demandes d'aide</a>.</p>
+  {% else %}
+    <button id="aide-btn" class="abandon-link" type="button">Demander de l'aide à un professeur</button>
+  {% endif %}
+
   <div id="result-box" class="result-box hidden"></div>
 
   <div id="solution-reveal" class="solution-reveal" hidden>
@@ -65,6 +71,18 @@
     </div>
   </div>
 
+  <div id="aide-modal" class="modal-overlay">
+    <div class="modal-box">
+      <p>Ton code actuel sera envoyé à l'équipe de professeurs. Tu peux préciser où tu bloques ci-dessous (facultatif) — tu recevras la réponse sur ta page « Mes demandes d'aide ».</p>
+      <label for="aide-commentaire" class="aide-label">Commentaire (facultatif)</label>
+      <textarea id="aide-commentaire" class="aide-textarea" rows="3" placeholder="Ex : je ne comprends pas l'erreur à la ligne 4"></textarea>
+      <div class="modal-actions">
+        <button type="button" id="aide-envoyer" class="modal-confirm aide-confirm">Envoyer</button>
+        <button type="button" id="aide-cancel" class="modal-cancel">Annuler</button>
+      </div>
+    </div>
+  </div>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
@@ -80,6 +98,8 @@
   // "/<vrai_id>/" au moment du clic (voir hint-btn dans exercise.js).
   const HINT_VIEWED_URL_TEMPLATE = "{% url 'hint_viewed' 0 %}";
   const LAST_SUBMITTED_CODE = {% if last_result %}"{{ last_result.submitted_code|escapejs }}"{% else %}null{% endif %};
+  const DEMANDER_AIDE_URL = "{% url 'demander_aide' exercise.id %}";
+  const MES_DEMANDES_AIDE_URL = "{% url 'mes_demandes_aide' %}";
   </script>
   <script src="{% static 'js/exercise.js' %}"></script>
 {% endif %}

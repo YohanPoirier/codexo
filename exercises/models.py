@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 
 class Theme(models.Model):
@@ -502,3 +503,62 @@ class HintReveal(models.Model):
 
     def __str__(self):
         return f"{self.user} a vu l'indice #{self.hint.order} de {self.hint.exercise}"
+
+
+class DemandeAide(models.Model):
+    """Une demande d'aide envoyée par un étudiant bloqué sur un exercice : le code qu'il a
+    soumis, accompagné d'un commentaire optionnel. Un prof peut ensuite tester ce code
+    lui-même (page dédiée, voir demande_aide_detail dans views.py) puis répondre ; l'étudiant
+    voit la réponse sur sa page "Mes demandes d'aide" — pas d'email, comme pour le reste du
+    site (voir la refonte auth du 06/09/2026 dans contexte-technique.md).
+
+    Un étudiant ne peut avoir qu'UNE SEULE demande en attente (traite=False) à la fois sur un
+    même exercice : en renvoyer une nouvelle remplace la précédente au lieu d'en empiler une
+    deuxième (voir la méthode de classe `envoyer` ci-dessous)."""
+
+    eleve = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="demandes_aide", on_delete=models.CASCADE
+    )
+    exercise = models.ForeignKey(Exercise, related_name="demandes_aide", on_delete=models.CASCADE)
+    code_soumis = models.TextField()
+    commentaire = models.TextField(blank=True)
+    date_demande = models.DateTimeField(auto_now_add=True)
+    traite = models.BooleanField(default=False)
+    reponse = models.TextField(blank=True)
+    traite_le = models.DateTimeField(null=True, blank=True)
+    traite_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="demandes_aide_traitees",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    class Meta:
+        ordering = ["-date_demande"]
+
+    def __str__(self):
+        statut = "traitée" if self.traite else "en attente"
+        return f"{self.eleve} — {self.exercise} ({statut})"
+
+    @classmethod
+    def envoyer(cls, eleve, exercise, code_soumis, commentaire):
+        """Crée une nouvelle demande, ou REMPLACE celle déjà en attente de cet élève sur ce
+        même exercice (voir la docstring de la classe), plutôt que d'en empiler une deuxième."""
+        existante = cls.objects.filter(eleve=eleve, exercise=exercise, traite=False).first()
+        if existante is not None:
+            existante.code_soumis = code_soumis
+            existante.commentaire = commentaire
+            existante.date_demande = timezone.now()
+            existante.save(update_fields=["code_soumis", "commentaire", "date_demande"])
+            return existante
+        return cls.objects.create(
+            eleve=eleve, exercise=exercise, code_soumis=code_soumis, commentaire=commentaire,
+        )
+
+    def repondre(self, reponse, prof):
+        self.reponse = reponse
+        self.traite = True
+        self.traite_le = timezone.now()
+        self.traite_par = prof
+        self.save(update_fields=["reponse", "traite", "traite_le", "traite_par"])

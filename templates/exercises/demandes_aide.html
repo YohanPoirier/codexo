@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Demandes d'aide — Codexo{% endblock %}
+{% block content %}
+<h1>Demandes d'aide</h1>
+
+{% if demandes %}
+<div class="table-scroll">
+<table class="stats-table">
+  <thead>
+    <tr>
+      <th>Élève</th>
+      <th>Exercice</th>
+      <th>Date</th>
+      <th>Statut</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for demande in demandes %}
+    <tr class="{% if not demande.traite %}en-attente{% endif %}">
+      <td>{{ demande.eleve.display_name|default:demande.eleve.identifiant }}</td>
+      <td>{{ demande.exercise.theme.name }} — {{ demande.exercise.title }}</td>
+      <td>{{ demande.date_demande|date:"d/m/Y H:i" }}</td>
+      <td>{% if demande.traite %}Traitée{% else %}En attente{% endif %}</td>
+      <td><a href="{% url 'demande_aide_detail' demande.id %}">{% if demande.traite %}Revoir{% else %}Répondre{% endif %}</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p>Aucune demande d'aide pour le moment.</p>
+{% endif %}
+{% endblock %}

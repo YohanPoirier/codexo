@@ -435,6 +435,53 @@ finally:
     });
   }
 
+  // Bouton "Demander de l'aide à un professeur" : modal similaire à celui d'abandon, mais envoyé en
+  // fetch (JSON) plutôt qu'un vrai formulaire POST, car on a besoin du code ACTUEL de
+  // l'éditeur (pas d'un simple lien) — voir demander_aide côté serveur. Ne touche jamais à
+  // submit_result : ceci ne crée aucun Result, seulement une DemandeAide.
+  const aideBtn = document.getElementById("aide-btn");
+  const aideModal = document.getElementById("aide-modal");
+  const aideCancel = document.getElementById("aide-cancel");
+  const aideEnvoyer = document.getElementById("aide-envoyer");
+  const aideCommentaire = document.getElementById("aide-commentaire");
+  if (aideBtn && aideModal) {
+    aideBtn.addEventListener("click", function () {
+      aideModal.classList.add("open");
+    });
+    aideCancel.addEventListener("click", function () {
+      aideModal.classList.remove("open");
+    });
+    aideModal.addEventListener("click", function (e) {
+      if (e.target === aideModal) aideModal.classList.remove("open"); // clic sur le fond
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") aideModal.classList.remove("open");
+    });
+    aideEnvoyer.addEventListener("click", async function () {
+      aideEnvoyer.disabled = true;
+      aideEnvoyer.textContent = "Envoi…";
+      try {
+        const res = await fetch(DEMANDER_AIDE_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({ code: getCode(), commentaire: aideCommentaire.value }),
+        });
+        if (!res.ok) throw new Error("réponse serveur non ok");
+        aideModal.classList.remove("open");
+        aideBtn.outerHTML =
+          '<p class="aide-pending">Demande envoyée : tu retrouveras la réponse sur ' +
+          '<a href="' + MES_DEMANDES_AIDE_URL + '">Mes demandes d\'aide</a>.</p>';
+      } catch (e) {
+        aideEnvoyer.disabled = false;
+        aideEnvoyer.textContent = "Envoyer";
+        window.alert("La demande n'a pas pu être envoyée, réessaie dans un instant.");
+      }
+    });
+  }
+
   runBtn.addEventListener("click", runCheck);
   init();
 })();

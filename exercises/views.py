@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 
 from accounts.models import User, Classe
-from .models import Theme, Exercise, Result, Abandonment, Hint, HintReveal
+from .models import Theme, Exercise, Result, Abandonment, Hint, HintReveal, DemandeAide
 
 # Durée pendant laquelle un exercice est verrouillé après un abandon (voir abandon_exercise
 # ci-dessous). Passé ce délai, l'étudiant peut retenter l'exercice normalement.
@@ -132,6 +132,9 @@ def exercise_detail(request, theme_slug, exercise_slug):
         Result.objects.filter(user=request.user, exercise=exercise).order_by("-created_at").first()
     )
     hints = list(exercise.hints.all())
+    pending_demande_aide = DemandeAide.objects.filter(
+        eleve=request.user, exercise=exercise, traite=False
+    ).exists()
     return render(
         request,
         "exercises/exercise_detail.html",
@@ -142,6 +145,7 @@ def exercise_detail(request, theme_slug, exercise_slug):
             "hints": hints,
             "show_solution_once": just_abandoned,
             "retry_at": retry_at,
+            "pending_demande_aide": pending_demande_aide,
         },
     )
 
@@ -246,6 +250,66 @@ def hint_viewed(request, hint_id):
     hint = get_object_or_404(Hint, id=hint_id)
     HintReveal.objects.get_or_create(user=request.user, hint=hint)
     return JsonResponse({"ok": True})
+
+
+@login_required
+@csrf_protect
+def demander_aide(request, exercise_id):
+    """Endpoint JSON appelé depuis exercise_detail (bouton "Demander de l'aide à un prof") :
+    enregistre le code actuel de l'étudiant, plus un commentaire optionnel. Remplace toute
+    demande déjà en attente de ce même élève sur ce même exercice (voir DemandeAide.envoyer),
+    plutôt que d'en empiler une deuxième."""
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    exercise = get_object_or_404(Exercise, id=exercise_id)
+    payload = json.loads(request.body.decode("utf-8"))
+    code_soumis = payload.get("code", "")
+    commentaire = (payload.get("commentaire") or "").strip()
+    DemandeAide.envoyer(
+        eleve=request.user, exercise=exercise, code_soumis=code_soumis, commentaire=commentaire,
+    )
+    return JsonResponse({"ok": True})
+
+
+@login_required
+def mes_demandes_aide(request):
+    """Page élève : historique de ses demandes d'aide (en attente puis traitées), avec la
+    réponse du prof une fois disponible. Pas de notification par email (comme pour le reste
+    du site) : l'élève doit revenir consulter cette page lui-même."""
+    demandes = (
+        DemandeAide.objects.filter(eleve=request.user)
+        .select_related("exercise", "exercise__theme")
+    )
+    return render(request, "exercises/mes_demandes_aide.html", {"demandes": demandes})
+
+
+@staff_member_required
+def demandes_aide(request):
+    """Page prof : liste de TOUTES les demandes d'aide, tous élèves confondus (tous les profs
+    voient tout), les demandes en attente affichées en premier."""
+    demandes = (
+        DemandeAide.objects.all()
+        .select_related("eleve", "exercise", "exercise__theme", "traite_par")
+        .order_by("traite", "-date_demande")
+    )
+    return render(request, "exercises/demandes_aide.html", {"demandes": demandes})
+
+
+@staff_member_required
+def demande_aide_detail(request, demande_id):
+    """Page prof : voir le code soumis et le commentaire éventuel d'une demande d'aide
+    précise, le tester soi-même (même mécanisme Pyodide côté navigateur que la page
+    exercice, voir static/js/demande_aide_test.js — mais SANS jamais appeler submit_result,
+    pour ne pas créer un Result parasite sous le compte du prof), puis répondre à l'élève."""
+    demande = get_object_or_404(DemandeAide, id=demande_id)
+    if request.method == "POST":
+        reponse = request.POST.get("reponse", "").strip()
+        if reponse:
+            demande.repondre(reponse, request.user)
+            messages.success(request, "Réponse envoyée à l'élève.")
+            return redirect("demandes_aide")
+        messages.error(request, "La réponse ne peut pas être vide.")
+    return render(request, "exercises/demande_aide_detail.html", {"demande": demande})
 
 
 def _stats_row(user, exercise, label):

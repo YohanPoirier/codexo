@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Demande d'aide — {{ demande.exercise.title }} — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow"><a href="{% url 'demandes_aide' %}">← Demandes d'aide</a></span>
+<h1>{{ demande.exercise.title }}</h1>
+<p class="demande-aide-meta">
+  Élève : <strong>{{ demande.eleve.display_name|default:demande.eleve.identifiant }}</strong>
+  — {{ demande.date_demande|date:"d/m/Y à H:i" }}
+</p>
+
+{% if demande.commentaire %}
+<div class="statement">
+  <p><strong>Commentaire de l'élève :</strong></p>
+  <p>{{ demande.commentaire|linebreaksbr }}</p>
+</div>
+{% endif %}
+
+<div class="editor-panel">
+  <label for="code-editor">Code soumis par l'élève</label>
+  <textarea id="code-editor" spellcheck="false"></textarea>
+</div>
+
+<div class="actions">
+  <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
+  <button id="solution-toggle-btn" class="reset-btn" type="button">Voir le corrigé</button>
+</div>
+
+<div id="result-box" class="result-box hidden"></div>
+
+<div id="solution-reveal" class="solution-reveal" hidden>
+  <p class="solution-reveal-title">Corrigé</p>
+  <div id="solution-reveal-code" class="solution-code-editor"></div>
+</div>
+
+<form method="post" class="reponse-form">
+  {% csrf_token %}
+  <label for="reponse">{% if demande.traite %}Réponse envoyée à l'élève{% else %}Ta réponse pour l'élève{% endif %}</label>
+  <textarea name="reponse" id="reponse" rows="5" {% if demande.traite %}readonly{% endif %}>{{ demande.reponse }}</textarea>
+  {% if not demande.traite %}
+    <button type="submit" class="run-btn">Envoyer la réponse</button>
+  {% endif %}
+</form>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+<script>
+const EXERCISE_KIND = "{{ demande.exercise.kind }}";
+const TESTS_URL = "{% url 'exercise_tests' demande.exercise.id %}";
+const INITIAL_CODE = "{{ demande.code_soumis|escapejs }}";
+</script>
+<script src="{% static 'js/demande_aide_test.js' %}"></script>
+{% endblock %}

@@ -629,3 +629,61 @@ table.schema-columns code {
   .visibility-exercises { grid-template-columns: 1fr; padding-left: 34px; }
   .visibility-toolbar { flex-direction: column; align-items: flex-start; }
 }
+
+/* --- Demandes d'aide (élève <-> profs) --- */
+.aide-pending {
+  margin-top: 16px; font-size: .85rem; color: var(--ink-soft);
+}
+.aide-pending a { color: var(--indigo); }
+.aide-label {
+  display: block; font-family: 'JetBrains Mono', monospace; font-size: .78rem;
+  color: var(--ink-soft); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .06em;
+}
+.aide-textarea {
+  width: 100%; font-family: 'Inter', system-ui, sans-serif; font-size: .92rem;
+  border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; resize: vertical;
+  margin-bottom: 20px;
+}
+.aide-confirm { background: var(--indigo); }
+.aide-confirm:hover { background: var(--indigo-deep); }
+
+.demande-aide-meta { color: var(--ink-soft); font-size: .92rem; margin: -6px 0 18px; }
+
+.demandes-aide-list { display: flex; flex-direction: column; gap: 14px; }
+.demande-aide-item {
+  border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px 20px;
+  background: var(--paper);
+}
+.demande-aide-item.en-attente { border-left: 3px solid var(--amber); }
+.demande-aide-item.traitee { border-left: 3px solid var(--ok); }
+.demande-aide-head {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.demande-aide-exercice { color: var(--indigo-deep); font-weight: 600; }
+.demande-aide-commentaire { font-style: italic; margin: 0 0 8px; }
+.demande-aide-statut { color: var(--amber); font-size: .88rem; margin: 0; }
+.demande-aide-reponse {
+  background: var(--paper-alt); border-radius: 8px; padding: 12px 14px; margin-top: 6px;
+}
+.demande-aide-reponse-label {
+  font-family: 'JetBrains Mono', monospace; font-size: .74rem; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--ink-soft); margin: 0 0 6px;
+}
+.demande-aide-reponse p:last-child { margin-bottom: 0; }
+
+.stats-table tr.en-attente { background: #fdf3e2; }
+.stats-table tr.en-attente:hover { background: #fbe9c6; }
+
+.reponse-form { margin-top: 22px; }
+.reponse-form label {
+  display: block; font-family: 'JetBrains Mono', monospace; font-size: .78rem;
+  color: var(--ink-soft); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .06em;
+}
+.reponse-form textarea {
+  width: 100%; font-family: 'Inter', system-ui, sans-serif; font-size: .92rem;
+  border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; resize: vertical;
+  margin-bottom: 14px;
+}
+.reponse-form textarea[readonly] { background: var(--paper-alt); color: var(--ink-soft); }

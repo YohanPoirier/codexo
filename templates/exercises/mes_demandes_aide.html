@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Mes demandes d'aide — Codexo{% endblock %}
+{% block content %}
+<h1>Mes demandes d'aide</h1>
+
+{% if demandes %}
+<div class="demandes-aide-list">
+  {% for demande in demandes %}
+  <div class="demande-aide-item {% if demande.traite %}traitee{% else %}en-attente{% endif %}">
+    <div class="demande-aide-head">
+      <span class="demande-aide-exercice">{{ demande.exercise.theme.name }} — {{ demande.exercise.title }}</span>
+      <span class="demande-aide-date">{{ demande.date_demande|date:"d/m/Y à H:i" }}</span>
+    </div>
+    {% if demande.commentaire %}
+      <p class="demande-aide-commentaire">« {{ demande.commentaire }} »</p>
+    {% endif %}
+    {% if demande.traite %}
+      <div class="demande-aide-reponse">
+        <p class="demande-aide-reponse-label">Réponse du professeur :</p>
+        <p>{{ demande.reponse|linebreaksbr }}</p>
+      </div>
+    {% else %}
+      <p class="demande-aide-statut">En attente de réponse…</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p>Tu n'as envoyé aucune demande d'aide pour le moment. Depuis la page d'un exercice, le bouton « Demander de l'aide à un professeur » envoie ton code actuel à l'équipe de professeurs.</p>
+{% endif %}
+{% endblock %}
