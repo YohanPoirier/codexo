@@ -25,9 +25,9 @@
 {% if show_solution_once %}
   <div class="abandon-locked">
     <p class="abandon-locked-title">Solution de l'exercice</p>
-    <p>Voici la solution. Prends le temps de bien la comprendre (ligne par ligne si besoin) avant de continuer.</p>
+    <p>Voici une proposition de solution. Prenez le temps de bien la comprendre avant de continuer.</p>
     <pre class="solution-code"><code>{% if exercise.kind == "sql" %}{{ exercise.sql_solution }}{% else %}{{ exercise.solution_code }}{% endif %}</code></pre>
-    <p>Tu pourras retenter cet exercice à partir du <strong>{{ retry_at|date:"d/m/Y à H:i" }}</strong>. En attendant, il ne sera plus consultable.</p>
+    <p>Vous pourrez retenter cet exercice à partir du <strong>{{ retry_at|date:"d/m/Y à H:i" }}</strong>. En attendant, il ne sera plus consultable.</p>
   </div>
 {% else %}
   <div class="editor-panel">
@@ -53,7 +53,7 @@
   <div id="result-box" class="result-box hidden"></div>
 
   <div id="solution-reveal" class="solution-reveal" hidden>
-    <p class="solution-reveal-title">Bravo, exercice réussi ! Voici le corrigé</p>
+    <p class="solution-reveal-title">Bravo, exercice réussi ! Voici une proposition de corrigé</p>
     <div id="solution-reveal-code" class="solution-code-editor"></div>
   </div>
 

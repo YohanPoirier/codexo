@@ -399,6 +399,50 @@
     ]
   },
   {
+    "name": "Variables & types",
+    "slug": "variables-types",
+    "description": "Manipuler des nombres, des chaînes et des booléens.",
+    "sql_setup": "",
+    "exercises": [
+      {
+        "title": "Addition simple",
+        "slug": "addition-simple",
+        "statement": "Écrire une fonction `addition(a, b)` qui renvoie la somme de a et b.",
+        "kind": "python",
+        "starter_code": "def addition(a, b):\r\n    pass",
+        "function_name": "addition",
+        "solution_code": "def addition(a, b):\n    # On additionne simplement les deux nombres reçus en paramètre\n    return a + b\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[15, 27]",
+          "[0, 0]",
+          "[-5, 5]"
+        ],
+        "hints": [
+          "Il faut utiliser `+`"
+        ]
+      },
+      {
+        "title": "Conversion en chaîne",
+        "slug": "conversion-chaine",
+        "statement": "Écrire une fonction `phrase(nombre)` qui renvoie le texte \"J'ai {nombre} pommes\" (en remplaçant {nombre} par la valeur reçue), en utilisant str() pour convertir le nombre en texte.",
+        "kind": "python",
+        "starter_code": "def phrase(nombre):\n    pass\n",
+        "function_name": "phrase",
+        "solution_code": "def phrase(nombre):\n    # str(nombre) convertit le nombre en texte pour pouvoir le concaténer\n    # avec les chaînes de caractères qui l'entourent\n    return \"J'ai \" + str(nombre) + \" pommes\"\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[12]",
+          "[0]",
+          "[1]"
+        ],
+        "hints": []
+      }
+    ]
+  },
+  {
     "name": "Conditions",
     "slug": "conditions",
     "description": "Utiliser if / elif / else pour prendre des décisions.",
@@ -1064,8 +1108,7 @@
           "[[-1, -5, 2]]",
           "[[4, 4, 4]]"
         ],
-        "hints": [],
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_appelle_min = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"minimum\":\n        for _sn in ast.walk(_n):\n            if isinstance(_sn, ast.Call) and isinstance(_sn.func, ast.Name) and _sn.func.id == \"min\":\n                _appelle_min = True\n__RESULTS__.append((not _appelle_min, \"Cette fonction ne doit pas utiliser min() : le calculer soi-même avec une boucle.\", \"\"))\n"
+        "hints": []
       },
       {
         "title": "Indice du minimum d'une liste",
@@ -1083,8 +1126,7 @@
           "[[-1, -5, 2]]",
           "[[1, 1, 1]]"
         ],
-        "hints": [],
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_appelle_min = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"indice_minimum\":\n        for _sn in ast.walk(_n):\n            if isinstance(_sn, ast.Call) and isinstance(_sn.func, ast.Name) and _sn.func.id == \"min\":\n                _appelle_min = True\n__RESULTS__.append((not _appelle_min, \"Cette fonction ne doit pas utiliser min() : le calculer soi-même avec une boucle.\", \"\"))\n"
+        "hints": []
       },
       {
         "title": "Deuxième plus grand élément d'une liste",
@@ -1105,8 +1147,7 @@
         ],
         "hints": [
           "Attention aux doublons : si le maximum apparaît plusieurs fois dans la liste, il ne faut en retirer aucune occurrence, sinon on risque de retomber sur le maximum lui-même comme \"deuxième plus grand\"."
-        ],
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_appelle_max = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"deuxieme_maximum\":\n        for _sn in ast.walk(_n):\n            if isinstance(_sn, ast.Call) and isinstance(_sn.func, ast.Name) and _sn.func.id == \"max\":\n                _appelle_max = True\n__RESULTS__.append((not _appelle_max, \"Cette fonction ne doit pas utiliser max() : le calculer soi-même avec une boucle.\", \"\"))\n"
+        ]
       },
       {
         "title": "Indices des éléments nuls",
@@ -1181,8 +1222,7 @@
         ],
         "hints": [
           "Une liste en compréhension permet de construire une liste en une seule ligne, en appliquant une expression à chaque élément d'un itérable : `[expression for variable in iterable]`. Exemple : `[x**2 for x in range(5)]` renvoie `[0, 1, 4, 9, 16]` — pour chaque `x` parcouru par `range(5)` (soit 0, 1, 2, 3, 4), on calcule son carré."
-        ],
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_a_for = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"premiers_pairs\":\n        _a_for = any(isinstance(_sn, ast.For) for _sn in ast.walk(_n))\n__RESULTS__.append((not _a_for, \"Cette fonction ne doit pas utiliser de boucle for : utiliser une liste en compréhension.\", \"\"))\n"
+        ]
       },
       {
         "title": "Créer une matrice remplie de zéros",
@@ -1203,8 +1243,7 @@
         ],
         "hints": [
           "L'écriture `[[0] * n] * m` crée `m` fois la **même** liste en mémoire, et non `m` listes indépendantes : modifier une valeur dans une ligne modifie alors toutes les autres. Utiliser plutôt une liste en compréhension imbriquée, qui crée des lignes réellement indépendantes."
-        ],
-        "extra_test_code": "_m = __FN__(2, 3)\n_m[0][0] = 99\n__RESULTS__.append((_m[1][0] != 99, \"Modifier une valeur dans une ligne ne doit pas modifier les autres lignes (chaque ligne doit être une liste indépendante).\", \"\"))\n"
+        ]
       },
       {
         "title": "Matrice identité",
@@ -1540,22 +1579,7 @@
           "[{'R': ['A', 'B'], 'A': ['C', 'D'], 'B': [], 'C': [], 'D': []}, 'R']",
           "[{'1': ['2', '3', '4'], '2': ['5'], '3': [], '4': ['6'], '5': [], '6': []}, '1']",
           "[{'X': []}, 'X']",
-          [
-            {
-              "A": [
-                "B",
-                "C"
-              ],
-              "B": [
-                "D"
-              ],
-              "C": [
-                "D"
-              ],
-              "D": []
-            },
-            "A"
-          ]
+          "[{'A': ['B', 'C'], 'B': ['D'], 'C': ['D'], 'D': []}, 'A']"
         ],
         "hints": [
           "Utiliser une file (FIFO) : ajouter les voisins non visités à la fin, retirer toujours le premier élément (avec `file.pop(0)`).",
@@ -1577,22 +1601,7 @@
           "[{'R': ['A', 'B'], 'A': ['C', 'D'], 'B': [], 'C': [], 'D': []}, 'R']",
           "[{'1': ['2', '3', '4'], '2': ['5'], '3': [], '4': ['6'], '5': [], '6': []}, '1']",
           "[{'X': []}, 'X']",
-          [
-            {
-              "A": [
-                "B",
-                "C"
-              ],
-              "B": [
-                "D"
-              ],
-              "C": [
-                "D"
-              ],
-              "D": []
-            },
-            "A"
-          ]
+          "[{'A': ['B', 'C'], 'B': ['D'], 'C': ['D'], 'D': []}, 'A']"
         ],
         "hints": [
           "Utiliser la récursivité (ou une pile manuelle) : on va aussi loin que possible dans une branche avant de revenir en arrière.",
@@ -1694,8 +1703,7 @@
         "hints": [
           "Le cas de base est `n = 0` : dans ce cas, le résultat vaut toujours 1, quelle que soit la valeur de `a`.",
           "Pour le cas général, penser à `a**n` comme `a * a**(n-1)` : l'appel récursif se fait sur `n - 1`."
-        ],
-        "require_recursive": true
+        ]
       },
       {
         "title": "Factorielle",
@@ -1716,8 +1724,7 @@
         "hints": [
           "Le cas de base est `n = 0` : la factorielle de 0 vaut 1 par convention.",
           "Pour le cas général, `n!` s'écrit `n * (n-1)!` : l'appel récursif se fait sur `n - 1`."
-        ],
-        "require_recursive": true
+        ]
       },
       {
         "title": "Somme des éléments d'une liste",
@@ -1738,9 +1745,7 @@
         "hints": [
           "Le cas de base est la liste vide : sa somme vaut 0.",
           "Pour le cas général, séparer le premier élément (`liste[0]`) du reste de la liste (`liste[1:]`) : la somme totale est la somme de ces deux morceaux."
-        ],
-        "require_recursive": true,
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_probleme = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"somme_liste\":\n        for _sn in ast.walk(_n):\n            if isinstance(_sn, ast.Call) and isinstance(_sn.func, ast.Name) and _sn.func.id == \"sum\":\n                _probleme = True\n            if isinstance(_sn, (ast.For, ast.While)):\n                _probleme = True\n__RESULTS__.append((not _probleme, \"Cette fonction ne doit utiliser ni sum(), ni boucle for/while : la résoudre uniquement par récursivité.\", \"\"))\n"
+        ]
       },
       {
         "title": "PGCD (algorithme d'Euclide)",
@@ -1761,8 +1766,7 @@
         ],
         "hints": [
           "Le cas de base est `b = 0` : le résultat est alors `a`."
-        ],
-        "require_recursive": true
+        ]
       },
       {
         "title": "Ajouter n fois une lettre à un mot",
@@ -1780,9 +1784,7 @@
           "[\"\", \"a\", 5]",
           "[\"x\", \"y\", 1]"
         ],
-        "hints": [],
-        "require_recursive": true,
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_probleme = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"ajouter_lettres\":\n        for _sn in ast.walk(_n):\n            if isinstance(_sn, ast.BinOp) and isinstance(_sn.op, ast.Mult):\n                _probleme = True\n            if isinstance(_sn, (ast.For, ast.While)):\n                _probleme = True\n__RESULTS__.append((not _probleme, \"Cette fonction ne doit utiliser ni la multiplication de chaîne, ni boucle for/while : la résoudre uniquement par récursivité.\", \"\"))\n"
+        "hints": []
       },
       {
         "title": "Inverser une chaîne",
@@ -1803,9 +1805,7 @@
         "hints": [
           "Le cas de base est la chaîne vide : elle reste vide une fois \"inversée\".",
           "Pour le cas général, place la première lettre tout à la fin, après avoir inversé récursivement le reste."
-        ],
-        "require_recursive": true,
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_probleme = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"inverser_chaine\":\n        for _sn in ast.walk(_n):\n            if isinstance(_sn, ast.Slice) and _sn.step is not None:\n                _probleme = True\n            if isinstance(_sn, ast.Call) and isinstance(_sn.func, ast.Name) and _sn.func.id == \"reversed\":\n                _probleme = True\n            if isinstance(_sn, (ast.For, ast.While)):\n                _probleme = True\n__RESULTS__.append((not _probleme, \"Cette fonction ne doit utiliser ni le slicing avec un pas, ni reversed(), ni boucle for/while : la résoudre uniquement par récursivité.\", \"\"))\n"
+        ]
       },
       {
         "title": "Palindrome",
@@ -1825,8 +1825,7 @@
           "[\"a\"]",
           "[\"ab\"]"
         ],
-        "hints": [],
-        "require_recursive": true
+        "hints": []
       },
       {
         "title": "Somme des chiffres d'un entier",
@@ -1849,9 +1848,7 @@
         "hints": [
           "Le dernier chiffre de `n` s'obtient avec `n % 10`, et le nombre privé de son dernier chiffre s'obtient avec `n // 10`.",
           "Le cas de base est un nombre à un seul chiffre (`n < 10`) : la somme de ses chiffres est `n` lui-même."
-        ],
-        "require_recursive": true,
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_probleme = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"somme_chiffres\":\n        for _sn in ast.walk(_n):\n            if isinstance(_sn, ast.Call) and isinstance(_sn.func, ast.Name) and _sn.func.id == \"str\":\n                _probleme = True\n            if isinstance(_sn, (ast.For, ast.While)):\n                _probleme = True\n__RESULTS__.append((not _probleme, \"Cette fonction ne doit ni convertir n en chaîne de caractères (str()), ni utiliser de boucle for/while : la résoudre uniquement par récursivité.\", \"\"))\n"
+        ]
       },
       {
         "title": "Suite de Fibonacci",
@@ -1870,8 +1867,7 @@
           "[10]",
           "[2]"
         ],
-        "hints": [],
-        "require_recursive": true
+        "hints": []
       },
       {
         "title": "Aplatir une liste imbriquée",
@@ -1893,9 +1889,7 @@
         "hints": [
           "Le cas de base est la liste vide : elle reste vide une fois \"aplatie\".",
           "Séparer le premier élément du reste. Si le premier élément est lui-même une liste, l'aplatir récursivement avant de le recoller au reste aplati — ne pas le garder tel quel."
-        ],
-        "require_recursive": true,
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_probleme = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"aplatir\":\n        for _sn in ast.walk(_n):\n            if isinstance(_sn, (ast.For, ast.While)):\n                _probleme = True\n__RESULTS__.append((not _probleme, \"Cette fonction ne doit utiliser aucune boucle for/while : la résoudre uniquement par récursivité.\", \"\"))\n"
+        ]
       },
       {
         "title": "Recherche dichotomique",
@@ -1919,8 +1913,7 @@
           "On compare `cible` à l'élément du milieu de la portion de liste encore à explorer. S'ils sont égaux, on a trouvé l'indice. Sinon, comme la liste est triée, on sait dans laquelle des deux moitiés continuer à chercher — on élimine ainsi la moitié qui ne peut pas contenir `cible`.",
           "Le cas de base est une portion vide à explorer (`borne_inf > borne_sup`) : cible n'a pas été trouvée, renvoyer -1.",
           "Si `liste[milieu]` est plus petite que `cible`, la recherche continue uniquement dans la moitié **droite** (`milieu + 1` à `borne_sup`) ; si elle est plus grande, uniquement dans la moitié **gauche** (`borne_inf` à `milieu - 1`)."
-        ],
-        "require_recursive": true
+        ]
       }
     ]
   },
@@ -1968,13 +1961,12 @@
         "hints": [
           "`sort()`/`sorted()` n'étant pas autorisés ici, s'inspirer du tri par sélection : chercher à chaque tour l'élément restant qui a la plus petite distance.",
           "Retirer l'élément trouvé de la liste des distances restantes (avec `.pop(indice)`), pour ne pas le sélectionner deux fois."
-        ],
-        "extra_test_code": "_arbre = ast.parse(__STUDENT_CODE__)\n_a_tri = False\nfor _n in ast.walk(_arbre):\n    if isinstance(_n, ast.FunctionDef) and _n.name == \"plus_proches_voisins\":\n        for _sn in ast.walk(_n):\n            if isinstance(_sn, ast.Call):\n                if isinstance(_sn.func, ast.Name) and _sn.func.id == \"sorted\":\n                    _a_tri = True\n                if isinstance(_sn.func, ast.Attribute) and _sn.func.attr == \"sort\":\n                    _a_tri = True\n__RESULTS__.append((not _a_tri, \"Cette fonction ne doit pas utiliser sort() ni sorted() : sélectionner le plus proche restant, k fois de suite.\", \"\"))\n"
+        ]
       },
       {
         "title": "KNN (3/3)",
         "slug": "knn-3-3",
-        "statement": "Écrire une fonction `classifier_fruit(fruit, echantillons, k)` qui renvoie l'étiquette prédite pour `fruit` : celle qui est la **plus fréquente** parmi ses `k` plus proches voisins (vote majoritaire).\n\nLa fonction `plus_proches_voisins` de l'exercice précédent peut être réutilisée (déjà disponible dans le code de départ).\n\n**Cas d'égalité** : si plusieurs étiquettes sont à égalité pour la première place, renvoyer celle qui appartient au voisin **le plus proche** parmi celles à égalité.",
+        "statement": "Dernière étape : transformer les k plus proches voisins (exercice précédent) en une vraie prédiction, en votant.\n\nÉcrire une fonction `classifier_fruit(fruit, echantillons, k)` qui renvoie l'étiquette prédite pour `fruit` : celle qui est la **plus fréquente** parmi ses `k` plus proches voisins (vote majoritaire).\n\nLa fonction `plus_proches_voisins` de l'exercice précédent peut être réutilisée (déjà disponible dans le code de départ).\n\n**Cas d'égalité** : si plusieurs étiquettes sont à égalité pour la première place, renvoyer celle qui appartient au voisin **le plus proche** parmi celles à égalité.",
         "kind": "python",
         "starter_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n\n\ndef plus_proches_voisins(fruit, echantillons, k):\n    distances = []\n    for poids, diametre, etiquette in echantillons:\n        d = distance(fruit, [poids, diametre])\n        distances.append((d, etiquette))\n    resultat = []\n    for _ in range(k):\n        indice_min = 0\n        for i in range(1, len(distances)):\n            if distances[i][0] < distances[indice_min][0]:\n                indice_min = i\n        _, etiquette = distances.pop(indice_min)\n        resultat.append(etiquette)\n    return resultat\n\n\ndef classifier_fruit(fruit, echantillons, k):\n    pass\n",
         "function_name": "classifier_fruit",
@@ -1994,7 +1986,7 @@
       {
         "title": "K-means (1/3)",
         "slug": "kmeans-1-3",
-        "statement": "Une boutique en ligne veut regrouper ses clients selon leur comportement d'achat, pour adapter ses campagnes marketing (relance, fidélisation, promotions...). C'est ce qu'on appelle la **segmentation client**, une application classique du k-means en entreprise, souvent basée sur l'analyse RFM (Récence, Fréquence, Montant). Ici, on utilise une version simplifiée à deux critères : le montant total dépensé et le nombre de commandes passées. L'algorithme regroupe automatiquement les clients qui se ressemblent (par exemple des \"gros acheteurs réguliers\", des \"acheteurs occasionnels\", des \"clients inactifs\"), sans qu'on lui dise à l'avance quels groupes chercher.\n\nLe k-means répète deux étapes, jusqu'à ce que les groupes se stabilisent :\n\n- assigner chaque point au centroïde (le \"centre\") le plus proche ;\n- recalculer chaque centroïde comme le barycentre des points qui lui sont assignés.\n\nÉcrire une fonction `assigner_client(client, centroides)` qui renvoie l'**indice** (la position dans la liste `centroides`) du centroïde le plus proche de `client`, au sens de la distance euclidienne. `client` est une liste `[montant, nombre_commandes]`, et `centroides` une liste de points de même forme.\n\nExemple : `assigner_client([500, 10], [[100, 2], [600, 12], [50, 1]])` renvoie `1` (le centroïde `[600, 12]`, à l'indice 1, est le plus proche).",
+        "statement": "Le k-means est un algorithme de **clustering** (regroupement) : contrairement au KNN, on ne connaît pas de catégories à l'avance — l'algorithme les découvre lui-même à partir des données.\n\n**Contexte** : une boutique en ligne veut regrouper ses clients selon leur comportement d'achat, pour adapter ses campagnes marketing (relance, fidélisation, promotions...). C'est ce qu'on appelle la **segmentation client**, une application classique du k-means en entreprise, souvent basée sur l'analyse RFM (Récence, Fréquence, Montant). Ici, on utilise une version simplifiée à deux critères : le montant total dépensé et le nombre de commandes passées. L'algorithme regroupe automatiquement les clients qui se ressemblent (par exemple des \"gros acheteurs réguliers\", des \"acheteurs occasionnels\", des \"clients inactifs\"), sans qu'on lui dise à l'avance quels groupes chercher.\n\nLe k-means répète deux étapes : (1) assigner chaque point au centroïde (le \"centre\") le plus proche, (2) recalculer chaque centroïde comme le barycentre des points qui lui sont assignés — jusqu'à ce que les groupes se stabilisent.\n\n**Cette première étape** : écrire une fonction `assigner_client(client, centroides)` qui renvoie l'**indice** (la position dans la liste `centroides`) du centroïde le plus proche de `client`, au sens de la distance euclidienne. `client` est une liste `[montant, nombre_commandes]`, et `centroides` une liste de points de même forme.\n\nExemple : `assigner_client([500, 10], [[100, 2], [600, 12], [50, 1]])` renvoie `1` (le centroïde `[600, 12]`, à l'indice 1, est le plus proche).",
         "kind": "python",
         "starter_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    pass\n",
         "function_name": "assigner_client",
@@ -2032,7 +2024,7 @@
       {
         "title": "K-means (3/3)",
         "slug": "kmeans-3-3",
-        "statement": "Écrire une fonction `kmeans(clients, centroides_initiaux, nb_iterations)` qui répète `nb_iterations` fois l'assignation des clients puis le recalcul des centroïdes, et renvoie la liste finale des centroïdes.\n\n`centroides_initiaux` ne doit pas être modifiée : construire une nouvelle liste de centroïdes à faire évoluer.",
+        "statement": "Combiner les deux fonctions précédentes (déjà fournies dans le code de départ) pour implémenter l'algorithme k-means complet.\n\nÉcrire une fonction `kmeans(clients, centroides_initiaux, nb_iterations)` qui répète `nb_iterations` fois l'assignation des clients puis le recalcul des centroïdes, et renvoie la liste finale des centroïdes.\n\n`centroides_initiaux` ne doit pas être modifiée : construire une nouvelle liste de centroïdes à faire évoluer.",
         "kind": "python",
         "starter_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    meilleur_indice = 0\n    meilleure_distance = distance(client, centroides[0])\n    for i in range(1, len(centroides)):\n        d = distance(client, centroides[i])\n        if d < meilleure_distance:\n            meilleure_distance = d\n            meilleur_indice = i\n    return meilleur_indice\n\n\ndef recalculer_centroide(clients):\n    n = len(clients)\n    total_montant = 0\n    total_commandes = 0\n    for client in clients:\n        total_montant += client[0]\n        total_commandes += client[1]\n    return [total_montant / n, total_commandes / n]\n\n\ndef kmeans(clients, centroides_initiaux, nb_iterations):\n    pass\n",
         "function_name": "kmeans",
@@ -2045,8 +2037,8 @@
           "[[[900, 18], [850, 16], [80, 1], [60, 2]], [[1000, 20], [100, 2]], 3]"
         ],
         "hints": [
-          "Réutiliser `assigner_client` pour répartir les clients en groupes, puis `recalculer_centroide` sur chaque groupe non vide, en répétant ces deux étapes `nb_iterations` fois.",
-          "Penser à partir d'une copie de `centroides_initiaux` (par exemple avec une liste en compréhension) : ne pas modifier la liste reçue en argument."
+          "Réutiliser `assigner_client` pour répartir les clients en groupes, puis `recalculer_centroide` sur chaque groupe non vide — répète ces deux étapes `nb_iterations` fois.",
+          "Penser à partir d'une copie de `centroides_initiaux` (par exemple avec une liste en compréhension) : ne modifie jamais la liste reçue en argument."
         ]
       }
     ]
@@ -2106,11 +2098,11 @@
       {
         "title": "Chemin dans une grille — top-down",
         "slug": "chemin-grille-top-down",
-        "statement": "On se déplace sur une grille de `m` lignes et `n` colonnes, en partant de la case en haut à gauche (`(0, 0)`) pour arriver à la case en bas à droite (`(m-1, n-1)`), en ne pouvant se déplacer que vers le bas ou vers la droite à chaque étape.\r\n\r\nPour atteindre la case `(m,n)` , on vient forcément de la case de gauche ou de la case du dessus. En notant `N(m,n)` le nombre de chemin permettant d'accéder à la case `(m,n)` : `N(m,n) = N(m-1,n) + N(m,n-1)`.\r\n\r\nÉcrire une fonction `chemin_grille_td(m, n)` qui calcule, avec la technique du **top-down (mémoïsation)**, le nombre total de chemins distincts permettant d'aller du coin haut-gauche au coin bas-droite.\r\n\r\nExemple : `chemin_grille_td(3, 3)` renvoie `6`.",
+        "statement": "On se déplace sur une grille de `m` lignes et `n` colonnes, en partant de la case en haut à gauche (`(0, 0)`) pour arriver à la case en bas à droite (`(m-1, n-1)`), en ne pouvant se déplacer que vers le bas ou vers la droite à chaque étape.\r\n\r\nPour atteindre la case `(m,n)` , on vient forcément de la case de gauche ou de la case du dessus. En notant `N(m,n)` le nombre de chemin permettant d'accéder à la case `(m,n)` : `N(m,n) = N(m-1,n) + N(m,n-1)`.\r\n\r\nÉcrire une fonction `chemin_grille_td(m, n)` qui calcule, avec la technique du **top-down (mémoïsation)**, le nombre total de chemins distincts permettant d'aller du coin haut-gauche au coin bas-droite.\r\n\r\n\r\n**Cas de base** : une grille d'une seule ligne (`m = 1`) ou d'une seule colonne (`n = 1`) n'offre qu'un seul chemin possible (tout droit).\r\n\r\nExemple : `chemin_grille_td(3, 3)` renvoie `6`.",
         "kind": "python",
         "starter_code": "def chemin_grille_td(m, n):\r\n    cache = {}\r\n\r\n    def aux(i, j):\r\n        pass\r\n\r\n    return aux(m - 1, n - 1)",
         "function_name": "chemin_grille_td",
-        "solution_code": "def chemin_grille_td(m, n):\r\n    # Le cache mémorise, pour chaque case (i, j) déjà rencontrée, le nombre de\r\n    # chemins qui y mènent — évite de recalculer plusieurs fois le même\r\n    # sous-problème (ex : aux(1, 2) est redemandé à la fois par aux(2, 2) et\r\n    # aux(1, 3))\r\n    cache = {}\r\n\r\n    def aux(i, j):\r\n        if (i, j) in cache:\r\n            return cache[(i, j)]\r\n        # Cas de base : sur la première ligne ou la première colonne, il\r\n        # n'existe qu'un seul chemin possible (tout droit)\r\n        if i == 0 or j == 0:\r\n            resultat = 1\r\n        else:\r\n            # Sinon, on vient forcément soit de la case du dessus (i-1, j),\r\n            # soit de la case de gauche (i, j-1) : le nombre de chemins vers\r\n            # (i, j) est la somme des deux\r\n            resultat = aux(i - 1, j) + aux(i, j - 1)\r\n        cache[(i, j)] = resultat\r\n        return resultat\r\n\r\n    return aux(m - 1, n - 1)",
+        "solution_code": "def chemin_grille_td(m, n):\r\n    cache = {}\r\n\r\n    def aux(i, j):\r\n        if (i, j) in cache:\r\n            return cache[(i, j)]\r\n        if i == 0 or j == 0:\r\n            resultat = 1\r\n        else:\r\n            resultat = aux(i - 1, j) + aux(i, j - 1)\r\n        cache[(i, j)] = resultat\r\n        return resultat\r\n\r\n    return aux(m - 1, n - 1)",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2133,7 +2125,7 @@
         "kind": "python",
         "starter_code": "def chemin_grille_bu(m, n):\r\n    pass",
         "function_name": "chemin_grille_bu",
-        "solution_code": "def chemin_grille_bu(m, n):\r\n    # Double liste en compréhension : grille de m lignes et n colonnes,\r\n    # chaque case initialisée à 1 (un seul chemin possible pour atteindre la\r\n    # première ligne ou la première colonne)\r\n    table = [[1 for _ in range(n)] for _ in range(m)]\r\n\r\n    for i in range(1, m):\r\n        for j in range(1, n):\r\n            # Comme en top-down : le nombre de chemins vers (i, j) est la\r\n            # somme du nombre de chemins vers la case du dessus et vers\r\n            # celle de gauche, déjà calculées à ce stade (on parcourt les\r\n            # lignes puis les colonnes dans l'ordre croissant)\r\n            table[i][j] = table[i - 1][j] + table[i][j - 1]\r\n\r\n    return table[m - 1][n - 1]",
+        "solution_code": "def chemin_grille_bu(m, n):\r\n    # On initialise toute la première ligne et la première colonne à 1 (un\r\n    # seul chemin possible pour les atteindre)\r\n    table = [[1] * n for _ in range(m)]\r\n\r\n    for i in range(1, m):\r\n        for j in range(1, n):\r\n            # Comme en top-down : le nombre de chemins vers (i, j) est la\r\n            # somme du nombre de chemins vers la case du dessus et vers\r\n            # celle de gauche, déjà calculées à ce stade (on parcourt les\r\n            # lignes puis les colonnes dans l'ordre croissant)\r\n            table[i][j] = table[i - 1][j] + table[i][j - 1]\r\n\r\n    return table[m - 1][n - 1]",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2174,11 +2166,11 @@
       {
         "title": "Rendu de monnaie — top-down",
         "slug": "rendu-monnaie-top-down",
-        "statement": "Reprenons le problème du rendu de monnaie, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours le nombre minimal de pièces, contrairement à l'algorithme glouton de l'exercice précédent.\r\n\r\nPour rendre un montant `m`, on essaie chaque valeurs `p` des pièces disponibles (si elle est inférieure ou égale à `m`) : utiliser cette pièce revient à ajouter 1 pièce au résultat optimal pour rendre `m - p`. Le résultat pour `m` est le minimum obtenu en testant ainsi toutes les pièces possibles.\r\n\r\nEn notant `C(m)` le **nombre minimal de pièces nécessaires pour rendre le montant** `m` (avec `P` l'ensemble des valeurs des pièces disponibles) : `C(0) = 0`, et pour `m > 0`, `C(m)` est le plus petit `1 + C(m - p)` obtenu en testant chaque pièce `p` de `P` vérifiant `p <= m`.\r\n\r\nÉcrire une fonction `rendu_td(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible avec les pièces disponibles. La fonction devra utiliser une méthode top-down (mémoïsation).",
+        "statement": "Reprendre le problème du rendu de monnaie, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours le nombre minimal de pièces, contrairement à l'algorithme glouton de l'exercice précédent.\r\n\r\nPour rendre un montant `m`, on essaie chaque valeurs `p` des pièces disponibles (si elle est inférieure ou égale à `m`) : utiliser cette pièce revient à ajouter 1 pièce au résultat optimal pour rendre `m - p`. Le résultat pour `m` est le minimum obtenu en testant ainsi toutes les pièces possibles.\r\n\r\nEn notant `C(m)` le **nombre minimal de pièces nécessaires pour rendre le montant** `m`, on a donc :\r\n\r\n$$\r\nC(m)=\r\n\\begin{cases}\r\n0 & \\text{si } m=0, \\\\\r\n\\displaystyle \\min_{p\\in P,\\;p\\le m}\\left(1+C(m-p)\\right) & \\text{si } m>0,\r\n\\end{cases}\r\n$$\r\n\r\noù `P` est l'ensemble des valeurs des pièces disponibles.\r\n\r\nÉcrire une fonction `rendu_td(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible avec les pièces disponibles. La fonction devra utiliser une méthode top-down (mémoïsation).",
         "kind": "python",
         "starter_code": "def rendu_td(montant, pieces):\r\n    pass",
         "function_name": "rendu_td",
-        "solution_code": "def rendu_td(montant, pieces):\r\n    # Le cache mémorise, pour chaque montant déjà traité, le nombre minimal de\r\n    # pièces trouvé (ou None si aucune combinaison n'est possible) — évite de\r\n    # retraiter plusieurs fois le même sous-problème\r\n    cache = {}\r\n\r\n    def aux(m):\r\n        # Cas de base : rendre 0, c'est ne poser aucune pièce\r\n        if m == 0:\r\n            return 0\r\n        if m in cache:\r\n            return cache[m]\r\n\r\n        # On essaie chaque pièce utilisable (valeur <= m) : l'utiliser revient\r\n        # à ajouter 1 pièce au résultat optimal pour rendre m - p. On garde le\r\n        # meilleur (le plus petit) de tous les essais.\r\n        meilleur = None\r\n        for p in pieces:\r\n            if p <= m:\r\n                sous_resultat = aux(m - p)\r\n                if sous_resultat is not None:\r\n                    candidat = sous_resultat + 1\r\n                    if meilleur is None or candidat < meilleur:\r\n                        meilleur = candidat\r\n\r\n        cache[m] = meilleur\r\n        return meilleur\r\n\r\n    resultat = aux(montant)\r\n    # Si meilleur est resté à None jusqu'au bout, aucune combinaison de pièces\r\n    # ne permet de rendre exactement le montant demandé\r\n    if resultat is not None:\r\n        return resultat\r\n    else:\r\n        return -1",
+        "solution_code": "def rendu_td(montant, pieces):\r\n    cache = {}\r\n\r\n    def aux(m):\r\n        if m == 0:\r\n            return 0\r\n        if m in cache:\r\n            return cache[m]\r\n\r\n        meilleur = None\r\n        for p in pieces:\r\n            if p <= m:\r\n                sous_resultat = aux(m - p)\r\n                if sous_resultat is not None:\r\n                    candidat = sous_resultat + 1\r\n                    if meilleur is None or candidat < meilleur:\r\n                        meilleur = candidat\r\n\r\n        cache[m] = meilleur\r\n        return meilleur\r\n\r\n    resultat = aux(montant)\r\n    if resultat is not None:\r\n        return resultat\r\n    else:\r\n        return -1",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2195,7 +2187,7 @@
       {
         "title": "Rendu de monnaie — bottom-up",
         "slug": "rendu-monnaie-bottom-up",
-        "statement": "Reprenons le problème du rendu de monnaie, mais cette fois avec la technique du **bottom-up (tabulation)**. \r\n\r\nOn rappelle que `C(m)`, le nombre minimal de pièces nécessaires pour rendre le montant `m` (avec `P` l'ensemble des valeurs des pièces disponibles), vérifie : `C(0) = 0`, et pour `m > 0`, `C(m)` est le plus petit `1 + C(m - p)` obtenu en testant chaque pièce `p` de `P` vérifiant `p <= m`.\r\n\r\nÉcrire une fonction `rendu_bu(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible.",
+        "statement": "Reprendre le problème du rendu de monnaie, mais cette fois avec la technique du **bottom_up**. \r\n\r\nOn rappelle que `C(m)`, le nombre minimal de pièces nécessaires pour rendre le montant `m`, vérifie :\r\n\r\n$$\r\nC(m)=\r\n\\begin{cases}\r\n0 & \\text{si } m=0, \\\\\r\n\\displaystyle \\min_{p\\in P,\\;p\\le m}\\left(1+C(m-p)\\right) & \\text{si } m>0,\r\n\\end{cases}\r\n$$\r\n\r\noù `P` est l'ensemble des valeurs des pièces disponibles.\r\n\r\nÉcrire une fonction `rendu_bu(montant, pieces)` qui renvoie le nombre minimal de pièces nécessaires pour rendre exactement `montant`, ou `-1` si c'est impossible.",
         "kind": "python",
         "starter_code": "def rendu_bu(montant, pieces):\r\n    pass",
         "function_name": "rendu_bu",
@@ -2220,9 +2212,9 @@
         "slug": "sac-a-dos-glouton",
         "statement": "Le **problème du sac à dos** est le suivant : on dispose d'objets, chacun avec un poids et une valeur, et d'un sac ayant une capacité maximale. On veut choisir un sous-ensemble d'objets (chaque objet est pris en entier ou pas du tout, jamais fractionné) qui maximise la valeur totale, sans dépasser la capacité en poids.\r\n\r\nÉcrire une fonction `sac_a_dos_glouton(objets, capacite)` qui calcule, avec un **algorithme glouton**, la valeur totale obtenue. `objets` est une liste de tuples `(poids, valeur)`.\r\n\r\n**Principe glouton** : on trie les objets par ordre décroissant de rapport valeur/poids (le meilleur rapport qualité-prix en premier), puis on ajoute chaque objet au sac tant qu'il y a encore assez de place, sans jamais revenir en arrière.\r\n\r\nExemple : `sac_a_dos_glouton([(10, 60), (20, 100), (30, 120)], 50)` : les rapports sont 6, 5 et 4 — on prend donc l'objet (10, 60) puis (20, 100) (poids total 30, valeur 160), et (30, 120) ne rentre plus (30 + 30 > 50). Résultat : `160`.",
         "kind": "python",
-        "starter_code": "def sac_a_dos_glouton(objets, capacite):\r\n    # Trie les objets par rapport valeur/poids décroissant (le plus\r\n    # rentable au kilo en premier) — hors programme, ligne déjà fournie\r\n    objets_tries = sorted(objets, key=lambda o: o[1] / o[0], reverse=True)\r\n    pass",
+        "starter_code": "def sac_a_dos_glouton(objets, capacite):\r\n    pass",
         "function_name": "sac_a_dos_glouton",
-        "solution_code": "def sac_a_dos_glouton(objets, capacite):\r\n    # Trie les objets par rapport valeur/poids décroissant (le plus\r\n    # rentable au kilo en premier) — hors programme, ligne déjà fournie\r\n    objets_tries = sorted(objets, key=lambda o: o[1] / o[0], reverse=True)\r\n\r\n    poids_total = 0\r\n    valeur_totale = 0\r\n\r\n    for poids, valeur in objets_tries:\r\n        # On ajoute l'objet seulement s'il reste assez de place ; sinon on\r\n        # l'ignore définitivement (pas de retour en arrière possible)\r\n        if poids_total + poids <= capacite:\r\n            poids_total += poids\r\n            valeur_totale += valeur\r\n\r\n    return valeur_totale\r\n\r\n\r\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\r\n# n'est pas toujours optimal pour le sac à dos 0/1. Sur l'exemple de\r\n# l'énoncé ([(10, 60), (20, 100), (30, 120)], 50), le glouton s'arrête à\r\n# une valeur de 160, alors que la meilleure solution possible est en\r\n# réalité de prendre les objets (20, 100) et (30, 120) (poids total 50,\r\n# valeur 220). Ce regroupement n'est jamais considéré par le glouton, qui\r\n# prend l'objet (10, 60) dès le départ pour son bon rapport valeur/poids,\r\n# sans jamais revenir sur ce choix ensuite.",
+        "solution_code": "def sac_a_dos_glouton(objets, capacite):\r\n    # Contrairement aux pièces de l'exercice précédent, les objets ne sont\r\n    # PAS donnés triés ici (leur \"meilleur ordre\" dépend du rapport\r\n    # valeur/poids, propre à chaque objet) : on les trie donc nous-mêmes,\r\n    # par rapport valeur/poids décroissant, pour privilégier les objets les\r\n    # plus rentables au kilo\r\n    objets_tries = sorted(objets, key=lambda o: o[1] / o[0], reverse=True)\r\n\r\n    poids_total = 0\r\n    valeur_totale = 0\r\n\r\n    for poids, valeur in objets_tries:\r\n        # On ajoute l'objet seulement s'il reste assez de place ; sinon on\r\n        # l'ignore définitivement (pas de retour en arrière possible)\r\n        if poids_total + poids <= capacite:\r\n            poids_total += poids\r\n            valeur_totale += valeur\r\n\r\n    return valeur_totale\r\n\r\n\r\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\r\n# n'est pas toujours optimal pour le sac à dos 0/1. Sur l'exemple de\r\n# l'énoncé ([(10, 60), (20, 100), (30, 120)], 50), le glouton s'arrête à\r\n# une valeur de 160, alors que la meilleure solution possible est en\r\n# réalité de prendre les objets (20, 100) et (30, 120) (poids total 50,\r\n# valeur 220). Ce regroupement n'est jamais considéré par le glouton, qui\r\n# prend l'objet (10, 60) dès le départ pour son bon rapport valeur/poids,\r\n# sans jamais revenir sur ce choix ensuite.",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2233,17 +2225,18 @@
           "[[(5, 10)], 4]"
         ],
         "hints": [
+          "Contrairement aux pièces de l'exercice précédent, les objets ne sont pas fournis pré-triés ici : les trier par rapport valeur/poids décroissant.",
           "Le glouton ne revient jamais sur un choix : une fois qu'un objet est ignoré (faute de place), il ne sera jamais reconsidéré."
         ]
       },
       {
         "title": "Sac à dos — top-down",
         "slug": "sac-a-dos-top-down",
-        "statement": "Reprenons le problème du sac à dos, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours la valeur totale maximale possible, contrairement à l'algorithme glouton de l'exercice précédent.\r\n\r\nOn note `V(i, m)` la valeur maximale que l'on peut obtenir en utilisant uniquement les `i` premiers objets, avec une capacité de sac restante égale à `m`.\r\n\r\nOn considère les deux possibilités pour le dernier objet :\r\n\r\n- soit on ne prend pas l'objet `i` ;\r\n- soit on prend l'objet `i` (si son poids `p_i` ne dépasse pas la capacité disponible).\r\n\r\nOn obtient donc : `V(i, m)` est le maximum entre `V(i-1, m)` (sans l'objet `i`) et `v_i + V(i-1, m - p_i)` (avec l'objet `i`).\r\n\r\nÉcrire une fonction `sac_a_dos_td(objets, capacite)` qui renvoie la valeur maximale atteignable, en utilisant une approche top-bottom.",
+        "statement": "Reprendre le problème du sac à dos, mais cette fois avec la technique du **top-down (mémoïsation)**, qui garantit toujours la valeur totale maximale possible, contrairement à l'algorithme glouton de l'exercice précédent.\r\n\r\nOn note \\(V(i,m)\\) la valeur maximale que l'on peut obtenir en utilisant uniquement les \\(i\\) premiers objets, avec une capacité de sac restante égale à \\(m\\).\r\n\r\nOn considère les deux possibilités pour le dernier objet :\r\n\r\n- soit on ne prend pas l'objet \\(i\\) ;\r\n- soit on prend l'objet \\(i\\) (si son poids \\(p_i\\) ne dépasse pas la capacité disponible).\r\n\r\nOn obtient donc :\r\n\r\n$$\r\nV(i,m)=\r\n\\max\\left(\r\nV(i-1,m),\r\nv_i+V(i-1,m-p_i)\r\n\\right)\r\n$$\r\n\r\nÉcrire une fonction `sac_a_dos_td(objets, capacite)` qui renvoie la valeur maximale atteignable, en utilisant une approche top-bottom.",
         "kind": "python",
         "starter_code": "def sac_a_dos_td(objets, capacite):\r\n    pass",
         "function_name": "sac_a_dos_td",
-        "solution_code": "def sac_a_dos_td(objets, capacite):\r\n    # Le cache mémorise, pour chaque sous-problème (i, capacite_restante) déjà\r\n    # rencontré, la valeur maximale déjà calculée — évite de recalculer\r\n    # plusieurs fois le même sous-problème\r\n    cache = {}\r\n\r\n    def aux(i, capacite_restante):\r\n        # Cas de base : plus d'objet à considérer, ou plus de place dans le sac\r\n        # -> valeur maximale nulle\r\n        if i == len(objets) or capacite_restante == 0:\r\n            return 0\r\n        if (i, capacite_restante) in cache:\r\n            return cache[(i, capacite_restante)]\r\n\r\n        poids, valeur = objets[i]\r\n\r\n        # Option 1 : ne pas prendre l'objet i\r\n        meilleur = aux(i + 1, capacite_restante)\r\n        # Option 2 : le prendre, si son poids le permet — on garde la meilleure\r\n        # des deux options\r\n        if poids <= capacite_restante:\r\n            avec_objet = valeur + aux(i + 1, capacite_restante - poids)\r\n            if avec_objet > meilleur:\r\n                meilleur = avec_objet\r\n\r\n        cache[(i, capacite_restante)] = meilleur\r\n        return meilleur\r\n\r\n    return aux(0, capacite)",
+        "solution_code": "def sac_a_dos_td(objets, capacite):\r\n    cache = {}\r\n\r\n    def aux(i, capacite_restante):\r\n        if i == len(objets) or capacite_restante == 0:\r\n            return 0\r\n        if (i, capacite_restante) in cache:\r\n            return cache[(i, capacite_restante)]\r\n\r\n        poids, valeur = objets[i]\r\n\r\n        meilleur = aux(i + 1, capacite_restante)\r\n        if poids <= capacite_restante:\r\n            avec_objet = valeur + aux(i + 1, capacite_restante - poids)\r\n            if avec_objet > meilleur:\r\n                meilleur = avec_objet\r\n\r\n        cache[(i, capacite_restante)] = meilleur\r\n        return meilleur\r\n\r\n    return aux(0, capacite)",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2261,7 +2254,7 @@
       {
         "title": "Sac à dos — bottom-up",
         "slug": "sac-a-dos-bottom-up",
-        "statement": "Reprenons le problème du sac à dos, mais cette fois avec la technique du **bottom-up (tabulation)**, qui garantit toujours la valeur totale maximale possible, contrairement à l'algorithme glouton de l'exercice précédent.\r\n\r\nOn rappelle que `V(i, m)`, la valeur maximale que l'on peut obtenir en utilisant uniquement les `i` premiers objets, avec une capacité de sac restante égale à `m`, vérifie : `V(i, m)` est le maximum entre `V(i-1, m)` (sans l'objet `i`) et `v_i + V(i-1, m - p_i)` (avec l'objet `i`).\r\n\r\nÉcrire une fonction `sac_a_dos_bu(objets, capacite)` qui renvoie la valeur maximale atteignable, en utilisant une approche bottom-up.",
+        "statement": "Reprendre le problème du sac à dos, mais cette fois avec la technique du **bottom-up (tabulation)**, qui garantit toujours la valeur totale maximale possible, contrairement à l'algorithme glouton de l'exercice précédent.\r\n\r\nOn rappelle que \\(V(i,m)\\), la valeur maximale que l'on peut obtenir en utilisant uniquement les \\(i\\) premiers objets, avec une capacité de sac restante égale à \\(m\\), vérifie :\r\n$$\r\nV(i,m)=\r\n\\max\\left(\r\nV(i-1,m),\r\nv_i+V(i-1,m-p_i)\r\n\\right)\r\n$$\r\n\r\nÉcrire une fonction `sac_a_dos_bu(objets, capacite)` qui renvoie la valeur maximale atteignable, en utilisant une approche bottom-up.",
         "kind": "python",
         "starter_code": "def sac_a_dos_bu(objets, capacite):\r\n    pass",
         "function_name": "sac_a_dos_bu",
@@ -2292,7 +2285,7 @@
       {
         "title": "Nim (1/4)",
         "slug": "minimax-nim",
-        "statement": "**Jeu de nim**\n\nDeux joueurs, A et B, s'affrontent autour d'une pile de `n` allumettes. A joue en premier. À tour de rôle, chaque joueur retire 1, 2 ou 3 allumettes de la pile (sans jamais en retirer plus qu'il n'en reste). **Le joueur qui retire la toute dernière allumette gagne.**\n\n**Algorithme Minmax**\n\nLe **minimax** est un algorithme permettant de déterminer le résultat optimal d'un jeu à deux joueurs, à somme nulle (ce que gagne l'un, l'autre le perd) et à information complète (pas de hasard, chaque joueur voit l'état du jeu en entier).\n\nÀ chaque étape, on explore récursivement tous les coups possibles. Un des deux joueurs, dit **maximisant**, cherche à obtenir la valeur la plus grande possible ; l'autre, dit **minimisant**, cherche au contraire la valeur la plus petite possible (le jeu étant à somme nulle, ce qui est bon pour l'un est mauvais pour l'autre). Selon le joueur dont c'est le tour, on prend donc le MAXIMUM ou le MINIMUM des valeurs obtenues pour chaque coup possible.\n\nÉcrire une fonction `minimax_nim(n, maximise)` qui renvoie, du point de vue du joueur A (le joueur maximisant) :\n\n- `1` si A peut forcer sa victoire, en supposant que les deux joueurs jouent de façon optimale à chaque tour ;\n- `-1` si c'est B qui peut forcer sa victoire.\n\n`n` est le nombre d'allumettes restantes, et `maximise` vaut `True` si c'est au tour de A de jouer (le joueur maximisant), `False` si c'est au tour de B (le joueur minimisant).\n\nExemple : `minimax_nim(1, True)` renvoie `1` (A retire la seule allumette restante et gagne immédiatement).",
+        "statement": "Le **minimax** est un algorithme permettant de déterminer le résultat optimal d'un jeu à deux joueurs, à somme nulle (ce que gagne l'un, l'autre le perd) et à information complète (pas de hasard, chaque joueur voit l'état du jeu en entier).\n\n**Principe** : à chaque étape, on explore récursivement tous les coups possibles. Un des deux joueurs, dit **maximisant**, cherche à obtenir la valeur la plus grande possible ; l'autre, dit **minimisant**, cherche au contraire la valeur la plus petite possible (le jeu étant à somme nulle, ce qui est bon pour l'un est mauvais pour l'autre). Selon le joueur dont c'est le tour, on prend donc le MAXIMUM ou le MINIMUM des valeurs obtenues pour chaque coup possible.\n\n**Jeu utilisé pour ce thème : le jeu du Nim, à une seule pile**\n\nDeux joueurs, A et B, s'affrontent autour d'une pile de `n` allumettes. A joue en premier. À tour de rôle, chaque joueur retire 1, 2 ou 3 allumettes de la pile (sans jamais en retirer plus qu'il n'en reste). **Le joueur qui retire la toute dernière allumette gagne.**\n\nÉcrire une fonction `minimax_nim(n, maximise)` qui renvoie, du point de vue du joueur A (le joueur maximisant) :\n\n- `1` si A peut forcer sa victoire, en supposant que les deux joueurs jouent de façon optimale à chaque tour ;\n- `-1` si c'est B qui peut forcer sa victoire.\n\n`n` est le nombre d'allumettes restantes, et `maximise` vaut `True` si c'est au tour de A de jouer (le joueur maximisant), `False` si c'est au tour de B (le joueur minimisant).\n\nExemple : `minimax_nim(1, True)` renvoie `1` (A retire la seule allumette restante et gagne immédiatement).",
         "kind": "python",
         "starter_code": "def minimax_nim(n, maximise):\n    pass\n",
         "function_name": "minimax_nim",
@@ -2312,14 +2305,14 @@
           "[8, True]"
         ],
         "hints": [
-          "Le cas de base correspond à la situation où un joueur a perdu car il ne reste plus d'allumettes.",
+          "Cas de base : que se passe-t-il quand n vaut 0 ? Réfléchir à qui vient de gagner dans cette situation (celui qui vient de jouer, pas celui dont c'est le tour), selon que c'est alors le tour de A (maximise=True) ou de B (maximise=False), puis renvoyer la valeur correspondante (1 ou -1) pour chacun des deux cas.",
           "Quand c'est au tour du joueur maximisant, prendre le **maximum** des valeurs obtenues pour chaque coup possible ; quand c'est au tour du joueur minimisant, prendre le **minimum**."
         ]
       },
       {
         "title": "Nim (2/4)",
         "slug": "minimax-nim-meilleur-coup",
-        "statement": "Dans l'exercice précédent, `minimax_nim(n, maximise)` renvoie seulement la **valeur** du jeu (`1` si A gagne, `-1` si B gagne), mais pas le coup à jouer pour y arriver. Or au tout premier coup — c'est-à-dire la vraie décision que le joueur A doit prendre en pratique — c'est justement **ce coup** qui nous intéresse, pas seulement le résultat final.\n\n**Principe** : pour connaître le meilleur premier coup, il suffit d'essayer chacun des coups possibles (retirer 1, 2 ou 3 allumettes), d'évaluer la position obtenue avec `minimax_nim` (déjà disponible dans le code de départ, pas besoin de la réécrire), et de retenir le coup qui mène à la **meilleure** valeur pour A.\n\nÉcrire une fonction `meilleur_coup_nim(n)` qui renvoie le nombre d'allumettes à retirer (1, 2 ou 3) que le joueur A doit jouer en premier, pour une partie commençant avec `n` allumettes.\n\nExemple : `meilleur_coup_nim(5)` renvoie `1` (en retirant 1 allumette, A ramène B à une position perdante de 4 allumettes).\n\n**Remarque** : si `n` est une position déjà perdante pour A (un multiple de 4), aucun coup ne permet réellement de gagner : tous se valent en théorie. Ce cas n'est volontairement pas testé ici.",
+        "statement": "Dans l'exercice précédent, `minimax_nim(n, maximise)` renvoie seulement la VALEUR du jeu (`1` si A gagne, `-1` si B gagne), mais pas le coup à jouer pour y arriver. Or au tout premier coup — c'est-à-dire la vraie décision que le joueur A doit prendre en pratique — c'est justement CE COUP qui nous intéresse, pas seulement le résultat final.\n\n**Principe** : pour connaître le meilleur premier coup, il suffit d'essayer chacun des coups possibles (retirer 1, 2 ou 3 allumettes), d'évaluer la position obtenue avec `minimax_nim` (déjà disponible dans le code de départ, pas besoin de la réécrire), et de retenir le coup qui mène à la MEILLEURE valeur pour A.\n\nÉcrire une fonction `meilleur_coup_nim(n)` qui renvoie le nombre d'allumettes à retirer (1, 2 ou 3) que le joueur A doit jouer en premier, pour une partie commençant avec `n` allumettes.\n\nExemple : `meilleur_coup_nim(5)` renvoie `1` (en retirant 1 allumette, A ramène B à une position perdante de 4 allumettes).\n\n**Remarque** : si `n` est une position déjà perdante pour A (un multiple de 4), aucun coup ne permet réellement de gagner : tous se valent en théorie. Ce cas n'est volontairement pas testé ici (plusieurs réponses seraient également correctes).",
         "kind": "python",
         "starter_code": "def minimax_nim(n, maximise):\n    if n == 0:\n        return -1 if maximise else 1\n    if maximise:\n        meilleure_valeur = -2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        pire_valeur = 2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n\n\ndef meilleur_coup_nim(n):\n    pass\n",
         "function_name": "meilleur_coup_nim",
@@ -2338,17 +2331,18 @@
           "[11]"
         ],
         "hints": [
+          "Le premier coup, c'est à A de jouer : évaluer chaque position résultante avec `minimax_nim(n - coup, False)` (c'est ensuite au tour de B), et garder le coup qui donne la meilleure valeur pour A.",
           "Retenir à la fois le meilleur coup ET sa valeur au fil de la boucle : dès qu'un coup fait mieux que le meilleur trouvé jusqu'ici, mettre à jour les deux."
         ]
       },
       {
         "title": "Nim (3/4)",
         "slug": "minimax-nim-profondeur-limitee-meilleur-coup",
-        "statement": "Sur le jeu du Nim, la recherche complète (jusqu'à la victoire de l'un des deux joueurs) reste faisable, mais elle devient vite très coûteuse dès que `n` grandit : sans mémorisation, le nombre d'appels récursifs explose. Dans la plupart des jeux réels (échecs, puissance 4...), il est tout simplement impossible d'aller jusqu'au bout de la partie à chaque coup : il faut s'arrêter après quelques coups seulement, et **estimer** la position obtenue avec une **fonction d'évaluation** (une heuristique), plutôt que de connaître sa valeur exacte.\n\nUne fonction d'évaluation toute faite est fournie (déjà présente dans le code de départ, pas besoin de la modifier) :\n\n```python\ndef evaluation_nim(n):\n    # Heuristique simple (et volontairement approximative) : on suppose\n    # qu'un nombre impair d'allumettes restantes est plutôt favorable au\n    # joueur dont c'est le tour de jouer (pas forcément à A !) : cette valeur\n    # est donc exprimée du point de vue du joueur au trait.\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n```\n\nÉcrire une fonction `meilleur_coup_minimax_profondeur(n, profondeur)` qui renvoie le meilleur premier coup (1, 2 ou 3) que doit jouer A, en limitant la recherche à `profondeur` coups d'avance : on utilise la même méthode que dans l'exercice précédent, mais dès que la profondeur maximale est atteinte (`profondeur == 0`), on utilise la fonction d'évaluation `evaluation_nim` à la place de la valeur exacte.\n\nExemple : avec une profondeur suffisante, `meilleur_coup_minimax_profondeur(5, 6)` renvoie `1` (le même résultat que `meilleur_coup_nim(5)`, la profondeur étant assez grande pour explorer toute la partie).",
+        "statement": "Sur le jeu du Nim, la recherche complète (jusqu'à la victoire de l'un des deux joueurs) reste faisable, mais elle devient vite très coûteuse dès que `n` grandit : sans mémorisation, le nombre d'appels récursifs explose. Dans la plupart des jeux réels (échecs, puissance 4...), il est tout simplement impossible d'aller jusqu'au bout de la partie à chaque coup : il faut s'arrêter après quelques coups seulement, et **estimer** la position obtenue avec une **fonction d'évaluation** (une heuristique), plutôt que de connaître sa valeur exacte.\n\nUne fonction d'évaluation toute faite est fournie (déjà présente dans le code de départ, pas besoin de la modifier) :\n\n```python\ndef evaluation_nim(n):\n    # Heuristique simple (et volontairement approximative) : on suppose\n    # qu'un nombre impair d'allumettes restantes est plutôt favorable au\n    # joueur dont c'est le TOUR DE JOUER (pas forcément à A !) : cette valeur\n    # est donc exprimée du point de vue du joueur au trait.\n    return 1 if n % 2 == 1 else -1\n```\n\nÉcrire une fonction `meilleur_coup_minimax_profondeur(n, profondeur)` qui renvoie le meilleur premier coup (1, 2 ou 3) que doit jouer A, en limitant la recherche à `profondeur` coups d'avance.\n\nPour cela, définir à l'intérieur de la fonction un minimax classique `score(n, maximise, profondeur)`, avec TROIS cas :\n\n- si `n` vaut 0 : la partie est réellement terminée — cas de base habituel, valeur EXACTE (`VALEUR_DEFAITE` si c'est le tour de A qui ne peut plus jouer, `VALEUR_VICTOIRE` sinon — ces deux constantes sont déjà définies dans le code de départ) ;\n- sinon, si `profondeur` vaut 0 : on s'arrête là et on renvoie une ESTIMATION donnée par `evaluation_nim(n)` ;\n- sinon, on explore normalement chaque coup possible, en diminuant `profondeur` de 1 à chaque appel récursif, en prenant le MAXIMUM ou le MINIMUM des valeurs selon le joueur au trait — exactement comme dans le tout premier exercice de ce thème.\n\n**Point important sur les valeurs** : `VALEUR_VICTOIRE` et `VALEUR_DEFAITE` valent `10` et `-10`, très supérieures en valeur absolue aux `1`/`-1` renvoyés par `evaluation_nim`. C'est volontaire : une victoire ou une défaite CONFIRMÉE (une vraie fin de partie observée dans l'arbre de recherche) doit toujours l'emporter sur une simple estimation, aussi bonne soit-elle — sans cet écart d'échelle, une estimation optimiste pourrait faire ignorer à tort une victoire certaine trouvée un peu plus loin dans l'arbre.\n\n**Piège à éviter** : `evaluation_nim(n)` est exprimée du point de vue du joueur qui a le trait à ce moment précis (comme `VALEUR_DEFAITE`/`VALEUR_VICTOIRE` d'ailleurs) — pas forcément du point de vue de A ! Si c'est au tour de B (`maximise = False`) quand la profondeur est épuisée, il faut donc INVERSER le signe de `evaluation_nim(n)` avant de la renvoyer, pour ramener la valeur au point de vue de A (le joueur maximisant), exactement comme on le fait déjà pour `VALEUR_VICTOIRE`/`VALEUR_DEFAITE` selon `maximise`.\n\nExemple : avec une profondeur suffisante, `meilleur_coup_minimax_profondeur(5, 6)` renvoie `1` (le même résultat que `meilleur_coup_nim(5)`, la profondeur étant assez grande pour explorer toute la partie).",
         "kind": "python",
-        "starter_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    # Heuristique simple (et volontairement approximative) : un nombre impair\n    # d'allumettes restantes est supposé favorable au joueur qui a le trait\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    pass\n",
+        "starter_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    # Heuristique simple (et volontairement approximative) : un nombre impair\n    # d'allumettes restantes est supposé favorable au joueur qui a le trait\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    pass\n",
         "function_name": "meilleur_coup_minimax_profondeur",
-        "solution_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    # Minimax classique (comme dans le premier exercice), mais avec deux\n    # cas de base au lieu d'un seul : la vraie fin de partie (n == 0, valeur\n    # exacte) et l'arrêt anticipé faute de profondeur (valeur estimée)\n    def score(n, maximise, profondeur):\n        if n == 0:\n            # Fin de partie réelle : valeur exacte, garantie correcte\n            if maximise:\n                return VALEUR_DEFAITE\n            else:\n                return VALEUR_VICTOIRE\n        if profondeur == 0:\n            # On s'arrête là : on renvoie une estimation plutôt que la vraie\n            # valeur. evaluation_nim(n) est exprimée du point de vue du joueur\n            # au trait : si ce joueur est A (maximise), on la garde telle\n            # quelle ; si c'est B, on l'inverse pour revenir au point de vue\n            # de A — exactement comme pour VALEUR_VICTOIRE/VALEUR_DEFAITE\n            # juste au-dessus\n            if maximise:\n                return evaluation_nim(n)\n            else:\n                return -evaluation_nim(n)\n        if maximise:\n            meilleure_valeur = float('-inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, False, profondeur - 1)\n                    if valeur > meilleure_valeur:\n                        meilleure_valeur = valeur\n            return meilleure_valeur\n        else:\n            pire_valeur = float('inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, True, profondeur - 1)\n                    if valeur < pire_valeur:\n                        pire_valeur = valeur\n            return pire_valeur\n\n    # Au tout premier coup, c'est à A de jouer : on essaie chaque coup et on\n    # garde celui qui donne la meilleure valeur (du point de vue de A)\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = score(n - coup, False, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n\r\n\r\n\r\n# Remarque sur les valeurs : VALEUR_VICTOIRE et VALEUR_DEFAITE valent 10 et -10,\r\n# bien plus grands en valeur absolue que les ±1 d'evaluation_nim : ainsi un résultat\r\n# certain l'emporte toujours sur une simple estimation.",
+        "solution_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    # Minimax classique (comme dans le premier exercice), mais avec DEUX\n    # cas de base au lieu d'un seul : la vraie fin de partie (n == 0, valeur\n    # exacte) et l'arrêt anticipé faute de profondeur (valeur estimée)\n    def score(n, maximise, profondeur):\n        if n == 0:\n            # Fin de partie réelle : valeur exacte, garantie correcte\n            if maximise:\n                return VALEUR_DEFAITE\n            else:\n                return VALEUR_VICTOIRE\n        if profondeur == 0:\n            # On s'arrête là : on renvoie une ESTIMATION plutôt que la vraie\n            # valeur. evaluation_nim(n) est exprimée du point de vue du joueur\n            # au trait : si ce joueur est A (maximise), on la garde telle\n            # quelle ; si c'est B, on l'inverse pour revenir au point de vue\n            # de A — exactement comme pour VALEUR_VICTOIRE/VALEUR_DEFAITE\n            # juste au-dessus\n            if maximise:\n                return evaluation_nim(n)\n            else:\n                return -evaluation_nim(n)\n        if maximise:\n            meilleure_valeur = float('-inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, False, profondeur - 1)\n                    if valeur > meilleure_valeur:\n                        meilleure_valeur = valeur\n            return meilleure_valeur\n        else:\n            pire_valeur = float('inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, True, profondeur - 1)\n                    if valeur < pire_valeur:\n                        pire_valeur = valeur\n            return pire_valeur\n\n    # Au tout premier coup, c'est à A de jouer : on essaie chaque coup et on\n    # garde celui qui donne la meilleure valeur (du point de vue de A)\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = score(n - coup, False, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2369,15 +2363,16 @@
         ],
         "hints": [
           "Il y a trois cas à distinguer, dans cet ordre : n == 0 (fin de partie réelle, valeur exacte), puis profondeur == 0 (on s'arrête, on renvoie une estimation), puis le cas général (on explore les coups en prenant le max ou le min selon maximise).",
-          "Ne pas oublier de convertir `evaluation_nim(n)` au point de vue de A quand `profondeur == 0` : inverser son signe si `maximise` vaut `False`, exactement comme pour `VALEUR_VICTOIRE`/`VALEUR_DEFAITE`."
+          "Ne pas oublier de convertir `evaluation_nim(n)` au point de vue de A quand `profondeur == 0` : inverser son signe si `maximise` vaut `False`, exactement comme pour `VALEUR_VICTOIRE`/`VALEUR_DEFAITE`.",
+          "`VALEUR_VICTOIRE` et `VALEUR_DEFAITE` valent 10 et -10, bien plus grands en valeur absolue que les ±1 d'`evaluation_nim` : ainsi un résultat certain l'emporte toujours sur une simple estimation."
         ]
       },
       {
         "title": "Nim (4/4)",
         "slug": "negamax-nim-profondeur-limitee-meilleur-coup",
-        "statement": "On reprend le principe du minimax de l'exercice précédent, mais avec le **négamax**, une réécriture équivalente utilisable dès que le jeu est à somme nulle et symétrique (la valeur d'un état, vue par le joueur dont c'est le tour, est toujours l'exacte opposée de sa valeur vue par l'autre joueur — c'est le cas ici). Cette propriété permet de se passer complètement de la distinction \"joueur maximisant / joueur minimisant\" : à **chaque** appel récursif, le joueur dont c'est le tour cherche simplement à maximiser **sa propre** valeur, et la valeur d'un coup pour lui est l'opposé de la valeur renvoyée par l'appel récursif sur l'état résultant.\n\nComme dans l'exercice précédent, on limite la recherche à un nombre de coups donné (`profondeur`), et on utilise la même fonction d'évaluation heuristique, déjà fournie dans le code de départ :\n\n```python\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n```\n\nÉcrire une fonction `meilleur_coup_negamax_profondeur(n, profondeur)` qui renvoie le meilleur premier coup (1, 2 ou 3) à jouer, en limitant la recherche à `profondeur` coups d'avance.\n\nExemple : avec une profondeur suffisante, `meilleur_coup_negamax_profondeur(5, 6)` renvoie `1`.",
+        "statement": "On reprend le principe du minimax de l'exercice précédent, mais avec le **négamax**, une réécriture équivalente utilisable dès que le jeu est à somme nulle et symétrique (la valeur d'un état, vue par le joueur dont c'est le tour, est toujours l'exacte opposée de sa valeur vue par l'autre joueur — c'est le cas ici). Cette propriété permet de se passer complètement de la distinction \"joueur maximisant / joueur minimisant\" : à CHAQUE appel récursif, le joueur dont c'est le tour cherche simplement à maximiser SA PROPRE valeur, et la valeur d'un coup pour lui est l'opposé de la valeur renvoyée par l'appel récursif sur l'état résultant.\n\nComme dans l'exercice précédent, on limite la recherche à un nombre de coups donné (`profondeur`), et on utilise la même fonction d'évaluation heuristique, déjà fournie dans le code de départ :\n\n```python\ndef evaluation_nim(n):\n    return 1 if n % 2 == 1 else -1\n```\n\nÉcrire une fonction `meilleur_coup_negamax_profondeur(n, profondeur)` qui renvoie le meilleur premier coup (1, 2 ou 3) à jouer, en limitant la recherche à `profondeur` coups d'avance.\n\nPour cela, définir à l'intérieur de la fonction un négamax `score(n, profondeur)`, avec les mêmes trois cas que pour le minimax de l'exercice précédent :\n\n- si `n` vaut 0 : la partie est réellement terminée — valeur EXACTE, `VALEUR_DEFAITE` (déjà définie dans le code de départ, vaut `-10`) : le joueur dont c'est le tour ne peut pas jouer, il a donc perdu ;\n- sinon, si `profondeur` vaut 0 : on s'arrête là et on renvoie l'ESTIMATION `evaluation_nim(n)` ;\n- sinon, on explore chaque coup possible, en diminuant `profondeur` de 1 à chaque appel récursif, et en prenant l'opposé (`-`) de la valeur retournée par l'appel récursif sur l'état résultant.\n\n**Remarque, en écho à l'exercice précédent** : contrairement au minimax, il n'y a ICI aucune conversion de point de vue à faire sur `evaluation_nim(n)` ! Puisque cette fonction est déjà exprimée du point de vue du joueur au trait — exactement la convention qu'utilise le négamax à chaque étage — elle peut être renvoyée telle quelle, sans inversion de signe. C'est précisément ce que le négamax simplifie par rapport au minimax.\n\nExemple : avec une profondeur suffisante, `meilleur_coup_negamax_profondeur(5, 6)` renvoie `1`.",
         "kind": "python",
-        "starter_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    pass\n",
+        "starter_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    return 1 if n % 2 == 1 else -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    pass\n",
         "function_name": "meilleur_coup_negamax_profondeur",
         "solution_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    # Négamax, avec les deux mêmes cas de base que pour le minimax de\n    # l'exercice précédent : la vraie fin de partie (n == 0) et l'arrêt\n    # anticipé faute de profondeur (estimation)\n    def score(n, profondeur):\n        if n == 0:\n            # Fin de partie réelle : le joueur au trait ne peut pas jouer,\n            # il a donc perdu — valeur exacte\n            return VALEUR_DEFAITE\n        if profondeur == 0:\n            # On s'arrête là : evaluation_nim(n) est déjà exprimée du point\n            # de vue du joueur au trait, exactement la convention du\n            # négamax — pas besoin de l'adapter, contrairement au minimax\n            return evaluation_nim(n)\n        meilleure_valeur = float('-inf')\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de l'adversaire : sa valeur\n                # est l'opposée de la nôtre\n                valeur = -score(n - coup, profondeur - 1)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = -score(n - coup, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n",
         "sql_setup": "",
@@ -2399,6 +2394,7 @@
           "[8, 1]"
         ],
         "hints": [
+          "Même ordre de cas que pour le minimax : n == 0 (fin de partie réelle) avant profondeur == 0 (estimation).",
           "Contrairement au minimax, `evaluation_nim(n)` peut être renvoyée telle quelle quand `profondeur == 0` : elle est déjà exprimée du point de vue du joueur au trait, ce que le négamax utilise directement partout.",
           "Ne pas oublier le signe \"-\" devant l'appel récursif `score(n - coup, profondeur - 1)` : c'est lui qui remplace toute la distinction maximisant/minimisant du minimax."
         ]
@@ -2414,7 +2410,7 @@
       {
         "title": "Complexité du tri par insertion",
         "slug": "complexite-tri-insertion",
-        "statement": "Voici le code du tri par insertion étudié précédemment :\n\n```python\ndef tri_insertion(L):\n    Ltriee = []\n    for i in range(len(L)):\n        x = L[i]\n        Ltriee.append(x)\n        j = i\n        while j > 0 and Ltriee[j] < Ltriee[j-1]:\n            Ltriee[j], Ltriee[j-1] = Ltriee[j-1], Ltriee[j]\n            j -= 1\n    return Ltriee\n```\n\nÉcrire une fonction `complexite_tri_insertion(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_insertion`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```",
+        "statement": "Voici le code du tri par insertion étudié précédemment :\n\n```python\ndef tri_insertion(L):\n    Ltriee = []\n    for i in range(len(L)):\n        x = L[i]\n        Ltriee.append(x)\n        j = i\n        while j > 0 and Ltriee[j] < Ltriee[j-1]:\n            Ltriee[j], Ltriee[j-1] = Ltriee[j-1], Ltriee[j]\n            j -= 1\n    return Ltriee\n```\n\nÉcrire une fonction `complexite_tri_insertion(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_insertion`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si `L` est déjà triée (chaque élément \"remonte\"-t-il beaucoup) ? Et si `L` est triée dans l'ordre inverse ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_insertion(L):\n    pass\n",
         "function_name": "complexite_tri_insertion",
@@ -2428,7 +2424,6 @@
           "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
         ],
         "hints": [
-          "Le meilleur des cas correspond à une liste déjà triée ; le pire des cas correspond à une liste triée dans l'ordre inverse.",
           "Compter le nombre de comparaisons faites par le `while` dans le meilleur des cas (liste déjà triée) : combien de fois la condition est-elle vérifiée avant d'être fausse ?",
           "Dans le pire cas (liste triée à l'envers), chaque élément doit remonter tout le chemin jusqu'au début : le nombre total de comparaisons est proche de 1 + 2 + ... + n."
         ]
@@ -2436,7 +2431,7 @@
       {
         "title": "Complexité du tri par sélection",
         "slug": "complexite-tri-selection",
-        "statement": "Voici le code du tri par sélection étudié précédemment :\n\n```python\ndef tri_selection(L):\n    for i in range(len(L)):\n        i_min = i\n        for j in range(i + 1, len(L)):\n            if L[j] < L[i_min]:\n                i_min = j\n        L[i], L[i_min] = L[i_min], L[i]\n    return L\n```\n\nÉcrire une fonction `complexite_tri_selection(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_selection`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```",
+        "statement": "Voici le code du tri par sélection étudié précédemment :\n\n```python\ndef tri_selection(L):\n    for i in range(len(L)):\n        i_min = i\n        for j in range(i + 1, len(L)):\n            if L[j] < L[i_min]:\n                i_min = j\n        L[i], L[i_min] = L[i_min], L[i]\n    return L\n```\n\nÉcrire une fonction `complexite_tri_selection(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `tri_selection`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : la boucle interne (recherche du minimum restant) dépend-elle des valeurs de `L`, ou s'exécute-t-elle toujours en entier, quel que soit l'état initial de la liste ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_selection(L):\n    pass\n",
         "function_name": "complexite_tri_selection",
@@ -2450,13 +2445,14 @@
           "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
         ],
         "hints": [
-          "Contrairement au tri par insertion, ici il n'y a pas de \"raccourci\" possible : même si L est déjà triée, il faut quand même comparer chaque élément restant pour confirmer le minimum."
+          "Contrairement au tri par insertion, ici il n'y a pas de \"raccourci\" possible : même si L est déjà triée, il faut quand même comparer chaque élément restant pour confirmer le minimum.",
+          "Le nombre de comparaisons de la boucle interne ne dépend jamais des valeurs de L, seulement de sa taille."
         ]
       },
       {
         "title": "Complexité du tri fusion",
         "slug": "complexite-tri-fusion",
-        "statement": "Voici le code du tri fusion étudié précédemment :\n\n```python\ndef tri_fusion(L):\n    if len(L) <= 1:\n        return L\n    milieu = len(L) // 2\n    gauche = tri_fusion(L[:milieu])\n    droite = tri_fusion(L[milieu:])\n    return fusion(gauche, droite)\n```\n\nÉcrire une fonction `complexite_tri_fusion(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_fusion`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```",
+        "statement": "Voici le code du tri fusion étudié précédemment :\n\n```python\ndef tri_fusion(L):\n    if len(L) <= 1:\n        return L\n    milieu = len(L) // 2\n    gauche = tri_fusion(L[:milieu])\n    droite = tri_fusion(L[milieu:])\n    return fusion(gauche, droite)\n```\n\nÉcrire une fonction `complexite_tri_fusion(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_fusion`, en fonction de `n = len(L)`.\n\n**Contrairement aux deux exercices précédents**, on ne demande pas ici `(meilleur_cas, pire_cas)` mais **`(cas_moyen, pire_cas)`** : le découpage de `tri_fusion` en deux moitiés ne dépend jamais des valeurs contenues dans `L`, seulement de sa taille. Il n'y a donc pas de \"meilleur cas\" avantageux à distinguer — en revanche, la distinction entre cas moyen et pire cas reste pertinente et est celle habituellement retenue pour cet algorithme.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : combien de niveaux de découpage y a-t-il avant d'atteindre des listes de taille 1 ? Et combien d'opérations coûte la fusion à chaque niveau ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_fusion(L):\n    pass\n",
         "function_name": "complexite_tri_fusion",
@@ -2469,14 +2465,14 @@
           "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
         ],
         "hints": [
-          "Le découpage en deux moitiés ne dépend jamais des valeurs de L : le cas moyen et le pire cas sont identiques pour cet algorithme.",
+          "Le découpage en deux moitiés ne dépend jamais des valeurs de L : c'est pour ça que cas moyen et pire cas sont identiques pour cet algorithme.",
           "Compter le nombre de \"niveaux\" de récursion (division par 2 à chaque fois) et le coût de `fusion()` à chaque niveau."
         ]
       },
       {
         "title": "Complexité du tri rapide",
         "slug": "complexite-tri-rapide",
-        "statement": "Voici le code du tri rapide étudié précédemment :\n\n```python\ndef tri_rapide(L):\n    if len(L) <= 1:\n        return L\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n```\n\nÉcrire une fonction `complexite_tri_rapide(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_rapide`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```",
+        "statement": "Voici le code du tri rapide étudié précédemment :\n\n```python\ndef tri_rapide(L):\n    if len(L) <= 1:\n        return L\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n```\n\nÉcrire une fonction `complexite_tri_rapide(L)` qui renvoie un tuple `(cas_moyen, pire_cas)` donnant la **complexité asymptotique** de `tri_rapide`, en fonction de `n = len(L)`.\n\n**Comme pour le tri fusion**, on demande ici `(cas_moyen, pire_cas)` plutôt que `(meilleur_cas, pire_cas)` : le pivot étant toujours choisi comme le premier élément de `L`, le \"meilleur cas\" (pivot parfaitement au milieu à chaque appel) est un cas particulier peu représentatif. C'est le **cas moyen** qui est habituellement retenu pour cet algorithme — et c'est justement là que le tri rapide se distingue du tri fusion : leur cas moyen est identique (`n * log(n)`), mais leur pire cas diffère.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si le pivot (toujours `L[0]`) tombe systématiquement sur le plus petit ou le plus grand élément restant, par exemple sur une liste déjà triée ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_tri_rapide(L):\n    pass\n",
         "function_name": "complexite_tri_rapide",
@@ -2489,13 +2485,14 @@
           "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
         ],
         "hints": [
-          "Le pire cas correspond à une liste déjà triée (par ordre croissant ou décroissant) : le pivot étant toujours `L[0]`, il correspond systématiquement au plus petit ou au plus grand élément restant."
+          "Le pivot est toujours `L[0]` : imaginer ce que ça donne sur une liste déjà triée par ordre croissant ou décroissant — combien d'éléments partent dans \"inférieurs\" ou \"supérieurs\" à chaque appel ?",
+          "Dans le pire cas, chaque appel récursif ne réduit la taille du problème que d'un seul élément : la somme des tailles à chaque niveau ressemble à 1+2+...+n."
         ]
       },
       {
         "title": "Complexité de la recherche du minimum",
         "slug": "complexite-recherche-min",
-        "statement": "Voici le code de la recherche du minimum étudiée précédemment :\n\n```python\ndef recherche_min(L):\n    mini = L[0]\n    for i in range(1, len(L)):\n        if L[i] < mini:\n            mini = L[i]\n    return mini\n```\n\nÉcrire une fonction `complexite_recherche_min(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_min`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```",
+        "statement": "Voici le code de la recherche du minimum étudiée précédemment :\n\n```python\ndef recherche_min(L):\n    mini = L[0]\n    for i in range(1, len(L)):\n        if L[i] < mini:\n            mini = L[i]\n    return mini\n```\n\nÉcrire une fonction `complexite_recherche_min(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_min`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : la boucle peut-elle jamais s'arrêter avant d'avoir comparé tous les éléments restants, quelles que soient les valeurs de `L` ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_recherche_min(L):\n    pass\n",
         "function_name": "complexite_recherche_min",
@@ -2508,12 +2505,14 @@
           "[[]]",
           "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]"
         ],
-        "hints": []
+        "hints": [
+          "Contrairement au tri par insertion, il n'existe ici aucun raccourci : même si le minimum se trouve dès le premier élément, la boucle continue quand même à comparer tous les éléments suivants pour s'en assurer."
+        ]
       },
       {
         "title": "Complexité de la recherche d'un élément (avec boucle)",
         "slug": "complexite-recherche-element",
-        "statement": "Voici le code d'une recherche d'élément dans une liste, avec une boucle, étudiée précédemment :\n\n```python\ndef recherche_element(L, x):\n    for i in range(len(L)):\n        if L[i] == x:\n            return True\n    return False\n```\n\nÉcrire une fonction `complexite_recherche_element(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```",
+        "statement": "Voici le code d'une recherche d'élément dans une liste, avec une boucle, étudiée précédemment :\n\n```python\ndef recherche_element(L, x):\n    for i in range(len(L)):\n        if L[i] == x:\n            return True\n    return False\n```\n\nÉcrire une fonction `complexite_recherche_element(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : que se passe-t-il si l'élément recherché est le tout premier de la liste ? Et s'il ne s'y trouve pas du tout ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_recherche_element(L):\n    pass\n",
         "function_name": "complexite_recherche_element",
@@ -2526,12 +2525,14 @@
           "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]",
           "[[7, 3, 9, 2, 8]]"
         ],
-        "hints": []
+        "hints": [
+          "Le meilleur cas correspond à un coût **constant** (voir le second exemple du format de réponse attendu) : une seule comparaison suffit, quelle que soit la taille de la liste."
+        ]
       },
       {
         "title": "Complexité de la recherche d'un élément (avec in)",
         "slug": "complexite-recherche-element-in",
-        "statement": "Voici la même recherche que dans l'exercice précédent, mais écrite avec l'opérateur `in` :\n\n```python\ndef recherche_element_in(L, x):\n    return x in L\n```\n\nÉcrire une fonction `complexite_recherche_element_in(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element_in`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```",
+        "statement": "Voici la même recherche que dans l'exercice précédent, mais écrite avec l'opérateur `in` :\n\n```python\ndef recherche_element_in(L, x):\n    return x in L\n```\n\nÉcrire une fonction `complexite_recherche_element_in(L)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `recherche_element_in`, en fonction de `n = len(L)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(L)`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la liste (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : l'opérateur `in` cache la boucle, mais fait-il vraiment quelque chose de différent \"sous le capot\" par rapport à l'exercice précédent ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_recherche_element_in(L):\n    pass\n",
         "function_name": "complexite_recherche_element_in",
@@ -2544,29 +2545,14 @@
           "[[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]",
           "[[7, 3, 9, 2, 8]]"
         ],
-        "hints": []
-      },
-      {
-        "title": "Complexité de la recherche d'un élément (avec dictionnaire)",
-        "slug": "complexite-recherche-element-dictionnaire",
-        "statement": "Un dictionnaire Python est construit sur une table de hachage. Écrire une fonction `complexite_recherche_element_dictionnaire(dictionnaire)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `cle_presente` (exercice précédent du thème Dictionnaire), en fonction de `n = len(dictionnaire)`.\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n = len(dictionnaire)`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille du dictionnaire (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```",
-        "kind": "python",
-        "starter_code": "from math import log\n\ndef complexite_recherche_element_dictionnaire(dictionnaire):\n    pass\n",
-        "function_name": "complexite_recherche_element_dictionnaire",
-        "solution_code": "from math import log\n\ndef complexite_recherche_element_dictionnaire(dictionnaire):\n    n = len(dictionnaire)\n    # Recherche par clé dans un dictionnaire : temps constant, quelle que soit la\n    # situation (meilleur cas et pire cas sont donc identiques ici)\n    return 1, 1\n",
-        "sql_setup": "",
-        "sql_solution": "",
-        "test_cases": [
-          "[{'a': 1, 'b': 2}]",
-          "[{}]",
-          "[{'x': 1, 'y': 2, 'z': 3}]"
-        ],
-        "hints": []
+        "hints": [
+          "`in` s'arrête dès qu'il trouve une correspondance, exactement comme le `return True` de la boucle manuelle : la complexité ne change donc pas."
+        ]
       },
       {
         "title": "Complexité de la transposition d'une matrice",
         "slug": "complexite-transposition",
-        "statement": "Voici le code de la transposition de matrice étudiée précédemment :\n\n```python\ndef transposer(matrice):\n    m = len(matrice)\n    p = len(matrice[0])\n    return [[matrice[i][j] for i in range(m)] for j in range(p)]\n```\n\nÉcrire une fonction `complexite_transposition(matrice)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `transposer`, en fonction de `n`, le **nombre total d'éléments** de la matrice (`n = m × p`, où `m` est le nombre de lignes et `p` le nombre de colonnes).\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n`.\n\nExemples :\n\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la matrice (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```",
+        "statement": "Voici le code de la transposition de matrice étudiée précédemment :\n\n```python\ndef transposer(matrice):\n    m = len(matrice)\n    p = len(matrice[0])\n    return [[matrice[i][j] for i in range(m)] for j in range(p)]\n```\n\nÉcrire une fonction `complexite_transposition(matrice)` qui renvoie un tuple `(meilleur_cas, pire_cas)` donnant la **complexité asymptotique** de `transposer`, en fonction de `n`, le **nombre total d'éléments** de la matrice (`n = m × p`, où `m` est le nombre de lignes et `p` le nombre de colonnes).\n\n**Format de réponse attendu** : renvoyer un tuple de deux valeurs, exprimant la **complexité asymptotique** en fonction de `n`.\n\nExemples :\n- coût linéaire pour le meilleur cas, quadratique pour le pire cas :\n```python\nreturn n, n**2\n```\n- coût constant, c'est-à-dire indépendant de la taille de la matrice (par exemple si une seule opération suffit, quelle que soit la valeur de `n`) :\n```python\nreturn 1, 1\n```\n\nIndice de raisonnement : chaque case de la matrice est-elle toujours visitée, quelles que soient les valeurs qu'elle contient ?",
         "kind": "python",
         "starter_code": "from math import log\n\ndef complexite_transposition(matrice):\n    pass\n",
         "function_name": "complexite_transposition",
@@ -2578,6 +2564,25 @@
           "[[[1, 2, 3], [4, 5, 6]]]",
           "[[[1]]]",
           "[[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]]"
+        ],
+        "hints": [
+          "Il n'y a pas de \"sortie anticipée\" possible ici : la transposition doit forcément visiter chaque case de la matrice une fois. Meilleur cas et pire cas sont donc identiques."
+        ]
+      },
+      {
+        "title": "Complexité de la recherche d'une clé dans un dictionnaire",
+        "slug": "complexite-cle-presente",
+        "statement": "Un dictionnaire Python est construit sur une table de hachage. Écrire une fonction `complexite_cle_presente(dictionnaire)` qui renvoie la complexité de `cle_presente` (exercice précédent du thème Dictionnaire), en fonction de `n = len(dictionnaire)`.\n\n**Contrairement aux autres exercices de ce thème, on ne distingue pas ici meilleur cas et pire cas** (ils sont toujours identiques pour une recherche par clé dans un dictionnaire) : renvoyer **une seule valeur**, pas un tuple.\n\nExemple : pour un coût constant, renvoyer simplement `1`.",
+        "kind": "python",
+        "starter_code": "from math import log\n\ndef complexite_cle_presente(dictionnaire):\n    pass\n",
+        "function_name": "complexite_cle_presente",
+        "solution_code": "from math import log\n\ndef complexite_cle_presente(dictionnaire):\n    n = len(dictionnaire)\n    # Recherche par clé dans un dictionnaire : temps constant, quelle que soit\n    # la situation (pas de distinction meilleur/pire cas ici, contrairement à une\n    # recherche dans une liste)\n    return 1\n",
+        "sql_setup": "",
+        "sql_solution": "",
+        "test_cases": [
+          "[{'a': 1, 'b': 2}]",
+          "[{}]",
+          "[{'x': 1, 'y': 2, 'z': 3}]"
         ],
         "hints": []
       }
@@ -2594,7 +2599,7 @@
         "slug": "liste-eleves-triee",
         "statement": "Écrire une requête qui affiche le nom et le prénom de tous les élèves, classés par ordre alphabétique du nom, puis du prénom (en cas d'égalité de nom).",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2607,7 +2612,7 @@
         "slug": "exercices-faciles-meta",
         "statement": "Écrire une requête qui affiche les titres de tous les exercices faciles, classés par id croissant.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2620,7 +2625,7 @@
         "slug": "prenoms-commencant-par-m",
         "statement": "Écrire une requête qui affiche le nom et le prénom de tous les élèves dont le prénom commence par la lettre \"M\", classés par ordre alphabétique du nom, puis du prénom.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2631,9 +2636,9 @@
       {
         "title": "Exercices du thème Boucles",
         "slug": "exercices-theme-boucles",
-        "statement": "Écrire une requête qui affiche les titres de tous les exercices du thème \"Boucles\", triés par id croissant.",
+        "statement": "Écrire une requête qui affiche les titres de tous les exercices du thème \"Boucles\".",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2646,7 +2651,7 @@
         "slug": "double-jointure-reussites",
         "statement": "Écrire une requête qui affiche le prénom de l'élève et le titre de l'exercice, pour chaque tentative réussie, triés par prénom d'élève puis par titre d'exercice.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2659,7 +2664,7 @@
         "slug": "nombre-total-exercices",
         "statement": "Écrire une requête qui affiche le nombre total d'exercices dans la base.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2672,7 +2677,7 @@
         "slug": "nombre-exercices-par-theme",
         "statement": "Écrire une requête qui affiche, pour chaque thème, son nom et son nombre d'exercices, triés par nom de thème.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2683,9 +2688,9 @@
       {
         "title": "Temps total passé par élève",
         "slug": "temps-total-par-eleve",
-        "statement": "Écrire une requête qui affiche, pour chaque élève (nom, prénom), le temps total passé (en secondes) sur tous ses essais, triés par ordre alphabétique du nom, puis du prénom.",
+        "statement": "Écrire une requête qui affiche, pour chaque élève (nom, prénom), le temps total passé (en secondes) sur tous ses essais, triés par ordre alphabétique du nom.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2696,13 +2701,13 @@
       {
         "title": "Temps moyen par exercice",
         "slug": "temps-moyen-par-exercice",
-        "statement": "Écrire une requête qui affiche, pour chaque exercice (titre), le temps moyen (en secondes) passé par les élèves, triés par temps moyen croissant.",
+        "statement": "Écrire une requête qui affiche, pour chaque exercice (titre), le temps moyen (en secondes) passé par les élèves, triés par titre.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
-        "sql_solution": "-- AVG calcule la moyenne des valeurs numériques d'une colonne, par groupe\nSELECT ex.titre, AVG(r.temps_secondes)\nFROM resultats AS r\nJOIN exercices AS ex ON r.exercice_id = ex.id\nGROUP BY ex.id\nORDER BY AVG(r.temps_secondes);",
+        "sql_solution": "-- AVG calcule la moyenne des valeurs numériques d'une colonne, par groupe\nSELECT ex.titre, AVG(r.temps_secondes)\nFROM resultats AS r\nJOIN exercices AS ex ON r.exercice_id = ex.id\nGROUP BY ex.id\nORDER BY ex.titre;",
         "test_cases": [],
         "hints": []
       },
@@ -2711,7 +2716,7 @@
         "slug": "meilleur-temps-par-exercice",
         "statement": "Écrire une requête qui affiche, pour chaque exercice (titre), le meilleur temps (le plus petit) enregistré parmi les tentatives réussies, triés par titre.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2724,7 +2729,7 @@
         "slug": "themes-plus-de-6-exercices",
         "statement": "Écrire une requête qui affiche le nom des thèmes contenant plus de 6 exercices.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2737,7 +2742,7 @@
         "slug": "themes-au-moins-2-exercices-faciles",
         "statement": "Écrire une requête qui affiche le nom des thèmes ayant au moins 2 exercices faciles, triés par nom.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2758,7 +2763,7 @@
         "slug": "equipes-ville",
         "statement": "Écrire une requête qui affiche le nom des équipes situées à Lyon.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2771,7 +2776,7 @@
         "slug": "joueurs-poste",
         "statement": "Écrire une requête qui affiche le nom et le prénom de tous les joueurs au poste d'attaquant, triés par nom.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2784,7 +2789,7 @@
         "slug": "joueurs-nom-d",
         "statement": "Écrire une requête qui affiche le nom et le prénom de tous les joueurs dont le nom commence par la lettre \"D\", triés par nom puis par prénom.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2797,7 +2802,7 @@
         "slug": "joueurs-et-equipe",
         "statement": "Écrire une requête qui affiche, pour chaque joueur, son nom, son prénom et le nom de son équipe, triés par nom d'équipe puis par nom de joueur.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2810,7 +2815,7 @@
         "slug": "buts-dun-match",
         "statement": "Écrire une requête qui affiche, pour le match dont l'identifiant est 4, le nom et le prénom du buteur ainsi que la minute de chaque but marqué, triés par minute croissante.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2823,7 +2828,7 @@
         "slug": "buts-par-joueur",
         "statement": "Écrire une requête qui affiche, pour chaque joueur ayant marqué au moins un but, son nom, son prénom et son nombre total de buts, triés par nom.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2836,7 +2841,7 @@
         "slug": "buts-par-equipe",
         "statement": "Écrire une requête qui affiche, pour chaque équipe, son nom et son nombre total de buts marqués (tous joueurs confondus), triés par nom d'équipe.\n\nUn but est associé à une équipe via l'équipe du joueur buteur (table `joueurs`), pas via la table `matchs`.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2847,9 +2852,9 @@
       {
         "title": "Buts par équipe depuis une date",
         "slug": "buts-equipe-depuis-date",
-        "statement": "Écrire une requête qui affiche, pour chaque équipe, son nombre de buts marqués lors des matchs joués à partir du 1er février 2026 inclus, triés par nom d'équipe.\n\nDans cette base de données, les dates sont stockées sous forme d'une chaîne de caractères, au format `AAAA-MM-JJ` (par exemple `'2026-02-01'`) : une comparaison alphabétique donne donc exactement le même résultat qu'une comparaison chronologique (par exemple `'2026-02-01' >= '2026-01-15'` donne `True`).",
+        "statement": "Écrire une requête qui affiche, pour chaque équipe, son nombre de buts marqués lors des matchs joués à partir du 1er février 2026 inclus, triés par nom d'équipe.\n\n**Rappel sur les dates (hors-programme)** : dans cette base, les dates sont stockées comme du simple texte, au format `AAAA-MM-JJ` (par exemple `'2026-02-01'`). Avec ce format précis, comparer des dates avec `<`, `>`, `>=`, etc. fonctionne correctement : une comparaison alphabétique de texte donne exactement le même résultat qu'une comparaison chronologique. Il est donc possible d'écrire `m.date >= '2026-02-01'` comme une simple comparaison de nombres, sans fonction spéciale.\n\n**Point clé de cet exercice** : le filtre sur la date doit s'appliquer AVANT le regroupement par équipe, avec `WHERE` — pas avec `HAVING`, qui filtre des groupes déjà constitués.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2860,9 +2865,9 @@
       {
         "title": "Équipes très buteuses",
         "slug": "equipes-tres-buteuses",
-        "statement": "Écrire une requête qui affiche le nom des équipes ayant marqué strictement plus de 5 buts au total, triées par nom.",
+        "statement": "Écrire une requête qui affiche le nom des équipes ayant marqué strictement plus de 5 buts au total, triées par nom.\n\nContrairement à l'exercice précédent, il ne s'agit pas ici de filtrer des LIGNES avant le regroupement, mais de filtrer les GROUPES eux-mêmes, une fois le total de buts par équipe calculé : c'est à ça que sert `HAVING`, utilisé après un `GROUP BY`, là où `WHERE` ne peut pas s'appliquer (`WHERE` ne connaît pas encore la valeur de `COUNT(*)` au moment où il s'exécute, puisque les groupes n'existent pas encore).",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2873,9 +2878,9 @@
       {
         "title": "Buteurs prolifiques à domicile",
         "slug": "buteurs-domicile",
-        "statement": "Écrire une requête qui affiche le nom, le prénom et le nombre de buts des joueurs ayant marqué au moins 2 buts lors de matchs joués À DOMICILE par leur équipe (c'est-à-dire des matchs où leur équipe était l'équipe qui recevait), triés par nom.",
+        "statement": "Écrire une requête qui affiche le nom, le prénom et le nombre de buts des joueurs ayant marqué au moins 2 buts lors de matchs joués À DOMICILE par leur équipe (c'est-à-dire des matchs où leur équipe était l'équipe qui recevait), triés par nom.\n\nCet exercice combine les trois clauses : `WHERE` pour ne garder que les buts marqués à domicile, `GROUP BY` pour regrouper par joueur, et `HAVING` pour ne garder que les joueurs totalisant au moins 2 buts dans ces conditions précises.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2886,41 +2891,35 @@
       {
         "title": "Joueurs ayant marqué dans plusieurs matchs",
         "slug": "buteurs-plusieurs-matchs",
-        "statement": "Écrire une requête qui affiche le nom, le prénom et le nombre de matchs DIFFÉRENTS dans lesquels chaque joueur a marqué (au moins un but), en ne gardant que les joueurs ayant marqué dans au moins 2 matchs différents, triés par nom.",
+        "statement": "Écrire une requête qui affiche le nom, le prénom et le nombre de matchs DIFFÉRENTS dans lesquels chaque joueur a marqué (au moins un but), en ne gardant que les joueurs ayant marqué dans au moins 2 matchs différents, triés par nom.\n\nAttention : un même joueur peut marquer plusieurs buts dans le même match (un doublé, par exemple). En comptant simplement avec `COUNT(*)`, on compte le nombre de buts, pas le nombre de matchs distincts. Utiliser `COUNT(DISTINCT ...)` pour ne compter chaque match qu'une seule fois, même si le joueur y a marqué plusieurs buts.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
         "sql_solution": "-- COUNT(DISTINCT b.match_id) : ne compte chaque match_id qu'UNE SEULE\n-- fois par joueur, même si ce joueur a marqué plusieurs buts dans le\n-- même match (contrairement à COUNT(*), qui compterait chaque but)\nSELECT j.nom, j.prenom, COUNT(DISTINCT b.match_id)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nGROUP BY j.id\nHAVING COUNT(DISTINCT b.match_id) >= 2\nORDER BY j.nom;",
         "test_cases": [],
-        "hints": [
-          "Un même joueur peut marquer plusieurs buts dans un même match (un doublé, par exemple) : utiliser `COUNT(DISTINCT b.match_id)` plutôt que `COUNT(*)` pour ne compter chaque match qu'une seule fois, même si le joueur y a marqué plusieurs buts."
-        ]
+        "hints": []
       },
       {
         "title": "Homonymes parmi les joueurs",
         "slug": "homonymes-joueurs",
-        "statement": "Certains joueurs de clubs différents portent le même nom de famille, sans être la même personne. Écrire une requête qui affiche les paires de joueurs homonymes (même nom, mais joueurs différents) : le nom commun, puis le prénom de chacun des deux joueurs, triés par nom.",
+        "statement": "Certains joueurs de clubs différents portent le même nom de famille, sans être la même personne. Écrire une requête qui affiche les paires de joueurs homonymes (même nom, mais joueurs différents) : le nom commun, puis le prénom de chacun des deux joueurs, triés par nom.\n\nIndice : il s'agit d'une AUTOJOINTURE, une jointure de la table `joueurs` avec elle-même. Penser à utiliser deux alias différents (par exemple `a` et `b`), et à comparer `a.id < b.id` plutôt que `a.id != b.id` : sinon chaque paire apparaîtrait deux fois (une fois dans chaque sens), et un joueur serait même apparié avec lui-même (puisqu'il porte forcément le même nom que lui-même).",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
         "sql_solution": "-- Autojointure : on joint \"joueurs\" avec elle-même via deux alias (a et b)\n-- a.nom = b.nom : les deux joueurs partagent le même nom\n-- a.id < b.id : évite qu'un joueur soit apparié avec lui-même (id = id),\n-- et évite d'obtenir chaque paire en double (une fois (a,b), une fois (b,a))\nSELECT a.nom, a.prenom, b.prenom\nFROM joueurs AS a\nJOIN joueurs AS b ON a.nom = b.nom AND a.id < b.id\nORDER BY a.nom;",
         "test_cases": [],
-        "hints": [
-          "Il s'agit d'une AUTOJOINTURE : une jointure de la table `joueurs` avec elle-même.",
-          "Utiliser deux alias différents pour la table `joueurs` (par exemple `a` et `b`).",
-          "Comparer `a.id < b.id` plutôt que `a.id != b.id` : sinon chaque paire apparaîtrait deux fois (une fois dans chaque sens), et un joueur serait même apparié avec lui-même (puisqu'il porte forcément le même nom que lui-même)."
-        ]
+        "hints": []
       },
       {
         "title": "Coéquipiers au même poste",
         "slug": "coequipiers-meme-poste",
-        "statement": "Écrire une requête qui affiche les paires de joueurs qui jouent dans la même équipe ET au même poste (par exemple deux attaquants dans la même équipe) : le nom de l'équipe, le poste concerné, puis le prénom de chacun des deux joueurs, triés par nom d'équipe.",
+        "statement": "Écrire une requête qui affiche les paires de joueurs qui jouent dans la même équipe ET au même poste (par exemple deux attaquants dans la même équipe) : le nom de l'équipe, le poste concerné, puis le prénom de chacun des deux joueurs, triés par nom d'équipe.\n\nComme dans l'exercice précédent, il s'agit d'une autojointure sur `joueurs` — mais cette fois avec DEUX conditions de correspondance (même équipe ET même poste), en plus de la condition `a.id < b.id` pour éviter les doublons.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2929,41 +2928,37 @@
         "hints": []
       },
       {
-        "title": "L'équipe la plus buteuse",
-        "slug": "equipe-plus-buteuse",
-        "statement": "Écrire une requête qui affiche le nom de l'équipe ayant marqué le plus de buts au total, ainsi que son nombre de buts.",
-        "kind": "sql",
-        "starter_code": "",
-        "function_name": "",
-        "solution_code": "",
-        "sql_setup": "",
-        "sql_solution": "-- Même requête que \"Nombre de buts par équipe\", mais triée par total décroissant\n-- et limitée à la première ligne : l'équipe avec le plus grand total\nSELECT e.nom, COUNT(*) AS total\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nGROUP BY e.id\nORDER BY total DESC\nLIMIT 1;",
-        "test_cases": [],
-        "hints": [
-          "Trier les équipes par nombre total de buts décroissant (`ORDER BY total DESC`), puis ne garder que la première ligne avec `LIMIT 1`."
-        ]
-      },
-      {
         "title": "Joueurs n'ayant jamais marqué",
         "slug": "joueurs-jamais-marque",
-        "statement": "Écrire une requête qui affiche le nom et le prénom des joueurs n'ayant jamais marqué le moindre but, triés par nom.",
+        "statement": "Écrire une requête qui affiche le nom et le prénom des joueurs n'ayant jamais marqué le moindre but, triés par nom.\n\nIndice : une sous-requête `SELECT joueur_id FROM buts` donne la liste de tous les joueurs ayant marqué au moins une fois. Il reste à sélectionner les joueurs dont l'`id` n'apparaît PAS dans cette liste.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
         "sql_solution": "-- La sous-requête (SELECT joueur_id FROM buts) donne l'ensemble des\n-- identifiants de joueurs ayant marqué AU MOINS une fois\n-- NOT IN exclut alors tous les joueurs présents dans cette liste\nSELECT nom, prenom\nFROM joueurs\nWHERE id NOT IN (SELECT joueur_id FROM buts)\nORDER BY nom;",
         "test_cases": [],
-        "hints": [
-          "Une sous-requête `SELECT joueur_id FROM buts` donne la liste de tous les joueurs ayant marqué au moins une fois. Il reste à sélectionner les joueurs dont l'`id` n'apparaît PAS dans cette liste."
-        ]
+        "hints": []
+      },
+      {
+        "title": "L'équipe la plus buteuse",
+        "slug": "equipe-plus-buteuse",
+        "statement": "Écrire une requête qui affiche le nom de l'équipe ayant marqué le plus de buts au total, ainsi que son nombre de buts.\n\nIndice de méthode : calculer d'abord, pour chaque équipe, son nombre total de buts (comme à l'exercice \"Nombre de buts par équipe\"). Le maximum de cette liste de totaux peut ensuite être obtenu avec une sous-requête imbriquée : `SELECT MAX(...) FROM (une requête qui calcule un total par équipe)`. Il ne reste plus qu'à ne garder, avec `HAVING`, que l'équipe (ou les équipes, en cas d'égalité) dont le total est égal à ce maximum.",
+        "kind": "sql",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
+        "function_name": "",
+        "solution_code": "",
+        "sql_setup": "",
+        "sql_solution": "-- Sous-requête interne : calcule le nombre de buts de CHAQUE équipe\n-- (une ligne par equipe_id), exactement comme l'exercice \"buts par équipe\"\n-- MAX(cnt) : le plus grand de ces totaux, tous équipes confondues\n-- HAVING COUNT(*) = ce maximum : ne garde que l'équipe (ou les équipes,\n-- en cas d'égalité) qui atteint exactement ce total\nSELECT e.nom, COUNT(*) AS total\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nGROUP BY e.id\nHAVING COUNT(*) = (\n    SELECT MAX(cnt)\n    FROM (\n        SELECT COUNT(*) AS cnt\n        FROM buts AS b2\n        JOIN joueurs AS j2 ON b2.joueur_id = j2.id\n        GROUP BY j2.equipe_id\n    )\n);",
+        "test_cases": [],
+        "hints": []
       },
       {
         "title": "Matchs au-dessus de la moyenne",
         "slug": "matchs-au-dessus-moyenne",
-        "statement": "On appelle **score total d'un match** la somme des buts marqués par les deux équipes lors de ce match, c'est-à-dire `score_domicile + score_exterieur`.\n\nÉcrire une requête qui affiche les matchs (identifiant, score à domicile, score à l'extérieur) dont le score total est strictement supérieur à la MOYENNE des scores totaux de tous les matchs de la base, triés par identifiant.",
+        "statement": "On appelle **score total d'un match** la somme des buts marqués par les deux équipes lors de ce match, c'est-à-dire `score_domicile + score_exterieur`.\n\nÉcrire une requête qui affiche les matchs (identifiant, score à domicile, score à l'extérieur) dont le score total est strictement supérieur à la MOYENNE des scores totaux de tous les matchs de la base, triés par identifiant.\n\nIndice : une sous-requête `SELECT AVG(score_domicile + score_exterieur) FROM matchs` calcule cette moyenne globale sur l'ensemble des matchs. Comparer ensuite le score total de chaque match à cette valeur, directement dans la clause `WHERE`.",
         "kind": "sql",
-        "starter_code": "",
+        "starter_code": "-- Écrire la requête ici\nSELECT ",
         "function_name": "",
         "solution_code": "",
         "sql_setup": "",
@@ -2982,7 +2977,7 @@
       {
         "title": "Tableau numpy rempli de zéros",
         "slug": "tableau-zeros",
-        "statement": "Écrire une fonction `tableau_zeros(n)` qui renvoie un tableau **numpy** de taille `n`, rempli de zéros.",
+        "statement": "Écrire une fonction `tableau_zeros(n)` qui renvoie un tableau **numpy** de taille `n`, rempli de zéros.\n\nIndice : la fonction `np.zeros` fait exactement ça.",
         "kind": "python",
         "starter_code": "import numpy as np\n\ndef tableau_zeros(n):\n    pass\n",
         "function_name": "tableau_zeros",
@@ -2994,29 +2989,31 @@
           "[1]",
           "[0]"
         ],
-        "hints": []
+        "hints": [
+          "`np.zeros(n)` renvoie directement un tableau numpy de taille `n` rempli de zéros — pas besoin de boucle."
+        ]
       },
       {
-        "title": "Tableau numpy rempli d'une valeur",
+        "title": "Tableau numpy rempli de uns",
         "slug": "tableau-uns",
-        "statement": "Écrire une fonction `tableau_rempli(n, x)` qui renvoie un tableau **numpy** de taille `n`, rempli de la valeur `x`.",
+        "statement": "Écrire une fonction `tableau_uns(n)` qui renvoie un tableau **numpy** de taille `n`, rempli de uns.\n\nIndice : la fonction `np.ones` fait exactement ça.",
         "kind": "python",
-        "starter_code": "import numpy as np\n\ndef tableau_rempli(n, x):\n    pass\n",
-        "function_name": "tableau_rempli",
-        "solution_code": "import numpy as np\n\ndef tableau_rempli(n, x):\n    return np.ones(n) * x\n\n\n# Autre écriture possible, tout aussi valide :\n#\n# def tableau_rempli(n, x):\n#     return np.zeros(n) + x\n",
+        "starter_code": "import numpy as np\n\ndef tableau_uns(n):\n    pass\n",
+        "function_name": "tableau_uns",
+        "solution_code": "import numpy as np\n\ndef tableau_uns(n):\n    # np.ones(n) crée directement un tableau numpy de taille n rempli de 1.0\n    return np.ones(n)\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
-          "[4, 7]",
-          "[1, -2]",
-          "[0, 5]"
+          "[4]",
+          "[1]",
+          "[0]"
         ],
         "hints": []
       },
       {
         "title": "Intégration : méthode des rectangles",
         "slug": "integration-rectangles",
-        "statement": "On dispose des vitesses successives d'un mobile, mesurées à intervalles de temps réguliers `dt`.\n\nÉcrire une fonction `integration_rectangles(vitesses, dt, x0)` qui renvoie un tableau numpy des positions correspondantes (même taille que `vitesses`), obtenues par la **méthode des rectangles**, à partir d'une position initiale `x0`.",
+        "statement": "On dispose des vitesses successives d'un mobile, mesurées à intervalles de temps réguliers `dt`.\n\nÉcrire une fonction `integration_rectangles(vitesses, dt, x0)` qui renvoie un tableau numpy des positions correspondantes (même taille que `vitesses`), obtenues par la **méthode des rectangles**, à partir d'une position initiale `x0`.\n\nExemple : `integration_rectangles([2, 4, 6], 1, 0)` renvoie `[0, 2, 6]`.",
         "kind": "python",
         "starter_code": "import numpy as np\n\ndef integration_rectangles(vitesses, dt, x0):\n    pass\n",
         "function_name": "integration_rectangles",
@@ -3054,7 +3051,7 @@
       {
         "title": "Méthode d'Euler — équation différentielle d'ordre 1 (décharge d'un condensateur)",
         "slug": "euler-ordre-1",
-        "statement": "On étudie la décharge d'un condensateur de capacité `C` dans une résistance `R`. La tension `u(t)` à ses bornes suit l'équation différentielle du premier ordre :\n\n```\ndu/dt = -u / (R*C)\n```\n\navec `u(0) = u0`.\n\nÉcrire une fonction `euler_rc(u0, R, C, dt, n)` qui calcule, avec la **méthode d'Euler explicite**, un tableau numpy des `n+1` valeurs de `u` aux instants `t = 0, dt, 2*dt, ..., n*dt`.",
+        "statement": "On étudie la décharge d'un condensateur de capacité `C` dans une résistance `R`. La tension `u(t)` à ses bornes suit l'équation différentielle du premier ordre :\n\n`du/dt = -u / (R*C)`\n\navec `u(0) = u0`.\n\nÉcrire une fonction `euler_rc(u0, R, C, dt, n)` qui calcule, avec la **méthode d'Euler explicite**, un tableau numpy des `n+1` valeurs de `u` aux instants `t = 0, dt, 2*dt, ..., n*dt`.",
         "kind": "python",
         "starter_code": "import numpy as np\n\ndef euler_rc(u0, R, C, dt, n):\n    pass\n",
         "function_name": "euler_rc",
@@ -3067,13 +3064,13 @@
           "[1, 1, 1, 0.5, 4]"
         ],
         "hints": [
-          "Rappel de la méthode d'Euler explicite, de façon générale : pour une équation différentielle `dx/dt = f(x, t)`, on calcule `x[k+1] = x[k] + dt * f(x[k], t[k])`."
+          "`u[k+1] = u[k] + dt * (-u[k] / (R*C))` : c'est la définition même de la méthode d'Euler appliquée à cette équation."
         ]
       },
       {
         "title": "Méthode d'Euler — équation différentielle d'ordre 2 (oscillateur masse-ressort)",
         "slug": "euler-ordre-2",
-        "statement": "On étudie un système masse-ressort sans frottement : une masse `m` accrochée à un ressort de raideur `k`, dont la position `x(t)` suit l'équation différentielle du second ordre :\n\n```\nm * x'' = -k * x\n```\n\nÉcrire une fonction `euler_masse_ressort(x0, v0, k, m, dt, n)` qui calcule, avec la méthode d'Euler explicite, un tableau numpy des `n+1` valeurs de la position `x` aux instants `t = 0, dt, ..., n*dt` (la vitesse `v` est calculée en interne à chaque étape, mais seule la position est renvoyée).",
+        "statement": "On étudie un système masse-ressort sans frottement : une masse `m` accrochée à un ressort de raideur `k`, dont la position `x(t)` suit l'équation différentielle du second ordre :\n\n`m * x'' = -k * x`\n\nÉcrire une fonction `euler_masse_ressort(x0, v0, k, m, dt, n)` qui calcule, avec la méthode d'Euler explicite, un tableau numpy des `n+1` valeurs de la position `x` aux instants `t = 0, dt, ..., n*dt` (la vitesse `v` est calculée en interne à chaque étape, mais seule la position est renvoyée).",
         "kind": "python",
         "starter_code": "import numpy as np\n\ndef euler_masse_ressort(x0, v0, k, m, dt, n):\n    pass\n",
         "function_name": "euler_masse_ressort",
@@ -3086,8 +3083,8 @@
           "[2, -1, 5, 2, 0.05, 8]"
         ],
         "hints": [
-          "L'astuce consiste à écrire l'équation d'ordre 2 comme un système de deux équations d'ordre 1.",
-          "En posant `v = x'`, on obtient `x' = v` et `v' = -k/m * x`, chacune résolue par la méthode d'Euler comme dans l'exercice précédent."
+          "Deux tableaux internes (x et v) évoluent en parallèle, mais la fonction ne renvoie que x.",
+          "Attention à utiliser `x[step]` et `v[step]` (valeurs du pas précédent) pour calculer `x[step+1]` et `v[step+1]`, pas les valeurs déjà mises à jour."
         ]
       }
     ]
