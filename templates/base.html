@@ -21,10 +21,18 @@
         <a href="{% url 'theme_list' %}">Thèmes</a>
         <a href="{% url 'profile' %}">Progression</a>
         {% if user.is_staff %}
-          <a href="/admin/">Administration</a>
-          <a href="{% url 'stats' %}">Statistiques</a>
-          <a href="{% url 'classe_visibility' %}">Visibilité</a>
-          <a href="{% url 'demandes_reinitialisation' %}">Demandes de mot de passe</a>
+          <div class="nav-dropdown">
+            <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+              Espace prof <span class="caret">▾</span>
+            </button>
+            <div class="nav-dropdown-menu">
+              <a href="/admin/">Administration Django</a>
+              <a href="{% url 'stats' %}">Statistiques</a>
+              <a href="{% url 'classe_visibility' %}">Visibilité</a>
+              <a href="{% url 'importer_eleves' %}">Import CSV élèves</a>
+              <a href="{% url 'demandes_reinitialisation' %}">Demandes de mot de passe</a>
+            </div>
+          </div>
         {% endif %}
         <form method="post" action="{% url 'logout' %}" class="logout-form">
           {% csrf_token %}

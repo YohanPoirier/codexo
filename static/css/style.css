@@ -71,6 +71,31 @@ header.site nav a:hover { color: var(--indigo); }
 .nav-toggle.open span:nth-child(2) { opacity: 0; }
 .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+/* --- Menu déroulant "Espace prof" (ajout du 06/09/2026) : regroupe les liens
+   réservés aux profs qui étaient auparavant à plat dans la nav --- */
+.nav-dropdown { position: relative; }
+.nav-dropdown-toggle {
+  font-family: inherit; font-size: .92rem; color: var(--ink-soft);
+  background: none; border: none; padding: 0; margin: 0;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+}
+.nav-dropdown-toggle:hover { color: var(--indigo); }
+.nav-dropdown-toggle .caret { font-size: .75em; transition: transform .15s ease; }
+.nav-dropdown-toggle.open .caret { transform: rotate(180deg); }
+
+.nav-dropdown-menu {
+  display: none; flex-direction: column;
+  position: absolute; top: 100%; left: 0; margin-top: 10px;
+  background: var(--paper); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 8px 0; min-width: 220px; box-shadow: 0 8px 20px rgba(28,39,71,.12); z-index: 20;
+}
+.nav-dropdown-menu.open { display: flex; }
+.nav-dropdown-menu a {
+  padding: 8px 16px; font-size: .92rem; color: var(--ink-soft);
+  text-decoration: none; white-space: nowrap;
+}
+.nav-dropdown-menu a:hover { background: var(--paper-alt); color: var(--indigo); }
+
 @media (max-width: 640px) {
   header.site .bar { padding: 14px 16px; }
   header.site .brand { font-size: 1.15rem; }
@@ -84,6 +109,14 @@ header.site nav a:hover { color: var(--indigo); }
   header.site nav.open { display: flex; }
   header.site nav a { padding: 8px 0; font-size: .95rem; }
   .nav-link-btn { padding: 8px 0; font-size: .95rem; }
+
+  /* Sur mobile, la nav est déjà verticale (voir header.site nav ci-dessus) : le
+     sous-menu "Espace prof" s'affiche donc en ligne (indenté), pas en popup
+     flottant par-dessus le reste comme sur desktop. */
+  .nav-dropdown-menu {
+    position: static; margin-top: 4px; border: none; box-shadow: none;
+    padding: 0 0 0 14px; min-width: 0;
+  }
 }
 
 main { padding: 48px 0 80px; }
