@@ -28,6 +28,7 @@ urlpatterns = [
     path('demandes-aide/<int:demande_id>/', ex_views.demande_aide_detail, name='demande_aide_detail'),
     path('stats/', ex_views.stats, name='stats'),
     path('stats/visibilite/', ex_views.classe_visibility, name='classe_visibility'),
+    path('journal/', ex_views.journal, name='journal'),
     path('theme/<slug:theme_slug>/', ex_views.exercise_list, name='exercise_list'),
     path('theme/<slug:theme_slug>/<slug:exercise_slug>/', ex_views.exercise_detail, name='exercise_detail'),
     path('api/exercise/<int:exercise_id>/tests/', ex_views.exercise_tests, name='exercise_tests'),
