@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Journal — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow">Admin</span>
+<h1>Journal</h1>
+
+<p class="journal-intro">
+  Dernières lignes du fichier de log serveur (<code>django.log</code>). Ce journal
+  ne reçoit que les avertissements et erreurs (404, 403, 500...), pas les requêtes
+  normales : un fichier vide ou très court est bon signe.
+</p>
+
+<div class="journal-meta">
+  <span>{{ taille_ko }} Ko</span>
+  <span class="secondary-sep">·</span>
+  <span>
+    {% if nb_lignes_affichees %}
+      {{ nb_lignes_affichees }} ligne{{ nb_lignes_affichees|pluralize }} affichée{{ nb_lignes_affichees|pluralize }}
+      {% if tronque %}(les plus récentes){% endif %}
+    {% else %}
+      Aucune ligne enregistrée
+    {% endif %}
+  </span>
+  {% if fichiers_rotation %}
+    <span class="secondary-sep">·</span>
+    <span>
+      Historique plus ancien dans
+      {% for f in fichiers_rotation %}{{ f.nom }} ({{ f.taille_ko }} Ko){% if not forloop.last %}, {% endif %}{% endfor %}
+      (non affiché ici)
+    </span>
+  {% endif %}
+</div>
+
+{% if contenu %}
+  <pre class="journal-log">{{ contenu }}</pre>
+{% else %}
+  <p class="journal-empty">Rien à signaler pour l'instant.</p>
+{% endif %}
+{% endblock %}

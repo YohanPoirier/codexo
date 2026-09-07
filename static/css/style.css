@@ -662,6 +662,24 @@ table.schema-columns code {
   .visibility-toolbar { flex-direction: column; align-items: flex-start; }
 }
 
+/* --- Page journal / logs (admin, superusers uniquement) --- */
+.journal-intro { color: var(--ink-soft); line-height: 1.6; max-width: 62ch; }
+.journal-meta {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--ink-soft);
+  margin: 14px 0 18px;
+}
+.journal-log {
+  background: var(--indigo-deep); color: #eef1fb; border-radius: var(--radius);
+  padding: 18px 20px; overflow-x: auto; max-height: 65vh; overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem; line-height: 1.55;
+  white-space: pre-wrap; word-break: break-word;
+}
+.journal-empty {
+  color: var(--ink-soft); background: var(--paper-alt); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 18px 20px;
+}
+
 /* --- Demandes d'aide (élève <-> profs) --- */
 .aide-pending {
   margin: 0; font-size: .85rem; color: var(--ink-soft);

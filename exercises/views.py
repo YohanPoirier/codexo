@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Sum
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
@@ -23,6 +23,15 @@ ABANDON_LOCK_DURATION = timedelta(hours=2)
 # un abandon est toujours enregistré en base, mais il ne bloque jamais l'accès à l'exercice.
 # En production (DEBUG=False), le verrou reste actif normalement pour les étudiants.
 ABANDON_LOCK_ENABLED = not settings.DEBUG
+
+
+def superuser_required(view_func):
+    """Comme @staff_member_required (utilisé pour les autres pages de l'"Espace
+    prof" : stats, visibilité, demandes d'aide...), mais réservé aux superusers.
+    Utilisé uniquement pour la page "journal" ci-dessous, qui affiche le contenu
+    brut du fichier de log serveur (chemins, tracebacks) : plus sensible que le
+    reste de l'espace prof, donc pas ouvert à tout compte is_staff."""
+    return user_passes_test(lambda u: u.is_active and u.is_superuser)(view_func)
 
 
 @login_required
@@ -513,5 +522,51 @@ def classe_visibility(request):
             "themes": themes_data,
             "total_enabled": total_enabled,
             "total_exercises": total_exercises,
+        },
+    )
+
+
+# Nombre de lignes les plus récentes affichées sur la page "journal" (voir ci-dessous).
+JOURNAL_NB_LIGNES_AFFICHEES = 500
+
+
+@superuser_required
+def journal(request):
+    """Page (superusers uniquement) affichant les dernières lignes du fichier de
+    log serveur (django.log, voir LOGGING dans settings.py). Ce logger ne reçoit
+    que les avertissements/erreurs (django.request >= WARNING : 4xx et 5xx), donc
+    un fichier vide ou très court est normal si le site fonctionne sans accroc —
+    ce n'est pas un journal de toutes les requêtes."""
+    log_path = settings.LOG_DIR / "django.log"
+
+    lignes = []
+    taille_octets = 0
+    if log_path.exists():
+        taille_octets = log_path.stat().st_size
+        with open(log_path, encoding="utf-8", errors="replace") as f:
+            toutes_les_lignes = f.readlines()
+        lignes = toutes_les_lignes[-JOURNAL_NB_LIGNES_AFFICHEES:]
+        lignes.reverse()  # la plus récente en premier
+
+    # Anciens fichiers conservés par la rotation (RotatingFileHandler, voir
+    # settings.py) : juste signalés (nom + taille), pas affichés ici.
+    fichiers_rotation = []
+    for i in range(1, 6):
+        chemin = settings.LOG_DIR / f"django.log.{i}"
+        if chemin.exists():
+            fichiers_rotation.append({
+                "nom": chemin.name,
+                "taille_ko": round(chemin.stat().st_size / 1024, 1),
+            })
+
+    return render(
+        request,
+        "exercises/journal.html",
+        {
+            "contenu": "".join(lignes),
+            "nb_lignes_affichees": len(lignes),
+            "tronque": len(lignes) >= JOURNAL_NB_LIGNES_AFFICHEES,
+            "taille_ko": round(taille_octets / 1024, 1),
+            "fichiers_rotation": fichiers_rotation,
         },
     )

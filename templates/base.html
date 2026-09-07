@@ -36,6 +36,9 @@
               <a href="{% url 'importer_eleves' %}">Import CSV élèves</a>
               <a href="{% url 'demandes_reinitialisation' %}">Demandes de mot de passe{% if a_demandes_reinitialisation_en_attente %}<span class="nav-badge-dot" title="Demande en attente"></span>{% endif %}</a>
               <a href="{% url 'demandes_aide' %}">Demandes d'aide{% if a_demandes_aide_en_attente %}<span class="nav-badge-dot" title="Demande en attente"></span>{% endif %}</a>
+              {% if user.is_superuser %}
+                <a href="{% url 'journal' %}">Journal (logs)</a>
+              {% endif %}
             </div>
           </div>
         {% endif %}
