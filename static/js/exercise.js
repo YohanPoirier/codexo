@@ -297,16 +297,14 @@
 
     // Empêche le tap sur le bouton de faire perdre le focus (donc fermer le clavier) à
     // l'éditeur : sans ça, "blur" se déclenche avant "click" et coupe court à l'action.
+    // Seul "mousedown" doit être intercepté ici : sur mobile, un tap synthétise ensuite un
+    // "mousedown" puis un "click" — mais si on appelle preventDefault() dès "touchstart", le
+    // navigateur annule TOUTE la suite de cette synthèse, "click" y compris, et le bouton ne
+    // répond plus au toucher (c'est exactement ce qui se passait). preventDefault() sur
+    // "mousedown" suffit à garder le focus, sans casser le clic qui suit.
     tabBtn.addEventListener("mousedown", function (e) {
       e.preventDefault();
     });
-    tabBtn.addEventListener(
-      "touchstart",
-      function (e) {
-        e.preventDefault();
-      },
-      { passive: false }
-    );
 
     tabBtn.addEventListener("click", function () {
       insertTabAtCursor(cm);
