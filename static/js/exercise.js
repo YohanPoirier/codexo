@@ -30,6 +30,17 @@
     else editor.value = value;
   }
 
+  // Utilisée à la fois par le raccourci clavier Tab (voir extraKeys dans initCodeMirror) et
+  // par le bouton flottant #mobile-tab-btn (voir setupMobileTabButton) : le clavier virtuel
+  // mobile n'a pas de touche Tab, ce bouton est le seul moyen d'indenter sur téléphone/tablette.
+  function insertTabAtCursor(cmInstance) {
+    if (cmInstance.somethingSelected()) {
+      cmInstance.execCommand("indentMore");
+    } else {
+      cmInstance.replaceSelection("    ", "end");
+    }
+  }
+
   function getCookie(name) {
     const match = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
     return match ? match.pop() : "";
@@ -171,6 +182,48 @@
     });
   }
 
+  // --- Autocomplétion : CodeMirror5 n'a pas d'addon "python-hint" officiel (contrairement à
+  // SQL, voir plus bas), donc pour Python on combine anyword-hint (mots déjà présents dans le
+  // document, via l'addon addon/hint/anyword-hint.js) avec cette liste de mots-clés/fonctions
+  // courantes — utile même sur un éditeur encore vide. Volontairement limitée au niveau CPGE :
+  // ce n'est pas un vrai IntelliSense conscient de la syntaxe (pas d'analyse d'imports, de
+  // signatures de fonctions, etc.), seulement une aide à la frappe.
+  const PYTHON_HINT_WORDS = [
+    "and", "as", "assert", "break", "class", "continue", "def", "del", "elif", "else",
+    "except", "False", "finally", "for", "from", "if", "import", "in", "is", "lambda",
+    "None", "not", "or", "pass", "print", "raise", "return", "True", "try", "while", "with",
+    "abs", "all", "any", "bool", "dict", "enumerate", "float", "int", "len", "list", "map",
+    "max", "min", "range", "round", "set", "sorted", "str", "sum", "tuple", "type", "zip",
+  ];
+
+  function pythonHint(cmInstance) {
+    const cursor = cmInstance.getCursor();
+    const line = cmInstance.getLine(cursor.line);
+    let start = cursor.ch;
+    while (start > 0 && /\w/.test(line.charAt(start - 1))) start--;
+    const typed = line.slice(start, cursor.ch);
+    if (!typed) return { list: [], from: cursor, to: cursor }; // rien en cours de frappe : pas de suggestions
+
+    const anywordResult = CodeMirror.hint.anyword(cmInstance) || { list: [] };
+    const fromKeywords = PYTHON_HINT_WORDS.filter((w) => w.startsWith(typed) && w !== typed);
+    const list = Array.from(new Set([...fromKeywords, ...anywordResult.list]));
+
+    return { list, from: CodeMirror.Pos(cursor.line, start), to: CodeMirror.Pos(cursor.line, cursor.ch) };
+  }
+
+  // Déclenche automatiquement les suggestions à chaque lettre/chiffre tapé (le raccourci
+  // Ctrl-Espace classique n'existe pas sur clavier virtuel mobile) — mais jamais de complétion
+  // automatique toute seule (completeSingle: false) : l'étudiant choisit toujours explicitement.
+  function setupAutocomplete(cmInstance, hintFn) {
+    cmInstance.on("inputRead", function (instance, change) {
+      if (change.origin !== "+input") return; // ignore setValue()/collage/undo-redo
+      const lastChar = change.text[change.text.length - 1];
+      if (!lastChar || !/\w/.test(lastChar)) return;
+      if (instance.state.completionActive) return; // déjà ouvert
+      instance.showHint({ hint: hintFn, completeSingle: false });
+    });
+  }
+
   // --- Coloration syntaxique : enveloppe la textarea #code-editor avec CodeMirror.
   // fromTextArea() garde la textarea d'origine en mémoire (cachée) et permet de
   // resynchroniser sa valeur avec cm.save() — mais ici on lit/écrit directement
@@ -178,6 +231,8 @@
   // ailleurs dans ce fichier, pas besoin d'appeler cm.save() manuellement.
   function initCodeMirror(initialValue) {
     editor.value = initialValue; // valeur de secours si CodeMirror ne charge pas (CDN indisponible)
+    // sql-hint (addon officiel, mots-clés SQL) pour le SQL ; pythonHint (voir plus haut) sinon.
+    const hintFn = EXERCISE_KIND === "sql" ? CodeMirror.hint.sql : pythonHint;
     cm = CodeMirror.fromTextArea(editor, {
       mode: EXERCISE_KIND === "sql" ? "text/x-sql" : "python",
       lineNumbers: true,
@@ -186,18 +241,77 @@
       indentWithTabs: false,
       viewportMargin: Infinity, // la zone grandit avec le contenu plutôt que scroller en interne
       lineWrapping: true, // évite le scroll horizontal, surtout utile sur petit écran (mobile)
+      hintOptions: { hint: hintFn, completeSingle: false },
       extraKeys: {
-        Tab: function (cmInstance) {
-          if (cmInstance.somethingSelected()) {
-            cmInstance.execCommand("indentMore");
-          } else {
-            cmInstance.replaceSelection("    ", "end");
-          }
-        },
+        Tab: insertTabAtCursor,
         "Shift-Tab": "indentLess",
+        "Ctrl-Space": "autocomplete", // reste dispo au clavier physique (desktop)
       },
     });
+    setupAutocomplete(cm, hintFn);
     cm.setValue(initialValue);
+  }
+
+  // Bouton flottant "Tab ⇥" : le clavier virtuel mobile n'a pas de touche Tab, donc le
+  // raccourci clavier (extraKeys.Tab, voir initCodeMirror) est inatteignable au tactile. Ce
+  // bouton apparaît juste au-dessus du clavier virtuel quand l'éditeur est actif, et disparaît
+  // sinon — positionné via l'API visualViewport (supportée par les navigateurs mobiles
+  // récents : iOS Safari, Chrome Android...). Sur un navigateur qui ne la supporte pas, ou sur
+  // desktop (pas de clavier virtuel, donc pas de redimensionnement de la fenêtre visible), le
+  // bouton reste utilisable, juste fixé en bas de l'écran plutôt que suivre un clavier.
+  function setupMobileTabButton() {
+    const tabBtn = document.getElementById("mobile-tab-btn");
+    if (!tabBtn || !cm) return;
+
+    function positionAboveKeyboard() {
+      const vv = window.visualViewport;
+      if (vv) {
+        // Hauteur de ce qui est masqué par le clavier virtuel : la différence entre la fenêtre
+        // "layout" complète et la portion réellement visible à l'écran (visualViewport).
+        const hiddenByKeyboard = window.innerHeight - (vv.height + vv.offsetTop);
+        tabBtn.style.bottom = Math.max(hiddenByKeyboard, 0) + 10 + "px";
+      } else {
+        tabBtn.style.bottom = "16px";
+      }
+    }
+
+    function show() {
+      tabBtn.classList.add("visible");
+      positionAboveKeyboard();
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", positionAboveKeyboard);
+        window.visualViewport.addEventListener("scroll", positionAboveKeyboard);
+      }
+    }
+
+    function hide() {
+      tabBtn.classList.remove("visible");
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", positionAboveKeyboard);
+        window.visualViewport.removeEventListener("scroll", positionAboveKeyboard);
+      }
+    }
+
+    cm.on("focus", show);
+    cm.on("blur", hide);
+
+    // Empêche le tap sur le bouton de faire perdre le focus (donc fermer le clavier) à
+    // l'éditeur : sans ça, "blur" se déclenche avant "click" et coupe court à l'action.
+    tabBtn.addEventListener("mousedown", function (e) {
+      e.preventDefault();
+    });
+    tabBtn.addEventListener(
+      "touchstart",
+      function (e) {
+        e.preventDefault();
+      },
+      { passive: false }
+    );
+
+    tabBtn.addEventListener("click", function () {
+      insertTabAtCursor(cm);
+      cm.focus();
+    });
   }
 
   async function init() {
@@ -217,6 +331,7 @@
     const initialCode =
       LAST_SUBMITTED_CODE !== null && LAST_SUBMITTED_CODE !== "" ? LAST_SUBMITTED_CODE : starterCode;
     initCodeMirror(initialCode);
+    setupMobileTabButton();
 
     runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
     try {
