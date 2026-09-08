@@ -48,29 +48,14 @@
     if (testsLabel) testsLabel.classList.remove("hidden");
   }
 
-  // Petit filet de sécurité "anti-décalage" : affiche, repliable, le code exact qui a été
-  // envoyé au test (pas forcément lu à nouveau depuis l'éditeur ici, donc fiable même si un
-  // futur bug de timing fait que l'éditeur affiche autre chose entre-temps). Permet de repérer
-  // d'un coup d'œil un éventuel décalage entre "ce qui est écrit" et "ce qui a été testé" (voir
-  // historique de ce fichier) sans avoir à deviner ou à rouvrir les outils de développement.
-  function codeTestedBlock(code) {
-    return (
-      '<details class="code-tested-toggle">' +
-      "<summary>Code testé</summary>" +
-      '<pre class="code-tested-output">' + escapeHtml(code) + "</pre>" +
-      "</details>"
-    );
-  }
-
-  function showRuntimeError(text, code) {
+  function showRuntimeError(text) {
     revealTestsLabel();
     resultBox.classList.remove("hidden", "all-success", "all-error");
     resultBox.classList.add("all-error");
     resultBox.innerHTML =
-      '<div class="result-line fail"><span class="result-icon">✗</span><div class="result-body">' +
-      '<pre class="result-msg">' + escapeHtml(text) + "</pre>" +
-      codeTestedBlock(code) +
-      "</div></div>";
+      '<div class="result-line fail"><span class="result-icon">✗</span><pre class="result-msg">' +
+      escapeHtml(text) +
+      "</pre></div>";
   }
 
   function prefixLines(text) {
@@ -85,35 +70,34 @@
   // d'une vérification à l'autre (les tests restent dans le même ordre).
   const openPrintIndices = new Set();
 
-  function showResultLines(items, code) {
+  function showResultLines(items) {
     revealTestsLabel();
     resultBox.classList.remove("hidden", "all-success", "all-error");
     const allOk = items.length > 0 && items.every((it) => it.ok);
     resultBox.classList.add(allOk ? "all-success" : "all-error");
 
-    resultBox.innerHTML =
-      items
-        .map((it, i) => {
-          const printsBlock = it.printed
-            ? '<details class="prints-toggle" data-index="' + i + '"' +
-              (openPrintIndices.has(i) ? " open" : "") + ">" +
-              "<summary>Ce qui a été affiché</summary>" +
-              '<pre class="prints-output">' + escapeHtml(prefixLines(it.printed)) + "</pre>" +
-              "</details>"
-            : "";
-          return (
-            '<div class="result-line ' +
-            (it.ok ? "ok" : "fail") +
-            '">' +
-            '<span class="result-icon">' + (it.ok ? "✓" : "✗") + "</span>" +
-            '<div class="result-body">' +
-            '<span class="result-msg">' + escapeHtml(it.msg) + "</span>" +
-            printsBlock +
-            "</div>" +
-            "</div>"
-          );
-        })
-        .join("") + codeTestedBlock(code);
+    resultBox.innerHTML = items
+      .map((it, i) => {
+        const printsBlock = it.printed
+          ? '<details class="prints-toggle" data-index="' + i + '"' +
+            (openPrintIndices.has(i) ? " open" : "") + ">" +
+            "<summary>Ce qui a été affiché</summary>" +
+            '<pre class="prints-output">' + escapeHtml(prefixLines(it.printed)) + "</pre>" +
+            "</details>"
+          : "";
+        return (
+          '<div class="result-line ' +
+          (it.ok ? "ok" : "fail") +
+          '">' +
+          '<span class="result-icon">' + (it.ok ? "✓" : "✗") + "</span>" +
+          '<div class="result-body">' +
+          '<span class="result-msg">' + escapeHtml(it.msg) + "</span>" +
+          printsBlock +
+          "</div>" +
+          "</div>"
+        );
+      })
+      .join("");
 
     resultBox.querySelectorAll(".prints-toggle").forEach((el) => {
       el.addEventListener("toggle", function () {
@@ -346,7 +330,7 @@ __RESULTS__ = __EXEC_NS__["__RESULTS__"]
 
       const runtimeError = pyodide.globals.get("__RUNTIME_ERROR__");
       if (runtimeError) {
-        showRuntimeError("Erreur dans ton code :\n\n" + runtimeError, code);
+        showRuntimeError("Erreur dans ton code :\n\n" + runtimeError);
         showSolutionIfSuccess(false);
         await submitResult(code, false, true);
       } else {
@@ -360,13 +344,13 @@ __RESULTS__ = __EXEC_NS__["__RESULTS__"]
         // (déjà mis à "hidden" en début de runCheck) — on ne l'affiche qu'en cas d'échec,
         // pour aider l'étudiant à comprendre ce qui ne va pas.
         if (!allOk) {
-          showResultLines(items, code);
+          showResultLines(items);
         }
         showSolutionIfSuccess(allOk);
         await submitResult(code, allOk, true);
       }
     } catch (e) {
-      showRuntimeError("Erreur inattendue : " + e.message, code);
+      showRuntimeError("Erreur inattendue : " + e.message);
       showSolutionIfSuccess(false);
     }
 
