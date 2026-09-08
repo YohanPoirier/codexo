@@ -208,21 +208,6 @@ main { padding: 48px 0 80px; }
 }
 .secondary-sep { color: var(--rule); }
 
-/* --- Bouton flottant "Tab ⇥" (mobile, voir setupMobileTabButton dans exercise.js) : caché
-   par défaut, affiché juste au-dessus du clavier virtuel pendant que l'éditeur est actif --- */
-.mobile-tab-btn {
-  position: fixed; left: 50%; bottom: 16px; z-index: 60;
-  transform: translateX(-50%) translateY(10px);
-  /* Ambre plutôt que le bleu marine de l'éditeur juste derrière : sinon le bouton se fond
-     dans le fond de l'éditeur (#code-editor a le même indigo-deep) et devient peu visible. */
-  background: var(--amber); color: var(--indigo-deep); border: 2px solid var(--indigo-deep);
-  border-radius: 999px; padding: 10px 22px; font-family: 'JetBrains Mono', monospace;
-  font-size: .85rem; font-weight: 700; letter-spacing: .04em;
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-  opacity: 0; pointer-events: none; transition: opacity .15s ease, transform .15s ease;
-}
-.mobile-tab-btn.visible { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
-
 .hints-panel { margin-top: 16px; }
 .hint-btn {
   font-family: 'JetBrains Mono', monospace; font-size: .82rem;

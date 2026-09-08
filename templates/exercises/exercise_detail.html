@@ -37,12 +37,6 @@
       <textarea id="code-editor" spellcheck="false"></textarea>
     </div>
 
-    <!-- Bouton flottant, positionné au-dessus du clavier virtuel quand l'éditeur est actif
-         (voir setupMobileTabButton dans exercise.js) : le clavier virtuel n'a pas de touche
-         Tab, ce bouton est le seul moyen d'indenter sur mobile. Caché par défaut (classe
-         "visible" ajoutée/retirée en JS). -->
-    <button id="mobile-tab-btn" class="mobile-tab-btn" type="button">Tab ⇥</button>
-
     <div class="actions">
       <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
       <button id="reset-btn" class="reset-btn" type="button" title="Revenir au code de départ">Réinitialiser</button>
@@ -107,6 +101,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/anyword-hint.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/sql-hint.min.js"></script>
+  <!-- Repères verticaux d'indentation (voir l'option "rulers" dans initCodeMirror,
+       exercise.js) : addon officiel, aucune CSS supplémentaire nécessaire. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/rulers.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
   <script>

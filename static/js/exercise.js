@@ -30,9 +30,10 @@
     else editor.value = value;
   }
 
-  // Utilisée à la fois par le raccourci clavier Tab (voir extraKeys dans initCodeMirror) et
-  // par le bouton flottant #mobile-tab-btn (voir setupMobileTabButton) : le clavier virtuel
-  // mobile n'a pas de touche Tab, ce bouton est le seul moyen d'indenter sur téléphone/tablette.
+  // Utilisée par le raccourci clavier Tab (voir extraKeys dans initCodeMirror) — utile pour qui
+  // a un clavier physique/Bluetooth. Sur clavier virtuel mobile (pas de touche Tab), l'étudiant
+  // tape directement 4 espaces avec la barre d'espace : les repères verticaux (voir l'option
+  // "rulers" dans initCodeMirror) l'aident à les aligner sans avoir à les compter.
   function insertTabAtCursor(cmInstance) {
     if (cmInstance.somethingSelected()) {
       cmInstance.execCommand("indentMore");
@@ -241,6 +242,15 @@
       indentWithTabs: false,
       viewportMargin: Infinity, // la zone grandit avec le contenu plutôt que scroller en interne
       lineWrapping: true, // évite le scroll horizontal, surtout utile sur petit écran (mobile)
+      // Repères verticaux tous les 4 caractères (addon/display/rulers.js) : sur mobile, sans
+      // touche Tab, l'étudiant tape directement 4 espaces avec la barre d'espace — ces lignes
+      // l'aident à aligner/compter son indentation sans avoir à deviner. Jusqu'à 8 niveaux
+      // (32 colonnes), largement suffisant pour les exercices CPGE de ce site.
+      rulers: [4, 8, 12, 16, 20, 24, 28, 32].map((col) => ({
+        column: col,
+        color: "rgba(255,255,255,.12)",
+        lineStyle: "solid",
+      })),
       hintOptions: { hint: hintFn, completeSingle: false },
       extraKeys: {
         Tab: insertTabAtCursor,
@@ -250,66 +260,6 @@
     });
     setupAutocomplete(cm, hintFn);
     cm.setValue(initialValue);
-  }
-
-  // Bouton flottant "Tab ⇥" : le clavier virtuel mobile n'a pas de touche Tab, donc le
-  // raccourci clavier (extraKeys.Tab, voir initCodeMirror) est inatteignable au tactile. Ce
-  // bouton apparaît juste au-dessus du clavier virtuel quand l'éditeur est actif, et disparaît
-  // sinon — positionné via l'API visualViewport (supportée par les navigateurs mobiles
-  // récents : iOS Safari, Chrome Android...). Sur un navigateur qui ne la supporte pas, ou sur
-  // desktop (pas de clavier virtuel, donc pas de redimensionnement de la fenêtre visible), le
-  // bouton reste utilisable, juste fixé en bas de l'écran plutôt que suivre un clavier.
-  function setupMobileTabButton() {
-    const tabBtn = document.getElementById("mobile-tab-btn");
-    if (!tabBtn || !cm) return;
-
-    function positionAboveKeyboard() {
-      const vv = window.visualViewport;
-      if (vv) {
-        // Hauteur de ce qui est masqué par le clavier virtuel : la différence entre la fenêtre
-        // "layout" complète et la portion réellement visible à l'écran (visualViewport).
-        const hiddenByKeyboard = window.innerHeight - (vv.height + vv.offsetTop);
-        tabBtn.style.bottom = Math.max(hiddenByKeyboard, 0) + 10 + "px";
-      } else {
-        tabBtn.style.bottom = "16px";
-      }
-    }
-
-    function show() {
-      tabBtn.classList.add("visible");
-      positionAboveKeyboard();
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener("resize", positionAboveKeyboard);
-        window.visualViewport.addEventListener("scroll", positionAboveKeyboard);
-      }
-    }
-
-    function hide() {
-      tabBtn.classList.remove("visible");
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener("resize", positionAboveKeyboard);
-        window.visualViewport.removeEventListener("scroll", positionAboveKeyboard);
-      }
-    }
-
-    cm.on("focus", show);
-    cm.on("blur", hide);
-
-    // Empêche le tap sur le bouton de faire perdre le focus (donc fermer le clavier) à
-    // l'éditeur : sans ça, "blur" se déclenche avant "click" et coupe court à l'action.
-    // Seul "mousedown" doit être intercepté ici : sur mobile, un tap synthétise ensuite un
-    // "mousedown" puis un "click" — mais si on appelle preventDefault() dès "touchstart", le
-    // navigateur annule TOUTE la suite de cette synthèse, "click" y compris, et le bouton ne
-    // répond plus au toucher (c'est exactement ce qui se passait). preventDefault() sur
-    // "mousedown" suffit à garder le focus, sans casser le clic qui suit.
-    tabBtn.addEventListener("mousedown", function (e) {
-      e.preventDefault();
-    });
-
-    tabBtn.addEventListener("click", function () {
-      insertTabAtCursor(cm);
-      cm.focus();
-    });
   }
 
   async function init() {
@@ -329,7 +279,6 @@
     const initialCode =
       LAST_SUBMITTED_CODE !== null && LAST_SUBMITTED_CODE !== "" ? LAST_SUBMITTED_CODE : starterCode;
     initCodeMirror(initialCode);
-    setupMobileTabButton();
 
     runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
     try {
