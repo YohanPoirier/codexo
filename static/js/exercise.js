@@ -234,6 +234,21 @@
     editor.value = initialValue; // valeur de secours si CodeMirror ne charge pas (CDN indisponible)
     // sql-hint (addon officiel, mots-clés SQL) pour le SQL ; pythonHint (voir plus haut) sinon.
     const hintFn = EXERCISE_KIND === "sql" ? CodeMirror.hint.sql : pythonHint;
+    // Repères verticaux tous les 4 caractères (addon/display/rulers.js) : sur mobile, sans
+    // touche Tab, l'étudiant tape directement 4 espaces avec la barre d'espace — ces lignes
+    // l'aident à aligner/compter son indentation sans avoir à deviner. Jusqu'à 8 niveaux
+    // (32 colonnes), largement suffisant pour les exercices CPGE de ce site. Réservé au
+    // mobile (même seuil que le reste du site, voir @media max-width:640px dans style.css) :
+    // sur desktop l'étudiant a en général un clavier physique (touche Tab) et ces lignes
+    // n'apportent qu'une gêne visuelle.
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    const rulers = isMobile
+      ? [4, 8, 12, 16, 20, 24, 28, 32].map((col) => ({
+          column: col,
+          color: "rgba(255,255,255,.12)",
+          lineStyle: "solid",
+        }))
+      : false;
     cm = CodeMirror.fromTextArea(editor, {
       mode: EXERCISE_KIND === "sql" ? "text/x-sql" : "python",
       lineNumbers: true,
@@ -242,15 +257,7 @@
       indentWithTabs: false,
       viewportMargin: Infinity, // la zone grandit avec le contenu plutôt que scroller en interne
       lineWrapping: true, // évite le scroll horizontal, surtout utile sur petit écran (mobile)
-      // Repères verticaux tous les 4 caractères (addon/display/rulers.js) : sur mobile, sans
-      // touche Tab, l'étudiant tape directement 4 espaces avec la barre d'espace — ces lignes
-      // l'aident à aligner/compter son indentation sans avoir à deviner. Jusqu'à 8 niveaux
-      // (32 colonnes), largement suffisant pour les exercices CPGE de ce site.
-      rulers: [4, 8, 12, 16, 20, 24, 28, 32].map((col) => ({
-        column: col,
-        color: "rgba(255,255,255,.12)",
-        lineStyle: "solid",
-      })),
+      rulers: rulers,
       hintOptions: { hint: hintFn, completeSingle: false },
       extraKeys: {
         Tab: insertTabAtCursor,
