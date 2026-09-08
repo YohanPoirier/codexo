@@ -125,6 +125,7 @@
           lineNumbers: true,
           readOnly: true,
           viewportMargin: Infinity,
+          lineWrapping: true,
         });
       } else {
         solutionCM.setValue(solutionCode);
@@ -184,6 +185,7 @@
       tabSize: 4,
       indentWithTabs: false,
       viewportMargin: Infinity, // la zone grandit avec le contenu plutôt que scroller en interne
+      lineWrapping: true, // évite le scroll horizontal, surtout utile sur petit écran (mobile)
       extraKeys: {
         Tab: function (cmInstance) {
           if (cmInstance.somethingSelected()) {
@@ -491,6 +493,14 @@ finally:
     });
   }
 
-  runBtn.addEventListener("click", runCheck);
+  // Sur certains claviers virtuels mobiles (ex: Gboard), un tap ailleurs sur l'écran (bouton,
+  // scroll...) juste après avoir tapé peut arriver avant que le navigateur n'ait fini de
+  // transmettre la toute dernière frappe/correction automatique à l'éditeur : lire le code
+  // immédiatement risquerait alors de tester une version légèrement en retard par rapport à ce
+  // qui est affiché. Un court délai avant runCheck() laisse le temps à cette mise à jour de se
+  // terminer, sans être perceptible pour l'étudiant.
+  runBtn.addEventListener("click", function () {
+    setTimeout(runCheck, 50);
+  });
   init();
 })();
