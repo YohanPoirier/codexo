@@ -380,6 +380,18 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
   font-family: 'JetBrains Mono', monospace; font-size: .82rem; opacity: .95;
 }
 
+/* --- Bloc repliable "Code testé" (voir showRuntimeError/showResultLines dans exercise.js) :
+   filet de sécurité pour repérer un éventuel décalage entre le code affiché et le code
+   réellement envoyé au test (bug de timing possible sur mobile) --- */
+.code-tested-toggle { font-size: .8rem; margin-top: 10px; color: var(--ink-soft); }
+.code-tested-toggle summary { cursor: pointer; user-select: none; }
+.code-tested-toggle summary:hover { color: var(--ink); }
+.code-tested-output {
+  background: var(--indigo-deep); color: #eef1fb; border-radius: 8px; padding: 10px 12px;
+  margin: 6px 0 0; overflow-x: auto; white-space: pre-wrap; word-break: break-word;
+  font-family: 'JetBrains Mono', monospace; font-size: .82rem;
+}
+
 /* --- Corrigé affiché après une réussite : contrairement à .abandon-locked, l'éditeur
    reste visible et modifiable juste au-dessus, l'étudiant peut continuer à retoucher son
    code tout en gardant le corrigé sous les yeux --- */

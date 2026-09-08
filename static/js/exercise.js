@@ -48,14 +48,29 @@
     if (testsLabel) testsLabel.classList.remove("hidden");
   }
 
-  function showRuntimeError(text) {
+  // Petit filet de sécurité "anti-décalage" : affiche, repliable, le code exact qui a été
+  // envoyé au test (pas forcément lu à nouveau depuis l'éditeur ici, donc fiable même si un
+  // futur bug de timing fait que l'éditeur affiche autre chose entre-temps). Permet de repérer
+  // d'un coup d'œil un éventuel décalage entre "ce qui est écrit" et "ce qui a été testé" (voir
+  // historique de ce fichier) sans avoir à deviner ou à rouvrir les outils de développement.
+  function codeTestedBlock(code) {
+    return (
+      '<details class="code-tested-toggle">' +
+      "<summary>Code testé</summary>" +
+      '<pre class="code-tested-output">' + escapeHtml(code) + "</pre>" +
+      "</details>"
+    );
+  }
+
+  function showRuntimeError(text, code) {
     revealTestsLabel();
     resultBox.classList.remove("hidden", "all-success", "all-error");
     resultBox.classList.add("all-error");
     resultBox.innerHTML =
-      '<div class="result-line fail"><span class="result-icon">✗</span><pre class="result-msg">' +
-      escapeHtml(text) +
-      "</pre></div>";
+      '<div class="result-line fail"><span class="result-icon">✗</span><div class="result-body">' +
+      '<pre class="result-msg">' + escapeHtml(text) + "</pre>" +
+      codeTestedBlock(code) +
+      "</div></div>";
   }
 
   function prefixLines(text) {
@@ -70,34 +85,35 @@
   // d'une vérification à l'autre (les tests restent dans le même ordre).
   const openPrintIndices = new Set();
 
-  function showResultLines(items) {
+  function showResultLines(items, code) {
     revealTestsLabel();
     resultBox.classList.remove("hidden", "all-success", "all-error");
     const allOk = items.length > 0 && items.every((it) => it.ok);
     resultBox.classList.add(allOk ? "all-success" : "all-error");
 
-    resultBox.innerHTML = items
-      .map((it, i) => {
-        const printsBlock = it.printed
-          ? '<details class="prints-toggle" data-index="' + i + '"' +
-            (openPrintIndices.has(i) ? " open" : "") + ">" +
-            "<summary>Ce qui a été affiché</summary>" +
-            '<pre class="prints-output">' + escapeHtml(prefixLines(it.printed)) + "</pre>" +
-            "</details>"
-          : "";
-        return (
-          '<div class="result-line ' +
-          (it.ok ? "ok" : "fail") +
-          '">' +
-          '<span class="result-icon">' + (it.ok ? "✓" : "✗") + "</span>" +
-          '<div class="result-body">' +
-          '<span class="result-msg">' + escapeHtml(it.msg) + "</span>" +
-          printsBlock +
-          "</div>" +
-          "</div>"
-        );
-      })
-      .join("");
+    resultBox.innerHTML =
+      items
+        .map((it, i) => {
+          const printsBlock = it.printed
+            ? '<details class="prints-toggle" data-index="' + i + '"' +
+              (openPrintIndices.has(i) ? " open" : "") + ">" +
+              "<summary>Ce qui a été affiché</summary>" +
+              '<pre class="prints-output">' + escapeHtml(prefixLines(it.printed)) + "</pre>" +
+              "</details>"
+            : "";
+          return (
+            '<div class="result-line ' +
+            (it.ok ? "ok" : "fail") +
+            '">' +
+            '<span class="result-icon">' + (it.ok ? "✓" : "✗") + "</span>" +
+            '<div class="result-body">' +
+            '<span class="result-msg">' + escapeHtml(it.msg) + "</span>" +
+            printsBlock +
+            "</div>" +
+            "</div>"
+          );
+        })
+        .join("") + codeTestedBlock(code);
 
     resultBox.querySelectorAll(".prints-toggle").forEach((el) => {
       el.addEventListener("toggle", function () {
@@ -275,47 +291,62 @@
         // on le passe tel quel comme variable, test_code (généré côté serveur) s'occupe
         // de l'exécuter via sqlite3 et de comparer le résultat à la requête de correction.
         pyodide.globals.set("__STUDENT_SQL__", code);
+        // __EXEC_NS__ : espace de noms FRAÎCHEMENT créé à CHAQUE clic sur "Vérifier" (cette
+        // chaîne "runner" est ré-exécutée en entier à chaque appel de runPythonAsync). Sans ça,
+        // exec(..., globals()) exécuterait dans les globals persistants de pyodide (le même
+        // objet Python, réutilisé pour tous les clics de toute la session) : toute fonction/
+        // variable définie par test_code lors d'un clic précédent resterait présente et pourrait
+        // fausser silencieusement le résultat du clic suivant (décalage entre le code testé et
+        // le code affiché). Voir même remarque dans la branche Python ci-dessous.
         runner = `
 import sys, io, traceback
 
 __stdout_capture__ = io.StringIO()
-__RESULTS__ = []
 __RUNTIME_ERROR__ = None
+__EXEC_NS__ = {"__RESULTS__": []}
 
 _old_stdout = sys.stdout
 sys.stdout = __stdout_capture__
 try:
-    exec(__TEST_CODE__, globals())
+    exec(__TEST_CODE__, __EXEC_NS__)
 except Exception:
     __RUNTIME_ERROR__ = traceback.format_exc()
 finally:
     sys.stdout = _old_stdout
+__RESULTS__ = __EXEC_NS__["__RESULTS__"]
 `;
       } else {
         pyodide.globals.set("__STUDENT_CODE__", code);
+        // __EXEC_NS__ : voir le commentaire équivalent dans la branche SQL ci-dessus. Ici c'est
+        // encore plus important : sans espace de noms frais à chaque clic, une fonction définie
+        // par une ANCIENNE version du code de l'étudiant (clic précédent) pouvait rester dans les
+        // globals persistants de pyodide et être utilisée par erreur si la nouvelle version ne la
+        // redéfinissait pas exactement — donnant l'impression que "Vérifier" teste un code qui
+        // n'est plus celui affiché à l'écran.
         runner = `
 import sys, io, traceback
 
 __stdout_capture__ = io.StringIO()
-__RESULTS__ = []
 __RUNTIME_ERROR__ = None
+__EXEC_NS__ = {"__RESULTS__": []}
 
 _old_stdout = sys.stdout
 sys.stdout = __stdout_capture__
 try:
-    exec(__STUDENT_CODE__, globals())
-    exec(__TEST_CODE__, globals())
+    exec(__STUDENT_CODE__, __EXEC_NS__)
+    exec(__TEST_CODE__, __EXEC_NS__)
 except Exception:
     __RUNTIME_ERROR__ = traceback.format_exc()
 finally:
     sys.stdout = _old_stdout
+__RESULTS__ = __EXEC_NS__["__RESULTS__"]
 `;
       }
       await pyodide.runPythonAsync(runner);
 
       const runtimeError = pyodide.globals.get("__RUNTIME_ERROR__");
       if (runtimeError) {
-        showRuntimeError("Erreur dans ton code :\n\n" + runtimeError);
+        showRuntimeError("Erreur dans ton code :\n\n" + runtimeError, code);
         showSolutionIfSuccess(false);
         await submitResult(code, false, true);
       } else {
@@ -329,13 +360,13 @@ finally:
         // (déjà mis à "hidden" en début de runCheck) — on ne l'affiche qu'en cas d'échec,
         // pour aider l'étudiant à comprendre ce qui ne va pas.
         if (!allOk) {
-          showResultLines(items);
+          showResultLines(items, code);
         }
         showSolutionIfSuccess(allOk);
         await submitResult(code, allOk, true);
       }
     } catch (e) {
-      showRuntimeError("Erreur inattendue : " + e.message);
+      showRuntimeError("Erreur inattendue : " + e.message, code);
       showSolutionIfSuccess(false);
     }
 
@@ -494,13 +525,14 @@ finally:
   }
 
   // Sur certains claviers virtuels mobiles (ex: Gboard), un tap ailleurs sur l'écran (bouton,
-  // scroll...) juste après avoir tapé peut arriver avant que le navigateur n'ait fini de
-  // transmettre la toute dernière frappe/correction automatique à l'éditeur : lire le code
+  // scroll...) juste après avoir tapé/modifié le code peut arriver avant que le navigateur
+  // n'ait fini de transmettre la dernière frappe/suppression à l'éditeur : lire le code
   // immédiatement risquerait alors de tester une version légèrement en retard par rapport à ce
-  // qui est affiché. Un court délai avant runCheck() laisse le temps à cette mise à jour de se
-  // terminer, sans être perceptible pour l'étudiant.
+  // qui est affiché (voir aussi le bloc repliable "Code testé" ajouté sous chaque résultat, qui
+  // permet de repérer un éventuel décalage si ça arrive quand même). 150ms reste largement en
+  // dessous du seuil de perception humaine pour un clic sur un bouton.
   runBtn.addEventListener("click", function () {
-    setTimeout(runCheck, 50);
+    setTimeout(runCheck, 150);
   });
   init();
 })();
