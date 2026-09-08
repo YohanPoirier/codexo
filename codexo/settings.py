@@ -15,15 +15,15 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Charge les variables depuis un fichier .env s'il existe. En développement, ce
-# fichier est propre à ta machine (jamais committé, voir .env.example) ; en
-# production (VPS), il s'agit du .env du serveur (voir deploiement_checklist.md).
-# Si aucun .env n'est trouvé, load_dotenv() ne fait rien et les variables
-# d'environnement doivent alors être définies autrement (ex: par le service systemd).
-load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Charge les variables depuis un fichier .env s'il existe, en local comme sur le VPS.
+# Chemin absolu basé sur BASE_DIR (et non sur le répertoire de travail courant du
+# processus) : ça marche à l'identique quel que soit l'endroit d'où Python est lancé
+# (manage.py en local, gunicorn via systemd sur le serveur), sans dépendre du
+# "WorkingDirectory" du service systemd.
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
