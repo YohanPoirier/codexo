@@ -13,10 +13,12 @@ DUREE_BLOCAGE_SECONDES = 15 * 60  # 15 minutes
 class ConnexionThrottleeForm(AuthenticationForm):
     """AuthenticationForm avec blocage temporaire après plusieurs échecs, pour
     limiter le brute-force sur le formulaire de connexion — devenu un vrai risque
-    depuis que le mot de passe provisoire d'un élève importé par CSV est sa date
-    de naissance (voir contexte-technique.md, section "Refonte de
-    l'authentification") : un espace de recherche assez restreint si on connaît
-    déjà l'identifiant d'un élève.
+    depuis que le mot de passe provisoire d'un élève importé par CSV est défini
+    directement dans la colonne "mot_de_passe" du fichier (voir
+    contexte-technique.md, section "Refonte de l'authentification") : un secret
+    potentiellement assez faible si le prof y met quelque chose de prévisible (ex:
+    une date de naissance), d'où l'intérêt de ce throttling même si on ne connaît
+    plus la convention utilisée pour le remplir.
 
     Le compteur d'échecs est stocké dans le cache Django (CACHES, LocMemCache par
     défaut ici) et clé par identifiant (pas par IP) : après NB_TENTATIVES_MAX
@@ -101,7 +103,8 @@ class ImporterElevesForm(forms.Form):
         label="Fichier CSV",
         help_text=(
             "Colonnes attendues, avec en-tête : id, nom_complet, classe, "
-            "date_naissance (format JJ/MM/AAAA, ex: 15/03/2007). Les classes "
+            "mot_de_passe (mot de passe provisoire du compte, ex: 15/03/2007 si "
+            "vous utilisez la date de naissance comme convention). Les classes "
             "doivent déjà exister dans l'admin (recherche par nom exact)."
         ),
     )

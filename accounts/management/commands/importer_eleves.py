@@ -8,10 +8,10 @@ from accounts.importation import ColonnesManquantes, importer_eleves_depuis_lign
 class Command(BaseCommand):
     help = (
         "Importe des comptes élèves depuis un fichier CSV (colonnes attendues, avec "
-        "en-tête : id, nom_complet, classe, date_naissance). Le mot de passe "
-        "provisoire de chaque compte est sa date de naissance telle qu'écrite dans "
-        "le CSV (ex: 15/03/2007) ; le compte est marqué 'doit changer son mot de "
-        "passe' et sera redirigé vers le changement de mot de passe dès sa première "
+        "en-tête : id, nom_complet, classe, mot_de_passe). Le mot de passe "
+        "provisoire de chaque compte est la valeur telle qu'écrite dans la colonne "
+        "mot_de_passe du CSV ; le compte est marqué 'doit changer son mot de passe' "
+        "et sera redirigé vers le changement de mot de passe dès sa première "
         "connexion. Peut être relancé sans dupliquer (get_or_create par identifiant). "
         "Un formulaire web équivalent existe aussi, voir /importer-eleves/ (réservé "
         "aux profs, lien dans le menu déroulant \"Espace prof\")."

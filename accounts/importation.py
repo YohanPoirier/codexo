@@ -2,7 +2,7 @@ import csv
 
 from .models import Classe, User
 
-COLONNES_ATTENDUES = {"id", "nom_complet", "classe", "date_naissance"}
+COLONNES_ATTENDUES = {"id", "nom_complet", "classe", "mot_de_passe"}
 
 
 class ColonnesManquantes(Exception):
@@ -42,9 +42,14 @@ def importer_eleves_depuis_lignes(lignes_texte, delimiter=","):
         identifiant = (row.get("id") or "").strip()
         nom_complet = (row.get("nom_complet") or "").strip()
         classe_nom = (row.get("classe") or "").strip()
-        date_naissance = (row.get("date_naissance") or "").strip()
+        # Anciennement "date_naissance" : la colonne ne sert qu'à fournir le mot de
+        # passe provisoire du compte (jamais stockée telle quelle, voir
+        # set_password() plus bas), donc renommée pour refléter son vrai usage. Rien
+        # n'empêche d'y remettre une date de naissance si c'est la convention
+        # choisie côté établissement, mais ce n'est plus imposé par le nom de colonne.
+        mot_de_passe_provisoire = (row.get("mot_de_passe") or "").strip()
 
-        if not identifiant or not nom_complet or not classe_nom or not date_naissance:
+        if not identifiant or not nom_complet or not classe_nom or not mot_de_passe_provisoire:
             erreurs.append(f"Ligne {numero_ligne} : champ(s) manquant(s), ignorée.")
             continue
 
@@ -72,7 +77,7 @@ def importer_eleves_depuis_lignes(lignes_texte, delimiter=","):
         utilisateur.role = User.ELEVE
         utilisateur.classe = classe
         utilisateur.doit_changer_mot_de_passe = True
-        utilisateur.set_password(date_naissance)
+        utilisateur.set_password(mot_de_passe_provisoire)
         utilisateur.save()
 
         if cree:
