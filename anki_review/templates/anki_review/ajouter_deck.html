@@ -1,0 +1,33 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}{% if deck %}Modifier le paquet{% else %}Ajouter un paquet{% endif %} — Anki{% endblock %}
+
+{% block content %}
+<p class="edition-fil"><a href="{% url 'anki_review:edition' %}">← Édition</a></p>
+<h1>{% if deck %}Modifier le paquet{% else %}Ajouter un paquet{% endif %}</h1>
+
+<form method="post" class="editeur-note" style="max-width:480px;">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <div class="erreur-bandeau">{{ form.non_field_errors }}</div>
+  {% endif %}
+  <div class="editeur-champ-groupe">
+    <label for="id_nom">Nom</label>
+    {{ form.nom }}
+    {% for erreur in form.nom.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
+  </div>
+  <div class="editeur-champ-groupe">
+    <label for="id_description">Description</label>
+    {{ form.description }}
+    {% for erreur in form.description.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
+  </div>
+  <div class="editeur-champ-groupe">
+    <label for="id_matiere">Matière (optionnel)</label>
+    {{ form.matiere }}
+    {% for erreur in form.matiere.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
+  </div>
+  <button type="submit" class="btn-ajouter">
+    {% if deck %}Enregistrer{% else %}Créer le paquet{% endif %}
+  </button>
+</form>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}Choisir un paquet — Anki{% endblock %}
+
+{% block content %}
+<p class="edition-fil"><a href="{% url 'anki_review:partage_etudiants' %}">← Import/Export</a></p>
+<h1>Où ranger {{ description_source }} ?</h1>
+<p>Le paquet d'origine ne t'est pas accessible (paquet privé du partageur). Choisis où l'accueillir.</p>
+
+<form method="post" class="editeur-note choix-paquet">
+  {% csrf_token %}
+
+  <label class="choix-paquet-option">
+    <input type="radio" name="choix" value="nouveau" checked>
+    <div>
+      <span class="choix-paquet-titre">Créer le paquet</span>
+      <input type="text" name="nouveau_paquet_nom" value="{{ nom_paquet_source }}">
+    </div>
+  </label>
+
+  <label class="choix-paquet-option">
+    <input type="radio" name="choix" value="existant">
+    <div>
+      <span class="choix-paquet-titre">Ajouter dans un paquet existant</span>
+      <select name="deck_existant" class="select-stylise">
+        {% for deck in decks_visibles %}
+          <option value="{{ deck.pk }}">{{ deck.nom }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </label>
+
+  <button type="submit" class="btn-ajouter" style="margin-top:8px;">Ajouter</button>
+</form>
+{% endblock %}

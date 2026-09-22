@@ -1,0 +1,80 @@
+{% load anki_extras %}
+<details class="ie-groupe" data-cle="edition-{{ groupe.deck.id }}">
+  <summary class="ie-groupe-entete edition-ligne edition-ligne--paquet">
+    <div class="edition-ligne-titre">
+      <span>{{ groupe.deck.nom }}</span>
+      <span class="edition-ligne-meta">
+        {{ groupe.notes|length }} carte{{ groupe.notes|length|pluralize }}
+        {% if user.is_staff and groupe.deck.cree_par and not groupe.deck.cree_par.is_staff %}· créé par {{ groupe.deck.cree_par }}{% endif %}
+      </span>
+    </div>
+    <div class="edition-actions" onclick="event.stopPropagation()">
+      {% if groupe.deck|peut_editer_deck:user %}
+        <a class="edition-icone-btn" href="{% url 'anki_review:modifier_deck' groupe.deck.id %}" title="Modifier">✏️</a>
+        <form method="post" action="{% url 'anki_review:supprimer_deck' groupe.deck.id %}"
+              onsubmit="return confirm('Supprimer le paquet « {{ groupe.deck.nom }} » et toutes ses cartes ?');" style="display:contents;">
+          {% csrf_token %}
+          <button type="submit" class="edition-icone-btn supprimer" title="Supprimer">🗑️</button>
+        </form>
+      {% else %}
+        <div class="ie-bulle-conteneur">
+          <button type="button" class="edition-icone-btn edition-icone-btn--desactive"
+                  onclick="this.nextElementSibling.classList.add('ie-bulle--visible'); setTimeout(() => this.nextElementSibling.classList.remove('ie-bulle--visible'), 2500)">✏️</button>
+          <span class="ie-bulle">Tu n'es pas propriétaire de ce paquet.</span>
+        </div>
+        {% if groupe.notes|compte_notes_de:user %}
+          <form method="post" action="{% url 'anki_review:supprimer_mes_cartes_paquet' groupe.deck.id %}"
+                onsubmit="return confirm('Supprimer tes {{ groupe.notes|compte_notes_de:user }} carte(s) de « {{ groupe.deck.nom }} » ? Le paquet lui-même n\'est pas supprimé.');" style="display:contents;">
+            {% csrf_token %}
+            <button type="submit" class="edition-icone-btn supprimer" title="Supprimer mes cartes de ce paquet">🗑️</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    </div>
+  </summary>
+  <ul class="edition-liste ie-sous-liste">
+    {% for note in groupe.notes %}
+      <li class="edition-ligne ie-sous-ligne">
+        <div class="edition-ligne-titre">
+          <span>{{ note.titre_affichage|truncatechars:80 }}{% if note.sens_affichage %} <span class="ie-sens">{{ note.sens_affichage }}</span>{% endif %}</span>
+          <span class="edition-ligne-meta">
+            {% if user.is_staff and note.cree_par and not note.cree_par.is_staff %}
+              {{ note.cree_par }} · {% if note.partagee_avec_classe %}partagée{% else %}privée{% endif %}{% if note.tags %} ·{% endif %}
+            {% endif %}
+            {{ note.tags }}
+          </span>
+        </div>
+        <div class="edition-actions">
+          <button type="button" class="edition-icone-btn" title="Aperçu"
+                  onclick="document.getElementById('apercu-{{ note.id }}').hidden = !document.getElementById('apercu-{{ note.id }}').hidden">
+            <svg viewBox="0 0 20 14" width="18" height="14"><path d="M1 7C3 2 7 0 10 0s7 2 9 7c-2 5-6 7-9 7S3 12 1 7z" fill="none" stroke="currentColor" stroke-width="1.5"></path><circle cx="10" cy="7" r="3" fill="none" stroke="currentColor" stroke-width="1.5"></circle></svg>
+          </button>
+          {% if note|peut_editer:user %}
+            <a class="edition-icone-btn" href="{% url 'anki_review:modifier_note' note.id %}" title="Modifier">✏️</a>
+          {% endif %}
+          {% if note|peut_supprimer:user %}
+            <form method="post" action="{% url 'anki_review:supprimer_note' note.id %}"
+                  onsubmit="return confirm('Supprimer cette carte ?');" style="display:contents;">
+              {% csrf_token %}
+              <button type="submit" class="edition-icone-btn supprimer" title="Supprimer">🗑️</button>
+            </form>
+          {% endif %}
+        </div>
+      </li>
+      <li class="ie-apercu" id="apercu-{{ note.id }}" hidden>
+        {% with bandes=note.bandes_apercu %}
+          <div class="ie-apercu-section">
+            <span class="ie-apercu-bande ie-apercu-bande--{% if bandes.0 == 'R' %}recto{% else %}verso{% endif %}">{{ bandes.0 }}</span>
+            <div class="ie-apercu-contenu">{{ note.question|resoudre_images }}</div>
+          </div>
+          <div class="ie-apercu-section">
+            <span class="ie-apercu-bande ie-apercu-bande--{% if bandes.1 == 'R' %}recto{% else %}verso{% endif %}">{{ bandes.1 }}</span>
+            <div class="ie-apercu-contenu">{{ note.reponse|resoudre_images }}</div>
+          </div>
+        {% endwith %}
+      </li>
+    {% empty %}
+      <li class="edition-ligne ie-sous-ligne"><span>Aucune carte dans ce paquet pour l'instant.</span></li>
+    {% endfor %}
+  </ul>
+</details>

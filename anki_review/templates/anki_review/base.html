@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Anki{% endblock %}</title>
+<!-- Réutilise style.css pour les variables/polices communes (--paper, --indigo, Fraunces...)
+     mais AUCUN lien, logo ou texte "Codexo" n'apparaît sur ces pages. -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'anki_review/css/anki_base.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+</head>
+<body>
+<header class="anki-site">
+  <div class="bar">
+    <a class="brand" href="{% url 'anki_review:liste_decks' %}">Anki<span class="dot">.</span></a>
+    <button type="button" class="anki-nav-toggle" id="anki-nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="anki-nav">
+      <a href="{% url 'anki_review:liste_decks' %}">Révision</a>
+      <a href="{% url 'anki_review:edition' %}">Edition</a>
+      <a href="{% url 'anki_review:import_export_accueil' %}">Import/Export</a>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+          {% csrf_token %}
+          <button type="submit" class="nav-link-btn">Déconnexion</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}?next={{ request.path }}">Connexion</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="message {{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+<script>
+document.getElementById('anki-nav-toggle')?.addEventListener('click', function () {
+  const nav = document.getElementById('anki-nav');
+  const ouvert = nav.classList.toggle('anki-nav-ouvert');
+  this.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+});
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from accounts.views import (
     IdentifiantLoginView,
     ChangerMotDePasseView,
@@ -36,7 +36,13 @@ urlpatterns = [
     path('api/exercise/<int:exercise_id>/abandon/', ex_views.abandon_exercise, name='abandon_exercise'),
     path('api/exercise/<int:exercise_id>/demander-aide/', ex_views.demander_aide, name='demander_aide'),
     path('api/hint/<int:hint_id>/viewed/', ex_views.hint_viewed, name='hint_viewed'),
+    path("anki/", include("anki_review.urls")),
 ]
 # Suppression de /signup/ (06/09/2026) : plus d'inscription publique, pour aucun
 # rôle. Voir contexte-technique.md — comptes créés uniquement via /admin/ (profs) ou
 # la commande "importer_eleves" (élèves).
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

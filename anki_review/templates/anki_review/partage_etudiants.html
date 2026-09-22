@@ -1,0 +1,144 @@
+{% extends "anki_review/base.html" %}
+{% load anki_extras %}
+
+{% block title %}Partage entre étudiants — Anki{% endblock %}
+
+{% block content %}
+<p class="edition-fil"><a href="{% url 'anki_review:import_export_accueil' %}">← Import/Export</a></p>
+<h1>Entre étudiants</h1>
+
+<h2 class="ie-section-titre">Mes paquets</h2>
+{% for m in mes_matieres %}
+  <details class="ie-groupe" data-cle="mes-matiere-{{ m.valeur }}">
+    <summary class="ie-groupe-entete edition-ligne edition-ligne--matiere">
+      <div class="edition-ligne-titre">
+        <span>{{ m.libelle }}</span>
+        <span class="edition-ligne-meta">{{ m.paquets|length }} paquet{{ m.paquets|length|pluralize }}</span>
+      </div>
+    </summary>
+    <ul class="ie-groupe-liste">
+      {% for groupe in m.paquets %}
+        <li>{% include "anki_review/_partage_mon_paquet.html" with groupe=groupe %}</li>
+      {% endfor %}
+    </ul>
+  </details>
+{% empty %}
+  <p>Tu n'as pas encore créé de carte personnelle.</p>
+{% endfor %}
+
+<h2 class="ie-section-titre">Partagé par la classe</h2>
+<div class="ie-legende">
+  <span class="ie-legende-item"><span class="ie-voyant ie-voyant--identique"></span> Même version</span>
+  <span class="ie-legende-item"><span class="ie-voyant ie-voyant--differente"></span> Version différente</span>
+  <span class="ie-legende-item"><span class="ie-voyant ie-voyant--absente"></span> Tu ne l'as pas</span>
+</div>
+{% for groupe in groupes_partages %}
+  <details class="ie-groupe" data-cle="partage-{{ groupe.deck.id }}-{{ groupe.cree_par.id }}">
+    <summary class="ie-groupe-entete edition-ligne edition-ligne--paquet">
+      <div class="ie-ligne-gauche">
+        {% if groupe.tout_identique %}
+          <span class="ie-voyant ie-voyant--identique" title="Tu as déjà cette version"></span>
+        {% else %}
+          <span class="ie-voyant ie-voyant--differente" title="Une ou plusieurs cartes diffèrent ou te manquent"></span>
+        {% endif %}
+        <div class="edition-ligne-titre">
+          <span>{{ groupe.deck.nom }}</span>
+          <span class="edition-ligne-meta">{{ groupe.notes|length }} carte{{ groupe.notes|length|pluralize }} · partagé par {{ groupe.cree_par|default:"un élève" }}</span>
+        </div>
+      </div>
+      <div class="edition-actions" onclick="event.stopPropagation()">
+        {% if not user.is_staff %}
+          {% if groupe.besoin_choix_paquet %}
+            <a class="ie-btn-action"
+               href="{% url 'anki_review:choisir_paquet_paquet_partage' groupe.deck.id groupe.cree_par.id %}">Tout ajouter</a>
+          {% else %}
+            <form method="post" action="{% url 'anki_review:ajouter_paquet_partage' groupe.deck.id groupe.cree_par.id %}" style="display:contents;">
+              {% csrf_token %}
+              <button type="submit" class="ie-btn-action">
+                {% if groupe.tout_identique %}Déjà à jour{% else %}Tout ajouter / mettre à jour{% endif %}
+              </button>
+            </form>
+          {% endif %}
+        {% endif %}
+      </div>
+    </summary>
+    <ul class="edition-liste ie-sous-liste">
+      {% for item in groupe.notes %}
+        <li class="edition-ligne ie-sous-ligne">
+          <span class="ie-ligne-gauche">
+            <span class="ie-voyant ie-voyant--{{ item.statut }}"
+                  title="{% if item.statut == 'identique' %}Tu as déjà cette version{% elif item.statut == 'differente' %}Tu as une version différente{% else %}Tu n'as pas cette carte{% endif %}"></span>
+            {{ item.note.titre_affichage|truncatechars:60 }}{% if item.note.sens_affichage %} <span class="ie-sens">{{ item.note.sens_affichage }}</span>{% endif %}
+          </span>
+          <div class="edition-actions">
+            <button type="button" class="edition-icone-btn" title="Aperçu"
+                    onclick="document.getElementById('apercu-{{ item.note.id }}').hidden = !document.getElementById('apercu-{{ item.note.id }}').hidden">
+              <svg viewBox="0 0 20 14" width="18" height="14"><path d="M1 7C3 2 7 0 10 0s7 2 9 7c-2 5-6 7-9 7S3 12 1 7z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="7" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+            </button>
+            {% if not user.is_staff %}
+              {% if item.statut == 'absente' and groupe.besoin_choix_paquet %}
+                <a class="ie-btn-action"
+                   href="{% url 'anki_review:choisir_paquet_carte_partagee' item.note.id %}">Ajouter</a>
+              {% else %}
+                <form method="post" action="{% url 'anki_review:ajouter_carte_partagee' item.note.id %}" style="display:contents;">
+                  {% csrf_token %}
+                  <button type="submit" class="ie-btn-action">
+                    {% if item.statut == 'identique' %}Déjà à jour{% elif item.statut == 'differente' %}Mettre à jour{% else %}Ajouter{% endif %}
+                  </button>
+                </form>
+              {% endif %}
+            {% endif %}
+          </div>
+        </li>
+        <li class="ie-apercu" id="apercu-{{ item.note.id }}" hidden>
+          {% with bandes=item.note.bandes_apercu %}
+            <div class="ie-apercu-section">
+              <span class="ie-apercu-bande ie-apercu-bande--{% if bandes.0 == 'R' %}recto{% else %}verso{% endif %}">{{ bandes.0 }}</span>
+              <div class="ie-apercu-contenu">{{ item.note.question|resoudre_images }}</div>
+            </div>
+            <div class="ie-apercu-section">
+              <span class="ie-apercu-bande ie-apercu-bande--{% if bandes.1 == 'R' %}recto{% else %}verso{% endif %}">{{ bandes.1 }}</span>
+              <div class="ie-apercu-contenu">{{ item.note.reponse|resoudre_images }}</div>
+            </div>
+          {% endwith %}
+        </li>
+      {% endfor %}
+    </ul>
+  </details>
+{% empty %}
+  <p>Aucune carte partagée par d'autres élèves pour l'instant.</p>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Un <details> HTML ne retient pas son état ouvert/fermé après un
+// rechargement de page — or les actions "Tout partager"/"Tout ajouter"
+// rechargent la page (POST classique). On mémorise donc l'état dans
+// sessionStorage pour que les paquets déjà dépliés le restent après l'action.
+document.querySelectorAll('details.ie-groupe').forEach(details => {
+  const cle = 'anki-detail-' + details.dataset.cle;
+  if (sessionStorage.getItem(cle) === 'open') details.open = true;
+  details.addEventListener('toggle', () => {
+    sessionStorage.setItem(cle, details.open ? 'open' : 'closed');
+  });
+});
+
+// Rendu LaTeX des aperçus (syntaxe Anki : \( \) inline, \[ \] en bloc).
+function rendreApercusQuandPret() {
+  if (window.renderMathInElement) {
+    document.querySelectorAll('.ie-apercu').forEach(bloc => {
+      renderMathInElement(bloc, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false },
+        ],
+      });
+    });
+  } else {
+    setTimeout(rendreApercusQuandPret, 50);
+  }
+}
+rendreApercusQuandPret();
+</script>
+{% endblock %}

@@ -1,0 +1,361 @@
+/* Header/nav de la section Anki — même base technique que Codexo
+   (variables, polices) mais identité visuelle propre : accent teal
+   au lieu de l'ambre Codexo, pour qu'il n'y ait aucune ambiguïté
+   visuelle entre les deux sections au premier coup d'œil. */
+
+:root {
+  --anki-accent: #2b8a7f;
+  --anki-accent-deep: #1f6b62;
+}
+
+/* Sans cette règle, l'attribut HTML `hidden` peut être écrasé par une
+   règle `display` définie ailleurs sur le même élément (même priorité,
+   la dernière déclarée dans la feuille de style l'emporte sur `hidden`) —
+   déjà rencontré une fois sur l'écran de révision (reviser.css), ici pour
+   les blocs d'aperçu (.ie-apercu) qui doivent rester masqués tant qu'on
+   n'a pas cliqué sur l'œil. */
+[hidden] { display: none !important; }
+
+header.anki-site {
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+}
+header.anki-site .bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 8px;
+  padding: 18px 24px; max-width: 920px; margin: 0 auto;
+}
+header.anki-site .brand {
+  font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.35rem;
+  color: var(--indigo-deep); text-decoration: none; letter-spacing: -.01em;
+}
+header.anki-site .brand .dot { color: var(--anki-accent); }
+header.anki-site nav { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; }
+header.anki-site nav a { font-size: .92rem; color: var(--ink-soft); text-decoration: none; }
+header.anki-site nav a:hover { color: var(--anki-accent-deep); }
+
+/* Bouton hamburger — cf. la règle mobile plus bas pour ce qu'il déclenche */
+.anki-nav-toggle {
+  display: none; flex-direction: column; justify-content: center; gap: 4px;
+  width: 32px; height: 32px; padding: 0; border: none; background: none; cursor: pointer;
+}
+.anki-nav-toggle span { display: block; width: 22px; height: 2px; background: var(--ink); border-radius: 2px; }
+
+/* Cartes de paquets, mêmes proportions que .theme-card de Codexo mais
+   accent recoloré pour cohérence avec ce header. */
+.anki-deck-card .progress-fill { background: var(--anki-accent); }
+.anki-deck-card:hover { box-shadow: 0 8px 20px rgba(43, 138, 127, .15); }
+
+/* --- Éditeur d'ajout/modification de note --- */
+.editeur-grille { display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; margin-top: 18px; }
+@media (max-width: 800px) { .editeur-grille { grid-template-columns: 1fr; } }
+
+.editeur-champ-groupe { margin-bottom: 18px; }
+.editeur-champ-groupe > label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: .85rem; font-weight: 600; margin-bottom: 6px; color: var(--ink-soft);
+}
+
+/* Champs texte/textarea nettement distincts du fond de la page (--paper) :
+   fond blanc, bordure plus marquée, léger relief, halo net au focus. */
+.editeur-champ, .editeur-champ-groupe input[type=text] {
+  width: 100%; box-sizing: border-box; padding: 12px 14px;
+  border: 1.5px solid var(--ink-soft); border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: .92rem;
+  background: #fff; resize: vertical;
+  box-shadow: inset 0 1px 3px rgba(33, 38, 43, .08);
+}
+.editeur-champ:focus, .editeur-champ-groupe input[type=text]:focus {
+  outline: none; border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(43, 58, 103, .18);
+}
+
+/* Menu déroulant stylé (au lieu du rendu natif du navigateur) */
+.select-stylise {
+  width: 100%; box-sizing: border-box; padding: 11px 40px 11px 14px;
+  border: 1.5px solid var(--ink-soft); border-radius: 8px;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23565f66'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.19l3.71-3.96a.75.75 0 111.1 1.02l-4.25 4.5a.75.75 0 01-1.1 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; background-size: 16px;
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  font-family: 'Inter', system-ui, sans-serif; font-size: .95rem; color: var(--ink);
+  cursor: pointer;
+}
+.select-stylise:focus {
+  outline: none; border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(43, 58, 103, .18);
+}
+
+/* Petit bouton d'aide "?" — révèle une explication au clic (tactile OK) */
+.champ-aide-toggle {
+  width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--ink-soft);
+  background: none; color: var(--ink-soft); font-size: .72rem; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0; flex-shrink: 0;
+}
+.champ-aide-toggle:hover, .champ-aide-toggle[aria-expanded="true"] {
+  border-color: var(--anki-accent); color: var(--anki-accent);
+}
+.champ-aide-texte {
+  font-size: .85rem; color: var(--ink-soft); margin: 6px 0 0; padding: 8px 10px;
+  background: var(--paper-alt); border-radius: 6px; border-left: 3px solid var(--anki-accent);
+}
+.champ-aide-texte code {
+  font-family: 'JetBrains Mono', monospace; background: #fff;
+  padding: 1px 5px; border-radius: 4px; font-size: .85rem;
+}
+
+.erreur-champ { color: var(--err); font-size: .82rem; margin: 6px 0 0; }
+.editeur-champ-aide { font-size: .8rem; color: var(--ink-soft); margin: 6px 0 0; }
+.erreur-bandeau {
+  background: rgba(184, 69, 47, .1); border: 1px solid var(--err); color: var(--err);
+  border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: .9rem;
+}
+.ie-resultat-import { background: var(--paper-alt); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; }
+.ie-resultat-import ul { margin: 8px 0 0; padding-left: 20px; }
+
+.btn-inserer-image {
+  margin-top: 6px; padding: 6px 12px; font-size: .82rem;
+  border: 1px solid var(--rule); border-radius: 6px; background: none; cursor: pointer;
+}
+.btn-inserer-image:hover { background: var(--paper-alt); }
+
+.editeur-barre-outils {
+  display: flex; align-items: center; gap: 2px; margin-bottom: 0;
+  border: 1.5px solid var(--ink-soft); border-bottom: none;
+  border-radius: 8px 8px 0 0; background: var(--paper-alt); padding: 4px;
+}
+.editeur-barre-outils + .editeur-champ { border-top-left-radius: 0; border-top-right-radius: 0; }
+.outil-btn {
+  box-sizing: border-box;
+  width: 30px; height: 28px; padding: 0; border: none; border-radius: 5px; background: none;
+  color: var(--ink); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  line-height: 0; flex-shrink: 0;
+}
+.outil-btn:hover { background: #fff; }
+.outil-btn svg { fill: currentColor; display: block; }
+.outil-separateur { width: 1px; height: 18px; background: var(--rule); margin: 0 4px; flex-shrink: 0; }
+
+.editeur-preview-titre { font-size: .85rem; font-weight: 600; color: var(--ink-soft); display: block; margin-bottom: 6px; }
+.editeur-preview {
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 24px; min-height: 200px; background: #fff;
+  box-shadow: 0 2px 10px rgba(33, 38, 43, .06);
+}
+.preview-mini-label {
+  display: block; font-family: 'JetBrains Mono', monospace; font-size: .7rem;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--anki-accent); margin-bottom: 6px;
+}
+.editeur-preview-question {
+  padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid var(--paper-alt);
+  font-size: 1.05rem; line-height: 1.55; color: var(--ink);
+  white-space: pre-line;
+}
+.editeur-preview-question:empty::after, .editeur-preview-reponse:empty::after {
+  content: "…"; color: var(--rule);
+}
+.editeur-preview-reponse { font-size: 1.05rem; line-height: 1.55; color: var(--indigo-deep); white-space: pre-line; }
+.editeur-preview img { max-width: 100%; border-radius: 6px; margin: 6px 0; }
+.editeur-preview ul, .editeur-preview ol { text-align: left; margin: 8px 0; padding-left: 22px; }
+
+/* --- Page Édition : listes de paquets / cartes avec icônes modifier/supprimer --- */
+.edition-liste { list-style: none; margin: 24px 0 0; padding: 0; }
+.edition-ligne {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px; border: 1.5px solid var(--rule); border-radius: 8px;
+  background: #fff; margin-bottom: 8px;
+}
+/* Distinction visuelle paquet / carte : fond neutre (comme le reste du
+   site), juste une fine bordure de couleur à gauche pour indiquer la
+   catégorie — plus sobre qu'un fond coloré plein. */
+.edition-ligne--paquet { background: #fff; border-left: 4px solid var(--indigo); }
+.edition-ligne--carte { background: #fff; border-left: 4px solid var(--anki-accent); }
+.edition-ligne--matiere {
+  background: var(--indigo-deep); border: 1.5px solid var(--indigo-deep); color: #fff;
+}
+.edition-ligne--matiere .edition-ligne-meta { color: rgba(255,255,255,.75); }
+
+/* Paquets nichés sous une matière : pas de retrait horizontal (juste la
+   couleur de bordure fait la distinction) — contrairement à la liste des
+   cartes sous un paquet, qui elle reste légèrement décalée. */
+.ie-groupe-liste { margin: 0 0 10px; list-style: none; padding: 0; }
+.ie-groupe-liste > li { margin-bottom: 0; }
+/* Couvre aussi le cas Révision : le paquet niché y est un simple lien
+   <a class="edition-ligne">, pas enveloppé dans un .ie-groupe comme en
+   Édition/Import-Export (pas de détail à déplier, juste un lien direct) —
+   sans cette règle, sa marge et son arrondi par défaut restent actifs. */
+.ie-groupe-liste > li > .edition-ligne { margin-bottom: 0; }
+
+/* Ligne cliquable menant directement à la révision (pas de <details>) */
+.edition-ligne--lien { text-decoration: none; color: inherit; }
+
+/* --- En-tête de groupe cliquable (remplace le <summary> texte séparé) --- */
+.ie-groupe-entete {
+  cursor: pointer; list-style: none;
+}
+.ie-groupe-entete::-webkit-details-marker { display: none; }
+.ie-groupe-entete .edition-ligne-meta::after { content: " ▸"; }
+details[open] > .ie-groupe-entete .edition-ligne-meta::after { content: " ▾"; }
+.ie-groupe-entete:hover { filter: brightness(0.97); }
+
+/* Bouton d'action sur fond coloré (paquet/carte) — plein, pas juste une
+   bordure fine qui se fondrait dans le fond teinté. */
+.ie-btn-action {
+  padding: 6px 14px; font-size: .82rem; font-weight: 600;
+  border: 1.5px solid var(--ink); border-radius: 6px;
+  background: #fff; color: var(--ink); cursor: pointer;
+  text-decoration: none; display: inline-block; white-space: nowrap;
+}
+.ie-btn-action:hover { background: var(--ink); color: #fff; }
+.edition-ligne-titre { display: flex; flex-direction: column; gap: 2px; }
+.edition-ligne-titre a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.edition-ligne-titre a:hover { color: var(--anki-accent-deep); }
+.edition-ligne--matiere .edition-ligne-titre > span:first-child { font-weight: 700; font-size: 1.05rem; }
+.edition-ligne--paquet .edition-ligne-titre > span:first-child { font-weight: 700; }
+.edition-ligne-titre label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.edition-ligne-meta { font-size: .8rem; color: var(--ink-soft); }
+.edition-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.edition-icone-btn {
+  width: 32px; height: 32px; border-radius: 6px; border: 1px solid transparent;
+  background: none; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+}
+.edition-icone-btn:hover { background: #fff; border-color: var(--rule); }
+.edition-icone-btn.supprimer:hover { border-color: var(--err); }
+.edition-icone-btn--desactive { opacity: .35; cursor: not-allowed; }
+.edition-icone-btn--desactive:hover { background: none; border-color: transparent; }
+
+.ie-bulle-conteneur { position: relative; display: inline-flex; }
+.ie-bulle {
+  position: absolute; bottom: calc(100% + 6px); right: 0;
+  background: var(--ink); color: #fff; font-size: .78rem; padding: 6px 10px;
+  border-radius: 6px; white-space: normal; max-width: 220px; text-align: left;
+  opacity: 0; pointer-events: none; transition: opacity .15s ease; z-index: 10;
+}
+.ie-bulle::after {
+  content: ""; position: absolute; top: 100%; right: 10px;
+  border: 5px solid transparent; border-top-color: var(--ink);
+}
+.ie-bulle--visible { opacity: 1; }
+.ie-sens { font-size: .8rem; font-weight: 400; color: var(--ink-soft); }
+
+.edition-entete { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+.btn-ajouter {
+  display: inline-block; padding: 10px 18px; border-radius: 8px;
+  background: var(--anki-accent); color: #fff; text-decoration: none; font-weight: 600; font-size: .9rem;
+  border: none; cursor: pointer; font-family: 'Inter', system-ui, sans-serif;
+}
+.btn-ajouter:hover { background: var(--anki-accent-deep); }
+.edition-fil { font-size: .85rem; color: var(--ink-soft); margin-bottom: 4px; }
+.edition-fil a { color: var(--ink-soft); }
+
+.ie-filtre { margin: 10px 0 18px; font-size: .9rem; }
+.ie-filtre label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+
+/* --- Page Import/Export --- */
+.ie-choix { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+@media (max-width: 600px) { .ie-choix { grid-template-columns: 1fr; } }
+.ie-carte {
+  display: block; padding: 20px; border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--paper-alt); text-decoration: none; color: var(--ink);
+}
+.ie-carte:hover { box-shadow: 0 8px 20px rgba(43, 138, 127, .15); }
+.ie-carte h3 { margin: 0 0 6px; color: var(--indigo-deep); }
+.ie-carte p { margin: 0; font-size: .9rem; color: var(--ink-soft); }
+
+.ie-section-titre { font-size: 1.05rem; margin: 28px 0 4px; }
+.ie-statut-partagee { color: var(--anki-accent); }
+
+.ie-ligne-gauche { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.ie-ligne-gauche .ie-voyant { margin-top: 6px; }
+.ie-voyant { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.ie-voyant--identique { background: var(--ok); }
+.ie-voyant--differente { background: var(--amber); }
+.ie-voyant--absente { background: var(--ink-soft); opacity: .4; }
+
+.ie-legende {
+  display: flex; flex-wrap: wrap; gap: 6px 18px;
+  margin: 4px 0 18px; font-size: .82rem; color: var(--ink-soft);
+}
+.ie-legende-item { display: flex; align-items: center; gap: 6px; }
+.ie-legende .ie-voyant { flex-shrink: 0; }
+
+.ie-apercu {
+  background: #fff; border: none; border-top: 1px dashed var(--rule);
+  padding: 0;
+}
+.ie-apercu-section { display: flex; align-items: stretch; }
+.ie-apercu-section + .ie-apercu-section { border-top: 1px dashed var(--rule); }
+.ie-apercu-bande {
+  flex-shrink: 0; width: 28px; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 700; font-size: .85rem;
+}
+.ie-apercu-bande--recto { background: var(--indigo); }
+.ie-apercu-bande--verso { background: var(--anki-accent); }
+.ie-apercu-contenu { flex: 1; padding: 14px 16px; font-size: .92rem; line-height: 1.5; }
+.ie-apercu img { max-width: 100%; border-radius: 6px; }
+
+.ie-groupe { margin-bottom: 10px; }
+/* Nichés sous une matière, les paquets se suivent sans aucun espace — la
+   marge par défaut ci-dessus ne vaut que pour un groupe de premier niveau
+   (matière, ou paquet isolé). */
+.ie-groupe-liste .ie-groupe { margin-bottom: 0; }
+/* Par défaut : un groupe (paquet isolé, ou matière) est une carte
+   visuellement indépendante, arrondie sur les 4 coins. */
+.ie-groupe > .edition-ligne { margin-bottom: 0; border-radius: 8px; }
+/* Une matière garde le bas plat : elle enchaîne directement, sans espace,
+   sur son premier paquet niché juste en dessous. */
+.ie-groupe > .edition-ligne--matiere { border-radius: 8px 8px 0 0; }
+/* Un paquet niché sous une matière : par défaut, arrondi partout comme un
+   paquet isolé — SAUF le tout premier de la liste, qui enchaîne sans
+   espace juste sous l'en-tête de la matière et garde donc le haut plat. */
+.ie-groupe-liste > li:first-child .ie-groupe > .edition-ligne { border-radius: 0 0 8px 8px; }
+.ie-groupe-liste > li:first-child > .edition-ligne { border-radius: 0 0 8px 8px; }
+.ie-sous-liste { margin: 0 0 0 20px; }
+.ie-sous-ligne {
+  background: #fff; border: none; border-top: 1px solid var(--rule);
+  border-left: 3px solid var(--anki-accent);
+  border-radius: 0; padding: 10px 12px; margin-bottom: 0; font-size: .92rem;
+}
+.ie-sous-ligne:first-child { border-top: none; }
+.ie-sous-ligne:last-child { border-radius: 0 0 8px 8px; }
+
+
+/* --- Écran de choix du paquet d'accueil (carte partagée) --- */
+.choix-paquet-option {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 14px; border: 1.5px solid var(--rule); border-radius: 8px;
+  margin-bottom: 10px; cursor: pointer;
+}
+.choix-paquet-option:has(input:checked) { border-color: var(--anki-accent); background: var(--paper-alt); }
+.choix-paquet-option input[type=radio] { margin-top: 4px; }
+.choix-paquet-option > div { flex: 1; }
+.choix-paquet-titre { display: block; font-weight: 600; margin-bottom: 6px; }
+.choix-paquet-option input[type=text] {
+  width: 100%; box-sizing: border-box; padding: 10px 12px;
+  border: 1.5px solid var(--ink-soft); border-radius: 8px; background: #fff; font-size: .92rem;
+}
+
+/* --- Mobile uniquement (ne touche pas au rendu PC) ---
+   Placé en fin de fichier exprès : à spécificité égale, c'est la règle la
+   plus bas dans le fichier qui l'emporte, media query ou non. Une version
+   précédente de ce bloc était placée en haut du fichier et se faisait donc
+   silencieusement écraser par les règles générales définies après elle
+   (d'où le texte court centré au lieu d'aligné à gauche). */
+@media (max-width: 700px) {
+  .anki-nav-toggle { display: flex; }
+  header.anki-site .bar { flex-wrap: wrap; }
+  header.anki-site nav {
+    display: none; flex-direction: column; align-items: flex-start; gap: 12px;
+    width: 100%; padding-top: 14px;
+  }
+  header.anki-site nav.anki-nav-ouvert { display: flex; }
+
+  /* Titre et actions empilés plutôt que côte à côte — évite que le bouton
+     ("Tout partager", l'œil d'aperçu...) chevauche le texte du paquet ou
+     de la carte, trop à l'étroit sur un petit écran. */
+  .edition-ligne { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .edition-actions { width: 100%; justify-content: flex-end; }
+
+  /* "+ Ajouter un paquet" / "+ Ajouter une carte" : une ligne chacun */
+  .edition-entete > div { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .edition-entete .btn-ajouter { text-align: center; }
+}

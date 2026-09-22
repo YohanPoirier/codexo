@@ -1,0 +1,43 @@
+{% extends "anki_review/base.html" %}
+{% load anki_extras %}
+
+{% block title %}{{ deck.nom }} — Édition — Anki{% endblock %}
+
+{% block content %}
+<p class="edition-fil"><a href="{% url 'anki_review:edition' %}">← Édition</a></p>
+<div class="edition-entete">
+  <h1>{{ deck.nom }}</h1>
+  <a class="btn-ajouter" href="{% url 'anki_review:ajouter_note' %}?deck={{ deck.slug }}">+ Ajouter une carte</a>
+</div>
+{% if deck.description %}<p>{{ deck.description }}</p>{% endif %}
+
+<ul class="edition-liste">
+  {% for note in notes %}
+    <li class="edition-ligne edition-ligne--carte">
+      <div class="edition-ligne-titre">
+        <span>{{ note.titre_affichage|truncatechars:80 }}{% if note.sens_affichage %} <span class="ie-sens">{{ note.sens_affichage }}</span>{% endif %}</span>
+        <span class="edition-ligne-meta">
+          {% if note.cree_par and not note.cree_par.is_staff %}
+            {{ note.cree_par }} · {% if note.partagee_avec_classe %}partagée{% else %}privée{% endif %}{% if note.tags %} ·{% endif %}
+          {% endif %}
+          {{ note.tags }}
+        </span>
+      </div>
+      <div class="edition-actions">
+        {% if note|peut_editer:user %}
+          <a class="edition-icone-btn" href="{% url 'anki_review:modifier_note' note.id %}" title="Modifier">✏️</a>
+        {% endif %}
+        {% if note|peut_supprimer:user %}
+          <form method="post" action="{% url 'anki_review:supprimer_note' note.id %}"
+                onsubmit="return confirm('Supprimer cette carte ?');" style="display:contents;">
+            {% csrf_token %}
+            <button type="submit" class="edition-icone-btn supprimer" title="Supprimer">🗑️</button>
+          </form>
+        {% endif %}
+      </div>
+    </li>
+  {% empty %}
+    <p>Aucune carte dans ce paquet pour l'instant.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

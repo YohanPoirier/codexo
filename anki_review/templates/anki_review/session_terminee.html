@@ -1,0 +1,15 @@
+{% extends "anki_review/base_fullscreen.html" %}
+
+{% block title %}Session terminée — {{ titre_paquet }}{% endblock %}
+
+{% block content %}
+<div class="session-terminee">
+  <div class="emoji">✅</div>
+  <h2>{{ titre_paquet }} à jour</h2>
+  <p>Plus aucune carte à réviser pour l'instant.</p>
+  <a class="btn-ajouter" style="margin-top:12px;"
+     href="{% url 'anki_review:liste_decks' %}">
+    Retour aux paquets
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}Édition — Anki{% endblock %}
+
+{% block content %}
+<div class="edition-entete">
+  <h1>Édition</h1>
+  <div style="display:flex; gap:8px;">
+    <a class="btn-ajouter" href="{% url 'anki_review:ajouter_deck' %}">+ Ajouter un paquet</a>
+    <a class="btn-ajouter" href="{% url 'anki_review:ajouter_note' %}">+ Ajouter une carte</a>
+  </div>
+</div>
+
+<form method="get" class="ie-filtre">
+  {% if user.is_staff %}
+  <label>
+    <input type="checkbox" name="mes" value="1" {% if filtre_mes %}checked{% endif %} onchange="this.form.submit()">
+    N'afficher que mes cartes
+  </label>
+  {% endif %}
+</form>
+
+{% for m in matieres %}
+  <details class="ie-groupe" data-cle="edition-matiere-{{ m.valeur }}">
+    <summary class="ie-groupe-entete edition-ligne edition-ligne--matiere">
+      <div class="edition-ligne-titre">
+        <span>{{ m.libelle }}</span>
+        <span class="edition-ligne-meta">{{ m.paquets|length }} paquet{{ m.paquets|length|pluralize }}</span>
+      </div>
+    </summary>
+    <ul class="ie-groupe-liste">
+      {% for groupe in m.paquets %}
+        <li>{% include "anki_review/_edition_paquet.html" with groupe=groupe %}</li>
+      {% endfor %}
+    </ul>
+  </details>
+{% empty %}
+  <p>Aucun paquet pour l'instant.</p>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('details.ie-groupe').forEach(details => {
+  const cle = 'anki-detail-' + details.dataset.cle;
+  if (sessionStorage.getItem(cle) === 'open') details.open = true;
+  details.addEventListener('toggle', () => {
+    sessionStorage.setItem(cle, details.open ? 'open' : 'closed');
+  });
+});
+
+// Rendu LaTeX des aperçus (syntaxe Anki : \( \) inline, \[ \] en bloc).
+function rendreApercusQuandPret() {
+  if (window.renderMathInElement) {
+    document.querySelectorAll('.ie-apercu').forEach(bloc => {
+      renderMathInElement(bloc, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false },
+        ],
+      });
+    });
+  } else {
+    setTimeout(rendreApercusQuandPret, 50);
+  }
+}
+rendreApercusQuandPret();
+</script>
+{% endblock %}

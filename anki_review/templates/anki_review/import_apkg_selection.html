@@ -1,0 +1,44 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}Choisir quoi importer — Anki{% endblock %}
+
+{% block content %}
+<p class="edition-fil"><a href="{% url 'anki_review:import_export_fichier' %}">← Import/Export</a></p>
+<h1>Choisir quoi importer</h1>
+<p>Tout est coché par défaut — décoche ce que tu ne veux pas importer.</p>
+{% if nb_cloze %}
+  <p class="editeur-champ-aide">{{ nb_cloze }} carte{{ nb_cloze|pluralize }} de type "texte à trous" ignorée{{ nb_cloze|pluralize }} (pas encore gérée).</p>
+{% endif %}
+
+<form method="post" action="{% url 'anki_review:import_apkg_confirmer' %}">
+  {% csrf_token %}
+  <input type="hidden" name="chemin_temp" value="{{ chemin_temp }}">
+
+  {% for paquet in paquets %}
+    <details class="ie-groupe" open>
+      <summary class="ie-groupe-entete edition-ligne edition-ligne--paquet">
+        <div class="edition-ligne-titre">
+          <label onclick="event.stopPropagation()">
+            <input type="checkbox" class="ie-case-paquet" checked
+                   onchange="document.querySelectorAll('.ie-cases-{{ forloop.counter }} input').forEach(c => c.checked = this.checked)">
+            <span>{{ paquet.nom_deck }}</span>
+          </label>
+          <span class="edition-ligne-meta">{{ paquet.notes|length }} carte{{ paquet.notes|length|pluralize }}</span>
+        </div>
+      </summary>
+      <ul class="edition-liste ie-sous-liste ie-cases-{{ forloop.counter }}">
+        {% for note in paquet.notes %}
+          <li class="edition-ligne ie-sous-ligne">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+              <input type="checkbox" name="notes" value="{{ note.guid }}" checked>
+              <span>{{ note.titre }}</span>
+            </label>
+          </li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% endfor %}
+
+  <button type="submit" class="btn-ajouter" style="margin-top:16px;">Importer la sélection</button>
+</form>
+{% endblock %}

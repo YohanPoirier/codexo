@@ -1,0 +1,73 @@
+{% extends "anki_review/base_fullscreen.html" %}
+{% load anki_extras %}
+
+{% block title %}{{ titre_paquet }} — Révision{% endblock %}
+
+{% block content %}
+<div class="reviser-screen" data-carte-id="{{ carte.id }}">
+  <div class="reviser-topbar">
+    <a class="reviser-back" href="{% url 'anki_review:liste_decks' %}" aria-label="Retour">‹</a>
+    <div class="reviser-progress-track">
+      <div class="reviser-progress-fill" style="width: 30%"></div>
+    </div>
+    <span class="reviser-count">{{ restantes }} restante{{ restantes|pluralize }}</span>
+  </div>
+  <div class="reviser-titre">{{ titre_paquet }}</div>
+
+  <div class="reviser-card-area">
+    <div class="reviser-card" id="carte-contenu">
+      <div class="question-bloc">{{ note.question|resoudre_images }}</div>
+      <div class="reponse-bloc" id="reponse-bloc" hidden>{{ note.reponse|resoudre_images }}</div>
+    </div>
+  </div>
+
+  <div class="reviser-actions">
+    <button type="button" class="btn-voir-reponse" id="btn-voir-reponse">Voir la réponse</button>
+
+    <form method="post" class="reponse-boutons" id="form-reponse" hidden>
+      {% csrf_token %}
+      <input type="hidden" name="carte_id" value="{{ carte.id }}">
+      <button class="btn-reponse btn-again" name="reponse" value="again">
+        <span class="label">Again</span><span class="intervalle">&lt;10 min</span>
+      </button>
+      <button class="btn-reponse btn-hard" name="reponse" value="hard">
+        <span class="label">Hard</span>
+      </button>
+      <button class="btn-reponse btn-good" name="reponse" value="good">
+        <span class="label">Good</span>
+      </button>
+      <button class="btn-reponse btn-easy" name="reponse" value="easy">
+        <span class="label">Easy</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+// Affichage de la réponse : purement côté client, aucune donnée envoyée
+// tant que l'étudiant n'a pas choisi Again/Hard/Good/Easy.
+document.getElementById('btn-voir-reponse').addEventListener('click', function () {
+  document.getElementById('reponse-bloc').hidden = false;
+  this.hidden = true;
+  document.getElementById('form-reponse').hidden = false;
+});
+
+// Rendu LaTeX (syntaxe Anki : \( \) inline, \[ \] en bloc). Les scripts
+// KaTeX sont chargés en `defer` dans <head> : on attend qu'ils soient
+// disponibles avant d'appeler renderMathInElement, car ce script inline
+// s'exécute pendant le parsing du body, donc potentiellement avant eux.
+function rendreLatexQuandPret() {
+  if (window.renderMathInElement) {
+    renderMathInElement(document.getElementById('carte-contenu'), {
+      delimiters: [
+        { left: "\\[", right: "\\]", display: true },
+        { left: "\\(", right: "\\)", display: false },
+      ],
+    });
+  } else {
+    setTimeout(rendreLatexQuandPret, 50);
+  }
+}
+rendreLatexQuandPret();
+</script>
+{% endblock %}

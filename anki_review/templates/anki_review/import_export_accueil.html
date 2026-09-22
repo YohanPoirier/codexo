@@ -1,0 +1,18 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}Import/Export — Anki{% endblock %}
+
+{% block content %}
+<h1>Import / Export</h1>
+
+<div class="ie-choix">
+  <a class="ie-carte" href="{% url 'anki_review:import_export_fichier' %}">
+    <h3>Avec un fichier</h3>
+    <p>Importer ou exporter un fichier .apkg, compatible avec l'application Anki.</p>
+  </a>
+  <a class="ie-carte" href="{% url 'anki_review:partage_etudiants' %}">
+    <h3>Entre étudiants</h3>
+    <p>Créer tes propres cartes, les partager avec la classe, et ajouter celles des autres.</p>
+  </a>
+</div>
+{% endblock %}

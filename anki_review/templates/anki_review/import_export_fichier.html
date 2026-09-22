@@ -1,0 +1,75 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}Import/export fichier — Anki{% endblock %}
+
+{% block content %}
+<p class="edition-fil"><a href="{% url 'anki_review:import_export_accueil' %}">← Import/Export</a></p>
+<h1>Avec un fichier</h1>
+
+{% if erreur %}
+  <div class="erreur-bandeau">{{ erreur }}</div>
+{% endif %}
+
+{% if resultat %}
+  <div class="ie-resultat-import">
+    <p><strong>Import terminé.</strong></p>
+    <ul>
+      <li>{{ resultat.decks }} paquet{{ resultat.decks|pluralize }} concerné{{ resultat.decks|pluralize }}</li>
+      <li>{{ resultat.notes_creees }} carte{{ resultat.notes_creees|pluralize }} créée{{ resultat.notes_creees|pluralize }}</li>
+      <li>{{ resultat.notes_mises_a_jour }} carte{{ resultat.notes_mises_a_jour|pluralize }} déjà connue{{ resultat.notes_mises_a_jour|pluralize }}, mise{{ resultat.notes_mises_a_jour|pluralize }} à jour</li>
+      {% if resultat.cartes_ignorees_cloze %}
+        <li>{{ resultat.cartes_ignorees_cloze }} carte{{ resultat.cartes_ignorees_cloze|pluralize }} de type "texte à trous" ignorée{{ resultat.cartes_ignorees_cloze|pluralize }} (pas encore géré)</li>
+      {% endif %}
+    </ul>
+    <p><a href="{% url 'anki_review:edition' %}">Voir dans Édition →</a></p>
+  </div>
+{% endif %}
+
+<h2 class="ie-section-titre">Importer un fichier .apkg</h2>
+<p>Le fichier .apkg s'exporte depuis l'application Anki (Fichier → Exporter → Package de paquet Anki).
+L'étape suivante te laissera choisir quels paquets/cartes importer. Toutes les cartes importées sont privées par défaut — à partager ensuite si tu veux qu'elles atteignent la classe.</p>
+
+<form method="post" enctype="multipart/form-data" class="editeur-note">
+  {% csrf_token %}
+  <div class="editeur-champ-groupe">
+    <input type="file" name="fichier" accept=".apkg" required>
+  </div>
+  <button type="submit" class="btn-ajouter">Analyser le fichier</button>
+</form>
+
+<h2 class="ie-section-titre">Exporter</h2>
+<p>Choisis les cartes à exporter (potentiellement réparties sur plusieurs paquets) — elles seront réunies dans un seul fichier .apkg, chaque paquet du site devenant un paquet Anki. Contenu uniquement : la progression repart à zéro côté Anki.</p>
+
+{% if decks_pour_export %}
+<form method="post" action="{% url 'anki_review:exporter_apkg_selection' %}">
+  {% csrf_token %}
+  {% for deck, notes in decks_pour_export.items %}
+    <details class="ie-groupe">
+      <summary class="ie-groupe-entete edition-ligne edition-ligne--paquet">
+        <div class="edition-ligne-titre">
+          <label onclick="event.stopPropagation()">
+            <input type="checkbox" checked
+                   onchange="document.querySelectorAll('.ie-export-{{ forloop.counter }} input').forEach(c => c.checked = this.checked)">
+            <span>{{ deck.nom }}</span>
+          </label>
+          <span class="edition-ligne-meta">{{ notes|length }} carte{{ notes|length|pluralize }}</span>
+        </div>
+      </summary>
+      <ul class="edition-liste ie-sous-liste ie-export-{{ forloop.counter }}">
+        {% for note in notes %}
+          <li class="edition-ligne ie-sous-ligne">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+              <input type="checkbox" name="notes" value="{{ note.id }}" checked>
+              <span>{{ note.titre_affichage }}{% if note.sens_affichage %} <span class="ie-sens">{{ note.sens_affichage }}</span>{% endif %}</span>
+            </label>
+          </li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% endfor %}
+  <button type="submit" class="btn-ajouter" style="margin-top:16px;">Télécharger la sélection (.apkg)</button>
+</form>
+{% else %}
+  <p>Aucun paquet à exporter pour l'instant.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}Paquets — Anki{% endblock %}
+
+{% block content %}
+<h1>Tes paquets</h1>
+
+{% for m in matieres %}
+  <details class="ie-groupe" data-cle="revision-matiere-{{ m.valeur }}">
+    <summary class="ie-groupe-entete edition-ligne edition-ligne--matiere">
+      <div class="edition-ligne-titre">
+        <span>{{ m.libelle }}</span>
+        <span class="edition-ligne-meta">
+          {% if m.dues %}{{ m.dues }} carte{{ m.dues|pluralize }} à réviser{% else %}Rien à réviser{% endif %}
+        </span>
+      </div>
+      <div class="edition-actions" onclick="event.stopPropagation()">
+        {% if m.valeur != "sans-matiere" %}
+          <a class="ie-btn-action" href="{% url 'anki_review:reviser_matiere' m.valeur %}">Réviser toute la matière</a>
+        {% endif %}
+      </div>
+    </summary>
+    <ul class="ie-groupe-liste">
+      {% for item in m.paquets %}
+        <li>
+          <a class="edition-ligne edition-ligne--paquet edition-ligne--lien" href="{% url 'anki_review:reviser' item.deck.slug %}">
+            <div class="edition-ligne-titre">
+              <span>{{ item.deck.nom }}</span>
+              <span class="edition-ligne-meta">
+                {% if item.dues %}{{ item.dues }} carte{{ item.dues|pluralize }} à réviser{% else %}Rien à réviser{% endif %}
+              </span>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </details>
+{% empty %}
+  <p>Aucun paquet disponible pour l'instant.</p>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('details.ie-groupe').forEach(details => {
+  const cle = 'anki-detail-' + details.dataset.cle;
+  if (sessionStorage.getItem(cle) === 'open') details.open = true;
+  details.addEventListener('toggle', () => {
+    sessionStorage.setItem(cle, details.open ? 'open' : 'closed');
+  });
+});
+</script>
+{% endblock %}

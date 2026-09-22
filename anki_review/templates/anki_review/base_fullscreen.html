@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>{% block title %}Révisions{% endblock %} — Codexo</title>
+<link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+<!-- On réutilise le style.css existant pour les variables (--paper, --indigo, etc.)
+     et les polices, plus une feuille dédiée à l'écran plein écran. -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'anki_review/css/anki_base.css' %}">
+<link rel="stylesheet" href="{% static 'anki_review/css/reviser.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" onload="window.__katexPret = true"></script>
+</head>
+<body class="fullscreen-app">
+<!-- Header visible seulement à partir d'une certaine largeur d'écran (voir
+     .anki-site--reviser dans reviser.css) : sur PC on garde une vraie nav,
+     sur mobile l'écran de révision reste plein écran type appli. -->
+<header class="anki-site anki-site--reviser">
+  <div class="bar">
+    <a class="brand" href="{% url 'anki_review:liste_decks' %}">Anki<span class="dot">.</span></a>
+    <nav>
+      <a href="{% url 'anki_review:liste_decks' %}">Révision</a>
+      <a href="{% url 'anki_review:edition' %}">Edition</a>
+      <a href="{% url 'anki_review:import_export_accueil' %}">Import/Export</a>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+          {% csrf_token %}
+          <button type="submit" class="nav-link-btn">Déconnexion</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}?next={{ request.path }}">Connexion</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+{% block content %}{% endblock %}
+</body>
+</html>
