@@ -222,5 +222,9 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'theme_list'
 LOGOUT_REDIRECT_URL = 'login'
 
+# Durée de vie de la session (en secondes) — 1 an, pour éviter d'avoir à se
+# reconnecter régulièrement (usage en classe, pas un contexte à haute sécurité).
+SESSION_COOKIE_AGE = 5000000 #Environ 2 mois
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
