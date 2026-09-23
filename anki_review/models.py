@@ -32,6 +32,8 @@ class Deck(models.Model):
         PHYSIQUE = "physique", "Physique"
         MATHEMATIQUES = "mathematiques", "Mathématiques"
         CHIMIE = "chimie", "Chimie"
+        INFORMATIQUE = "informatique", "Informatique"
+        SII = "sii", "SII"
         ANGLAIS = "anglais", "Anglais"
         LETTRES_PHILOSOPHIE = "lettres-philosophie", "Lettres-Philosophie"
         ALLEMAND = "allemand", "Allemand"
