@@ -4,14 +4,22 @@
 
 {% block content %}
 <p class="edition-fil"><a href="{{ retour_url }}">← Retour</a></p>
-<h1>{% if note %}Modifier la carte{% else %}Ajouter une carte{% endif %}</h1>
+<h1>{% if mode_proposition %}Proposer une correction{% elif note %}Modifier la carte{% else %}Ajouter une carte{% endif %}</h1>
 
-<form method="post" class="editeur-note">
+{% if mode_proposition %}
+  <div class="ie-propositions-bandeau">
+    <h2>Tu n'es pas propriétaire de cette carte</h2>
+    <p style="margin:0;">Ce que tu vas enregistrer ci-dessous sera envoyé comme <strong>proposition de correction</strong> au propriétaire — rien n'est modifié tout de suite, il devra l'accepter.</p>
+  </div>
+{% endif %}
+
+<form method="post" class="editeur-note editeur-note--simple" id="form-note">
   {% csrf_token %}
   {% if form.non_field_errors %}
     <div class="erreur-bandeau">{{ form.non_field_errors }}</div>
   {% endif %}
 
+  {% if not mode_proposition %}
   <div class="editeur-champ-groupe">
     <label for="id_deck">Paquet</label>
     <select name="deck" id="id_deck" class="select-stylise">
@@ -21,12 +29,6 @@
       {% endfor %}
     </select>
     {% for erreur in form.deck.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
-  </div>
-
-  <div class="editeur-champ-groupe">
-    <label for="id_titre">Titre (optionnel)</label>
-    {{ form.titre }}
-    {% for erreur in form.titre.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
   </div>
 
   <div class="editeur-champ-groupe">
@@ -42,19 +44,37 @@
       <p class="editeur-champ-aide">Repasser sur "Normal" supprime la carte inverse liée à celle-ci.</p>
     {% endif %}
   </div>
+  {% else %}
+    {# Champs conservés mais masqués — le formulaire les valide quand même,
+       leur valeur soumise est simplement ignorée côté serveur pour une
+       proposition (cf. views.modifier_note) : seuls question/réponse/tags
+       comptent. #}
+    <div hidden>
+      <select name="deck" id="id_deck">
+        {% for deck in decks %}
+          <option value="{{ deck.pk }}" {% if form.deck.value|stringformat:"s" == deck.pk|stringformat:"s" %}selected{% endif %}>{{ deck.nom }}</option>
+        {% endfor %}
+      </select>
+      <select name="type_carte" id="id_type_carte">
+        {% for valeur, libelle in form.fields.type_carte.choices %}
+          <option value="{{ valeur }}" {% if form.type_carte.value == valeur %}selected{% endif %}>{{ libelle }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endif %}
 
-  <div class="editeur-grille">
-    <div class="editeur-colonne">
+
       <div class="editeur-champ-groupe">
-        <label for="id_question">
+        <label for="riche_question">
           Question
           <button type="button" class="champ-aide-toggle" data-aide="aide-latex" aria-expanded="false">?</button>
         </label>
         <p class="champ-aide-texte" id="aide-latex" hidden>
-          Formules LaTeX : <code>\( ... \)</code> pour une formule dans le texte,
-          <code>\[ ... \]</code> pour une formule seule sur sa ligne — même syntaxe que dans Anki.
+          Formules LaTeX : clique sur le bouton "∑ Formule" (ou tape <code>\( ... \)</code> toi-même pour une
+          formule dans le texte, <code>\[ ... \]</code> pour une formule seule sur sa ligne) — même syntaxe que
+          dans Anki. Une formule apparaît grisée ; clique dessus pour la modifier.
         </p>
-        <div class="editeur-barre-outils" data-cible="id_question">
+        <div class="editeur-barre-outils" data-cible="riche_question">
           <button type="button" class="outil-btn" data-action="bold" title="Gras">
             <svg viewBox="0 0 16 16" width="16" height="16"><text x="3" y="12.5" font-size="12" font-weight="700" font-family="sans-serif">B</text></svg>
           </button>
@@ -78,14 +98,18 @@
           <button type="button" class="outil-btn" data-action="liste-numeros" title="Liste numérotée">
             <svg viewBox="0 0 16 16" width="16" height="16"><text x="0" y="4.3" font-size="4.3" font-family="monospace">1.</text><rect x="5.5" y="2.2" width="9.5" height="1.6"/><text x="0" y="9.3" font-size="4.3" font-family="monospace">2.</text><rect x="5.5" y="7.2" width="9.5" height="1.6"/><text x="0" y="14.3" font-size="4.3" font-family="monospace">3.</text><rect x="5.5" y="12.2" width="9.5" height="1.6"/></svg>
           </button>
+          <span class="outil-separateur"></span>
+          <button type="button" class="outil-btn outil-btn--formule" data-action="formule" title="Insérer une formule LaTeX">∑ Formule</button>
         </div>
-        {{ form.question }}
+        <div class="editeur-riche" id="riche_question" contenteditable="true"></div>
+        <textarea name="question" id="id_question" hidden>{{ form.question.value|default:"" }}</textarea>
         {% for erreur in form.question.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
-        <button type="button" class="btn-inserer-image" data-cible="id_question">📷 Insérer une image</button>
+        <button type="button" class="btn-inserer-image" data-cible="riche_question">📷 Insérer une image</button>
       </div>
+
       <div class="editeur-champ-groupe">
-        <label for="id_reponse">Réponse</label>
-        <div class="editeur-barre-outils" data-cible="id_reponse">
+        <label for="riche_reponse">Réponse</label>
+        <div class="editeur-barre-outils" data-cible="riche_reponse">
           <button type="button" class="outil-btn" data-action="bold" title="Gras">
             <svg viewBox="0 0 16 16" width="16" height="16"><text x="3" y="12.5" font-size="12" font-weight="700" font-family="sans-serif">B</text></svg>
           </button>
@@ -109,11 +133,15 @@
           <button type="button" class="outil-btn" data-action="liste-numeros" title="Liste numérotée">
             <svg viewBox="0 0 16 16" width="16" height="16"><text x="0" y="4.3" font-size="4.3" font-family="monospace">1.</text><rect x="5.5" y="2.2" width="9.5" height="1.6"/><text x="0" y="9.3" font-size="4.3" font-family="monospace">2.</text><rect x="5.5" y="7.2" width="9.5" height="1.6"/><text x="0" y="14.3" font-size="4.3" font-family="monospace">3.</text><rect x="5.5" y="12.2" width="9.5" height="1.6"/></svg>
           </button>
+          <span class="outil-separateur"></span>
+          <button type="button" class="outil-btn outil-btn--formule" data-action="formule" title="Insérer une formule LaTeX">∑ Formule</button>
         </div>
-        {{ form.reponse }}
+        <div class="editeur-riche" id="riche_reponse" contenteditable="true"></div>
+        <textarea name="reponse" id="id_reponse" hidden>{{ form.reponse.value|default:"" }}</textarea>
         {% for erreur in form.reponse.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
-        <button type="button" class="btn-inserer-image" data-cible="id_reponse">📷 Insérer une image</button>
+        <button type="button" class="btn-inserer-image" data-cible="riche_reponse">📷 Insérer une image</button>
       </div>
+
       <div class="editeur-champ-groupe">
         <label for="id_tags">
           Tags
@@ -126,23 +154,24 @@
         {% for erreur in form.tags.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
       </div>
       <button type="submit" class="btn-ajouter">
-        {% if note %}Enregistrer{% else %}Ajouter la carte{% endif %}
+        {% if mode_proposition %}Envoyer la proposition{% elif note %}Enregistrer{% else %}Ajouter la carte{% endif %}
       </button>
-    </div>
-
-    <div class="editeur-colonne">
-      <span class="editeur-preview-titre">Aperçu</span>
-      <div class="editeur-preview">
-        <span class="preview-mini-label">Question</span>
-        <div class="editeur-preview-question" id="preview-question"></div>
-        <span class="preview-mini-label">Réponse</span>
-        <div class="editeur-preview-reponse" id="preview-reponse"></div>
-      </div>
-    </div>
-  </div>
 </form>
 
 <input type="file" id="input-fichier-image" accept="image/*" hidden>
+
+<!-- Popup flottante d'édition d'une formule LaTeX (une seule, réutilisée
+     pour n'importe quelle formule cliquée) -->
+<div class="latex-popup" id="latex-popup" hidden>
+  <textarea id="latex-popup-textarea" rows="2" spellcheck="false"></textarea>
+  <label class="latex-popup-bloc-label">
+    <input type="checkbox" id="latex-popup-bloc"> Centrée sur sa ligne
+  </label>
+  <div class="latex-popup-actions">
+    <button type="button" id="latex-popup-supprimer">Supprimer la formule</button>
+    <button type="button" id="latex-popup-fermer">Fermer</button>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -158,216 +187,258 @@ document.querySelectorAll('.champ-aide-toggle').forEach(bouton => {
   });
 });
 
-const champQuestion = document.getElementById('id_question');
-const champReponse = document.getElementById('id_reponse');
-const previewQuestion = document.getElementById('preview-question');
-const previewReponse = document.getElementById('preview-reponse');
-
 // Les champs stockent uniquement le NOM du fichier image (ex.
 // <img src="abc123.png">), comme le fait Anki en interne — pas le chemin
-// complet Django. Pour l'aperçu, on reconstitue l'URL réelle afin que le
-// navigateur puisse charger l'image (même logique que le filtre Python
-// "resoudre_images" utilisé côté écran de révision).
+// complet Django. Pour l'affichage direct dans l'éditeur ET l'aperçu, on
+// reconstitue l'URL réelle (même logique que le filtre Python
+// "resoudre_images" utilisé côté écran de révision) ; on garde le nom nu de
+// côté (data-nom-fichier) pour pouvoir le restituer tel quel à l'enregistrement.
 const PREFIXE_IMAGES = "{{ media_notes_prefix }}";
-function resoudreImages(html) {
-  return html.replace(/src="(?!https?:\/\/|\/)([^"]+)"/g, (m, nom) => `src="${PREFIXE_IMAGES}${nom}"`);
-}
 
-function rafraichirApercu(champ, cible, etiquette) {
-  let contenu = champ.value;
-  if (etiquette) contenu = `<p><strong>${etiquette}</strong></p>` + contenu;
-  cible.innerHTML = resoudreImages(contenu);
-  if (window.renderMathInElement) {
-    renderMathInElement(cible, {
-      delimiters: [
-        { left: "\\[", right: "\\]", display: true },
-        { left: "\\(", right: "\\)", display: false },
-      ],
-    });
-  }
-}
-
-// Matière de chaque paquet (pour "Double vocabulaire" : adapter l'étiquette
-// du verso à la langue) — même mapping que LIBELLES_LANGUE_ETRANGERE côté
-// Python (anki_review/views.py), à garder synchronisé si ça change là-bas.
-const MATIERE_PAR_DECK = { {% for deck in decks %}"{{ deck.pk }}": "{{ deck.matiere }}",{% endfor %} };
-const LIBELLES_LANGUE_ETRANGERE = { anglais: "Anglais", espagnol: "Espagnol", allemand: "Allemand" };
-
-function etiquettesPourType(type, deckId) {
-  if (type === "double_definition") return ["Terme", "Définition"];
-  if (type === "double_vocabulaire") {
-    const matiere = MATIERE_PAR_DECK[deckId] || "";
-    return ["Français", LIBELLES_LANGUE_ETRANGERE[matiere] || "Étranger"];
-  }
-  return [null, null];
-}
-
-const champTypeCarte = document.getElementById('id_type_carte');
-const champDeck = document.getElementById('id_deck');
-
-function rafraichirLesDeux() {
-  const [etiquetteRecto, etiquetteVerso] = champTypeCarte
-    ? etiquettesPourType(champTypeCarte.value, champDeck.value)
-    : [null, null];
-  rafraichirApercu(champQuestion, previewQuestion, etiquetteRecto);
-  rafraichirApercu(champReponse, previewReponse, etiquetteVerso);
-}
-
-champQuestion.addEventListener('input', rafraichirLesDeux);
-champReponse.addEventListener('input', rafraichirLesDeux);
-if (champTypeCarte) champTypeCarte.addEventListener('change', rafraichirLesDeux);
-if (champDeck) champDeck.addEventListener('change', rafraichirLesDeux);
-
-// Auto-fermeture des délimiteurs LaTeX : taper "\(" insère automatiquement
-// "\)" juste après (curseur entre les deux), pareil pour "\[" / "\]".
-// Ne se déclenche que si le caractère qui précède le curseur est un
-// backslash — sinon une simple parenthèse tapée normalement ne serait plus
-// utilisable.
-//
-// Complément : si l'utilisateur retape lui-même "\)" ou "\]" juste avant la
-// fermeture déjà auto-insérée (au lieu d'utiliser la flèche droite pour la
-// dépasser), on détecte ce cas et on "saute par-dessus" au lieu de dupliquer
-// (sinon on se retrouverait avec "\)\)").
-function activerAssistanceLatex(champ) {
-  const ouvertures = { '(': ')', '[': ']' };
-  const fermetures = { ')': '\\)', ']': '\\]' };
-
-  champ.addEventListener('keydown', (e) => {
-    const pos = champ.selectionStart;
-    const avant = champ.value.slice(0, pos);
-    const apres = champ.value.slice(champ.selectionEnd);
-
-    // Cas 1 : ouverture "\(" ou "\[" → auto-fermeture
-    if (e.key in ouvertures && avant.slice(-1) === '\\') {
-      e.preventDefault();
-      champ.value = avant + e.key + '\\' + ouvertures[e.key] + apres;
-      champ.setSelectionRange(pos + 1, pos + 1);
-      champ.dispatchEvent(new Event('input'));
-      return;
-    }
-
-    // Cas 2 : l'utilisateur retape ")" ou "]" juste avant une fermeture
-    // déjà présente ("\)" ou "\]") → on saute par-dessus au lieu de dupliquer
-    if (e.key in fermetures && avant.slice(-1) === '\\' && apres.startsWith(fermetures[e.key])) {
-      e.preventDefault();
-      const nouvelleValeur = avant.slice(0, -1) + apres; // retire le backslash redondant tout juste tapé
-      champ.value = nouvelleValeur;
-      const nouvellePos = avant.length - 1 + fermetures[e.key].length;
-      champ.setSelectionRange(nouvellePos, nouvellePos);
-      champ.dispatchEvent(new Event('input'));
-    }
+function resoudreImagesPourAffichage(racine) {
+  racine.querySelectorAll('img').forEach(img => {
+    if (img.dataset.nomFichier) return; // déjà traitée
+    const src = img.getAttribute('src') || '';
+    if (src.startsWith('http') || src.startsWith('/') || src.startsWith('data:')) return;
+    img.dataset.nomFichier = src;
+    img.setAttribute('src', PREFIXE_IMAGES + src);
   });
 }
-activerAssistanceLatex(champQuestion);
-activerAssistanceLatex(champReponse);
 
-// --- Barre d'outils de mise en forme (Gras/Italique/Souligné/Alignement) ---
-// Gras/Italique/Souligné entourent la sélection avec la balise HTML
-// correspondante ; l'alignement s'applique à tout le champ (pas juste la
-// sélection, ça n'aurait pas de sens pour du texte en ligne) en enveloppant
-// tout le contenu dans un <div style="text-align:...">, avec bascule si on
-// reclique sur le même alignement.
-function appliquerBalise(champ, balise) {
-  const debut = champ.selectionStart;
-  const fin = champ.selectionEnd;
-  const valeur = champ.value;
-  const selection = valeur.slice(debut, fin);
-  champ.value = valeur.slice(0, debut) + `<${balise}>${selection}</${balise}>` + valeur.slice(fin);
-  const decalage = balise.length + 2;
-  champ.setSelectionRange(debut + decalage, debut + decalage + selection.length);
-  champ.focus();
-  champ.dispatchEvent(new Event('input'));
-}
+// --- Formules LaTeX affichées comme des "puces" grisées, cliquables ---
+// Le texte source (ex. "\(x^2\)") est gardé dans data-latex ; le rendu
+// visuel (KaTeX) n'est qu'un affichage par-dessus, jamais ce qui est
+// enregistré — cf. extraireHtmlBrut() qui reconstitue le texte source à
+// l'enregistrement.
+const RE_LATEX = /\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)/g;
 
-const RE_ALIGNEMENT = /^<div style="text-align:(left|center)">([\s\S]*)<\/div>$/;
-
-// L'alignement s'applique au PARAGRAPHE où se trouve le curseur (une ligne,
-// délimitée par des retours à la ligne), pas à tout le champ — pour pouvoir
-// aligner un paragraphe différemment du suivant.
-function limitesParagraphe(champ) {
-  const valeur = champ.value;
-  const debut = valeur.lastIndexOf('\n', champ.selectionStart - 1) + 1;
-  let fin = valeur.indexOf('\n', champ.selectionEnd);
-  if (fin === -1) fin = valeur.length;
-  return { debut, fin };
-}
-
-function appliquerAlignement(champ, alignement) {
-  const { debut, fin } = limitesParagraphe(champ);
-  const paragraphe = champ.value.slice(debut, fin);
-  const correspond = paragraphe.match(RE_ALIGNEMENT);
-  const contenu = correspond ? correspond[2] : paragraphe;
-  const dejaApplique = correspond && correspond[1] === alignement;
-  const nouveauParagraphe = dejaApplique ? contenu : `<div style="text-align:${alignement}">${contenu}</div>`;
-
-  champ.value = champ.value.slice(0, debut) + nouveauParagraphe + champ.value.slice(fin);
-  const nouvellePos = debut + nouveauParagraphe.length;
-  champ.setSelectionRange(nouvellePos, nouvellePos);
-  champ.focus();
-  champ.dispatchEvent(new Event('input'));
-}
-
-// Listes à puces / numérotées : s'appliquent au bloc sélectionné (étendu aux
-// limites de ligne, comme l'alignement), chaque ligne devenant un <li>.
-// Re-cliquer sur le même type de liste la retire (retour au texte simple,
-// une ligne par item) ; cliquer sur l'autre type convertit ul <-> ol.
-const RE_LISTE = /^<(ul|ol)>([\s\S]*)<\/\1>$/;
-
-function appliquerListe(champ, type) {
-  const { debut, fin } = limitesParagraphe(champ);
-  const bloc = champ.value.slice(debut, fin);
-  const correspond = bloc.match(RE_LISTE);
-  let nouveauBloc;
-
-  if (correspond) {
-    const items = correspond[2].split(/<\/li><li>|^<li>|<\/li>$/).filter(s => s !== '');
-    nouveauBloc = correspond[1] === type
-      ? items.join('\n')
-      : `<${type}>${items.map(i => `<li>${i}</li>`).join('')}</${type}>`;
+function rendreChip(chip) {
+  chip.innerHTML = '';
+  const zone = document.createElement('span');
+  zone.className = 'latex-chip-rendu';
+  chip.appendChild(zone);
+  const source = chip.dataset.latex || '';
+  const enBloc = source.startsWith('\\[');
+  const expression = source.replace(/^\\\[|\\\]$|^\\\(|\\\)$/g, '');
+  if (window.katex && expression.trim()) {
+    try {
+      katex.render(expression, zone, { throwOnError: false, displayMode: enBloc });
+    } catch (e) {
+      zone.textContent = source;
+    }
   } else {
-    const lignes = bloc.split('\n').filter(l => l.trim() !== '');
-    const items = lignes.length ? lignes : [bloc];
-    nouveauBloc = `<${type}>${items.map(l => `<li>${l}</li>`).join('')}</${type}>`;
+    zone.textContent = source || '(formule vide)';
   }
+}
 
-  champ.value = champ.value.slice(0, debut) + nouveauBloc + champ.value.slice(fin);
-  const nouvellePos = debut + nouveauBloc.length;
-  champ.setSelectionRange(nouvellePos, nouvellePos);
-  champ.focus();
-  champ.dispatchEvent(new Event('input'));
+function creerChip(source) {
+  const chip = document.createElement('span');
+  chip.className = 'latex-chip';
+  chip.contentEditable = 'false';
+  chip.dataset.latex = source;
+  rendreChip(chip);
+  chip.addEventListener('click', (e) => { e.preventDefault(); ouvrirPopupLatex(chip); });
+  return chip;
+}
+
+// Repère les motifs \( ... \) / \[ ... \] tapés directement dans le texte
+// (sans passer par le bouton "∑ Formule") et les convertit en chips dès
+// qu'ils sont complets — parcourt tous les nœuds de texte de la zone, en
+// traitant TOUTES les occurrences d'un même nœud (pas juste la première).
+function convertirLatexEnChips(racine) {
+  const walker = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT);
+  const noeuds = [];
+  let n;
+  while ((n = walker.nextNode())) noeuds.push(n);
+  noeuds.forEach(noeud => {
+    if (!noeud.parentNode || noeud.parentNode.closest('.latex-chip')) return;
+    const texte = noeud.textContent;
+    RE_LATEX.lastIndex = 0;
+    if (!RE_LATEX.test(texte)) return;
+    RE_LATEX.lastIndex = 0;
+    const fragment = document.createDocumentFragment();
+    let dernierIndex = 0;
+    let m;
+    while ((m = RE_LATEX.exec(texte))) {
+      if (m.index > dernierIndex) fragment.appendChild(document.createTextNode(texte.slice(dernierIndex, m.index)));
+      fragment.appendChild(creerChip(m[0]));
+      dernierIndex = m.index + m[0].length;
+    }
+    if (dernierIndex < texte.length) fragment.appendChild(document.createTextNode(texte.slice(dernierIndex)));
+    noeud.replaceWith(fragment);
+  });
+}
+
+// --- Popup d'édition d'une formule ---
+const popup = document.getElementById('latex-popup');
+const popupTextarea = document.getElementById('latex-popup-textarea');
+const popupCaseBloc = document.getElementById('latex-popup-bloc');
+let chipEnCours = null;
+let champEnCours = null;
+
+// La popup ne montre/manipule que l'EXPRESSION (sans \( \) ni \[ \]) — le
+// choix "en ligne" / "centrée sur sa ligne" (la case à cocher) porte
+// l'information des délimiteurs, reconstitués seulement au moment
+// d'enregistrer dans chip.dataset.latex.
+function ouvrirPopupLatex(chip) {
+  chipEnCours = chip;
+  champEnCours = chip.closest('.editeur-riche');
+  const source = chip.dataset.latex || '';
+  popupCaseBloc.checked = source.startsWith('\\[');
+  popupTextarea.value = source.replace(/^\\\[|\\\]$|^\\\(|\\\)$/g, '');
+  const rect = chip.getBoundingClientRect();
+  popup.style.left = Math.max(8, rect.left) + 'px';
+  popup.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+  popup.hidden = false;
+  popupTextarea.focus();
+  popupTextarea.select();
+}
+
+function fermerPopupLatex() {
+  popup.hidden = true;
+  if (champEnCours) synchroniserTextarea(champEnCours);
+  chipEnCours = null;
+  champEnCours = null;
+}
+
+function reconstituerDepuisPopup() {
+  if (!chipEnCours) return;
+  const [ouvrant, fermant] = popupCaseBloc.checked ? ['\\[', '\\]'] : ['\\(', '\\)'];
+  chipEnCours.dataset.latex = ouvrant + popupTextarea.value + fermant;
+  rendreChip(chipEnCours);
+}
+
+popupTextarea.addEventListener('input', reconstituerDepuisPopup);
+popupCaseBloc.addEventListener('change', reconstituerDepuisPopup);
+
+document.getElementById('latex-popup-fermer').addEventListener('click', fermerPopupLatex);
+document.getElementById('latex-popup-supprimer').addEventListener('click', () => {
+  if (chipEnCours) {
+    const champ = chipEnCours.closest('.editeur-riche');
+    chipEnCours.remove();
+    if (champ) synchroniserTextarea(champ);
+  }
+  popup.hidden = true;
+  chipEnCours = null;
+  champEnCours = null;
+});
+document.addEventListener('mousedown', (e) => {
+  if (!popup.hidden && !popup.contains(e.target) && !e.target.closest('.latex-chip')) {
+    fermerPopupLatex();
+  }
+});
+
+function inserernouvelleFormule(editable) {
+  // Si du texte était sélectionné (ex. une formule tapée sans marqueurs),
+  // on le récupère AVANT de le supprimer, pour en faire le contenu de la
+  // nouvelle formule plutôt que de le perdre.
+  const sel = window.getSelection();
+  let range = null;
+  let texteSelectionne = '';
+  if (sel.rangeCount) {
+    const r = sel.getRangeAt(0);
+    if (editable.contains(r.commonAncestorContainer)) {
+      range = r;
+      texteSelectionne = r.toString();
+    }
+  }
+  const chip = creerChip(texteSelectionne ? `\\( ${texteSelectionne} \\)` : '\\( \\)');
+  if (range) {
+    range.deleteContents();
+    range.insertNode(chip);
+    range.setStartAfter(chip);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    editable.appendChild(chip);
+  }
+  synchroniserTextarea(editable);
+  ouvrirPopupLatex(chip);
+}
+
+// --- Extraction du HTML "brut" (ce qui est vraiment enregistré) à partir
+// de la zone éditable : remplace chaque chip par son texte source LaTeX,
+// et chaque image par son nom de fichier nu (pas l'URL complète affichée
+// à l'écran) ---
+function extraireHtmlBrut(editable) {
+  const clone = editable.cloneNode(true);
+  clone.querySelectorAll('.latex-chip').forEach(chip => {
+    chip.replaceWith(document.createTextNode(chip.dataset.latex || ''));
+  });
+  clone.querySelectorAll('img').forEach(img => {
+    if (img.dataset.nomFichier) img.setAttribute('src', img.dataset.nomFichier);
+    img.removeAttribute('data-nom-fichier');
+  });
+  return clone.innerHTML;
+}
+
+function synchroniserTextarea(editable) {
+  const idTextarea = editable.id.replace('riche_', 'id_');
+  const textarea = document.getElementById(idTextarea);
+  if (textarea) textarea.value = extraireHtmlBrut(editable);
+}
+
+// --- Chargement initial (contenu existant en modification, ou rejoué
+// après une erreur de validation) : on part du texte brut du textarea,
+// on résout les images, on convertit les formules en chips. ---
+function chargerContenuInitial(editable) {
+  const idTextarea = editable.id.replace('riche_', 'id_');
+  const textarea = document.getElementById(idTextarea);
+  editable.innerHTML = textarea ? textarea.value : '';
+  resoudreImagesPourAffichage(editable);
+  convertirLatexEnChips(editable);
+}
+
+const richeQuestion = document.getElementById('riche_question');
+const richeReponse = document.getElementById('riche_reponse');
+chargerContenuInitial(richeQuestion);
+chargerContenuInitial(richeReponse);
+
+[richeQuestion, richeReponse].forEach(editable => {
+  editable.addEventListener('input', () => {
+    convertirLatexEnChips(editable);
+    synchroniserTextarea(editable);
+  });
+});
+
+// Sécurité supplémentaire : re-synchronise juste avant l'envoi du
+// formulaire (au cas où le dernier caractère tapé n'aurait pas encore
+// déclenché d'événement "input" pour une raison quelconque).
+document.getElementById('form-note').addEventListener('submit', () => {
+  synchroniserTextarea(richeQuestion);
+  synchroniserTextarea(richeReponse);
+});
+
+// --- Barre d'outils de mise en forme : s'applique à la zone éditable qui
+// a la sélection/le focus, via les commandes natives du navigateur. ---
+function appliquerAlignementRiche(editable, valeur) {
+  editable.focus();
+  document.execCommand(valeur === 'center' ? 'justifyCenter' : 'justifyLeft');
 }
 
 document.querySelectorAll('.editeur-barre-outils').forEach(barre => {
-  const champ = document.getElementById(barre.dataset.cible);
+  const editable = document.getElementById(barre.dataset.cible);
   barre.querySelectorAll('.outil-btn').forEach(bouton => {
     bouton.addEventListener('click', () => {
+      editable.focus();
       switch (bouton.dataset.action) {
-        case 'bold': appliquerBalise(champ, 'b'); break;
-        case 'italic': appliquerBalise(champ, 'i'); break;
-        case 'underline': appliquerBalise(champ, 'u'); break;
-        case 'align-left': appliquerAlignement(champ, 'left'); break;
-        case 'align-center': appliquerAlignement(champ, 'center'); break;
-        case 'liste-puces': appliquerListe(champ, 'ul'); break;
-        case 'liste-numeros': appliquerListe(champ, 'ol'); break;
+        case 'bold': document.execCommand('bold'); break;
+        case 'italic': document.execCommand('italic'); break;
+        case 'underline': document.execCommand('underline'); break;
+        case 'align-left': appliquerAlignementRiche(editable, 'left'); break;
+        case 'align-center': appliquerAlignementRiche(editable, 'center'); break;
+        case 'liste-puces': document.execCommand('insertUnorderedList'); break;
+        case 'liste-numeros': document.execCommand('insertOrderedList'); break;
+        case 'formule': inserernouvelleFormule(editable); return; // gère déjà la synchro
       }
+      synchroniserTextarea(editable);
     });
   });
 });
 
-// Rendu initial (utile si le formulaire est réaffiché après une erreur de
-// validation, ou en mode modification). Ce script inline s'exécute pendant
-// le parsing du body, donc potentiellement avant que les <script defer> de
-// KaTeX (dans <head>) n'aient fini de s'exécuter — on attend qu'ils soient prêts.
-function premierRenduQuandPret() {
-  if (window.renderMathInElement) {
-    rafraichirLesDeux();
-  } else {
-    setTimeout(premierRenduQuandPret, 50);
-  }
-}
-premierRenduQuandPret();
-
-// --- Insertion d'image : upload immédiat, puis insertion de la balise <img> ---
+// --- Insertion d'image : upload immédiat, puis insertion directe dans la
+// zone éditable (visible tout de suite, pas juste une balise texte) ---
 let champCible = null;
 
 document.querySelectorAll('.btn-inserer-image').forEach(bouton => {
@@ -396,11 +467,28 @@ document.getElementById('input-fichier-image').addEventListener('change', async 
     }
     const resultat = await reponse.json();
     if (resultat.url) {
-      const nomFichier = resultat.url.split('/').pop(); // on ne garde que le nom, pas le chemin
-      const balise = `<img src="${nomFichier}" alt="">`;
-      const pos = champCible.selectionStart;
-      champCible.value = champCible.value.slice(0, pos) + balise + champCible.value.slice(pos);
-      champCible.dispatchEvent(new Event('input'));
+      const nomFichier = resultat.url.split('/').pop();
+      const img = document.createElement('img');
+      img.dataset.nomFichier = nomFichier;
+      img.setAttribute('src', PREFIXE_IMAGES + nomFichier);
+      img.setAttribute('alt', '');
+      champCible.focus();
+      const sel = window.getSelection();
+      let inserted = false;
+      if (sel.rangeCount) {
+        const range = sel.getRangeAt(0);
+        if (champCible.contains(range.commonAncestorContainer)) {
+          range.deleteContents();
+          range.insertNode(img);
+          range.setStartAfter(img);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+          inserted = true;
+        }
+      }
+      if (!inserted) champCible.appendChild(img);
+      synchroniserTextarea(champCible);
     } else {
       alert(resultat.erreur || "Échec de l'upload.");
     }

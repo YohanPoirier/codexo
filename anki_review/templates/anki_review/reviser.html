@@ -8,7 +8,7 @@
   <div class="reviser-topbar">
     <a class="reviser-back" href="{% url 'anki_review:liste_decks' %}" aria-label="Retour">‹</a>
     <div class="reviser-progress-track">
-      <div class="reviser-progress-fill" style="width: 30%"></div>
+      <div class="reviser-progress-fill" style="width: {{ pourcentage }}%"></div>
     </div>
     <span class="reviser-count">{{ restantes }} restante{{ restantes|pluralize }}</span>
   </div>
@@ -16,8 +16,12 @@
 
   <div class="reviser-card-area">
     <div class="reviser-card" id="carte-contenu">
+      <div class="reviser-bandeau reviser-bandeau--recto">Recto</div>
       <div class="question-bloc">{{ note.question|resoudre_images }}</div>
-      <div class="reponse-bloc" id="reponse-bloc" hidden>{{ note.reponse|resoudre_images }}</div>
+      <div class="reponse-bloc" id="reponse-bloc" hidden>
+        <div class="reviser-bandeau reviser-bandeau--verso">Verso</div>
+        <div class="reponse-contenu">{{ note.reponse|resoudre_images }}</div>
+      </div>
     </div>
   </div>
 
@@ -28,16 +32,16 @@
       {% csrf_token %}
       <input type="hidden" name="carte_id" value="{{ carte.id }}">
       <button class="btn-reponse btn-again" name="reponse" value="again">
-        <span class="label">Again</span><span class="intervalle">&lt;10 min</span>
+        <span class="label">À revoir</span><span class="intervalle">{{ intervalles.again }}</span>
       </button>
       <button class="btn-reponse btn-hard" name="reponse" value="hard">
-        <span class="label">Hard</span>
+        <span class="label">Difficile</span><span class="intervalle">{{ intervalles.hard }}</span>
       </button>
       <button class="btn-reponse btn-good" name="reponse" value="good">
-        <span class="label">Good</span>
+        <span class="label">Correct</span><span class="intervalle">{{ intervalles.good }}</span>
       </button>
       <button class="btn-reponse btn-easy" name="reponse" value="easy">
-        <span class="label">Easy</span>
+        <span class="label">Facile</span><span class="intervalle">{{ intervalles.easy }}</span>
       </button>
     </form>
   </div>
@@ -63,6 +67,7 @@ function rendreLatexQuandPret() {
         { left: "\\[", right: "\\]", display: true },
         { left: "\\(", right: "\\)", display: false },
       ],
+      throwOnError: false,
     });
   } else {
     setTimeout(rendreLatexQuandPret, 50);

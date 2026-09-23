@@ -3,11 +3,16 @@ Schéma inspiré du format natif d'Anki (.anki2), adapté à Django/SQLite.
 
 Séparation volontaire :
 - Deck  : regroupement de notes (ex. "Optique")
-- Note  : contenu (question/réponse), partagé entre étudiants, identifié
-          par un GUID stable — permet la diff/fusion entre étudiants et
-          l'import/export .apkg
-- Card  : progression SM-2 d'UN étudiant sur UNE note. Une note peut avoir
-          plusieurs Card (une par étudiant qui l'a importée).
+- Note  : contenu (question/réponse), UNE SEULE fois en base même quand
+          plusieurs étudiants la révisent — pas de copie par étudiant.
+          Le propriétaire (cree_par) est seul à pouvoir la modifier
+          directement ; une modification par quelqu'un d'autre passe par
+          une PropositionModification, à valider par le propriétaire.
+- Card  : progression SM-2 d'UN étudiant sur UNE note. Une note a autant de
+          Card que d'étudiants qui l'ont ajoutée à leur révision, toutes
+          rattachées à la MÊME Note.
+- PropositionModification : correction en attente de validation par le
+          propriétaire d'une note (cf. Note ci-dessus).
 
 Les images référencées dans question/reponse sont stockées comme fichiers
 (MEDIA_ROOT), pas en base64 inline — cf. balises <img src="..."> classiques,
@@ -62,15 +67,6 @@ class Note(models.Model):
     guid = models.CharField(max_length=64, default=uuid.uuid4)
     deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="notes")
 
-    # Optionnel : sert UNIQUEMENT à l'affichage dans les listes (Édition,
-    # Import/Export) — jamais à l'écran de révision, qui montre toujours la
-    # vraie Question. Placé en premier champ du modèle (et de l'éditeur)
-    # exprès : c'est la convention Anki pour le "sort field", celui utilisé
-    # par défaut dans le navigateur de cartes (desktop et AnkiDroid) — s'il
-    # est vide (notamment une carte importée d'un .apkg qui n'a pas ce
-    # champ), on retombe sur la question (cf. titre_affichage ci-dessous).
-    titre = models.CharField(max_length=200, blank=True, default="")
-
     question = models.TextField(help_text="HTML autorisé, y compris <img src=\"...\">")
     reponse = models.TextField(help_text="HTML autorisé, y compris <img src=\"...\">")
     tags = models.CharField(max_length=300, blank=True, help_text="Séparés par des espaces, comme Anki")
@@ -86,9 +82,9 @@ class Note(models.Model):
     )
 
     # Une note personnelle d'un étudiant n'est visible que par lui tant que
-    # ce champ est False. Un étudiant qui "ajoute" une note partagée reçoit
-    # sa PROPRE copie (même guid, nouvelle ligne) plutôt qu'une référence
-    # vers l'originale — voir anki_review.views.ajouter_carte_partagee.
+    # ce champ est False. Contrairement à avant, "ajouter" une note
+    # partagée ne la duplique plus — l'étudiant reçoit juste sa propre Card
+    # (progression) sur CETTE MÊME Note, cf. anki_review.views.ajouter_carte_partagee.
     partagee_avec_classe = models.BooleanField(default=False)
 
     # Carte réversible (cf. NoteForm.CHOIX_TYPE_CARTE) : lien vers l'autre
@@ -106,23 +102,16 @@ class Note(models.Model):
 
     class Meta:
         ordering = ["id"]
-        # Un même propriétaire ne peut pas avoir deux notes avec le même
-        # guid — mais deux propriétaires DIFFÉRENTS le peuvent : c'est
-        # justement le mécanisme qui permet à chacun d'avoir sa propre copie
-        # indépendante d'une même note "conceptuelle" partagée.
-        unique_together = [("guid", "cree_par")]
 
     def __str__(self):
         return f"{self.deck.nom} — {self.question[:40]}"
 
     def titre_affichage(self):
         """Ce qu'il faut montrer dans une liste (Édition, Import/Export) :
-        le titre s'il est renseigné, sinon la question (nettoyée de son
-        HTML ET de ses codes d'entité comme &nbsp; — strip_tags seul ne
-        décode pas ces codes, laissant "&nbsp;" affiché tel quel) — jamais
-        utilisé pour l'écran de révision lui-même."""
-        if self.titre:
-            return self.titre
+        la question, nettoyée de son HTML ET de ses codes d'entité comme
+        &nbsp; (strip_tags seul ne décode pas ces codes, laissant "&nbsp;"
+        affiché tel quel) — jamais utilisé pour l'écran de révision
+        lui-même, qui montre toujours la vraie Question."""
         return html.unescape(strip_tags(self.question))
 
     def sens_affichage(self):
@@ -153,7 +142,7 @@ class Note(models.Model):
         # de boucle infinie entre les deux notes liées.
         if self.note_miroir_id:
             Note.objects.filter(pk=self.note_miroir_id).update(
-                deck=self.deck_id, titre=self.titre, tags=self.tags,
+                deck=self.deck_id, tags=self.tags,
                 question=self.reponse, reponse=self.question,
             )
 
@@ -177,6 +166,11 @@ class Card(models.Model):
     etudiant = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="cartes_anki"
     )
+    # Sert à déterminer qui, parmi plusieurs détenteurs d'une même note,
+    # l'a récupérée en premier — utilisé pour le transfert de propriété
+    # quand le propriétaire d'origine supprime sa carte (cf.
+    # anki_review.views.supprimer_note).
+    cree_le = models.DateTimeField(auto_now_add=True)
 
     file = models.CharField(max_length=10, choices=File.choices, default=File.NOUVELLE)
     intervalle_jours = models.FloatField(default=0)
@@ -196,3 +190,34 @@ class Card(models.Model):
 
     def __str__(self):
         return f"{self.etudiant} — {self.note_id} (échéance {self.prochaine_revision:%d/%m})"
+
+
+class PropositionModification(models.Model):
+    """
+    Correction proposée par quelqu'un qui n'est PAS propriétaire d'une note
+    (cf. anki_review.views._peut_editer_note) : le contenu proposé est
+    stocké ICI, séparément, tant que le propriétaire (ou un prof) ne l'a
+    pas explicitement acceptée — jamais appliqué directement à la Note.
+    """
+
+    class Statut(models.TextChoices):
+        EN_ATTENTE = "en_attente", "En attente"
+        ACCEPTEE = "acceptee", "Acceptée"
+        REFUSEE = "refusee", "Refusée"
+
+    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name="propositions")
+    auteur = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="propositions_faites",
+    )
+    question = models.TextField(help_text="HTML autorisé, y compris <img src=\"...\">")
+    reponse = models.TextField(help_text="HTML autorisé, y compris <img src=\"...\">")
+    tags = models.CharField(max_length=300, blank=True)
+    statut = models.CharField(max_length=10, choices=Statut.choices, default=Statut.EN_ATTENTE)
+    cree_le = models.DateTimeField(auto_now_add=True)
+    traitee_le = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-cree_le"]
+
+    def __str__(self):
+        return f"Proposition de {self.auteur} sur note {self.note_id} ({self.get_statut_display()})"

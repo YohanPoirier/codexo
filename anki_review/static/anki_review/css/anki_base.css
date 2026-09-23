@@ -47,6 +47,14 @@ header.anki-site nav a:hover { color: var(--anki-accent-deep); }
 
 /* --- Éditeur d'ajout/modification de note --- */
 .editeur-grille { display: grid; grid-template-columns: 1.1fr 1fr; gap: 28px; margin-top: 18px; }
+/* Depuis le retrait de la colonne "Aperçu" (l'éditeur WYSIWYG la rend
+   redondante), la page d'ajout de carte n'a plus qu'une seule colonne — on
+   plafonne sa largeur à celle d'une carte en révision (cf. reviser.css
+   .reviser-card), pour que ce qu'on tape corresponde visuellement à ce
+   qu'on verra vraiment. Classe dédiée (pas .editeur-note directement,
+   partagée avec ajouter_note_ancien.html) pour ne pas casser sa mise en
+   page à deux colonnes d'origine si jamais on y revient. */
+.editeur-note--simple { max-width: 560px; }
 @media (max-width: 800px) { .editeur-grille { grid-template-columns: 1fr; } }
 
 .editeur-champ-groupe { margin-bottom: 18px; }
@@ -68,6 +76,58 @@ header.anki-site nav a:hover { color: var(--anki-accent-deep); }
   outline: none; border-color: var(--indigo);
   box-shadow: 0 0 0 3px rgba(43, 58, 103, .18);
 }
+
+/* Zone éditable "riche" (WYSIWYG) — même cadre que .editeur-champ, mais en
+   police normale (elle affiche du texte mis en forme, pas du code brut) et
+   avec une hauteur minimale plutôt que "rows" (pas de notion d'attribut
+   rows sur un contenteditable). */
+.editeur-riche {
+  width: 100%; box-sizing: border-box; min-height: 130px; padding: 12px 14px;
+  border: 1.5px solid var(--ink-soft); border-radius: 8px;
+  font-family: 'Inter', system-ui, sans-serif; font-size: .95rem; line-height: 1.5;
+  background: #fff; box-shadow: inset 0 1px 3px rgba(33, 38, 43, .08);
+}
+.editeur-barre-outils + .editeur-riche { border-top-left-radius: 0; border-top-right-radius: 0; }
+.editeur-riche:focus {
+  outline: none; border-color: var(--indigo);
+  box-shadow: 0 0 0 3px rgba(43, 58, 103, .18);
+}
+.editeur-riche img { max-width: 100%; border-radius: 6px; margin: 6px 0; }
+.editeur-riche ul, .editeur-riche ol { margin: 6px 0; padding-left: 22px; }
+/* Même alignement par défaut que l'écran de révision (cf. reviser.css) :
+   question centrée, réponse à gauche. */
+#riche_question { text-align: center; }
+#riche_reponse { text-align: left; }
+
+/* Formule LaTeX affichée comme une "puce" grisée dans l'éditeur — bien
+   identifiable comme un bloc à part, cliquable pour la modifier. */
+.latex-chip {
+  display: inline-block; background: var(--paper-alt); color: var(--ink-soft);
+  border: 1px dashed var(--rule); border-radius: 6px; padding: 2px 8px;
+  margin: 0 1px; cursor: pointer; user-select: none;
+}
+.latex-chip:hover { background: var(--rule); border-color: var(--ink-soft); }
+.latex-chip .katex { font-size: 1em; }
+
+/* Popup flottante d'édition d'une formule LaTeX */
+.latex-popup {
+  position: absolute; z-index: 50; background: #fff; border: 1.5px solid var(--indigo);
+  border-radius: 8px; padding: 10px; box-shadow: 0 4px 16px rgba(33, 38, 43, .18);
+  width: min(360px, 90vw);
+}
+.latex-popup textarea {
+  width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid var(--rule);
+  border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: .88rem; resize: vertical;
+}
+.latex-popup-bloc-label { display: block; font-size: .8rem; color: var(--ink-soft); margin-top: 6px; cursor: pointer; }
+.latex-popup-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.latex-popup-actions button {
+  font-size: .8rem; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--rule);
+  background: none; cursor: pointer;
+}
+#latex-popup-supprimer { color: var(--err); border-color: var(--err); }
+#latex-popup-supprimer:hover { background: rgba(184, 69, 47, .08); }
+#latex-popup-fermer:hover { background: var(--paper-alt); }
 
 /* Menu déroulant stylé (au lieu du rendu natif du navigateur) */
 .select-stylise {
@@ -120,7 +180,7 @@ header.anki-site nav a:hover { color: var(--anki-accent-deep); }
 .btn-inserer-image:hover { background: var(--paper-alt); }
 
 .editeur-barre-outils {
-  display: flex; align-items: center; gap: 2px; margin-bottom: 0;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 2px 2px; row-gap: 4px; margin-bottom: 0;
   border: 1.5px solid var(--ink-soft); border-bottom: none;
   border-radius: 8px 8px 0 0; background: var(--paper-alt); padding: 4px;
 }
@@ -133,6 +193,10 @@ header.anki-site nav a:hover { color: var(--anki-accent-deep); }
 }
 .outil-btn:hover { background: #fff; }
 .outil-btn svg { fill: currentColor; display: block; }
+.outil-btn--formule {
+  width: auto; padding: 0 10px; font-size: .8rem; font-weight: 600;
+  color: var(--anki-accent-deep); line-height: normal;
+}
 .outil-separateur { width: 1px; height: 18px; background: var(--rule); margin: 0 4px; flex-shrink: 0; }
 
 .editeur-preview-titre { font-size: .85rem; font-weight: 600; color: var(--ink-soft); display: block; margin-bottom: 6px; }
@@ -148,12 +212,12 @@ header.anki-site nav a:hover { color: var(--anki-accent-deep); }
 .editeur-preview-question {
   padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid var(--paper-alt);
   font-size: 1.05rem; line-height: 1.55; color: var(--ink);
-  white-space: pre-line;
+  white-space: pre-line; text-align: center;
 }
 .editeur-preview-question:empty::after, .editeur-preview-reponse:empty::after {
   content: "…"; color: var(--rule);
 }
-.editeur-preview-reponse { font-size: 1.05rem; line-height: 1.55; color: var(--indigo-deep); white-space: pre-line; }
+.editeur-preview-reponse { font-size: 1.05rem; line-height: 1.55; color: var(--ink); white-space: pre-line; text-align: left; }
 .editeur-preview img { max-width: 100%; border-radius: 6px; margin: 6px 0; }
 .editeur-preview ul, .editeur-preview ol { text-align: left; margin: 8px 0; padding-left: 22px; }
 
@@ -237,6 +301,54 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::after { content: " ▾"; 
 .ie-bulle--visible { opacity: 1; }
 .ie-sens { font-size: .8rem; font-weight: 400; color: var(--ink-soft); }
 
+/* Écran de comparaison d'une proposition de modification */
+.ie-comparaison { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+@media (max-width: 700px) { .ie-comparaison { grid-template-columns: 1fr; } }
+.ie-comparaison-colonne { border: 1.5px solid var(--rule); border-radius: 10px; overflow: hidden; background: #fff; }
+.ie-comparaison-titre { font-size: .85rem; font-weight: 700; color: var(--ink-soft); padding: 10px 16px; margin: 0; background: var(--paper-alt); border-bottom: 1px solid var(--rule); }
+.ie-comparaison-actions { display: flex; gap: 10px; margin-top: 20px; }
+.ie-btn-refuser {
+  padding: 11px 22px; border: 1.5px solid var(--err); color: var(--err); background: none;
+  border-radius: 8px; font-weight: 600; font-size: .95rem; cursor: pointer;
+}
+.ie-btn-refuser:hover { background: rgba(184, 69, 47, .08); }
+
+/* Bandeau "propositions en attente" en haut d'Édition */
+.ie-propositions-bandeau {
+  background: rgba(217, 142, 43, .1); border: 1.5px solid var(--amber); border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 20px;
+}
+.ie-propositions-bandeau h2 { margin: 0 0 8px; font-size: .95rem; color: var(--amber); }
+.ie-propositions-bandeau ul { list-style: none; margin: 0; padding: 0; }
+.ie-propositions-bandeau li { padding: 6px 0; border-top: 1px dashed rgba(217, 142, 43, .3); }
+.ie-propositions-bandeau li:first-child { border-top: none; }
+.ie-propositions-bandeau a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.ie-propositions-bandeau a:hover { text-decoration: underline; }
+.ie-propositions-bandeau .ie-sens { display: inline; }
+
+.ie-divergence-badge {
+  font-size: .78rem; font-weight: 600; color: var(--amber);
+  background: rgba(217, 142, 43, .12); border-radius: 4px; padding: 1px 6px; margin-left: 4px;
+}
+.ie-divergence-avertissement {
+  color: var(--amber); font-weight: 600; font-size: .88rem;
+  padding: 10px 16px; border-bottom: 1px dashed var(--rule);
+}
+.ie-variante { border-bottom: 1px dashed var(--rule); }
+.ie-variante:last-child { border-bottom: none; }
+.ie-variante-entete {
+  cursor: pointer; padding: 8px 16px; font-size: .85rem; font-weight: 600;
+  color: var(--ink-soft); list-style: none;
+}
+.ie-variante-entete::-webkit-details-marker { display: none; }
+.ie-variante-entete::before { content: "▸ "; }
+.ie-variante[open] .ie-variante-entete::before { content: "▾ "; }
+.ie-variante-eleves { list-style: none; margin: 0; padding: 8px 16px 12px; }
+.ie-variante-eleves li {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 4px 0; font-size: .85rem;
+}
+
 .edition-entete { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
 .btn-ajouter {
   display: inline-block; padding: 10px 18px; border-radius: 8px;
@@ -291,7 +403,11 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::after { content: " ▾"; 
 .ie-apercu-bande--recto { background: var(--indigo); }
 .ie-apercu-bande--verso { background: var(--anki-accent); }
 .ie-apercu-contenu { flex: 1; padding: 14px 16px; font-size: .92rem; line-height: 1.5; }
-.ie-apercu img { max-width: 100%; border-radius: 6px; }
+/* 506px = largeur utile réelle d'une image en révision (carte plafonnée à
+   560px, moins la bordure et le padding de .question-bloc/.reponse-contenu
+   dans reviser.css) — pour qu'une image ne paraisse pas plus grande ici
+   qu'au moment de réviser. */
+.ie-apercu img { max-width: min(506px, 100%); border-radius: 6px; }
 
 .ie-groupe { margin-bottom: 10px; }
 /* Nichés sous une matière, les paquets se suivent sans aucun espace — la

@@ -28,18 +28,17 @@
 
 <h2 class="ie-section-titre">Partagé par la classe</h2>
 <div class="ie-legende">
-  <span class="ie-legende-item"><span class="ie-voyant ie-voyant--identique"></span> Même version</span>
-  <span class="ie-legende-item"><span class="ie-voyant ie-voyant--differente"></span> Version différente</span>
-  <span class="ie-legende-item"><span class="ie-voyant ie-voyant--absente"></span> Tu ne l'as pas</span>
+  <span class="ie-legende-item"><span class="ie-voyant ie-voyant--identique"></span> Déjà dans ta révision</span>
+  <span class="ie-legende-item"><span class="ie-voyant ie-voyant--absente"></span> Pas encore ajoutée</span>
 </div>
 {% for groupe in groupes_partages %}
   <details class="ie-groupe" data-cle="partage-{{ groupe.deck.id }}-{{ groupe.cree_par.id }}">
     <summary class="ie-groupe-entete edition-ligne edition-ligne--paquet">
       <div class="ie-ligne-gauche">
-        {% if groupe.tout_identique %}
-          <span class="ie-voyant ie-voyant--identique" title="Tu as déjà cette version"></span>
+        {% if groupe.tout_deja %}
+          <span class="ie-voyant ie-voyant--identique" title="Tu as déjà tout ce paquet"></span>
         {% else %}
-          <span class="ie-voyant ie-voyant--differente" title="Une ou plusieurs cartes diffèrent ou te manquent"></span>
+          <span class="ie-voyant ie-voyant--absente" title="Une ou plusieurs cartes te manquent"></span>
         {% endif %}
         <div class="edition-ligne-titre">
           <span>{{ groupe.deck.nom }}</span>
@@ -47,18 +46,11 @@
         </div>
       </div>
       <div class="edition-actions" onclick="event.stopPropagation()">
-        {% if not user.is_staff %}
-          {% if groupe.besoin_choix_paquet %}
-            <a class="ie-btn-action"
-               href="{% url 'anki_review:choisir_paquet_paquet_partage' groupe.deck.id groupe.cree_par.id %}">Tout ajouter</a>
-          {% else %}
-            <form method="post" action="{% url 'anki_review:ajouter_paquet_partage' groupe.deck.id groupe.cree_par.id %}" style="display:contents;">
-              {% csrf_token %}
-              <button type="submit" class="ie-btn-action">
-                {% if groupe.tout_identique %}Déjà à jour{% else %}Tout ajouter / mettre à jour{% endif %}
-              </button>
-            </form>
-          {% endif %}
+        {% if not user.is_staff and not groupe.tout_deja %}
+          <form method="post" action="{% url 'anki_review:ajouter_paquet_partage' groupe.deck.id groupe.cree_par.id %}" style="display:contents;">
+            {% csrf_token %}
+            <button type="submit" class="ie-btn-action">Tout ajouter</button>
+          </form>
         {% endif %}
       </div>
     </summary>
@@ -66,27 +58,20 @@
       {% for item in groupe.notes %}
         <li class="edition-ligne ie-sous-ligne">
           <span class="ie-ligne-gauche">
-            <span class="ie-voyant ie-voyant--{{ item.statut }}"
-                  title="{% if item.statut == 'identique' %}Tu as déjà cette version{% elif item.statut == 'differente' %}Tu as une version différente{% else %}Tu n'as pas cette carte{% endif %}"></span>
+            <span class="ie-voyant ie-voyant--{% if item.statut == 'deja' %}identique{% else %}absente{% endif %}"
+                  title="{% if item.statut == 'deja' %}Déjà dans ta révision{% else %}Pas encore ajoutée{% endif %}"></span>
             {{ item.note.titre_affichage|truncatechars:60 }}{% if item.note.sens_affichage %} <span class="ie-sens">{{ item.note.sens_affichage }}</span>{% endif %}
           </span>
           <div class="edition-actions">
             <button type="button" class="edition-icone-btn" title="Aperçu"
                     onclick="document.getElementById('apercu-{{ item.note.id }}').hidden = !document.getElementById('apercu-{{ item.note.id }}').hidden">
-              <svg viewBox="0 0 20 14" width="18" height="14"><path d="M1 7C3 2 7 0 10 0s7 2 9 7c-2 5-6 7-9 7S3 12 1 7z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="7" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              👁️
             </button>
-            {% if not user.is_staff %}
-              {% if item.statut == 'absente' and groupe.besoin_choix_paquet %}
-                <a class="ie-btn-action"
-                   href="{% url 'anki_review:choisir_paquet_carte_partagee' item.note.id %}">Ajouter</a>
-              {% else %}
-                <form method="post" action="{% url 'anki_review:ajouter_carte_partagee' item.note.id %}" style="display:contents;">
-                  {% csrf_token %}
-                  <button type="submit" class="ie-btn-action">
-                    {% if item.statut == 'identique' %}Déjà à jour{% elif item.statut == 'differente' %}Mettre à jour{% else %}Ajouter{% endif %}
-                  </button>
-                </form>
-              {% endif %}
+            {% if not user.is_staff and item.statut == 'absente' %}
+              <form method="post" action="{% url 'anki_review:ajouter_carte_partagee' item.note.id %}" style="display:contents;">
+                {% csrf_token %}
+                <button type="submit" class="ie-btn-action">Ajouter</button>
+              </form>
             {% endif %}
           </div>
         </li>
@@ -133,6 +118,7 @@ function rendreApercusQuandPret() {
           { left: "\\[", right: "\\]", display: true },
           { left: "\\(", right: "\\)", display: false },
         ],
+        throwOnError: false,
       });
     });
   } else {

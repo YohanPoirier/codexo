@@ -27,10 +27,19 @@ _RE_IMG_SRC_NU = re.compile(r'src="(?!https?://|/)([^"]+)"')
 
 @register.filter(name="peut_editer")
 def peut_editer(note, user):
-    """Le prof peut tout modifier ; un étudiant ne peut modifier que ses
-    propres notes. Utilisé dans les templates pour n'afficher l'icône
-    modifier que là où l'action est vraiment permise."""
+    """Modification DIRECTE (appliquée tout de suite) : réservée au
+    propriétaire ou au prof. Voir aussi peut_proposer pour les autres."""
     return user.is_staff or note.cree_par_id == user.id
+
+
+@register.filter(name="peut_proposer")
+def peut_proposer(note, user):
+    """Pas propriétaire, mais la carte est dans sa révision : peut
+    PROPOSER une correction (à valider par le propriétaire), pas modifier
+    directement."""
+    if user.is_staff or note.cree_par_id == user.id:
+        return False
+    return note.cards.filter(etudiant=user).exists()
 
 
 @register.filter(name="compte_notes_de")
@@ -43,9 +52,11 @@ def compte_notes_de(notes, user):
 
 @register.filter(name="peut_supprimer")
 def peut_supprimer(note, user):
-    """Suppression réservée au propriétaire de la note, sans exception
-    prof — voir _peut_supprimer_note côté vue pour le pourquoi."""
-    return note.cree_par_id == user.id
+    """Qui peut déclencher "supprimer" : le prof (suppression réelle) ou
+    quiconque a cette carte dans sa révision (simple retrait de sa propre
+    carte — voir anki_review.views.supprimer_note pour le détail complet,
+    notamment le transfert de propriété)."""
+    return user.is_staff or note.cards.filter(etudiant=user).exists()
 
 
 @register.filter(name="peut_editer_deck")

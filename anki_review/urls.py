@@ -33,12 +33,16 @@ urlpatterns = [
     path("import-export/etudiants/", views.partage_etudiants, name="partage_etudiants"),
     path("import-export/<int:note_id>/partager/", views.partager_note_toggle, name="partager_note_toggle"),
     path("import-export/<int:note_id>/ajouter-copie/", views.ajouter_carte_partagee, name="ajouter_carte_partagee"),
-    path("import-export/<int:note_id>/choisir-paquet/", views.choisir_paquet_carte_partagee, name="choisir_paquet_carte_partagee"),
 
     path("import-export/paquet/<int:deck_id>/partager-tout/", views.partager_paquet_toggle, name="partager_paquet_toggle"),
     path("import-export/paquet/<int:deck_id>/supprimer-mes-cartes/", views.supprimer_mes_cartes_paquet, name="supprimer_mes_cartes_paquet"),
     path("import-export/paquet/<int:deck_id>/<int:cree_par_id>/ajouter/", views.ajouter_paquet_partage, name="ajouter_paquet_partage"),
-    path("import-export/paquet/<int:deck_id>/<int:cree_par_id>/choisir-paquet/", views.choisir_paquet_paquet_partage, name="choisir_paquet_paquet_partage"),
+
+    # Propositions de modification (quelqu'un qui n'est pas propriétaire
+    # d'une note propose une correction, à valider par le propriétaire).
+    path("propositions/<int:proposition_id>/", views.voir_proposition, name="voir_proposition"),
+    path("propositions/<int:proposition_id>/accepter/", views.accepter_proposition, name="accepter_proposition"),
+    path("propositions/<int:proposition_id>/refuser/", views.refuser_proposition, name="refuser_proposition"),
 
     # Générique : à laisser en dernier (capte tout slug restant = un paquet à réviser)
     path("<slug:deck_slug>/", views.reviser, name="reviser"),

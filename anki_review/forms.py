@@ -32,25 +32,20 @@ class DeckForm(forms.ModelForm):
 class NoteForm(forms.ModelForm):
     TYPE_NORMAL = "normal"
     TYPE_DOUBLE = "double"
-    TYPE_DOUBLE_DEFINITION = "double_definition"
-    TYPE_DOUBLE_VOCABULAIRE = "double_vocabulaire"
     CHOIX_TYPE_CARTE = [
         (TYPE_NORMAL, "Normal"),
         (TYPE_DOUBLE, "Double (recto-verso et verso-recto)"),
-        (TYPE_DOUBLE_DEFINITION, "Double définition (ajoute \"Terme\" / \"Définition\")"),
-        (TYPE_DOUBLE_VOCABULAIRE, "Double vocabulaire (ajoute \"Français\" / langue étrangère)"),
     ]
 
-    # Champ non lié au modèle : influence UNIQUEMENT la création (combien de
-    # notes sont générées et avec quelles étiquettes) — jamais sauvegardé
-    # sur la Note elle-même, donc sans effet à la modification.
+    # Champ non lié au modèle : influence UNIQUEMENT la création (une ou
+    # deux notes générées) — jamais sauvegardé sur la Note elle-même, donc
+    # sans effet à la modification au-delà du choix Normal/Double lui-même.
     type_carte = forms.ChoiceField(choices=CHOIX_TYPE_CARTE, initial=TYPE_NORMAL, required=False)
 
     class Meta:
         model = Note
-        fields = ["deck", "titre", "question", "reponse", "tags"]
+        fields = ["deck", "question", "reponse", "tags"]
         widgets = {
-            "titre": forms.TextInput(),
             "question": forms.Textarea(attrs={"rows": 5, "class": "editeur-champ"}),
             "reponse": forms.Textarea(attrs={"rows": 5, "class": "editeur-champ"}),
             "tags": forms.TextInput(),

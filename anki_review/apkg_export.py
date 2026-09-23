@@ -26,22 +26,15 @@ from .models import Deck
 # exportés en circulation : Anki s'en sert pour reconnaître le type de note
 # d'un import à l'autre — on l'a vérifié : changer de modèle pour une carte
 # déjà importée bloque sa mise à jour côté Anki, sauf à activer "Fusionner
-# les types de notes" à chaque import). UN SEUL modèle, toujours à 3
-# champs : le Titre vaut le titre saisi, ou la question en repli s'il n'y
-# en a pas (cf. Note.titre_affichage) — comme pour n'importe quel paquet
-# Anki classique où le premier champ sert à la fois d'aperçu-liste et de
-# contenu de révision, ce n'est pas une "duplication" au sens où Anki
-# l'entend, juste son fonctionnement standard.
-_ID_MODELE_BASIQUE = 1968100421
+# les types de notes" à chaque import). Changé une fois de plus : le champ
+# Titre a été retiré du site, donc du modèle exporté aussi — retour à 2
+# champs (Front/Back) tout simple.
+_ID_MODELE_BASIQUE = 1968100422
 
 MODELE_BASIQUE = genanki.Model(
     _ID_MODELE_BASIQUE,
     "Basique (export du site)",
-    # Titre en premier champ : c'est lui qu'Anki utilise par défaut comme
-    # "sort field", affiché dans le navigateur de cartes (desktop et
-    # AnkiDroid) — jamais montré pendant la révision elle-même, puisque les
-    # templates ci-dessous ne le référencent pas.
-    fields=[{"name": "Titre"}, {"name": "Front"}, {"name": "Back"}],
+    fields=[{"name": "Front"}, {"name": "Back"}],
     templates=[{
         "name": "Carte 1",
         "qfmt": "{{Front}}",
@@ -99,7 +92,7 @@ def exporter_notes_apkg(notes) -> bytes:
 
         note_anki = genanki.Note(
             model=MODELE_BASIQUE,
-            fields=[note.titre_affichage(), note.question, note.reponse],
+            fields=[note.question, note.reponse],
             guid=note.guid,
             tags=note.tags.split() if note.tags else [],
         )

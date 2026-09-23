@@ -1,0 +1,78 @@
+{% extends "anki_review/base.html" %}
+{% load anki_extras %}
+
+{% block title %}Proposition de modification — Anki{% endblock %}
+
+{% block content %}
+<p class="edition-fil"><a href="{% url 'anki_review:edition' %}">← Édition</a></p>
+<h1>Proposition de {{ proposition.auteur }}</h1>
+<p class="editeur-champ-aide">
+  Sur une carte du paquet « {{ proposition.note.deck.nom }} », proposée le {{ proposition.cree_le|date:"d/m/Y à H:i" }}.
+</p>
+
+<div class="ie-comparaison">
+  <div class="ie-comparaison-colonne">
+    <h2 class="ie-comparaison-titre">Version actuelle</h2>
+    {% with bandes=proposition.note.bandes_apercu %}
+      <div class="ie-apercu-section">
+        <span class="ie-apercu-bande ie-apercu-bande--{% if bandes.0 == 'R' %}recto{% else %}verso{% endif %}">{{ bandes.0 }}</span>
+        <div class="ie-apercu-contenu">{{ proposition.note.question|resoudre_images }}</div>
+      </div>
+      <div class="ie-apercu-section">
+        <span class="ie-apercu-bande ie-apercu-bande--{% if bandes.1 == 'R' %}recto{% else %}verso{% endif %}">{{ bandes.1 }}</span>
+        <div class="ie-apercu-contenu">{{ proposition.note.reponse|resoudre_images }}</div>
+      </div>
+    {% endwith %}
+  </div>
+
+  <div class="ie-comparaison-colonne">
+    <h2 class="ie-comparaison-titre">Version proposée</h2>
+    <div class="ie-apercu-section">
+      <span class="ie-apercu-bande ie-apercu-bande--recto">R</span>
+      <div class="ie-apercu-contenu">{{ proposition.question|resoudre_images }}</div>
+    </div>
+    <div class="ie-apercu-section">
+      <span class="ie-apercu-bande ie-apercu-bande--verso">V</span>
+      <div class="ie-apercu-contenu">{{ proposition.reponse|resoudre_images }}</div>
+    </div>
+  </div>
+</div>
+
+{% if proposition.statut != "en_attente" %}
+  <p class="editeur-champ-aide" style="margin-top:16px;">
+    Déjà traitée : <strong>{{ proposition.get_statut_display }}</strong>{% if proposition.traitee_le %} le {{ proposition.traitee_le|date:"d/m/Y à H:i" }}{% endif %}.
+  </p>
+{% else %}
+  <div class="ie-comparaison-actions">
+    <form method="post" action="{% url 'anki_review:accepter_proposition' proposition.id %}" style="display:contents;">
+      {% csrf_token %}
+      <button type="submit" class="btn-ajouter">Accepter cette version</button>
+    </form>
+    <form method="post" action="{% url 'anki_review:refuser_proposition' proposition.id %}" style="display:contents;">
+      {% csrf_token %}
+      <button type="submit" class="ie-btn-refuser">Refuser</button>
+    </form>
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function rendreQuandPret() {
+  if (window.renderMathInElement) {
+    document.querySelectorAll('.ie-apercu-contenu').forEach(bloc => {
+      renderMathInElement(bloc, {
+        delimiters: [
+          { left: "\\[", right: "\\]", display: true },
+          { left: "\\(", right: "\\)", display: false },
+        ],
+        throwOnError: false,
+      });
+    });
+  } else {
+    setTimeout(rendreQuandPret, 50);
+  }
+}
+rendreQuandPret();
+</script>
+{% endblock %}

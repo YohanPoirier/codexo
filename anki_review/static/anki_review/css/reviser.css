@@ -82,7 +82,7 @@ body.fullscreen-app {
 .reviser-card-area {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 12px 20px;
   overflow-y: auto;
@@ -92,27 +92,37 @@ body.fullscreen-app {
 .reviser-card {
   width: 100%;
   max-width: 560px;
-  background: var(--paper-alt);
+  background: #fff;
   border: 1px solid var(--rule);
   border-radius: var(--radius);
-  padding: 28px 26px;
+  overflow: hidden; /* pour que les bandeaux respectent les coins arrondis */
   font-size: 1.15rem;
   line-height: 1.6;
   text-align: center;
-  white-space: pre-line;
 }
+.reviser-bandeau {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 7px 12px;
+}
+.reviser-bandeau--recto { background: var(--indigo); }
+.reviser-bandeau--verso { background: var(--anki-accent); }
+/* pre-line ici (pas sur .reviser-card) : préserve les retours à la ligne
+   VOULUS dans le texte de la question/réponse, sans que les retours à la
+   ligne du code source HTML entre les <div> (bandeau, blocs...) ne
+   deviennent eux aussi visibles. */
+.question-bloc { padding: 24px 26px; white-space: pre-line; }
+.reponse-contenu { padding: 20px 26px 24px; white-space: pre-line; text-align: left; }
 .reviser-card img {
   max-width: 100%;
   border-radius: 6px;
   margin: 10px 0;
 }
 .reviser-card ul, .reviser-card ol { text-align: left; margin: 8px 0; padding-left: 22px; }
-.reviser-card .reponse-bloc {
-  margin-top: 22px;
-  padding-top: 22px;
-  border-top: 1px dashed var(--rule);
-  color: var(--indigo-deep);
-}
 
 /* --- Zone d'action, fixée en bas --- */
 .reviser-actions {
