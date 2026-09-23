@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from accounts.views import (
     IdentifiantLoginView,
     ChangerMotDePasseView,
@@ -41,8 +41,21 @@ urlpatterns = [
 # Suppression de /signup/ (06/09/2026) : plus d'inscription publique, pour aucun
 # rôle. Voir contexte-technique.md — comptes créés uniquement via /admin/ (profs) ou
 # la commande "importer_eleves" (élèves).
-from django.conf import settings
-from django.conf.urls.static import static
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Fichiers envoyés par les utilisateurs (images des cartes anki_review) : servis par
+# Django lui-même, en local COMME en production. Sur le VPS, on n'a pas la main sur la
+# configuration d'Apache (pas d'Alias /media/ possible), et le helper static() de
+# Django ne fonctionne qu'avec DEBUG=True. Moins performant qu'un Alias Apache, mais
+# largement suffisant pour le trafic d'une classe. Réservé aux utilisateurs connectés :
+# les images des cartes ne sont pas accessibles publiquement.
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.views.static import serve
+
+urlpatterns += [
+    re_path(
+        r'^%s(?P<path>.*)$' % settings.MEDIA_URL.lstrip('/'),
+        login_required(serve),
+        {'document_root': settings.MEDIA_ROOT},
+    ),
+]

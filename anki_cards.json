@@ -1,0 +1,1818 @@
+[
+{
+  "model": "anki_review.deck",
+  "pk": 6,
+  "fields": {
+    "nom": "Optique",
+    "slug": "optique",
+    "description": "",
+    "matiere": "physique",
+    "cree_le": "2026-09-22T09:00:26.106Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ]
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 103,
+  "fields": {
+    "guid": "da13e389-0e8a-4ea8-bdd5-e50c3d9d34a5",
+    "deck": 6,
+    "question": "<div style=\"text-align:center\">Milieu homogène (définition)</div>",
+    "reponse": "Milieu dont les caractéristiques (indice optique, température, masse volumique, etc...) ne dépendent pas du point.",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-23T11:19:12.280Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 104,
+  "fields": {
+    "guid": "4d5fc462-2197-457d-8166-69e98c3c6982",
+    "deck": 6,
+    "question": "<div style=\"text-align:center\">Isotrope (définition)</div>",
+    "reponse": "Milieu dont les caractéristiques ne dépendent pas de la direction et du sens considérés.",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-23T11:19:08.289Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 105,
+  "fields": {
+    "guid": "a285f920-040c-400e-b2ee-1d8a052e412c",
+    "deck": 6,
+    "question": "Indice optique d'un milieu (définition)",
+    "reponse": "\\[\r\nn = \\frac{c}{v_{\\varphi}}\r\n\\]\r\navec :\r\n<ul><li>c= \\( 3,00 \\times 10^{8} m\\cdot s^{-1} \\), la vitesse de la lumière dans le vide,</li><li> \\(v_{\\varphi}\\), la vitesse (vitesse de phase) de propagation d'une onde lumineuse</li>\r\n</ul>",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:09:16.458Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 106,
+  "fields": {
+    "guid": "4f56e1e5-24ad-4382-b406-57172c4c477d",
+    "deck": 6,
+    "question": "Indices optiques usuels (valeurs)",
+    "reponse": "<ul><li>air : \\(n=1,00032\\)</li><li>eau : \\(n=1,33\\)</li><li>verre : \\(n\\approx 1,5\\)</li>\r\n</ul>",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:11:39.330Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 107,
+  "fields": {
+    "guid": "d1ecb4d8-b9a6-4434-98f5-53f98dec6658",
+    "deck": 6,
+    "question": "Relation entre fréquence et longueur d'onde dans le vide pour une onde lumineuse.",
+    "reponse": "\\[\r\nf = \\frac{c}{\\lambda_0}\r\n\\]",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:13:36.483Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 108,
+  "fields": {
+    "guid": "fc586d67-bc7b-4870-b737-7a9c7246bcff",
+    "deck": 6,
+    "question": "Longueurs d'onde du spectre visible et couleurs associées",
+    "reponse": "<img src=\"f6e0bb433cff401289415d2cff4206a2.jpg\" alt=\"\">",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:15:06.567Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 109,
+  "fields": {
+    "guid": "6afd64e0-2042-4159-8211-54795364fa21",
+    "deck": 6,
+    "question": "Spectre d'une source thermique",
+    "reponse": "Le spectre d'une source thermique est <b>continu</b>.\r\n\r\n<img src=\"3ba176a31bcf4d4882e9b2d02c265d28.png\" alt=\"\">",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:33:07.419Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 110,
+  "fields": {
+    "guid": "f958b523-0dd5-4338-82e8-d08baf6aa746",
+    "deck": 6,
+    "question": "Spectre d'une source à décharge (lampe spectrale).",
+    "reponse": "Le spectre d'une source à décharge est un <b>spectre de raies</b> (spectre discret).\r\n\r\n<img src=\"755c48ae55504730814a9cce45d17b2f.png\" alt=\"\">",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:34:05.066Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 111,
+  "fields": {
+    "guid": "5dff1dea-3bdc-476b-a5d1-416886edcfd4",
+    "deck": 6,
+    "question": "Spectre d'une source LASER",
+    "reponse": "Le spectre d'une source LASER est un <b>spectre quasi-monochromatique</b>.\r\n\r\n<img src=\"661bfc08436a4bdf8624e48fd72b6ed7.png\" alt=\"\">",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:35:56.503Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 112,
+  "fields": {
+    "guid": "6c868a70-22e1-4d64-b2e6-6ebc7dff7689",
+    "deck": 6,
+    "question": "Angle du cône de diffraction",
+    "reponse": "En ordre de grandeur :\r\n\\[\r\n\\sin \\theta = \\frac{\\lambda}{a}\r\n\\]\r\navec :\r\n<ul><li>\\(\\theta\\) l'angle de diffraction,</li><li>\\(a\\) la taille de l'obstacle,</li><li>\\(\\lambda\\) la longueur d'onde de l'onde.</li></ul>",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:39:29.210Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 113,
+  "fields": {
+    "guid": "85d509f5-761b-43f8-8d09-f99b856c50ec",
+    "deck": 6,
+    "question": "Optique géométrique (définition)",
+    "reponse": "Branche de l'optique dans laquelle on néglige les phénomènes ondulatoire (diffraction et interférences).",
+    "tags": "",
+    "modifie_le": "2026-09-22T09:40:27.502Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 114,
+  "fields": {
+    "guid": "58c28b08-8093-4fd7-9bcd-905c9e85c87b",
+    "deck": 6,
+    "question": "Propriétés des rayons dans le cadre de l'optique géométrique.",
+    "reponse": "<ul><li>Les rayons sont indépendants.</li><li>Dans un milieu homogène et transparent, les rayons sont rectilignes.</li><li>Dans un milieu isotrope et transparent, la trajectoire des rayons ne dépend pas du sens de propagation (principe de retour inverse de la lumière).</li></ul>",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:47:43.807Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 115,
+  "fields": {
+    "guid": "892c60dc-622c-42cf-8b36-e6dfbd7d301e",
+    "deck": 6,
+    "question": "Dioptre (définition)",
+    "reponse": "Surface délimitant deux milieux d'indices différents.",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:48:28.920Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 116,
+  "fields": {
+    "guid": "bce6791b-5cb5-48e8-8f9b-9fd41b760782",
+    "deck": 6,
+    "question": "Plan d'incidence (définition)",
+    "reponse": "Plan contenant le rayon incident et la normale au dioptre au point d'incidence.",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:49:15.587Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 117,
+  "fields": {
+    "guid": "91220295-2b48-4ce6-9621-538b0dafc046",
+    "deck": 6,
+    "question": "Lois de Snell-Descartes",
+    "reponse": "<img src=\"798f9e25cee643bfb18c980536034b75.png\" alt=\"\">\r\n<ul><li>le rayon réfracté et le rayon réfléchi sont contenus dans le plan d'incidence,</li><li>l'angle de réflexion et l'angle d'incidence sont reliés par :\r\n\t\\[\r\n\t\ti_1 = -  r\r\n\t\\]</li><li>l'angle de réfraction et l'angle d'incidence sont reliés par :\r\n\t\\[\r\n\t\tn_1 \\sin i_1 = n_2 \\sin i_2\r\n\t\\]</li></ul>",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T09:53:11.735Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 118,
+  "fields": {
+    "guid": "00f67cb1-8389-4abc-a058-c5414f113fcb",
+    "deck": 6,
+    "question": "Réfraction dans un milieu moins réfringent.",
+    "reponse": "Le rayon réfracté s'éloigne de la normale au dioptre.\r\n<img src=\"b4e496da5db94054adfa93c3c4b5c299.png\" alt=\"\">",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T10:04:58.920Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 119,
+  "fields": {
+    "guid": "d8a51997-3363-4086-9912-4e6f24b1720a",
+    "deck": 6,
+    "question": "Réfraction dans un milieu plus réfringent.",
+    "reponse": "Le rayon réfracté se rapproche de la normale au dioptre.\r\n\r\n<img src=\"2ef1186979624ef6947b999e3d8e45cf.png\" alt=\"\">",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T10:04:41.493Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 120,
+  "fields": {
+    "guid": "08a765fa-e11f-438e-94b2-6d71da87f7ad",
+    "deck": 6,
+    "question": "Réflexion totale (définition et conditions)",
+    "reponse": "Lors d'une réflexion totale, le rayon incident ne donne naissance qu'à un rayon réfléchi (absence de rayon réfracté).\r\n\r\nConditions :\r\n<ul><li>\\(n_2 < n_1\\)</li><li>\\(i_1 \\ge i_{1,lim}\\) où \\(i_{1,lim}\\) est l'angle d'incidence donnant un angle de réfraction égal à \\(\\frac{\\pi}{2}.\\)</li></ul>\r\n\r\n<img src=\"4306ff96fbcc483e902b59b5da7a3b73.png\" alt=\"\">",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T10:09:29.052Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 121,
+  "fields": {
+    "guid": "dd9a4549-dd77-4ced-be79-743b63f08e9b",
+    "deck": 6,
+    "question": "Dispersion intermodale (définition)",
+    "reponse": "Dans une fibre optique, la dispersion intermodale est le phénomène provoquant des temps de parcours différents pour des angles d'incidence différents.",
+    "tags": "Chap.1",
+    "modifie_le": "2026-09-22T10:10:48.056Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 122,
+  "fields": {
+    "guid": "02a6dff2-52af-495e-9f05-029d36b0215f",
+    "deck": 6,
+    "question": "Système optique centré (définition)",
+    "reponse": "Système optique possédant un axe de symétrie.",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T10:11:49.848Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 123,
+  "fields": {
+    "guid": "aeefb578-4346-46fb-a0bb-89e689d4fb9d",
+    "deck": 6,
+    "question": "Point objet (définition)",
+    "reponse": "Point d'intersection des rayons (ou de leur prolongement) arrivant sur un système optique.\r\n\r\n<img src=\"7ef89e53305b432f8533afdab8da8e77.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:12:33.520Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 124,
+  "fields": {
+    "guid": "4ed63901-7066-40b2-9db6-52e3d32de4ff",
+    "deck": 6,
+    "question": "Point image (définition)",
+    "reponse": "Point d'intersection des rayons (ou de leur prolongement) émergeant d'un système optique.\r\n\r\n<img src=\"2209fdebbbe5420a8ac48bf9d150d34b.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:13:07.043Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 125,
+  "fields": {
+    "guid": "25654be7-1bac-4b99-b95e-841be1311342",
+    "deck": 6,
+    "question": "Points conjugués (définition)",
+    "reponse": "Point objet et point image, par un système optique donné, associés à un même ensemble de rayons\r\n\r\n<img src=\"c5d9a101deb34df78ddf50995b7cad50.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:13:24.426Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 126,
+  "fields": {
+    "guid": "993c0f8f-5380-4c2d-8ec2-7f417924c747",
+    "deck": 6,
+    "question": "Point objet réel (définition)",
+    "reponse": "Point objet situé avant le système optique. Il est associé à des rayons qui divergent en arrivant sur le système optique.\r\n\r\n<img src=\"9958012e189c438796bb605f49f6b4a6.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:11:26.221Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 127,
+  "fields": {
+    "guid": "f5c8a913-fbbc-4165-b134-214f00ef51db",
+    "deck": 6,
+    "question": "Point objet virtuel (définition)",
+    "reponse": "Point objet situé <b>après</b> le système optique. Il est associé à des rayons qui <b>convergent</b> en arrivant sur le système optique.\r\n\r\n<img src=\"f489e57e3a9b4993ab121740aa3e0103.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:11:09.278Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 128,
+  "fields": {
+    "guid": "5b1ca808-5771-4319-b0f0-e78e3a66d5a4",
+    "deck": 6,
+    "question": "Point image réel (définition)",
+    "reponse": "Point image situé <b>après</b> le système optique. Il est associé à des rayons qui <b>convergent</b> en sortant du système optique.\r\n\r\n<img src=\"b3ff33c979324281a6c02c6c5871f08e.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:10:12.472Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 129,
+  "fields": {
+    "guid": "7d0dcfe4-66a1-463d-8de7-0bfa3a94cc61",
+    "deck": 6,
+    "question": "Point image virtuel (définition)",
+    "reponse": "Point image situé <b>avant</b> le système optique. Il est associé à des rayons qui <b>divergent</b> en sortant du système optique.\r\n\r\n<img src=\"7d6f322622b34cf28e935a733be2fbeb.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:09:45.979Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 130,
+  "fields": {
+    "guid": "ee5de43c-7c98-4a8f-ac0b-1b4ef9efd853",
+    "deck": 6,
+    "question": "Objet à l'infini (définition)",
+    "reponse": "Ensemble de rayons parallèles arrivant sur un système optique.\r\n\r\n<img src=\"cafc793d327443a9870a9db69f9b293d.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:09:16.568Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 131,
+  "fields": {
+    "guid": "6b7417f6-bd31-48ae-a1ab-8b7b1d39907a",
+    "deck": 6,
+    "question": "Image à l'infini (définition)",
+    "reponse": "Ensemble de rayons parallèles émergeant d'un système optique.\r\n\r\n<img src=\"7ed5014bd99d472c854c664a0a332790.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:08:41.218Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 132,
+  "fields": {
+    "guid": "5a20aa1b-f306-410f-8fb1-494158affe54",
+    "deck": 6,
+    "question": "Stigmatisme rigoureux (définition)",
+    "reponse": "Propriété d'un système optique permettant d'obtenir un point image à partir d'un point objet.\r\n\r\n<img src=\"fbea83a3fa8646df804cb9f855245791.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:07:36.853Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 133,
+  "fields": {
+    "guid": "f367c7f6-21a0-49b3-b071-c04233915bd2",
+    "deck": 6,
+    "question": "Stigmatisme approché (définition)",
+    "reponse": "Propriété d'un système optique permettant d'obtenir à partir d'un point objet une tâche image de dimension inférieure à celle du capteur.\r\n\r\n<img src=\"e1a41e09711146fcab191a5bd4502525.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:08:17.793Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 134,
+  "fields": {
+    "guid": "666bae20-bf17-4177-86b8-f65270c7e512",
+    "deck": 6,
+    "question": "Aplanétisme (définition)",
+    "reponse": "Propriété d'un système optique permettant d'obtenir d'un objet plan perpendiculaire à l'axe optique, une image plane perpendiculaire à l'axe optique.\r\n\r\n<img src=\"5793dcd612984766a41ae51933677b29.png\" alt=\"\">",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:15:10.714Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 135,
+  "fields": {
+    "guid": "9c2b67e4-7aed-4d0e-97e9-97d35fd57c07",
+    "deck": 6,
+    "question": "Conditions de Gauss",
+    "reponse": "Utilisation d'un système optique avec uniquement des rayons <b>paraxiaux</b>, c'est-à-dire :\r\n<ul><li>des rayons <b>peu inclinés</b> par rapport à l’axe optique,</li><li>des rayons <b>proches</b> de l'axe optique.</li></ul>",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:17:10.745Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 136,
+  "fields": {
+    "guid": "0f4afc65-ff5e-418b-b7d5-dab29c911128",
+    "deck": 6,
+    "question": "Points conjugués par un miroir plan",
+    "reponse": "Les points conjugués par un miroir plan sont symétriques par rapport au plan du miroir.",
+    "tags": "Chap.2",
+    "modifie_le": "2026-09-22T14:18:05.894Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 137,
+  "fields": {
+    "guid": "82bcb567-d4fe-4e2d-aa1f-54e8ddbed577",
+    "deck": 6,
+    "question": "Rayons particuliers d'une lentille",
+    "reponse": "<ul><li>Le rayon incident passant par le centre optique n'est pas dévié.\r\n<img src=\"5e957a6822f549a98d5fae33e999fd83.png\" alt=\"\">\r\n</li><li>Le rayon incident dont la droite support passe par le foyer objet de la lentille est dévié parallèlement à l'axe optique.\r\n<img src=\"e748ad3150d24646a402cdde7936d1b3.png\" alt=\"\">\r\n</li><li>Le rayon incident parallèle à l'axe optique est dévié de façon à ce que sa droite support passe par le foyer image de la lentille.\r\n<img src=\"f6b5f26e41ba46eca90843f4e47c7a34.png\" alt=\"\"></li></ul>",
+    "tags": "Chap.3",
+    "modifie_le": "2026-09-22T14:42:08.579Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 138,
+  "fields": {
+    "guid": "c9ef68fb-997f-4ccd-99cb-1c5c5f7057c4",
+    "deck": 6,
+    "question": "Distance focale (définition)",
+    "reponse": "\\[f'= \\overline{FO}=\\overline{OF'}\\]",
+    "tags": "Chap.3",
+    "modifie_le": "2026-09-22T14:25:32.311Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 139,
+  "fields": {
+    "guid": "573d1805-b6eb-46f0-99ac-9eb2c06db21f",
+    "deck": 6,
+    "question": "Vergence (définition et unité)",
+    "reponse": "\\[V=\\frac{1}{f'}\\]\r\n\r\nLa vergence s'exprime en dioptries, notées \\(\\delta\\) : \\(1\\, \\delta = 1\\, m^{-1}\\).",
+    "tags": "Chap.3",
+    "modifie_le": "2026-09-22T14:28:41.552Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 140,
+  "fields": {
+    "guid": "24f08ec2-b38a-411a-9d7a-67b351289339",
+    "deck": 6,
+    "question": "Image d'un objet situé dans le plan focal objet d'une lentille.",
+    "reponse": "L'image d'un objet situé dans le plan focal objet d'une lentille est située à l'infini.",
+    "tags": "Chap.3",
+    "modifie_le": "2026-09-22T14:30:21.692Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 141,
+  "fields": {
+    "guid": "2ac2a55a-d985-4e8c-ad36-e6fa799ca8e6",
+    "deck": 6,
+    "question": "Image d'un objet à l'infini",
+    "reponse": "L'image par une lentille d'un objet à l'infini est située dans le plan focal objet de la lentille.",
+    "tags": "Chap.3",
+    "modifie_le": "2026-09-22T14:34:57.007Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 142,
+  "fields": {
+    "guid": "6e40d2c1-b445-444b-b591-745adc19d883",
+    "deck": 6,
+    "question": "Grandissement transversal (définition)",
+    "reponse": "\\[\\gamma = \\frac{\\overline{A'B'}}{\\overline{AB}}\\]",
+    "tags": "Chap.3",
+    "modifie_le": "2026-09-22T14:35:51.013Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 143,
+  "fields": {
+    "guid": "3cb1726d-bdd7-4c18-bcb2-004007367f81",
+    "deck": 6,
+    "question": "Grandissement transversal (relations)",
+    "reponse": "Avec origine au centre :\r\n\\[\\gamma = \\frac{\\overline{OA'}}{\\overline{OA}}\\]\r\nAvec origine aux foyers :\r\n\\[\\gamma = \\frac{\\overline{F'A'}}{\\overline{F'O}}= \\frac{\\overline{FO}}{\\overline{FA}}\\]",
+    "tags": "Chap.3",
+    "modifie_le": "2026-09-22T14:37:29.595Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 144,
+  "fields": {
+    "guid": "e1b76a49-15b3-4f5a-acdf-54648163c2cf",
+    "deck": 6,
+    "question": "Relations de conjugaison",
+    "reponse": "Relation de conjugaison de Descartes :\r\n\\[\\frac{1}{\\overline{OA'}}-\\frac{1}{\\overline{OA}}=\\frac{1}{f'}\\]\r\nRelation de conjugaison de Newton :\r\n\\[\\overline{F'A'}\\cdot \\overline{FA}=-f'^2\\]",
+    "tags": "Chap.3",
+    "modifie_le": "2026-09-22T14:39:33.796Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 145,
+  "fields": {
+    "guid": "90fe3123-cf3c-49de-810a-ca67f1a14d4f",
+    "deck": 6,
+    "question": "Condition sur la distance \\(D\\) objet/image pour former une image réelle d'un objet réel.",
+    "reponse": "\\[D\\ge 4 f'\\]",
+    "tags": "Chap.3",
+    "modifie_le": "2026-09-22T14:40:50.698Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 146,
+  "fields": {
+    "guid": "9cad4273-2178-44ce-a9bb-266bb7dbed45",
+    "deck": 6,
+    "question": "Modèle optique de l’œil",
+    "reponse": "L’œil peut être modélisé par l'association :\r\n<ul><li>d'une lentille convergente (cornée + humeur aqueuse + cristallin) </li><li>d'écran (rétine),</li><li>d'un diaphragme (pupille).</li></ul>",
+    "tags": "Chap.4",
+    "modifie_le": "2026-09-22T14:45:10.185Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 147,
+  "fields": {
+    "guid": "049c60ca-51ba-4ff7-8a87-a8df21ef52f1",
+    "deck": 6,
+    "question": "Punctum Proximum et Punctum Remotum (définition et positions pour un œil emmétrope).",
+    "reponse": "Le <b>Punctum Proximum</b> est le point objet le plus proche qu'un œil est capable de voir nettement. Pour un oeil emmétrope il est situé à environ \\(25\\,cm\\).\r\n\r\nLe <b>Punctum Remotum</b> est le point objet le plus éloigné qu'un œil est capable de voir nettement. Pour un œil emmétrope il est situé <b>à l'infini</b>.",
+    "tags": "Chap.4",
+    "modifie_le": "2026-09-22T14:47:24.478Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 148,
+  "fields": {
+    "guid": "48d85d6a-04d3-49bf-9d79-e658c0213efa",
+    "deck": 6,
+    "question": "Diamètre angulaire (définition)",
+    "reponse": "Angle formé par les rayons provenant des deux extrémités (A et B) d'un objet éloigné.\r\n\r\n<img src=\"db26c08a1901485f959fd2658a433501.png\" alt=\"\">",
+    "tags": "Chap.4",
+    "modifie_le": "2026-09-22T14:49:01.430Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 149,
+  "fields": {
+    "guid": "db0b6c6a-e3ff-4fa3-be27-4bb8267f8bd3",
+    "deck": 6,
+    "question": "Résolution angulaire (définition et valeur pour un œil humain).",
+    "reponse": "La <b>résolution angulaire</b> est la valeur minimale du diamètre angulaire permettant à un instrument d'optique de distinguer deux objets.\r\n\r\nPour un œil humain :\r\n\\[\\alpha_{min}\\approx 1'=3\\times 10^{-4}\\, rad\\]",
+    "tags": "Chap.4",
+    "modifie_le": "2026-09-22T14:52:08.438Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 150,
+  "fields": {
+    "guid": "142b2f3f-95e3-45d9-b4f3-787cfd838e7e",
+    "deck": 6,
+    "question": "Profondeur de champ (définition)",
+    "reponse": "On appelle profondeur de champ la distance entre l'objet le plus proche et l'objet le plus éloigné de l'appareil donnant tous deux une image nette.",
+    "tags": "Chap.4",
+    "modifie_le": "2026-09-22T14:54:08.982Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.note",
+  "pk": 151,
+  "fields": {
+    "guid": "b746e9c2-1a69-45bc-9441-4440d19a6541",
+    "deck": 6,
+    "question": "Système afocal (définition)",
+    "reponse": "Un système optique est dit <b>afocal</b> s'il forme une image à l'infini d'un objet à l'infini.",
+    "tags": "Chap.4",
+    "modifie_le": "2026-09-22T14:54:57.725Z",
+    "cree_par": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "partagee_avec_classe": true,
+    "note_miroir": null
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 108,
+  "fields": {
+    "note": 103,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.3,
+    "facteur_facilite": 2.6,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-23T22:08:35.628Z",
+    "derniere_revision": "2026-09-22T14:56:35.628Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 109,
+  "fields": {
+    "note": 104,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-23T18:17:14.507Z",
+    "derniere_revision": "2026-09-22T18:17:14.507Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 110,
+  "fields": {
+    "note": 105,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-23T18:17:23.647Z",
+    "derniere_revision": "2026-09-22T18:17:23.647Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 111,
+  "fields": {
+    "note": 106,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-23T18:17:31.418Z",
+    "derniere_revision": "2026-09-22T18:17:31.418Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 112,
+  "fields": {
+    "note": 107,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.3,
+    "facteur_facilite": 2.6,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-24T01:31:16.596Z",
+    "derniere_revision": "2026-09-22T18:19:16.596Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 113,
+  "fields": {
+    "note": 108,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.3,
+    "facteur_facilite": 2.6,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-24T01:31:23.303Z",
+    "derniere_revision": "2026-09-22T18:19:23.303Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 114,
+  "fields": {
+    "note": 109,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.3,
+    "facteur_facilite": 2.6,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-24T01:31:42.299Z",
+    "derniere_revision": "2026-09-22T18:19:42.299Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 115,
+  "fields": {
+    "note": 110,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.3,
+    "facteur_facilite": 2.6,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-24T01:31:45.265Z",
+    "derniere_revision": "2026-09-22T18:19:45.265Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 116,
+  "fields": {
+    "note": 111,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.3,
+    "facteur_facilite": 2.6,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-24T01:32:29.250Z",
+    "derniere_revision": "2026-09-22T18:20:29.250Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 117,
+  "fields": {
+    "note": 112,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "review",
+    "intervalle_jours": 1.3,
+    "facteur_facilite": 2.6,
+    "repetitions": 1,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-24T01:32:41.526Z",
+    "derniere_revision": "2026-09-22T18:20:41.526Z",
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 118,
+  "fields": {
+    "note": 113,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T09:40:27.516Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 119,
+  "fields": {
+    "note": 114,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T09:47:43.829Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 120,
+  "fields": {
+    "note": 115,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T09:48:28.939Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 121,
+  "fields": {
+    "note": 116,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T09:49:15.606Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 122,
+  "fields": {
+    "note": 117,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T09:53:11.759Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 123,
+  "fields": {
+    "note": 118,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:02:54.710Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 124,
+  "fields": {
+    "note": 119,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:04:41.503Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 125,
+  "fields": {
+    "note": 120,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:09:29.080Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 126,
+  "fields": {
+    "note": 121,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:10:48.076Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 127,
+  "fields": {
+    "note": 122,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:11:49.879Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 128,
+  "fields": {
+    "note": 123,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:12:27.072Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 129,
+  "fields": {
+    "note": 124,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:12:54.948Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 130,
+  "fields": {
+    "note": 125,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:13:58.662Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 131,
+  "fields": {
+    "note": 126,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:15:04.340Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 132,
+  "fields": {
+    "note": 127,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:15:49.437Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 133,
+  "fields": {
+    "note": 128,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:16:20.413Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 134,
+  "fields": {
+    "note": 129,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:16:47.546Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 135,
+  "fields": {
+    "note": 130,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:17:31.157Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 136,
+  "fields": {
+    "note": 131,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:17:50.355Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 137,
+  "fields": {
+    "note": 132,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T10:19:19.008Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 138,
+  "fields": {
+    "note": 133,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:03:31.015Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 139,
+  "fields": {
+    "note": 134,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:15:10.733Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 140,
+  "fields": {
+    "note": 135,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:17:10.769Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 141,
+  "fields": {
+    "note": 136,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:18:05.926Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 142,
+  "fields": {
+    "note": 137,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:24:48.733Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 143,
+  "fields": {
+    "note": 138,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:25:32.328Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 144,
+  "fields": {
+    "note": 139,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:28:41.575Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 145,
+  "fields": {
+    "note": 140,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:30:21.714Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 146,
+  "fields": {
+    "note": 141,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:34:57.030Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 147,
+  "fields": {
+    "note": 142,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:35:51.033Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 148,
+  "fields": {
+    "note": 143,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:37:29.619Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 149,
+  "fields": {
+    "note": 144,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:39:33.813Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 150,
+  "fields": {
+    "note": 145,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:40:50.721Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 151,
+  "fields": {
+    "note": 146,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:45:10.204Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 152,
+  "fields": {
+    "note": 147,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:47:24.498Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 153,
+  "fields": {
+    "note": 148,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:49:01.447Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 154,
+  "fields": {
+    "note": 149,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:52:08.454Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 155,
+  "fields": {
+    "note": 150,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:54:09.000Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 156,
+  "fields": {
+    "note": 151,
+    "etudiant": [
+      "yohan.poirier@hotmail.fr"
+    ],
+    "cree_le": "2026-09-23T11:16:23.645Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-22T14:54:57.745Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 157,
+  "fields": {
+    "note": 103,
+    "etudiant": [
+      "test@test.com"
+    ],
+    "cree_le": "2026-09-23T11:17:36.890Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-23T11:17:36.889Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+},
+{
+  "model": "anki_review.card",
+  "pk": 158,
+  "fields": {
+    "note": 104,
+    "etudiant": [
+      "test@test.com"
+    ],
+    "cree_le": "2026-09-23T11:17:41.091Z",
+    "file": "new",
+    "intervalle_jours": 0.0,
+    "facteur_facilite": 2.5,
+    "repetitions": 0,
+    "echecs": 0,
+    "prochaine_revision": "2026-09-23T11:17:41.091Z",
+    "derniere_revision": null,
+    "suspendue": false
+  }
+}
+]
