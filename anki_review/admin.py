@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Card, Deck, Note
+from .models import Activite, Card, Deck, Note
 
 
 @admin.register(Deck)
@@ -21,3 +21,10 @@ class CardAdmin(admin.ModelAdmin):
     list_display = ("id", "note", "etudiant", "file", "prochaine_revision", "repetitions")
     list_filter = ("file", "suspendue")
     search_fields = ("etudiant__username",)
+
+
+@admin.register(Activite)
+class ActiviteAdmin(admin.ModelAdmin):
+    list_display = ("date", "etudiant", "type", "carte")
+    list_filter = ("type",)
+    date_hierarchy = "date"

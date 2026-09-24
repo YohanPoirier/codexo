@@ -223,3 +223,47 @@ class PropositionModification(models.Model):
 
     def __str__(self):
         return f"Proposition de {self.auteur} sur note {self.note_id} ({self.get_statut_display()})"
+
+
+class Activite(models.Model):
+    """
+    Journal des événements d'un étudiant dans la partie Anki, pour la page
+    Trafic réservée aux profs (cf. anki_review.views.trafic).
+
+    Indispensable car Card ne garde que sa DERNIÈRE révision (champ
+    derniere_revision, écrasé à chaque réponse) : sans ce journal, impossible
+    de savoir combien de révisions ont eu lieu un jour donné. Il sert aussi
+    pour les ajouts/récupérations, plutôt que de les déduire de Card.cree_le :
+    une Card retirée par l'étudiant disparaîtrait des statistiques passées,
+    et un transfert de propriété (cf. supprimer_note) changerait après coup
+    une récupération en ajout.
+
+    `carte` est en SET_NULL : l'événement reste compté même si la carte est
+    retirée ensuite. `etudiant` est en CASCADE : un compte supprimé emporte
+    son historique.
+    """
+
+    class Type(models.TextChoices):
+        REVISION = "revision", "Révision"      # une réponse (Again/Hard/Good/Easy) = un événement
+        AJOUT = "ajout", "Ajout"               # carte créée par l'étudiant (formulaire, miroir, import .apkg)
+        RECUPERATION = "recuperation", "Récupération"  # carte partagée par un autre, ajoutée à sa révision
+
+    etudiant = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="activites_anki"
+    )
+    type = models.CharField(max_length=15, choices=Type.choices)
+    carte = models.ForeignKey(
+        Card, on_delete=models.SET_NULL, null=True, blank=True, related_name="activites"
+    )
+    date = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-date"]
+        indexes = [models.Index(fields=["date"])]
+
+    def __str__(self):
+        return f"{self.etudiant} — {self.get_type_display()} ({self.date:%d/%m %H:%M})"
+
+    @classmethod
+    def journaliser(cls, etudiant, type_activite, carte=None):
+        return cls.objects.create(etudiant=etudiant, type=type_activite, carte=carte)

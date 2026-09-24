@@ -50,7 +50,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 from django.utils.text import slugify
 
-from .models import Card, Deck, Note
+from .models import Activite, Card, Deck, Note
 
 SEPARATEUR_CHAMPS = "\x1f"
 
@@ -290,7 +290,10 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
             nb_notes_creees += 1
 
         planning = planning_par_note.get(ligne["id"])
-        carte, _ = Card.objects.get_or_create(note=note, etudiant=utilisateur)
+        carte, carte_creee = Card.objects.get_or_create(note=note, etudiant=utilisateur)
+        if carte_creee:
+            # Une carte importée depuis un .apkg compte comme un ajout (page Trafic).
+            Activite.journaliser(utilisateur, Activite.Type.AJOUT, carte)
         if planning:
             ivl = planning["ivl"] or 0
             carte.intervalle_jours = abs(ivl) if ivl >= 0 else abs(ivl) / 86400

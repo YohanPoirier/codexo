@@ -1,0 +1,59 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}Trafic — Anki{% endblock %}
+
+{% block content %}
+<div class="edition-entete">
+  <h1>Trafic</h1>
+</div>
+
+<nav class="trafic-periodes" aria-label="Période affichée">
+  {% for p in periodes %}
+    <a href="?jours={{ p }}" class="trafic-periode{% if p == periode %} trafic-periode--active{% endif %}"
+       {% if p == periode %}aria-current="true"{% endif %}>{{ p }} jours</a>
+  {% endfor %}
+</nav>
+
+{% for jour in jours %}
+  <details class="ie-groupe trafic-jour" {% if forloop.first %}open{% endif %}>
+    <summary class="ie-groupe-entete edition-ligne edition-ligne--matiere trafic-jour-entete">
+      <div class="edition-ligne-titre">
+        <span>{% if jour.date == aujourd_hui %}Aujourd'hui{% else %}{{ jour.date|date:"l j F"|capfirst }}{% endif %}</span>
+        <span class="edition-ligne-meta">{{ jour.detail|length }} étudiant{{ jour.detail|length|pluralize }}</span>
+      </div>
+      <div class="trafic-totaux">
+        <span><strong>{{ jour.totaux.revision }}</strong> révision{{ jour.totaux.revision|pluralize }}</span>
+        <span><strong>{{ jour.totaux.ajout }}</strong> ajout{{ jour.totaux.ajout|pluralize }}</span>
+        <span><strong>{{ jour.totaux.recuperation }}</strong> récupération{{ jour.totaux.recuperation|pluralize }}</span>
+      </div>
+    </summary>
+    <div class="trafic-tableau-conteneur">
+      <table class="trafic-tableau">
+        <thead>
+          <tr>
+            <th scope="col">Étudiant</th>
+            <th scope="col" class="trafic-nb">Révisions</th>
+            <th scope="col" class="trafic-nb">Ajouts</th>
+            <th scope="col" class="trafic-nb">Récup.</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in jour.detail %}
+            <tr>
+              <th scope="row">
+                {{ d.etudiant }}
+                {% if d.etudiant.classe %}<span class="trafic-classe">{{ d.etudiant.classe.name }}</span>{% endif %}
+              </th>
+              <td class="trafic-nb{% if not d.revision %} trafic-zero{% endif %}">{{ d.revision }}</td>
+              <td class="trafic-nb{% if not d.ajout %} trafic-zero{% endif %}">{{ d.ajout }}</td>
+              <td class="trafic-nb{% if not d.recuperation %} trafic-zero{% endif %}">{{ d.recuperation }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+{% empty %}
+  <p class="trafic-vide">Aucune activité étudiante sur les {{ periode }} derniers jours.</p>
+{% endfor %}
+{% endblock %}

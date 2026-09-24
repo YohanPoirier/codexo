@@ -5,6 +5,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}Anki{% endblock %}</title>
+<!-- Icône propre à la partie Anki (pas celle de Codexo). Les PNG servent aux
+     raccourcis sur l'écran d'accueil (cf. templates/base.html). -->
+<link rel="icon" href="{% static 'anki_review/icons/favicon.svg' %}" type="image/svg+xml">
+<link rel="alternate icon" href="{% static 'anki_review/icons/favicon.ico' %}">
+<link rel="icon" type="image/png" sizes="192x192" href="{% static 'anki_review/icons/favicon-192.png' %}">
+<link rel="icon" type="image/png" sizes="512x512" href="{% static 'anki_review/icons/favicon-512.png' %}">
+<link rel="apple-touch-icon" href="{% static 'anki_review/icons/apple-touch-icon.png' %}">
 <!-- Réutilise style.css pour les variables/polices communes (--paper, --indigo, Fraunces...)
      mais AUCUN lien, logo ou texte "Codexo" n'apparaît sur ces pages. -->
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -24,6 +31,9 @@
       <a href="{% url 'anki_review:liste_decks' %}">Révision</a>
       <a href="{% url 'anki_review:edition' %}">Edition</a>
       <a href="{% url 'anki_review:import_export_accueil' %}">Import/Export</a>
+      {% if user.is_staff %}
+        <a href="{% url 'anki_review:trafic' %}">Trafic</a>
+      {% endif %}
       {% if user.is_authenticated %}
         <form method="post" action="{% url 'logout' %}" class="logout-form">
           {% csrf_token %}

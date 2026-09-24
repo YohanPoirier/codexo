@@ -475,3 +475,38 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::after { content: " ▾"; 
   .edition-entete > div { display: flex; flex-direction: column; gap: 8px; width: 100%; }
   .edition-entete .btn-ajouter { text-align: center; }
 }
+
+/* --- Page Trafic (profs uniquement, cf. anki_review.views.trafic) ---
+   Placé en fin de fichier, media query comprise, pour ne pas être écrasé
+   par les règles générales (cf. remarque au-dessus du bloc mobile). */
+.trafic-periodes { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 20px; }
+.trafic-periode {
+  padding: 6px 14px; border: 1.5px solid var(--rule); border-radius: 999px;
+  font-size: .85rem; color: var(--ink-soft); text-decoration: none; background: #fff;
+}
+.trafic-periode:hover { border-color: var(--anki-accent); color: var(--anki-accent-deep); }
+.trafic-periode--active { background: var(--anki-accent); border-color: var(--anki-accent); color: #fff; }
+.trafic-periode--active:hover { color: #fff; }
+
+.trafic-jour { margin-bottom: 8px; }
+.trafic-jour-entete { margin-bottom: 0; }
+.trafic-totaux { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: .88rem; color: rgba(255,255,255,.85); }
+.trafic-totaux strong { color: #fff; font-family: 'JetBrains Mono', monospace; font-size: .95rem; }
+
+.trafic-tableau-conteneur {
+  overflow-x: auto; background: #fff; border: 1.5px solid var(--rule); border-top: none;
+  border-radius: 0 0 8px 8px; margin-bottom: 10px;
+}
+.trafic-tableau { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.trafic-tableau th, .trafic-tableau td { padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--rule); }
+.trafic-tableau tbody tr:last-child th, .trafic-tableau tbody tr:last-child td { border-bottom: none; }
+.trafic-tableau thead th { font-size: .78rem; font-weight: 600; color: var(--ink-soft); background: var(--paper-alt); }
+.trafic-tableau tbody th { font-weight: 500; }
+.trafic-classe { display: block; font-size: .75rem; font-weight: 400; color: var(--ink-soft); }
+.trafic-nb { text-align: right !important; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+.trafic-zero { color: var(--rule); }
+.trafic-vide { color: var(--ink-soft); margin-top: 24px; }
+
+@media (max-width: 700px) {
+  .trafic-tableau th, .trafic-tableau td { padding: 8px 10px; }
+}

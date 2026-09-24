@@ -4,14 +4,18 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.files.storage import default_storage
-from django.db.models import Q
+from datetime import datetime, time, timedelta
+
+from django.contrib.auth import get_user_model
+from django.db.models import Count, Q
+from django.db.models.functions import TruncDate
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
 from .forms import DeckForm, NoteForm
-from .models import Card, Deck, Note, PropositionModification
+from .models import Activite, Card, Deck, Note, PropositionModification
 from .sm2 import Reponse, appliquer, calculer_prochaine_etape
 from .apkg_import import importer_apkg, analyser_apkg, ErreurImportApkg
 from .apkg_export import exporter_notes_apkg
@@ -227,6 +231,9 @@ def _traiter_revision(request, decks_qs, titre, nom_url_action, args_url_action)
         if reponse in (Reponse.AGAIN, Reponse.HARD, Reponse.GOOD, Reponse.EASY):
             appliquer(carte, reponse)
             carte.save()
+            # Une réponse = une révision dans le journal (page Trafic), y
+            # compris quand la même carte ratée revient dans la session.
+            Activite.journaliser(request.user, Activite.Type.REVISION, carte)
             if reponse == Reponse.AGAIN:
                 _ajouter_a_la_file_apprentissage(request, carte.id)
             else:
@@ -502,7 +509,9 @@ def _creer_miroir_pour_note_existante(form, note):
         tags=tags, cree_par=note.cree_par, partagee_avec_classe=note.partagee_avec_classe,
     )
     if note.cree_par_id:
-        Card.objects.get_or_create(note=miroir, etudiant=note.cree_par)
+        carte_miroir, cree = Card.objects.get_or_create(note=miroir, etudiant=note.cree_par)
+        if cree:
+            Activite.journaliser(note.cree_par, Activite.Type.AJOUT, carte_miroir)
 
     note.note_miroir = miroir
     miroir.note_miroir = note
@@ -528,7 +537,9 @@ def ajouter_note(request):
         if form.is_valid():
             notes = _creer_notes_depuis_formulaire(form, request.user)
             for note in notes:
-                Card.objects.get_or_create(note=note, etudiant=request.user)
+                carte, cree = Card.objects.get_or_create(note=note, etudiant=request.user)
+                if cree:
+                    Activite.journaliser(request.user, Activite.Type.AJOUT, carte)
             messages.success(request, f"{len(notes)} carte{'s' if len(notes) > 1 else ''} ajoutée{'s' if len(notes) > 1 else ''}.")
             # Retour sur le même formulaire, paquet pré-rempli, pour
             # enchaîner facilement l'ajout de plusieurs cartes de suite.
@@ -962,7 +973,9 @@ def ajouter_carte_partagee(request, note_id):
         return HttpResponseForbidden("Réservé aux étudiants — le prof ne récupère pas de cartes ici.")
 
     note = get_object_or_404(Note, id=note_id, partagee_avec_classe=True)
-    _, cree = Card.objects.get_or_create(note=note, etudiant=request.user)
+    carte, cree = Card.objects.get_or_create(note=note, etudiant=request.user)
+    if cree:
+        Activite.journaliser(request.user, Activite.Type.RECUPERATION, carte)
     messages.success(request, "Carte ajoutée à ta révision." if cree else "Tu avais déjà cette carte.")
     return redirect("anki_review:partage_etudiants")
 
@@ -979,8 +992,9 @@ def ajouter_paquet_partage(request, deck_id, cree_par_id):
     deck_source = get_object_or_404(Deck, id=deck_id)
     nb_ajoutees = 0
     for note in notes:
-        _, cree = Card.objects.get_or_create(note=note, etudiant=request.user)
+        carte, cree = Card.objects.get_or_create(note=note, etudiant=request.user)
         if cree:
+            Activite.journaliser(request.user, Activite.Type.RECUPERATION, carte)
             nb_ajoutees += 1
     messages.success(
         request,
@@ -1035,3 +1049,79 @@ def refuser_proposition(request, proposition_id):
         proposition.save(update_fields=["statut", "traitee_le"])
         messages.success(request, "Proposition refusée.")
     return redirect("anki_review:edition")
+
+
+# Périodes proposées sur la page Trafic (en jours) — la première est celle
+# affichée par défaut.
+PERIODES_TRAFIC = [30, 7, 90]
+
+
+@login_required
+def trafic(request):
+    """
+    Page réservée aux profs : pour chaque jour de la période, le nombre de
+    révisions (chaque réponse compte, cf. Activite), d'ajouts et de
+    récupérations de cartes, avec le détail par étudiant dans une liste
+    déroulante. Seuls apparaissent les jours et les étudiants ayant eu au
+    moins une activité ; l'activité des profs (is_staff) n'est pas comptée.
+    Les jours sont découpés à l'heure de Paris (TruncDate suit TIME_ZONE).
+    """
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Page réservée aux professeurs.")
+
+    try:
+        periode = int(request.GET.get("jours", PERIODES_TRAFIC[0]))
+    except ValueError:
+        periode = PERIODES_TRAFIC[0]
+    if periode not in PERIODES_TRAFIC:
+        periode = PERIODES_TRAFIC[0]
+
+    # Minuit (heure locale) du premier jour de la période, aujourd'hui inclus.
+    aujourd_hui = timezone.localdate()
+    debut = timezone.make_aware(
+        datetime.combine(aujourd_hui - timedelta(days=periode - 1), time.min)
+    )
+
+    lignes = (
+        Activite.objects.filter(date__gte=debut, etudiant__is_staff=False)
+        .annotate(jour=TruncDate("date"))
+        .values("jour", "etudiant_id", "type")
+        .annotate(nb=Count("id"))
+    )
+
+    # jour -> {"totaux": {type: nb}, "etudiants": {etudiant_id: {type: nb}}}
+    types = [t.value for t in Activite.Type]
+    jours = {}
+    for ligne in lignes:
+        jour = jours.setdefault(ligne["jour"], {"totaux": dict.fromkeys(types, 0), "etudiants": {}})
+        jour["totaux"][ligne["type"]] += ligne["nb"]
+        compteurs = jour["etudiants"].setdefault(ligne["etudiant_id"], dict.fromkeys(types, 0))
+        compteurs[ligne["type"]] += ligne["nb"]
+
+    # Une seule requête pour les noms (et classes) de tous les étudiants concernés.
+    ids = {eid for jour in jours.values() for eid in jour["etudiants"]}
+    etudiants = {
+        u.id: u for u in get_user_model().objects.filter(id__in=ids).select_related("classe")
+    }
+
+    jours_affiches = []
+    for date_jour in sorted(jours, reverse=True):
+        jour = jours[date_jour]
+        detail = [
+            {"etudiant": etudiants[eid], **compteurs}
+            for eid, compteurs in jour["etudiants"].items()
+            if eid in etudiants
+        ]
+        # Tri par classe puis par nom, pour retrouver facilement un élève.
+        detail.sort(key=lambda d: (
+            d["etudiant"].classe.name if d["etudiant"].classe else "",
+            str(d["etudiant"]).lower(),
+        ))
+        jours_affiches.append({"date": date_jour, "totaux": jour["totaux"], "detail": detail})
+
+    return render(request, "anki_review/trafic.html", {
+        "jours": jours_affiches,
+        "periode": periode,
+        "periodes": sorted(PERIODES_TRAFIC),
+        "aujourd_hui": aujourd_hui,
+    })

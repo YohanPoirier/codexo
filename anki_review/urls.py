@@ -10,6 +10,7 @@ urlpatterns = [
     # Espace prof — routes fixes, doivent être déclarées AVANT le
     # "<slug:deck_slug>/" générique ci-dessous, sans quoi Django
     # interpréterait "edition" comme un slug de paquet à réviser.
+    path("trafic/", views.trafic, name="trafic"),
     path("edition/", views.edition_accueil, name="edition"),
     path("edition/<slug:deck_slug>/", views.edition_deck, name="edition_deck"),
 

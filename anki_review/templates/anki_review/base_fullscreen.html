@@ -5,7 +5,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>{% block title %}Révisions{% endblock %} — Codexo</title>
-<link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+<!-- Icône propre à la partie Anki (pas celle de Codexo). Les PNG servent aux
+     raccourcis sur l'écran d'accueil (cf. templates/base.html). -->
+<link rel="icon" href="{% static 'anki_review/icons/favicon.svg' %}" type="image/svg+xml">
+<link rel="alternate icon" href="{% static 'anki_review/icons/favicon.ico' %}">
+<link rel="icon" type="image/png" sizes="192x192" href="{% static 'anki_review/icons/favicon-192.png' %}">
+<link rel="icon" type="image/png" sizes="512x512" href="{% static 'anki_review/icons/favicon-512.png' %}">
+<link rel="apple-touch-icon" href="{% static 'anki_review/icons/apple-touch-icon.png' %}">
 <!-- On réutilise le style.css existant pour les variables (--paper, --indigo, etc.)
      et les polices, plus une feuille dédiée à l'écran plein écran. -->
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
