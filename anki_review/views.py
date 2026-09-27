@@ -60,6 +60,19 @@ def _decks_visibles(user):
     ).distinct()
 
 
+def _decks_pour_selecteur(decks_visibles):
+    """Paquets triés par matière puis nom, avec un libellé de matière
+    précalculé sur chaque instance (attribut non stocké en base, juste
+    pour le regroupement du <select> du formulaire de carte, cf. template
+    ajouter_note.html) — "Sans matière" pour ceux qui n'en ont pas, même
+    convention que le reste du site (VALEUR_SANS_MATIERE/LIBELLE_SANS_MATIERE)."""
+    decks = list(decks_visibles.order_by("matiere", "nom"))
+    libelles = dict(Deck.Matiere.choices)
+    for deck in decks:
+        deck.libelle_matiere = libelles.get(deck.matiere, "") or LIBELLE_SANS_MATIERE
+    return decks
+
+
 @login_required
 def liste_decks(request):
     """Vue d'accueil de l'espace révision : les paquets ayant une matière
@@ -555,7 +568,7 @@ def ajouter_note(request):
         form.fields["deck"].queryset = decks_visibles
 
     return render(request, "anki_review/ajouter_note.html", {
-        "form": form, "decks": decks_visibles, "media_notes_prefix": PREFIXE_IMAGES_NOTES,
+        "form": form, "decks": _decks_pour_selecteur(decks_visibles), "media_notes_prefix": PREFIXE_IMAGES_NOTES,
         "retour_url": reverse("anki_review:edition"),
     })
 
@@ -622,7 +635,7 @@ def modifier_note(request, note_id):
 
     return render(
         request, "anki_review/ajouter_note.html",
-        {"form": form, "decks": decks_visibles, "note": note, "media_notes_prefix": PREFIXE_IMAGES_NOTES,
+        {"form": form, "decks": _decks_pour_selecteur(decks_visibles), "note": note, "media_notes_prefix": PREFIXE_IMAGES_NOTES,
          "retour_url": reverse("anki_review:edition"), "mode_proposition": not peut_direct},
     )
 

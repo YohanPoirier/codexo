@@ -24,8 +24,13 @@
     <label for="id_deck">Paquet</label>
     <select name="deck" id="id_deck" class="select-stylise">
       <option value="">— Choisir —</option>
-      {% for deck in decks %}
-        <option value="{{ deck.pk }}" {% if form.deck.value|stringformat:"s" == deck.pk|stringformat:"s" %}selected{% endif %}>{{ deck.nom }}</option>
+      {% regroup decks by libelle_matiere as groupes_matiere %}
+      {% for groupe in groupes_matiere %}
+        <optgroup label="{{ groupe.grouper }}">
+          {% for deck in groupe.list %}
+            <option value="{{ deck.pk }}" {% if form.deck.value|stringformat:"s" == deck.pk|stringformat:"s" %}selected{% endif %}>{{ deck.nom }}</option>
+          {% endfor %}
+        </optgroup>
       {% endfor %}
     </select>
     {% for erreur in form.deck.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}

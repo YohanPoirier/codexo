@@ -337,6 +337,20 @@ def analyser_apkg(fichier_django):
     return [{"nom_deck": k, "notes": v} for k, v in par_deck.items()], nb_cloze
 
 
+def _deviner_matiere(nom_anki: str) -> str:
+    """Devine la matière (au sens Deck.Matiere) d'un paquet importé, à
+    partir du premier segment de son nom Anki (avant "::") — par exemple
+    "Physique::Thermodynamique" -> matière "physique". Comparaison insensible
+    à la casse contre la valeur ("physique") ou le libellé ("Physique") de
+    chaque choix ; renvoie "" (aucune matière) si rien ne correspond,
+    laissant le paquet dans "Sans matière" comme avant cette détection."""
+    premier_segment = nom_anki.split("::", 1)[0].strip().lower()
+    for valeur, libelle in Deck.Matiere.choices:
+        if premier_segment in (valeur.lower(), libelle.lower()):
+            return valeur
+    return ""
+
+
 def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
     """
     Importe le contenu du fichier vers nos modèles, en ne retenant que les
@@ -368,7 +382,10 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
             while Deck.objects.filter(slug=slug).exists():
                 slug = f"{slug_base}-{i}"
                 i += 1
-            deck = Deck.objects.create(nom=nom_propre, slug=slug, cree_par=utilisateur)
+            deck = Deck.objects.create(
+                nom=nom_propre, slug=slug, cree_par=utilisateur,
+                matiere=_deviner_matiere(nom_anki),
+            )
         cache_decks[nom_anki] = deck
         return deck
 
