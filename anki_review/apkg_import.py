@@ -373,7 +373,22 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
     def _obtenir_deck(nom_anki):
         if nom_anki in cache_decks:
             return cache_decks[nom_anki]
-        nom_propre = nom_anki.replace("::", " — ")  # paquets imbriqués Anki -> nom plat
+
+        matiere = _deviner_matiere(nom_anki)
+        nom_sans_matiere = nom_anki
+        if matiere:
+            # Le premier segment (avant "::") est déjà représenté par le
+            # champ `matiere` — on ne le garde pas en double dans le nom du
+            # paquet (sinon "Physique::Thermodynamique" deviendrait le
+            # paquet "Physique — Thermodynamique" DANS le groupe "Physique",
+            # redondant). Si rien ne reste après (paquet nommé exactement
+            # comme sa matière, sans sous-paquet), on garde le nom complet
+            # tel quel : Deck.nom ne peut pas être vide.
+            segments = nom_anki.split("::", 1)
+            if len(segments) > 1:
+                nom_sans_matiere = segments[1]
+
+        nom_propre = nom_sans_matiere.replace("::", " — ")  # sous-paquets Anki restants -> nom plat
         deck = Deck.objects.filter(nom=nom_propre, cree_par=utilisateur).first()
         if deck is None:
             slug_base = slugify(nom_propre) or "paquet"
@@ -382,10 +397,7 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
             while Deck.objects.filter(slug=slug).exists():
                 slug = f"{slug_base}-{i}"
                 i += 1
-            deck = Deck.objects.create(
-                nom=nom_propre, slug=slug, cree_par=utilisateur,
-                matiere=_deviner_matiere(nom_anki),
-            )
+            deck = Deck.objects.create(nom=nom_propre, slug=slug, cree_par=utilisateur, matiere=matiere)
         cache_decks[nom_anki] = deck
         return deck
 
