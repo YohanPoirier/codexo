@@ -36,6 +36,7 @@ fichiers) :
   reproduire fidèlement sans pouvoir tester contre le fichier réel).
 """
 import html
+import io
 import json
 import re
 import sqlite3
@@ -50,7 +51,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 from django.utils.text import slugify
 
-from .models import Activite, Card, Deck, Note
+from .models import Card, Deck, Note
 
 SEPARATEUR_CHAMPS = "\x1f"
 
@@ -75,7 +76,15 @@ def _ouvrir_base_sqlite(archive, dossier_tmp: Path) -> Path:
                 "Il faut installer le module manquant : pip install zstandard"
             )
         brut = archive.read("collection.anki21b")
-        decompresse = zstandard.ZstdDecompressor().decompress(brut)
+        # .decompress() a besoin que la taille du contenu décompressé soit
+        # inscrite dans l'en-tête de la frame zstd. Depuis Anki 2.1.50+, les
+        # .apkg sont écrits en streaming, sans cette taille dans l'en-tête,
+        # ce qui fait échouer .decompress() avec "could not determine
+        # content size in frame header". stream_reader() n'a pas besoin de
+        # connaître la taille à l'avance, donc gère les deux cas.
+        dctx = zstandard.ZstdDecompressor()
+        with dctx.stream_reader(io.BytesIO(brut)) as lecteur:
+            decompresse = lecteur.read()
         chemin = dossier_tmp / "collection.sqlite"
         chemin.write_bytes(decompresse)
         return chemin
@@ -290,10 +299,7 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
             nb_notes_creees += 1
 
         planning = planning_par_note.get(ligne["id"])
-        carte, carte_creee = Card.objects.get_or_create(note=note, etudiant=utilisateur)
-        if carte_creee:
-            # Une carte importée depuis un .apkg compte comme un ajout (page Trafic).
-            Activite.journaliser(utilisateur, Activite.Type.AJOUT, carte)
+        carte, _ = Card.objects.get_or_create(note=note, etudiant=utilisateur)
         if planning:
             ivl = planning["ivl"] or 0
             carte.intervalle_jours = abs(ivl) if ivl >= 0 else abs(ivl) / 86400
