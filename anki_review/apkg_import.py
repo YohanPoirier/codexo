@@ -69,22 +69,18 @@ def _ouvrir_base_sqlite(archive, dossier_tmp: Path) -> Path:
 
     if "collection.anki21b" in noms:
         try:
-            import zstandard
+            import zstandard  # noqa: F401 — juste pour vérifier la présence du module ici
         except ImportError:
             raise ErreurImportApkg(
                 "Ce fichier .apkg utilise un format compressé récent (zstd). "
                 "Il faut installer le module manquant : pip install zstandard"
             )
-        brut = archive.read("collection.anki21b")
-        # .decompress() a besoin que la taille du contenu décompressé soit
-        # inscrite dans l'en-tête de la frame zstd. Depuis Anki 2.1.50+, les
-        # .apkg sont écrits en streaming, sans cette taille dans l'en-tête,
-        # ce qui fait échouer .decompress() avec "could not determine
-        # content size in frame header". stream_reader() n'a pas besoin de
-        # connaître la taille à l'avance, donc gère les deux cas.
-        dctx = zstandard.ZstdDecompressor()
-        with dctx.stream_reader(io.BytesIO(brut)) as lecteur:
-            decompresse = lecteur.read()
+        # _decompresser_si_zstd() utilise stream_reader(), qui n'a pas besoin
+        # de connaître la taille décompressée à l'avance — contrairement à
+        # .decompress() seul, qui échoue sur les frames "récentes" (Anki
+        # 2.1.50+, écrites en streaming, sans cette taille dans l'en-tête)
+        # avec "could not determine content size in frame header".
+        decompresse = _decompresser_si_zstd(archive.read("collection.anki21b"))
         chemin = dossier_tmp / "collection.sqlite"
         chemin.write_bytes(decompresse)
         return chemin
@@ -98,12 +94,96 @@ def _ouvrir_base_sqlite(archive, dossier_tmp: Path) -> Path:
     raise ErreurImportApkg("Fichier .apkg invalide : aucune base de collection trouvée à l'intérieur.")
 
 
+_SIGNATURE_ZSTD = b"\x28\xb5\x2f\xfd"
+
+
+def _decompresser_si_zstd(brut: bytes) -> bytes:
+    """Décompresse `brut` s'il commence par la signature zstd, sinon le
+    renvoie inchangé. stream_reader() n'a pas besoin de connaître la taille
+    décompressée à l'avance (cf. _ouvrir_base_sqlite), donc gère aussi bien
+    les frames "récentes" (sans taille dans l'en-tête) que les anciennes."""
+    if brut[:4] != _SIGNATURE_ZSTD:
+        return brut
+    import zstandard
+    dctx = zstandard.ZstdDecompressor()
+    with dctx.stream_reader(io.BytesIO(brut)) as lecteur:
+        return lecteur.read()
+
+
+def _lire_varint(donnees: bytes, pos: int):
+    """Lit un varint Protobuf à partir de `pos` ; renvoie (valeur, nouvelle_pos)."""
+    resultat = 0
+    decalage = 0
+    while True:
+        octet = donnees[pos]
+        pos += 1
+        resultat |= (octet & 0x7F) << decalage
+        if not (octet & 0x80):
+            return resultat, pos
+        decalage += 7
+
+
+def _lire_nom_media_entry(sous_message: bytes):
+    """Extrait le champ 1 (name, string) d'un message Protobuf MediaEntry ;
+    les autres champs (size, sha1) sont ignorés — on n'en a pas besoin."""
+    pos = 0
+    taille_totale = len(sous_message)
+    while pos < taille_totale:
+        etiquette, pos = _lire_varint(sous_message, pos)
+        champ, type_fil = etiquette >> 3, etiquette & 0x7
+        if type_fil == 2:  # length-delimited (string/bytes/sous-message)
+            taille, pos = _lire_varint(sous_message, pos)
+            valeur = sous_message[pos:pos + taille]
+            pos += taille
+            if champ == 1:
+                return valeur.decode("utf-8")
+        elif type_fil == 0:  # varint
+            _, pos = _lire_varint(sous_message, pos)
+        elif type_fil == 1:  # 64 bits fixe
+            pos += 8
+        elif type_fil == 5:  # 32 bits fixe
+            pos += 4
+        else:
+            return None
+    return None
+
+
+def _lire_media_protobuf(brut: bytes) -> dict:
+    """Parse le message Protobuf `MediaEntries` (format récent d'Anki,
+    remplace le JSON des versions plus anciennes) : une liste de
+    MediaEntry (champ 1, répété), chacun contenant au moins un nom (champ
+    1, string) — l'index dans la liste correspond au nom de fichier numéroté
+    dans l'archive (0, 1, 2...), exactement comme les clés du JSON legacy."""
+    pos = 0
+    taille_totale = len(brut)
+    noms = []
+    while pos < taille_totale:
+        etiquette, pos = _lire_varint(brut, pos)
+        champ, type_fil = etiquette >> 3, etiquette & 0x7
+        if type_fil != 2:
+            raise ErreurImportApkg("Format du fichier media (Protobuf) non reconnu.")
+        taille, pos = _lire_varint(brut, pos)
+        valeur = brut[pos:pos + taille]
+        pos += taille
+        if champ == 1:
+            noms.append(_lire_nom_media_entry(valeur))
+    return {str(i): nom for i, nom in enumerate(noms) if nom is not None}
+
+
 def _lire_media(archive) -> dict:
     """Renvoie {nom_original: contenu_binaire} pour chaque fichier média de
-    l'archive, à partir du fichier "media" (JSON {"0": "nom.jpg", ...})."""
+    l'archive, à partir du fichier "media". Ce fichier a deux formats
+    possibles selon la version d'Anki ayant fait l'export :
+    - ancien : JSON en clair, {"0": "nom.jpg", ...} ;
+    - récent : compressé zstd, contenant un message Protobuf MediaEntries
+      plutôt que du JSON (cf. _lire_media_protobuf)."""
     if "media" not in archive.namelist():
         return {}
-    mapping = json.loads(archive.read("media").decode("utf-8"))
+    brut = _decompresser_si_zstd(archive.read("media"))
+    try:
+        mapping = json.loads(brut.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        mapping = _lire_media_protobuf(brut)
     resultat = {}
     for numero, nom_original in mapping.items():
         if numero in archive.namelist():
