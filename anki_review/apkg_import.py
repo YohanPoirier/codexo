@@ -217,6 +217,45 @@ def _sauver_medias_references(html_texte: str, medias: dict, medias_deja_sauves:
     return _RE_IMG_SRC.sub(remplacer, html_texte)
 
 
+def _lire_modeles(curseur, models_brut) -> dict:
+    """Renvoie {mid (str): {"name": ...}} (et "type" si disponible), pour
+    repérer les notes Cloze par nom ensuite. Sur les schémas anciens,
+    col.models contient directement ce JSON ; sur les schémas récents,
+    cette colonne est vide et les types de note vivent dans leur propre
+    table `notetypes` — leur config (Protobuf) n'est pas décodée ici, donc
+    seul le nom est récupéré (suffisant pour la détection Cloze par nom,
+    déjà utilisée en complément du champ "type" absent sur ce schéma)."""
+    if models_brut:
+        try:
+            return json.loads(models_brut)
+        except json.JSONDecodeError:
+            pass
+    curseur.execute("SELECT id, name FROM notetypes")
+    return {str(ligne["id"]): {"name": ligne["name"]} for ligne in curseur.fetchall()}
+
+
+def _lire_decks(curseur, decks_brut) -> dict:
+    """Renvoie {did (str): {"name": ...}} — même bascule que _lire_modeles :
+    col.decks JSON sur les schémas anciens, table `decks` (colonne `name`
+    en clair, pas de Protobuf à décoder ici) sur les schémas récents.
+
+    Sur ce schéma récent, un nom de paquet imbriqué ("Physique" >
+    "Thermodynamique") est stocké avec le même séparateur \\x1f que les
+    champs d'une note, plutôt que "::" comme dans le JSON de l'ancien
+    schéma — normalisé ici vers "::" pour que le reste du code (qui ne
+    connaît que "::", cf. importer_apkg) n'ait pas à distinguer les deux."""
+    if decks_brut:
+        try:
+            return json.loads(decks_brut)
+        except json.JSONDecodeError:
+            pass
+    curseur.execute("SELECT id, name FROM decks")
+    return {
+        str(ligne["id"]): {"name": ligne["name"].replace(SEPARATEUR_CHAMPS, "::")}
+        for ligne in curseur.fetchall()
+    }
+
+
 def _lire_contenu_brut(fichier_django):
     """
     Ouvre le fichier .apkg et renvoie toutes les données lues depuis le
@@ -247,8 +286,8 @@ def _lire_contenu_brut(fichier_django):
             connexion.close()
             raise ErreurImportApkg("Fichier .apkg invalide : table de collection vide.")
 
-        modeles = json.loads(ligne_col["models"])
-        decks_anki = json.loads(ligne_col["decks"])
+        modeles = _lire_modeles(curseur, ligne_col["models"])
+        decks_anki = _lire_decks(curseur, ligne_col["decks"])
 
         ids_modeles_cloze = {
             mid for mid, m in modeles.items()
