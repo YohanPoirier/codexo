@@ -257,8 +257,17 @@ header.anki-site nav a:hover { color: var(--anki-accent-deep); }
   cursor: pointer; list-style: none;
 }
 .ie-groupe-entete::-webkit-details-marker { display: none; }
-.ie-groupe-entete .edition-ligne-meta::after { content: " ▸"; }
-details[open] > .ie-groupe-entete .edition-ligne-meta::after { content: " ▾"; }
+/* Flèche de dépliement : à gauche du texte des métadonnées (ex. "34 cartes
+   à réviser") plutôt qu'après, et plus grande — plus visible qu'un simple
+   petit triangle en bout de ligne. Rotation plutôt que changement de
+   glyphe pour l'état ouvert, comme ailleurs sur le site (voir
+   .stats-theme-summary côté exercises). */
+.ie-groupe-entete .edition-ligne-meta::before {
+  content: "▸"; display: inline-block; font-size: 1.3rem; line-height: 1;
+  margin-right: 8px; color: var(--anki-accent); vertical-align: -3px;
+  transition: transform .12s ease;
+}
+details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotate(90deg); }
 .ie-groupe-entete:hover { filter: brightness(0.97); }
 
 /* Bouton d'action sur fond coloré (paquet/carte) — plein, pas juste une
