@@ -400,6 +400,19 @@ const richeReponse = document.getElementById('riche_reponse');
 chargerContenuInitial(richeQuestion);
 chargerContenuInitial(richeReponse);
 
+// KaTeX est chargé en `defer` dans <head> : à l'exécution de ce script
+// inline (pendant le parsing du body), `window.katex` n'existe pas encore,
+// donc les chips créées ci-dessus affichent le texte brut. On les re-rend
+// dès que KaTeX est disponible.
+function rerendreChipsQuandKatexPret() {
+  if (window.katex) {
+    document.querySelectorAll('.latex-chip').forEach(rendreChip);
+  } else {
+    setTimeout(rerendreChipsQuandKatexPret, 50);
+  }
+}
+rerendreChipsQuandKatexPret();
+
 [richeQuestion, richeReponse].forEach(editable => {
   editable.addEventListener('input', () => {
     convertirLatexEnChips(editable);
