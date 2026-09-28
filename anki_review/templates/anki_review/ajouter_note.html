@@ -224,6 +224,7 @@ function rendreChip(chip) {
   chip.appendChild(zone);
   const source = chip.dataset.latex || '';
   const enBloc = source.startsWith('\\[');
+  chip.classList.toggle('latex-chip--bloc', enBloc);
   const expression = source.replace(/^\\\[|\\\]$|^\\\(|\\\)$/g, '');
   if (window.katex && expression.trim()) {
     try {
@@ -374,6 +375,8 @@ function extraireHtmlBrut(editable) {
   clone.querySelectorAll('img').forEach(img => {
     if (img.dataset.nomFichier) img.setAttribute('src', img.dataset.nomFichier);
     img.removeAttribute('data-nom-fichier');
+    img.classList.remove('img-selectionnee');
+    if (!img.getAttribute('class')) img.removeAttribute('class');
   });
   return clone.innerHTML;
 }
@@ -426,6 +429,100 @@ rerendreChipsQuandKatexPret();
 document.getElementById('form-note').addEventListener('submit', () => {
   synchroniserTextarea(richeQuestion);
   synchroniserTextarea(richeReponse);
+});
+
+// --- Redimensionnement d'une image (façon Word) : clic sur l'image pour la
+// sélectionner, puis glisser une des deux poignées latérales. La taille est enregistrée
+// dans l'attribut `width` (en px) de la balise <img> : elle est donc
+// conservée telle quelle à la révision. Les images étant centrées, le bord
+// bouge de moitié moins que la largeur : on double le déplacement de la
+// souris pour que la poignée reste sous le curseur. ---
+const cadreRedim = document.createElement('div');
+cadreRedim.className = 'img-redim';
+cadreRedim.hidden = true;
+['w', 'e'].forEach(coin => {
+  const poignee = document.createElement('span');
+  poignee.className = 'img-redim-poignee';
+  poignee.dataset.coin = coin;
+  cadreRedim.appendChild(poignee);
+});
+const etiquetteRedim = document.createElement('span');
+etiquetteRedim.className = 'img-redim-etiquette';
+cadreRedim.appendChild(etiquetteRedim);
+document.body.appendChild(cadreRedim);
+
+let imageSelectionnee = null;
+
+function positionnerCadreRedim() {
+  if (!imageSelectionnee || !imageSelectionnee.isConnected) { deselectionnerImage(); return; }
+  const r = imageSelectionnee.getBoundingClientRect();
+  cadreRedim.style.left = (r.left + window.scrollX) + 'px';
+  cadreRedim.style.top = (r.top + window.scrollY) + 'px';
+  cadreRedim.style.width = r.width + 'px';
+  cadreRedim.style.height = r.height + 'px';
+  etiquetteRedim.textContent = Math.round(r.width) + ' px';
+}
+
+function selectionnerImage(img) {
+  if (imageSelectionnee && imageSelectionnee !== img) imageSelectionnee.classList.remove('img-selectionnee');
+  imageSelectionnee = img;
+  img.classList.add('img-selectionnee');
+  cadreRedim.hidden = false;
+  positionnerCadreRedim();
+}
+
+function deselectionnerImage() {
+  if (imageSelectionnee) imageSelectionnee.classList.remove('img-selectionnee');
+  imageSelectionnee = null;
+  cadreRedim.hidden = true;
+}
+
+[document.getElementById('riche_question'), document.getElementById('riche_reponse')].forEach(editable => {
+  editable.addEventListener('click', (e) => {
+    if (e.target.tagName === 'IMG') selectionnerImage(e.target);
+  });
+  editable.addEventListener('input', () => {
+    if (imageSelectionnee) positionnerCadreRedim();
+  });
+});
+
+document.addEventListener('mousedown', (e) => {
+  if (!imageSelectionnee) return;
+  if (e.target === imageSelectionnee || cadreRedim.contains(e.target)) return;
+  deselectionnerImage();
+});
+window.addEventListener('scroll', () => { if (imageSelectionnee) positionnerCadreRedim(); }, true);
+window.addEventListener('resize', () => { if (imageSelectionnee) positionnerCadreRedim(); });
+
+cadreRedim.querySelectorAll('.img-redim-poignee').forEach(poignee => {
+  poignee.addEventListener('pointerdown', (e) => {
+    if (!imageSelectionnee) return;
+    e.preventDefault();
+    poignee.setPointerCapture(e.pointerId);
+    const img = imageSelectionnee;
+    const editable = img.closest('.editeur-riche');
+    const departX = e.clientX;
+    const largeurDepart = img.getBoundingClientRect().width;
+    const sensGauche = poignee.dataset.coin === 'w';
+    const largeurMax = editable.clientWidth - 28; // moins le padding
+
+    function deplacer(ev) {
+      const dx = (ev.clientX - departX) * (sensGauche ? -2 : 2);
+      const largeur = Math.max(40, Math.min(largeurMax, Math.round(largeurDepart + dx)));
+      img.removeAttribute('height');
+      img.setAttribute('width', largeur);
+      positionnerCadreRedim();
+    }
+    function terminer() {
+      poignee.removeEventListener('pointermove', deplacer);
+      poignee.removeEventListener('pointerup', terminer);
+      poignee.removeEventListener('pointercancel', terminer);
+      synchroniserTextarea(editable);
+    }
+    poignee.addEventListener('pointermove', deplacer);
+    poignee.addEventListener('pointerup', terminer);
+    poignee.addEventListener('pointercancel', terminer);
+  });
 });
 
 // --- Barre d'outils de mise en forme : s'applique à la zone éditable qui

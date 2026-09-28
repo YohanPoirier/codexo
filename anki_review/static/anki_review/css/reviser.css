@@ -119,8 +119,10 @@ body.fullscreen-app {
 .reponse-contenu { padding: 20px 26px 24px; white-space: pre-line; text-align: left; }
 .reviser-card img {
   max-width: 100%;
+  height: auto;
   border-radius: 6px;
-  margin: 10px 0;
+  margin: 10px auto;
+  display: block;
 }
 .reviser-card ul, .reviser-card ol { text-align: left; margin: 8px 0; padding-left: 22px; }
 

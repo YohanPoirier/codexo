@@ -92,7 +92,8 @@ header.anki-site nav a:hover { color: var(--anki-accent-deep); }
   outline: none; border-color: var(--indigo);
   box-shadow: 0 0 0 3px rgba(43, 58, 103, .18);
 }
-.editeur-riche img { max-width: 100%; border-radius: 6px; margin: 6px 0; }
+.editeur-riche img { max-width: 100%; height: auto; border-radius: 6px; margin: 6px auto; display: block; cursor: pointer; }
+.editeur-riche img.img-selectionnee { outline: 2px solid var(--indigo); outline-offset: 1px; }
 .editeur-riche ul, .editeur-riche ol { margin: 6px 0; padding-left: 22px; }
 /* Même alignement par défaut que l'écran de révision (cf. reviser.css) :
    question centrée, réponse à gauche. */
@@ -108,6 +109,29 @@ header.anki-site nav a:hover { color: var(--anki-accent-deep); }
 }
 .latex-chip:hover { background: var(--rule); border-color: var(--ink-soft); }
 .latex-chip .katex { font-size: 1em; }
+/* Formule "centrée sur sa ligne" (\[ ... \]) : la puce occupe toute la
+   largeur et centre son contenu, comme à la révision. */
+.latex-chip--bloc { display: block; text-align: center; margin: 6px 0; }
+.latex-chip--bloc .katex-display { margin: .2em 0; }
+
+/* Poignées de redimensionnement d'une image (façon Word) */
+.img-redim {
+  position: absolute; z-index: 40; pointer-events: none;
+  border: 1.5px solid var(--indigo); box-sizing: border-box;
+}
+.img-redim[hidden] { display: none; }
+.img-redim-poignee {
+  position: absolute; width: 12px; height: 12px; box-sizing: border-box;
+  background: #fff; border: 2px solid var(--indigo); border-radius: 3px;
+  pointer-events: auto; touch-action: none;
+}
+.img-redim-poignee[data-coin="w"] { left: -7px; top: 50%; margin-top: -6px; cursor: ew-resize; }
+.img-redim-poignee[data-coin="e"] { right: -7px; top: 50%; margin-top: -6px; cursor: ew-resize; }
+.img-redim-etiquette {
+  position: absolute; left: 50%; bottom: -26px; transform: translateX(-50%);
+  background: var(--indigo); color: #fff; font-size: .72rem; padding: 2px 8px;
+  border-radius: 4px; white-space: nowrap; pointer-events: none;
+}
 
 /* Popup flottante d'édition d'une formule LaTeX */
 .latex-popup {
@@ -218,7 +242,7 @@ header.anki-site nav a:hover { color: var(--anki-accent-deep); }
   content: "…"; color: var(--rule);
 }
 .editeur-preview-reponse { font-size: 1.05rem; line-height: 1.55; color: var(--ink); white-space: pre-line; text-align: left; }
-.editeur-preview img { max-width: 100%; border-radius: 6px; margin: 6px 0; }
+.editeur-preview img { max-width: 100%; height: auto; border-radius: 6px; margin: 6px auto; display: block; }
 .editeur-preview ul, .editeur-preview ol { text-align: left; margin: 8px 0; padding-left: 22px; }
 
 /* --- Page Édition : listes de paquets / cartes avec icônes modifier/supprimer --- */
@@ -416,7 +440,7 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
    560px, moins la bordure et le padding de .question-bloc/.reponse-contenu
    dans reviser.css) — pour qu'une image ne paraisse pas plus grande ici
    qu'au moment de réviser. */
-.ie-apercu img { max-width: min(506px, 100%); border-radius: 6px; }
+.ie-apercu img { max-width: min(506px, 100%); height: auto; border-radius: 6px; display: block; margin: 6px auto; }
 
 .ie-groupe { margin-bottom: 10px; }
 /* Nichés sous une matière, les paquets se suivent sans aucun espace — la
