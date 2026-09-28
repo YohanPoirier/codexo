@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Trafic — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow">Admin</span>
+<h1>Trafic</h1>
+
+<nav class="trafic-periodes" aria-label="Période affichée">
+  {% for p in periodes %}
+    <a href="?jours={{ p }}" class="trafic-periode{% if p == periode %} trafic-periode--active{% endif %}"
+       {% if p == periode %}aria-current="true"{% endif %}>{{ p }} jours</a>
+  {% endfor %}
+</nav>
+
+{% for jour in jours %}
+  <details class="stats-theme-group trafic-jour" {% if forloop.first %}open{% endif %}>
+    <summary class="stats-theme-summary trafic-jour-entete">
+      <span>{% if jour.date == aujourd_hui %}Aujourd'hui{% else %}{{ jour.date|date:"l j F"|capfirst }}{% endif %}</span>
+      <span class="trafic-totaux">
+        <span><strong>{{ jour.totaux.tentative }}</strong> tentative{{ jour.totaux.tentative|pluralize }}</span>
+        <span><strong>{{ jour.totaux.fini }}</strong> exercice{{ jour.totaux.fini|pluralize }} fini{{ jour.totaux.fini|pluralize }}</span>
+        <span><strong>{{ jour.totaux.abandon }}</strong> abandon{{ jour.totaux.abandon|pluralize }}</span>
+      </span>
+    </summary>
+    <div class="table-scroll">
+      <table class="stats-table trafic-tableau">
+        <thead>
+          <tr>
+            <th>Étudiant</th>
+            <th class="stats-cell-center">Tentatives</th>
+            <th class="stats-cell-center">Finis</th>
+            <th class="stats-cell-center">Abandons</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in jour.detail %}
+            <tr>
+              <td>
+                {{ d.etudiant.display_name|default:d.etudiant.identifiant }}
+                {% if d.etudiant.classe %}<span class="trafic-classe">{{ d.etudiant.classe.name }}</span>{% endif %}
+              </td>
+              <td class="stats-cell-center{% if not d.tentative %} trafic-zero{% endif %}">{{ d.tentative }}</td>
+              <td class="stats-cell-center{% if not d.fini %} trafic-zero{% endif %}">{{ d.fini }}</td>
+              <td class="stats-cell-center{% if not d.abandon %} trafic-zero{% endif %}">{{ d.abandon }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+{% empty %}
+  <p class="trafic-vide">Aucune activité étudiante sur les {{ periode }} derniers jours.</p>
+{% endfor %}
+{% endblock %}

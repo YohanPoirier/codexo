@@ -38,6 +38,7 @@
             <div class="nav-dropdown-menu">
               <a href="/admin/">Administration Django</a>
               <a href="{% url 'stats' %}">Statistiques</a>
+              <a href="{% url 'trafic' %}">Trafic</a>
               <a href="{% url 'classe_visibility' %}">Visibilité</a>
               <a href="{% url 'importer_eleves' %}">Import CSV élèves</a>
               <a href="{% url 'demandes_reinitialisation' %}">Demandes de mot de passe{% if a_demandes_reinitialisation_en_attente %}<span class="nav-badge-dot" title="Demande en attente"></span>{% endif %}</a>

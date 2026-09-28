@@ -1,12 +1,13 @@
 import itertools
 import json
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Sum
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncDate
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -446,6 +447,101 @@ def stats(request):
             "grouped_rows": grouped_rows,
         },
     )
+
+
+# Périodes proposées sur la page Trafic (en jours) — la première est celle
+# affichée par défaut.
+PERIODES_TRAFIC = [30, 7, 90]
+
+
+@staff_member_required
+def trafic(request):
+    """
+    Page réservée aux profs : pour chaque jour de la période, le nombre de
+    tentatives, d'exercices terminés (réussis) et d'abandons (corrigé
+    consulté), avec le détail par étudiant dans une liste déroulante.
+
+    Contrairement à "Statistiques" (compte d'exercices distincts réussis/
+    essayés au total), ici chaque événement compte à chaque fois qu'il se
+    produit : un exercice réussi deux fois le même jour compte deux fois —
+    c'est un journal d'activité, pas un état final. Seuls apparaissent les
+    jours et les étudiants ayant eu au moins un événement ; l'activité du
+    staff n'est pas comptée. Les jours sont découpés à l'heure de Paris
+    (TruncDate suit TIME_ZONE).
+    """
+    try:
+        periode = int(request.GET.get("jours", PERIODES_TRAFIC[0]))
+    except ValueError:
+        periode = PERIODES_TRAFIC[0]
+    if periode not in PERIODES_TRAFIC:
+        periode = PERIODES_TRAFIC[0]
+
+    # Minuit (heure locale) du premier jour de la période, aujourd'hui inclus.
+    aujourd_hui = timezone.localdate()
+    debut = timezone.make_aware(
+        datetime.combine(aujourd_hui - timedelta(days=periode - 1), time.min)
+    )
+
+    # jour -> {"totaux": {type: nb}, "etudiants": {user_id: {type: nb}}}
+    types = ["tentative", "fini", "abandon"]
+    jours = {}
+
+    def _ajouter(lignes, type_):
+        for ligne in lignes:
+            jour = jours.setdefault(ligne["jour"], {"totaux": dict.fromkeys(types, 0), "etudiants": {}})
+            jour["totaux"][type_] += ligne["nb"]
+            compteurs = jour["etudiants"].setdefault(ligne["user_id"], dict.fromkeys(types, 0))
+            compteurs[type_] += ligne["nb"]
+
+    tentatives = (
+        Result.objects.filter(created_at__gte=debut, is_attempt=True, user__is_staff=False)
+        .annotate(jour=TruncDate("created_at"))
+        .values("jour", "user_id")
+        .annotate(nb=Count("id"))
+    )
+    _ajouter(tentatives, "tentative")
+
+    finis = (
+        Result.objects.filter(created_at__gte=debut, is_attempt=True, success=True, user__is_staff=False)
+        .annotate(jour=TruncDate("created_at"))
+        .values("jour", "user_id")
+        .annotate(nb=Count("id"))
+    )
+    _ajouter(finis, "fini")
+
+    abandons = (
+        Abandonment.objects.filter(created_at__gte=debut, user__is_staff=False)
+        .annotate(jour=TruncDate("created_at"))
+        .values("jour", "user_id")
+        .annotate(nb=Count("id"))
+    )
+    _ajouter(abandons, "abandon")
+
+    # Une seule requête pour les noms (et classes) de tous les étudiants concernés.
+    ids = {uid for jour in jours.values() for uid in jour["etudiants"]}
+    etudiants = {u.id: u for u in User.objects.filter(id__in=ids).select_related("classe")}
+
+    jours_affiches = []
+    for date_jour in sorted(jours, reverse=True):
+        jour = jours[date_jour]
+        detail = [
+            {"etudiant": etudiants[uid], **compteurs}
+            for uid, compteurs in jour["etudiants"].items()
+            if uid in etudiants
+        ]
+        # Tri par classe puis par nom, pour retrouver facilement un élève.
+        detail.sort(key=lambda d: (
+            d["etudiant"].classe.name if d["etudiant"].classe else "",
+            str(d["etudiant"]).lower(),
+        ))
+        jours_affiches.append({"date": date_jour, "totaux": jour["totaux"], "detail": detail})
+
+    return render(request, "exercises/trafic.html", {
+        "jours": jours_affiches,
+        "periode": periode,
+        "periodes": sorted(PERIODES_TRAFIC),
+        "aujourd_hui": aujourd_hui,
+    })
 
 
 @staff_member_required
