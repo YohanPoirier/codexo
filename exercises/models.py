@@ -460,8 +460,8 @@ class TestCase(models.Model):
 
 class Abandonment(models.Model):
     """Enregistre qu'un étudiant a choisi d'abandonner un exercice pour voir la solution.
-    Utilisé pour verrouiller une nouvelle tentative pendant 48h (voir ABANDON_LOCK_DURATION
-    dans exercises/views.py) : le temps de digérer la solution plutôt que de la recopier
+    Utilisé pour verrouiller une nouvelle tentative pendant ABANDON_LOCK_DURATION (voir
+    exercises/views.py) : le temps de digérer la solution plutôt que de la recopier
     immédiatement pour valider l'exercice sans l'avoir vraiment compris."""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="abandonments", on_delete=models.CASCADE)

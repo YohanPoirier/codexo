@@ -18,12 +18,22 @@ from .models import Theme, Exercise, Result, Abandonment, Hint, HintReveal, Dema
 
 # Durée pendant laquelle un exercice est verrouillé après un abandon (voir abandon_exercise
 # ci-dessous). Passé ce délai, l'étudiant peut retenter l'exercice normalement.
-ABANDON_LOCK_DURATION = timedelta(hours=2)
+ABANDON_LOCK_DURATION = timedelta(minutes=30)
 
 # En local (DEBUG=True), le verrou est désactivé pour ne pas gêner les tests/débogage :
 # un abandon est toujours enregistré en base, mais il ne bloque jamais l'accès à l'exercice.
 # En production (DEBUG=False), le verrou reste actif normalement pour les étudiants.
 ABANDON_LOCK_ENABLED = not settings.DEBUG
+
+# Temps maximum (en secondes) qu'un seul envoi de submit_result peut ajouter à
+# Result.time_seconds. Filet de sécurité côté serveur : le calcul du temps passé
+# se fait côté navigateur (voir exercise.js), qui resynchronise normalement son
+# chrono quand l'onglet revient au premier plan après une pause — mais un cas
+# limite qui lui échapperait (mise en veille système, navigateur ne déclenchant
+# pas l'événement de façon fiable...) pourrait sinon faire remonter des durées
+# aberrantes (ex: un exercice "fini" en 15h) qui fausseraient les stats et la
+# page Trafic. 1h par envoi est largement suffisant pour un exercice normal.
+TEMPS_MAX_PAR_ENVOI_SECONDES = 3600
 
 
 def superuser_required(view_func):
@@ -163,7 +173,7 @@ def exercise_detail(request, theme_slug, exercise_slug):
 @login_required
 def abandon_exercise(request, exercise_id):
     """Enregistre l'abandon d'un exercice (l'étudiant a confirmé vouloir voir la solution).
-    Verrouille l'exercice pendant ABANDON_LOCK_DURATION (2h) : il ne sera alors même plus
+    Verrouille l'exercice pendant ABANDON_LOCK_DURATION : il ne sera alors même plus
     consultable (voir exercise_detail), à l'exception de cet instant précis, où la solution
     s'affiche une seule fois (drapeau de session 'just_abandoned_exercise_id').
 
@@ -243,7 +253,7 @@ def submit_result(request, exercise_id):
         submitted_code = payload.get("code", "")
         success = bool(payload.get("success", False))
         is_attempt = bool(payload.get("is_attempt", False))
-        time_seconds = int(payload.get("time_seconds") or 0)
+        time_seconds = min(int(payload.get("time_seconds") or 0), TEMPS_MAX_PAR_ENVOI_SECONDES)
     else:
         # navigator.sendBeacon() envoie les données au format formulaire classique
         # (application/x-www-form-urlencoded), pas en JSON — utilisé pour la sauvegarde
@@ -253,7 +263,7 @@ def submit_result(request, exercise_id):
         submitted_code = request.POST.get("code", "")
         success = request.POST.get("success") in ("true", "1", "True")
         is_attempt = request.POST.get("is_attempt") in ("true", "1", "True")
-        time_seconds = int(request.POST.get("time_seconds") or 0)
+        time_seconds = min(int(request.POST.get("time_seconds") or 0), TEMPS_MAX_PAR_ENVOI_SECONDES)
 
     Result.objects.create(
         user=request.user,

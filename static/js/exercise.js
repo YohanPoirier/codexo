@@ -492,7 +492,19 @@ __RESULTS__ = __EXEC_NS__["__RESULTS__"]
 
   window.addEventListener("pagehide", saveDraftOnLeave);
   document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "hidden") saveDraftOnLeave();
+    if (document.visibilityState === "hidden") {
+      saveDraftOnLeave();
+    } else {
+      // Onglet redevenu visible après une pause (parfois très longue : nuit,
+      // écran verrouillé, ordinateur en veille...). Sans ce reset, le prochain
+      // submitResult() calculerait le temps écoulé depuis le DERNIER passage en
+      // arrière-plan, qui inclut toute la durée où l'onglet était caché — un
+      // exercice repris le lendemain matin se voit alors crédité de plusieurs
+      // heures de "temps passé". On resynchronise donc le point de départ du
+      // chrono ici, sans envoyer de sauvegarde (rien de nouveau à enregistrer,
+      // juste remettre le compteur à zéro).
+      lastCheckpoint = Date.now();
+    }
   });
 
   // Bouton disquette : enregistrement manuel explicite, sur simple clic.
