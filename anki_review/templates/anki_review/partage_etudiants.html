@@ -36,9 +36,9 @@
     <summary class="ie-groupe-entete edition-ligne edition-ligne--paquet">
       <div class="ie-ligne-gauche">
         {% if groupe.tout_deja %}
-          <span class="ie-voyant ie-voyant--identique" title="Tu as déjà tout ce paquet"></span>
+          <span class="ie-voyant ie-voyant--identique js-voyant-groupe" title="Tu as déjà tout ce paquet"></span>
         {% else %}
-          <span class="ie-voyant ie-voyant--absente" title="Une ou plusieurs cartes te manquent"></span>
+          <span class="ie-voyant ie-voyant--absente js-voyant-groupe" title="Une ou plusieurs cartes te manquent"></span>
         {% endif %}
         <div class="edition-ligne-titre">
           <span>{{ groupe.deck.nom }}</span>
@@ -47,7 +47,7 @@
       </div>
       <div class="edition-actions" onclick="event.stopPropagation()">
         {% if not user.is_staff and not groupe.tout_deja %}
-          <form method="post" action="{% url 'anki_review:ajouter_paquet_partage' groupe.deck.id groupe.cree_par.id %}" style="display:contents;">
+          <form method="post" action="{% url 'anki_review:ajouter_paquet_partage' groupe.deck.id groupe.cree_par.id %}" class="js-ajout-paquet" style="display:contents;">
             {% csrf_token %}
             <button type="submit" class="ie-btn-action">Tout ajouter</button>
           </form>
@@ -68,7 +68,7 @@
               👁️
             </button>
             {% if not user.is_staff and item.statut == 'absente' %}
-              <form method="post" action="{% url 'anki_review:ajouter_carte_partagee' item.note.id %}" style="display:contents;">
+              <form method="post" action="{% url 'anki_review:ajouter_carte_partagee' item.note.id %}" class="js-ajout-note" style="display:contents;">
                 {% csrf_token %}
                 <button type="submit" class="ie-btn-action">Ajouter</button>
               </form>
@@ -106,6 +106,108 @@ document.querySelectorAll('details.ie-groupe').forEach(details => {
   if (sessionStorage.getItem(cle) === 'open') details.open = true;
   details.addEventListener('toggle', () => {
     sessionStorage.setItem(cle, details.open ? 'open' : 'closed');
+  });
+});
+
+// Partager / ne plus partager : requête asynchrone, la page ne se recharge
+// pas (elle ne remonte donc plus en haut, pratique pour enchaîner plusieurs
+// cartes). Sans JavaScript, les formulaires restent des POST classiques.
+function majBoutonNote(bouton, partagee) {
+  bouton.dataset.partagee = partagee ? '1' : '0';
+  bouton.textContent = partagee ? 'Ne plus partager' : 'Partager';
+}
+
+function majBoutonPaquet(details) {
+  const boutonPaquet = details.querySelector('.js-partage-paquet button');
+  if (!boutonPaquet) return;
+  const boutonsNotes = [...details.querySelectorAll('.js-partage-note button')];
+  const toutes = boutonsNotes.length > 0 && boutonsNotes.every(b => b.dataset.partagee === '1');
+  boutonPaquet.dataset.partagee = toutes ? '1' : '0';
+  boutonPaquet.textContent = toutes ? 'Tout retirer' : 'Tout partager';
+}
+
+async function envoyerPartage(form) {
+  const bouton = form.querySelector('button');
+  bouton.disabled = true;
+  try {
+    const reponse = await fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    });
+    if (!reponse.ok) throw new Error('HTTP ' + reponse.status);
+    const { partagee } = await reponse.json();
+    const details = form.closest('details.ie-groupe');
+    if (form.classList.contains('js-partage-paquet')) {
+      details.querySelectorAll('.js-partage-note button').forEach(b => majBoutonNote(b, partagee));
+    } else {
+      majBoutonNote(bouton, partagee);
+    }
+    majBoutonPaquet(details);
+  } catch (err) {
+    console.error(err);
+    alert("Le partage a échoué (" + err.message + "). Recharge la page et réessaie.");
+  } finally {
+    bouton.disabled = false;
+  }
+}
+
+document.querySelectorAll('form.js-partage-note, form.js-partage-paquet').forEach(form => {
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    envoyerPartage(form);
+  });
+});
+
+// Ajouter une carte / tout un paquet : même principe (pas de rechargement).
+function marquerNoteAjoutee(form) {
+  const ligne = form.closest('li');
+  const voyant = ligne.querySelector('.ie-voyant');
+  voyant.classList.replace('ie-voyant--absente', 'ie-voyant--identique');
+  voyant.title = 'Déjà dans ta révision';
+  form.remove();
+}
+
+function majGroupeAjout(details) {
+  if (details.querySelector('.js-ajout-note')) return; // il reste des cartes à ajouter
+  const voyant = details.querySelector('.js-voyant-groupe');
+  if (voyant) {
+    voyant.classList.replace('ie-voyant--absente', 'ie-voyant--identique');
+    voyant.title = 'Tu as déjà tout ce paquet';
+  }
+  const boutonPaquet = details.querySelector('.js-ajout-paquet');
+  if (boutonPaquet) boutonPaquet.remove();
+}
+
+async function envoyerAjout(form) {
+  const bouton = form.querySelector('button');
+  bouton.disabled = true;
+  try {
+    const reponse = await fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    });
+    if (!reponse.ok) throw new Error('HTTP ' + reponse.status);
+    await reponse.json();
+    const details = form.closest('details.ie-groupe');
+    if (form.classList.contains('js-ajout-paquet')) {
+      details.querySelectorAll('.js-ajout-note').forEach(marquerNoteAjoutee);
+    } else {
+      marquerNoteAjoutee(form);
+    }
+    majGroupeAjout(details);
+  } catch (err) {
+    console.error(err);
+    bouton.disabled = false;
+    alert("L'ajout a échoué (" + err.message + "). Recharge la page et réessaie.");
+  }
+}
+
+document.querySelectorAll('form.js-ajout-note, form.js-ajout-paquet').forEach(form => {
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    envoyerAjout(form);
   });
 });
 

@@ -919,6 +919,12 @@ def partage_etudiants(request):
     })
 
 
+def _est_ajax(request):
+    """Requête envoyée par fetch() depuis la page (en-tête posé par notre JS) :
+    on répond en JSON au lieu de rediriger, pour ne pas recharger la page."""
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+
 @login_required
 def partager_paquet_toggle(request, deck_id):
     """Partage ou retire du partage TOUTES mes notes d'un paquet donné en
@@ -927,6 +933,8 @@ def partager_paquet_toggle(request, deck_id):
         mes_notes = Note.objects.filter(deck_id=deck_id, cree_par=request.user)
         tout_deja_partage = not mes_notes.filter(partagee_avec_classe=False).exists()
         mes_notes.update(partagee_avec_classe=not tout_deja_partage)
+        if _est_ajax(request):
+            return JsonResponse({"partagee": not tout_deja_partage})
     return redirect("anki_review:partage_etudiants")
 
 
@@ -969,6 +977,8 @@ def partager_note_toggle(request, note_id):
     if request.method == "POST":
         note.partagee_avec_classe = not note.partagee_avec_classe
         note.save(update_fields=["partagee_avec_classe"])
+        if _est_ajax(request):
+            return JsonResponse({"partagee": note.partagee_avec_classe})
     return redirect("anki_review:partage_etudiants")
 
 
@@ -989,6 +999,8 @@ def ajouter_carte_partagee(request, note_id):
     carte, cree = Card.objects.get_or_create(note=note, etudiant=request.user)
     if cree:
         Activite.journaliser(request.user, Activite.Type.RECUPERATION, carte)
+    if _est_ajax(request):
+        return JsonResponse({"cree": cree})
     messages.success(request, "Carte ajoutée à ta révision." if cree else "Tu avais déjà cette carte.")
     return redirect("anki_review:partage_etudiants")
 
@@ -1009,6 +1021,8 @@ def ajouter_paquet_partage(request, deck_id, cree_par_id):
         if cree:
             Activite.journaliser(request.user, Activite.Type.RECUPERATION, carte)
             nb_ajoutees += 1
+    if _est_ajax(request):
+        return JsonResponse({"nouvelles": nb_ajoutees})
     messages.success(
         request,
         f"Paquet « {deck_source.nom} » ajouté ({nb_ajoutees} nouvelle{'s' if nb_ajoutees > 1 else ''} "

@@ -6,9 +6,9 @@
       <span class="edition-ligne-meta">{{ groupe.notes|length }} carte{{ groupe.notes|length|pluralize }} personnelle{{ groupe.notes|length|pluralize }}</span>
     </div>
     <div class="edition-actions" onclick="event.stopPropagation()">
-      <form method="post" action="{% url 'anki_review:partager_paquet_toggle' groupe.deck.id %}" style="display:contents;">
+      <form method="post" action="{% url 'anki_review:partager_paquet_toggle' groupe.deck.id %}" class="js-partage-paquet" style="display:contents;">
         {% csrf_token %}
-        <button type="submit" class="ie-btn-action">
+        <button type="submit" class="ie-btn-action" data-partagee="{% if groupe.toutes_partagees %}1{% else %}0{% endif %}">
           {% if groupe.toutes_partagees %}Tout retirer{% else %}Tout partager{% endif %}
         </button>
       </form>
@@ -23,9 +23,9 @@
                   onclick="document.getElementById('apercu-{{ note.id }}').hidden = !document.getElementById('apercu-{{ note.id }}').hidden">
             👁️
           </button>
-          <form method="post" action="{% url 'anki_review:partager_note_toggle' note.id %}" style="display:contents;">
+          <form method="post" action="{% url 'anki_review:partager_note_toggle' note.id %}" class="js-partage-note" style="display:contents;">
             {% csrf_token %}
-            <button type="submit" class="ie-btn-action">
+            <button type="submit" class="ie-btn-action" data-partagee="{% if note.partagee_avec_classe %}1{% else %}0{% endif %}">
               {% if note.partagee_avec_classe %}Ne plus partager{% else %}Partager{% endif %}
             </button>
           </form>
