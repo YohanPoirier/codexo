@@ -137,6 +137,16 @@ class Exercise(models.Model):
             "même si le résultat renvoyé est correct."
         ),
     )
+    forbid_in_operator = models.BooleanField(
+        "opérateur « in » interdit",
+        default=False,
+        help_text=(
+            "[Python] Si coché, on vérifie en plus (analyse statique du code, sans l'exécuter) "
+            "que le code de l'étudiant n'utilise pas l'opérateur de test d'appartenance « in » / "
+            "« not in » (ex: 'mot in phrase'). La boucle 'for x in ...' reste autorisée. "
+            "Sinon l'exercice est refusé même si le résultat renvoyé est correct."
+        ),
+    )
     extra_test_code = models.TextField(
         "code de test supplémentaire",
         blank=True,
@@ -263,6 +273,43 @@ class Exercise(models.Model):
         ]
         return "\n".join(lines) + "\n"
 
+    def _build_in_check(self):
+        """Génère le fragment de code (chaîne Python, vide si non applicable) qui vérifie que le
+        code soumis par l'étudiant n'utilise pas l'opérateur d'appartenance « in » / « not in »,
+        quand ce contrôle est activé sur CET exercice (champ forbid_in_operator).
+
+        Contrôle PUREMENT STATIQUE (analyse du texte du code via le module ast) : on cherche un
+        ast.Compare dont l'un des opérateurs est ast.In ou ast.NotIn. Une boucle 'for x in ...'
+        ou une compréhension n'est PAS un ast.Compare : elle reste donc autorisée. Les autres
+        façons de tester l'appartenance (find, count, index...) ne sont volontairement pas
+        contrôlées : elles sont hors programme, on compte sur la bonne foi des étudiants.
+
+        Si l'opérateur est trouvé, une entrée d'échec est ajoutée à __RESULTS__, au même titre
+        qu'un test raté classique."""
+        if not self.forbid_in_operator:
+            return ""
+
+        message = (
+            "L'opérateur « in » (test d'appartenance, ex: 'mot in phrase') est interdit dans cet "
+            "exercice : à toi de parcourir la chaîne autrement."
+        )
+
+        lines = [
+            "try:",
+            "    _arbre_in = ast.parse(__STUDENT_CODE__)",
+            "except Exception:",
+            "    _arbre_in = None",
+            "_utilise_in = False",
+            "if _arbre_in is not None:",
+            "    for _noeud in ast.walk(_arbre_in):",
+            "        if isinstance(_noeud, ast.Compare) and any(",
+            "                isinstance(_op, (ast.In, ast.NotIn)) for _op in _noeud.ops):",
+            "            _utilise_in = True",
+            "if _utilise_in:",
+            f"    __RESULTS__.append((False, {message!r}, \"\"))",
+        ]
+        return "\n".join(lines) + "\n"
+
     def _build_python_test_code(self):
         """Génère le code de test pour un exercice Python : appelle solution_code pour calculer
         l'attendu de chaque TestCase, puis compare à ce que produit la fonction de l'étudiant.
@@ -290,6 +337,7 @@ class Exercise(models.Model):
         errors_json = _json.dumps(parse_errors, ensure_ascii=False)
         solution_json = _json.dumps(self.solution_code or "", ensure_ascii=False)
         recursion_check = self._build_recursion_check(fn)
+        in_check = self._build_in_check()
         # extra_test_code est un bout de code écrit à la main pour CET exercice (voir le
         # help_text du champ) : on l'ajoute tel quel à la fin du test, avant le dernier
         # remplacement de __FN__ ci-dessous, qui s'applique donc aussi à lui.
@@ -299,7 +347,7 @@ class Exercise(models.Model):
 
         template = '''__RESULTS__ = []
 import json as _json, io as _io, contextlib as _contextlib, ast
-%(recursion_check)s_cases = _json.loads(%(cases_json)r)
+%(recursion_check)s%(in_check)s_cases = _json.loads(%(cases_json)r)
 _parse_errors = _json.loads(%(errors_json)r)
 for _err in _parse_errors:
     __RESULTS__.append((False, f"Erreur de configuration de l'exercice : {_err}", ""))
@@ -336,6 +384,7 @@ for _case in _cases:
             "errors_json": errors_json,
             "solution_json": solution_json,
             "recursion_check": recursion_check,
+            "in_check": in_check,
             "extra_test_code": extra_test_code,
         }
 

@@ -92,7 +92,8 @@ class ExerciseAdmin(SimplifieIndicationCtrlMixin, admin.ModelAdmin):
             "Correction automatique — exercices Python",
             {
                 "fields": (
-                    "function_name", "solution_code", "require_recursive", "extra_test_code",
+                    "function_name", "solution_code", "require_recursive", "forbid_in_operator",
+                    "extra_test_code",
                 ),
                 "description": (
                     "Uniquement si Type = 'Python (fonction)'. Renseigner le nom de la fonction et "
