@@ -383,8 +383,8 @@
         "kind": "python",
         "starter_code": "def contient_mot(phrase, mot):\n    pass\n",
         "function_name": "contient_mot",
-        "forbid_in_operator": true,
         "solution_code": "def contient_mot(phrase, mot):\n    n_m = len(mot)\n    n_p = len(phrase)\n    # On teste toutes les positions de départ possibles dans phrase : la\n    # dernière position valide est n_p - n_m (+1 car range s'arrête avant\n    # sa borne haute)\n    for i in range(n_p - n_m + 1):\n        if phrase[i:i+n_m] == mot:\n            return True\n    return False\n\n\n# Version interdite dans cet exercice : elle fonctionne et elle est très efficace,\n# mais le but ici est de refaire ce test à la main.\ndef contient_mot_avec_in(phrase, mot):\n    return mot in phrase\n",
+        "extra_test_code": "for _n in ast.walk(ast.parse(__STUDENT_CODE__)):\n    if isinstance(_n, ast.Compare) and any(isinstance(_o, (ast.In, ast.NotIn)) for _o in _n.ops):\n        __RESULTS__.append((False, \"L'opérateur « in » est interdit dans cet exercice : à toi de parcourir la chaîne autrement.\", \"\"))\n        break\n",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [

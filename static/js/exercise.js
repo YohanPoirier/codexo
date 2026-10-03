@@ -381,7 +381,9 @@ import sys, io, traceback
 
 __stdout_capture__ = io.StringIO()
 __RUNTIME_ERROR__ = None
-__EXEC_NS__ = {"__RESULTS__": []}
+# __STUDENT_CODE__ doit aussi exister DANS cet espace de noms : les contrôles statiques du
+# test (récursivité exigée, opérateur « in » interdit) font ast.parse(__STUDENT_CODE__).
+__EXEC_NS__ = {"__RESULTS__": [], "__STUDENT_CODE__": __STUDENT_CODE__}
 
 _old_stdout = sys.stdout
 sys.stdout = __stdout_capture__
