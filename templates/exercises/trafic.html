@@ -35,8 +35,21 @@
           {% for d in jour.detail %}
             <tr>
               <td>
-                {{ d.etudiant.display_name|default:d.etudiant.identifiant }}
-                {% if d.etudiant.classe %}<span class="trafic-classe">{{ d.etudiant.classe.name }}</span>{% endif %}
+                <div class="trafic-etudiant">
+                  <div>
+                    {{ d.etudiant.display_name|default:d.etudiant.identifiant }}
+                    {% if d.etudiant.classe %}<span class="trafic-classe">{{ d.etudiant.classe.name }}</span>{% endif %}
+                  </div>
+                  <a class="trafic-stats-lien" href="{% url 'stats' %}?mode=student&amp;student_id={{ d.etudiant.id }}"
+                     title="Voir les statistiques de {{ d.etudiant.display_name|default:d.etudiant.identifiant }}"
+                     aria-label="Voir les statistiques de {{ d.etudiant.display_name|default:d.etudiant.identifiant }}">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <line x1="6" y1="20" x2="6" y2="12"></line>
+                      <line x1="12" y1="20" x2="12" y2="5"></line>
+                      <line x1="18" y1="20" x2="18" y2="9"></line>
+                    </svg>
+                  </a>
+                </div>
               </td>
               <td class="stats-cell-center{% if not d.tentative %} trafic-zero{% endif %}">{{ d.tentative }}</td>
               <td class="stats-cell-center{% if not d.fini %} trafic-zero{% endif %}">{{ d.fini }}</td>

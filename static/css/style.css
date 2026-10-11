@@ -116,6 +116,9 @@ header.site nav a:hover { color: var(--indigo); }
   header.site nav.open { display: flex; }
   header.site nav a { padding: 8px 0; font-size: .95rem; }
   .nav-link-btn { padding: 8px 0; font-size: .95rem; }
+  /* Même hauteur de ligne que les autres entrées du menu (liens et "Déconnexion"),
+     sinon "Espace prof" est plus collé à l'entrée suivante. */
+  .nav-dropdown-toggle { padding: 8px 0; font-size: .95rem; }
 
   /* Sur mobile, la nav est déjà verticale (voir header.site nav ci-dessus) : le
      sous-menu "Espace prof" s'affiche donc en ligne (indenté), pas en popup
@@ -756,6 +759,13 @@ table.schema-columns code {
 .trafic-totaux strong { color: var(--indigo-deep); font-family: 'JetBrains Mono', monospace; font-size: .92rem; }
 .trafic-classe { display: block; font-size: .75rem; font-weight: 400; color: var(--ink-soft); }
 .trafic-zero { color: var(--rule); }
+.trafic-etudiant { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.trafic-stats-lien {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; flex-shrink: 0; border-radius: 6px;
+  color: var(--ink-soft); text-decoration: none;
+}
+.trafic-stats-lien:hover { background: var(--paper-alt); color: var(--indigo); }
 .trafic-vide { color: var(--ink-soft); margin-top: 24px; }
 
 @media (max-width: 700px) {

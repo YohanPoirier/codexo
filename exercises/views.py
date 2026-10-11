@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Min
 from django.db.models.functions import TruncDate
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
@@ -471,10 +471,12 @@ def trafic(request):
     tentatives, d'exercices terminés (réussis) et d'abandons (corrigé
     consulté), avec le détail par étudiant dans une liste déroulante.
 
-    Contrairement à "Statistiques" (compte d'exercices distincts réussis/
-    essayés au total), ici chaque événement compte à chaque fois qu'il se
-    produit : un exercice réussi deux fois le même jour compte deux fois —
-    c'est un journal d'activité, pas un état final. Seuls apparaissent les
+    Les tentatives et les abandons sont des événements : ils comptent à chaque
+    fois qu'ils se produisent. En revanche un exercice n'est compté "fini"
+    qu'UNE fois par étudiant, le jour de sa première réussite (les clics
+    suivants sur "Vérifier" sur un exercice déjà réussi ne comptent pas), ce
+    qui reste cohérent avec "Statistiques" (exercices distincts réussis).
+    Seuls apparaissent les
     jours et les étudiants ayant eu au moins un événement ; l'activité du
     staff n'est pas comptée. Les jours sont découpés à l'heure de Paris
     (TruncDate suit TIME_ZONE).
@@ -511,13 +513,24 @@ def trafic(request):
     )
     _ajouter(tentatives, "tentative")
 
-    finis = (
-        Result.objects.filter(created_at__gte=debut, is_attempt=True, success=True, user__is_staff=False)
-        .annotate(jour=TruncDate("created_at"))
-        .values("jour", "user_id")
-        .annotate(nb=Count("id"))
+    # Première réussite de chaque couple (étudiant, exercice), calculée sur TOUT
+    # l'historique puis filtrée sur la période : un exercice réussi avant le début
+    # de la période et revalidé depuis ne doit pas compter comme "fini" dans la période.
+    premieres_reussites = (
+        Result.objects.filter(is_attempt=True, success=True, user__is_staff=False)
+        .values("user_id", "exercise_id")
+        .annotate(premiere=Min("created_at"))
+        .filter(premiere__gte=debut)
     )
-    _ajouter(finis, "fini")
+    finis_par_jour = {}
+    for ligne in premieres_reussites:
+        # Jour à l'heure de Paris, comme TruncDate pour les autres indicateurs.
+        cle = (timezone.localtime(ligne["premiere"]).date(), ligne["user_id"])
+        finis_par_jour[cle] = finis_par_jour.get(cle, 0) + 1
+    _ajouter(
+        [{"jour": jour, "user_id": uid, "nb": nb} for (jour, uid), nb in finis_par_jour.items()],
+        "fini",
+    )
 
     abandons = (
         Abandonment.objects.filter(created_at__gte=debut, user__is_staff=False)
