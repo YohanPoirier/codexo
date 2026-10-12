@@ -771,3 +771,27 @@ table.schema-columns code {
 @media (max-width: 700px) {
   .trafic-totaux { font-size: .8rem; }
 }
+
+/* --- Bac à sable (page /bac-a-sable/) : fenêtre de résultat sous l'éditeur. Deux types de
+   blocs, affichés seulement s'ils ont du contenu : print (affichage) et error (traceback). --- */
+textarea#sandbox-editor {
+  width: 100%; min-height: 220px; font-family: 'JetBrains Mono', monospace; font-size: .92rem;
+  background: var(--indigo-deep); color: #eef1fb; border: none; border-radius: var(--radius);
+  padding: 18px; resize: vertical; tab-size: 4;
+}
+.sandbox-output {
+  background: var(--paper-alt); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 10px; margin-bottom: 22px; min-height: 64px;
+}
+.sandbox-placeholder { margin: 8px 10px; color: var(--ink-soft); font-size: .9rem; }
+.sandbox-block { border-radius: 6px; padding: 10px 14px; margin: 2px 0; }
+.sandbox-block-title {
+  display: block; font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; opacity: .8;
+}
+.sandbox-block pre {
+  margin: 0; white-space: pre-wrap; word-break: break-word;
+  font-family: 'JetBrains Mono', monospace; font-size: .86rem;
+}
+.sandbox-print { background: var(--paper); color: var(--ink); border: 1px solid var(--rule); }
+.sandbox-error { background: #fbe9e4; color: #8a3320; }

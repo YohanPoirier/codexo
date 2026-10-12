@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Bac à sable — Codexo{% endblock %}
+{% block content %}
+<span class="eyebrow">Pour expérimenter</span>
+<h1>Bac à sable</h1>
+
+<h2>Qu'est-ce que le bac à sable ?</h2>
+<p>
+  Le bac à sable est un espace libre pour essayer du code Python, sans exercice ni test
+  associé. Écrivez ce que vous voulez, cliquez sur <strong>Exécuter</strong>, et observez le
+  résultat : c'est l'endroit idéal pour tester une instruction, comprendre un message d'erreur
+  ou vérifier une idée avant de l'utiliser dans un exercice.
+</p>
+<p>
+  Rien n'est corrigé ni comptabilisé dans votre progression. Le code n'est pas envoyé au
+  serveur : il reste dans votre navigateur (et est simplement conservé sur cet appareil pour
+  que vous le retrouviez à votre prochaine visite).
+</p>
+<p>
+  La fenêtre de résultat affiche uniquement ce qui a été écrit avec <code>print()</code>,
+  ainsi que les éventuelles erreurs. Pensez donc à utiliser <code>print()</code> pour voir
+  une valeur. Si la page se fige à cause d'une boucle infinie, rechargez-la.
+</p>
+
+<span class="section-label">Code</span>
+<div class="code-block">
+  <div class="editor-panel">
+    <textarea id="sandbox-editor" spellcheck="false"></textarea>
+  </div>
+  <div class="actions">
+    <button id="sandbox-run-btn" class="run-btn" type="button" disabled>Chargement de Python…</button>
+    <button id="sandbox-clear-btn" class="reset-btn" type="button" title="Vider l'éditeur et les résultats">Effacer</button>
+  </div>
+</div>
+
+<span class="section-label">Résultat</span>
+<div id="sandbox-output" class="sandbox-output" aria-live="polite">
+  <p class="sandbox-placeholder">Le résultat de l'exécution apparaîtra ici.</p>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/anyword-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/rulers.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+<script src="{% static 'js/sandbox.js' %}"></script>
+{% endblock %}

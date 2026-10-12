@@ -196,6 +196,15 @@ def guide(request):
 
 
 @login_required
+def sandbox(request):
+    """Bac à sable : éditeur Python libre + fenêtre de résultat (print et erreurs
+    uniquement), exécuté entièrement dans le navigateur via Pyodide (voir
+    static/js/sandbox.js). Aucun contenu dynamique ni enregistrement côté serveur : le code
+    est seulement conservé dans le localStorage du navigateur."""
+    return render(request, "exercises/sandbox.html")
+
+
+@login_required
 def profile(request):
     all_success = (
         Result.objects.filter(user=request.user, success=True)

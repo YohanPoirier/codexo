@@ -27,6 +27,7 @@
         <a href="{% url 'theme_list' %}">Thèmes</a>
         <a href="{% url 'profile' %}">Progression</a>
         <a href="{% url 'guide' %}">Guide</a>
+        <a href="{% url 'sandbox' %}">Bac à sable</a>
         {% if not user.is_staff %}
           <a href="{% url 'mes_demandes_aide' %}">Mes demandes d'aide{% if a_reponse_aide_non_lue %}<span class="nav-badge-dot" title="Réponse non lue"></span>{% endif %}</a>
         {% endif %}
