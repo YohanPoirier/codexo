@@ -795,3 +795,14 @@ textarea#sandbox-editor {
 }
 .sandbox-print { background: var(--paper); color: var(--ink); border: 1px solid var(--rule); }
 .sandbox-error { background: #fbe9e4; color: #8a3320; }
+.sandbox-notice { background: #fbf1de; color: #7a5410; }
+button.stop-btn {
+  font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: .9rem;
+  background: var(--err); color: white; border: none; border-radius: 8px;
+  padding: 12px 22px; cursor: pointer;
+}
+button.stop-btn:hover { background: #8f3422; }
+button.stop-btn[hidden] { display: none; }
+@media (max-width: 480px) {
+  button.stop-btn { width: 100%; text-align: center; }
+}

@@ -1,14 +1,24 @@
 (function () {
   const editor = document.getElementById("sandbox-editor");
   const runBtn = document.getElementById("sandbox-run-btn");
+  const stopBtn = document.getElementById("sandbox-stop-btn");
   const clearBtn = document.getElementById("sandbox-clear-btn");
   const output = document.getElementById("sandbox-output");
 
   const STORAGE_KEY = "codexo-sandbox-code";
   const DEFAULT_CODE = "# Écrivez votre code ici\nprint(\"Bonjour !\")\n";
+  // Garde-fou : un programme qui affiche sans fin ne doit pas faire exploser la page.
+  const MAX_PRINT_CHARS = 200000;
 
-  let pyodide = null;
   let cm = null;
+  let worker = null; // Pyodide tourne dans un worker (voir sandbox-worker.js)
+  let ready = false;
+  let running = false;
+
+  // Sortie de l'exécution en cours (les print() arrivent au fil de l'eau)
+  let printedText = "";
+  let truncated = false;
+  let renderTimer = null;
 
   // --- Sauvegarde locale (navigateur uniquement, rien n'est envoyé au serveur) ---
   function loadSavedCode() {
@@ -108,7 +118,7 @@
     cm.setValue(initialValue);
   }
 
-  // --- Fenêtre de résultat ---
+  // --- Fenêtre de résultat : blocs « print », « erreur » et « information » ---
   function block(kind, title, text) {
     return (
       '<div class="sandbox-block sandbox-' + kind + '">' +
@@ -118,77 +128,133 @@
     );
   }
 
-  function showOutput(printed, error) {
+  // isRunning : exécution en cours (rien d'affiché pour l'instant => « en cours »)
+  // error     : texte de l'erreur à afficher en rouge (ou null)
+  // notice    : message d'information (ex. exécution interrompue)
+  function render(isRunning, error, notice) {
     let html = "";
-    if (printed) html += block("print", "Affichage (print)", printed.replace(/\n$/, ""));
+    if (printedText) {
+      let text = printedText.replace(/\n$/, "");
+      if (truncated) text += "\n… (affichage tronqué)";
+      html += block("print", "Affichage (print)", text);
+    }
     if (error) html += block("error", "Erreur", error.replace(/\n$/, ""));
+    if (notice) html += block("notice", "Information", notice);
     if (!html) {
-      html = '<p class="sandbox-placeholder">Le code s\'est exécuté sans rien afficher.</p>';
+      html = isRunning
+        ? '<p class="sandbox-placeholder">Exécution en cours…</p>'
+        : '<p class="sandbox-placeholder">Le code s\'est exécuté sans rien afficher.</p>';
     }
     output.innerHTML = html;
   }
 
   function resetOutput() {
+    printedText = "";
+    truncated = false;
     output.innerHTML = '<p class="sandbox-placeholder">Le résultat de l\'exécution apparaîtra ici.</p>';
   }
 
-  // Exécution dans un espace de noms frais à chaque clic (comme pour les exercices, voir
-  // __EXEC_NS__ dans exercise.js) : une variable définie lors d'une exécution précédente ne
-  // reste pas disponible par erreur. Seuls les print() (stdout) et les erreurs sont remontés.
-  const RUNNER = `
-import sys, io, traceback
+  // Les print() arrivent un par un : on regroupe les mises à jour de l'affichage (toutes les
+  // 100 ms au plus) pour ne pas saturer la page si le programme affiche à toute vitesse.
+  function scheduleRender() {
+    if (renderTimer) return;
+    renderTimer = setTimeout(function () {
+      renderTimer = null;
+      if (running) render(true, null, null);
+    }, 100);
+  }
 
-__sb_out__ = io.StringIO()
-__sb_error__ = None
-__sb_ns__ = {"__name__": "__main__"}
-
-_sb_old_stdout = sys.stdout
-sys.stdout = __sb_out__
-try:
-    exec(compile(__SB_CODE__, "<code>", "exec"), __sb_ns__)
-except SyntaxError:
-    __sb_error__ = "".join(traceback.format_exception_only(*sys.exc_info()[:2]))
-except BaseException:
-    _sb_et, _sb_ev, _sb_tb = sys.exc_info()
-    __sb_error__ = (
-        "Traceback (most recent call last):\\n"
-        + "".join(traceback.format_list(traceback.extract_tb(_sb_tb.tb_next)))
-        + "".join(traceback.format_exception_only(_sb_et, _sb_ev))
-    )
-finally:
-    sys.stdout = _sb_old_stdout
-__sb_printed__ = __sb_out__.getvalue()
-`;
-
-  async function runCode() {
-    if (!pyodide || runBtn.disabled) return;
-    const code = getCode();
-    saveCode(code);
-    runBtn.disabled = true;
-    runBtn.textContent = "Exécution…";
-
-    try {
-      if (/\bnumpy\b/.test(code)) {
-        await pyodide.loadPackage("numpy");
-      }
-      pyodide.globals.set("__SB_CODE__", code);
-      await pyodide.runPythonAsync(RUNNER);
-      const printed = pyodide.globals.get("__sb_printed__");
-      const error = pyodide.globals.get("__sb_error__");
-      showOutput(printed, error);
-    } catch (e) {
-      showOutput("", "Erreur inattendue : " + e.message);
-    }
-
+  function setIdle() {
+    running = false;
+    stopBtn.hidden = true;
     runBtn.disabled = false;
     runBtn.textContent = "Exécuter";
   }
+
+  // --- Worker : démarrage, messages, arrêt ---
+  function startWorker() {
+    ready = false;
+    runBtn.disabled = true;
+    runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
+
+    const w = new Worker(SANDBOX_WORKER_URL);
+    worker = w;
+
+    w.onmessage = function (ev) {
+      if (w !== worker) return; // message d'un ancien worker (déjà arrêté)
+      const msg = ev.data;
+      if (msg.type === "ready") {
+        ready = true;
+        setIdle();
+      } else if (msg.type === "stdout") {
+        if (!running || truncated) return;
+        printedText += msg.text;
+        if (printedText.length > MAX_PRINT_CHARS) {
+          printedText = printedText.slice(0, MAX_PRINT_CHARS);
+          truncated = true;
+        }
+        scheduleRender();
+      } else if (msg.type === "done") {
+        if (!running) return;
+        setIdle();
+        render(false, msg.error, null);
+      } else if (msg.type === "fatal") {
+        runBtn.textContent = "Erreur de chargement de Python";
+      }
+    };
+
+    // Erreur du worker lui-même (script introuvable, CDN indisponible, plantage...)
+    w.onerror = function () {
+      if (w !== worker) return;
+      if (!ready) {
+        runBtn.textContent = "Erreur de chargement de Python";
+        return;
+      }
+      const wasRunning = running;
+      setIdle();
+      if (wasRunning) render(false, "Erreur inattendue du moteur Python.", null);
+      startWorker();
+    };
+  }
+
+  function runCode() {
+    if (!ready || running) return;
+    const code = getCode();
+    saveCode(code);
+
+    running = true;
+    printedText = "";
+    truncated = false;
+    runBtn.disabled = true;
+    runBtn.textContent = "Exécution…";
+    stopBtn.hidden = false;
+    render(true, null, null);
+
+    worker.postMessage({ type: "run", code: code });
+  }
+
+  // Bouton « Arrêter » : on supprime le worker (ce qui coupe net le programme, même une boucle
+  // infinie) puis on en relance un neuf. Python est rechargé à chaque arrêt (quelques
+  // secondes, le fichier étant alors déjà en cache) ; les variables de l'exécution
+  // interrompue sont perdues, ce qui est sans importance puisque chaque exécution repart de zéro.
+  function stopCode() {
+    if (!running) return;
+    const old = worker;
+    worker = null; // les derniers messages éventuels de l'ancien worker seront ignorés
+    old.terminate();
+    running = false;
+    stopBtn.hidden = true;
+    render(false, null, "Exécution interrompue.");
+    startWorker();
+  }
+
+  stopBtn.addEventListener("click", stopCode);
 
   clearBtn.addEventListener("click", function () {
     if (getCode().trim() !== "" && !window.confirm("Vider l'éditeur ? Le code actuel sera perdu.")) return;
     setCode("");
     saveCode("");
-    resetOutput();
+    if (!running) resetOutput();
   });
 
   // Même délai que pour « Vérifier » dans les exercices : laisse au clavier virtuel mobile le
@@ -203,18 +269,6 @@ __sb_printed__ = __sb_out__.getvalue()
     if (document.visibilityState === "hidden") saveCode(getCode());
   });
 
-  async function init() {
-    initCodeMirror(loadSavedCode());
-    runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
-    try {
-      pyodide = await loadPyodide();
-    } catch (e) {
-      runBtn.textContent = "Erreur de chargement de Python";
-      return;
-    }
-    runBtn.disabled = false;
-    runBtn.textContent = "Exécuter";
-  }
-
-  init();
+  initCodeMirror(loadSavedCode());
+  startWorker();
 })();

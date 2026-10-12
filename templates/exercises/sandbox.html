@@ -9,18 +9,13 @@
 <p>
   Le bac à sable est un espace libre pour essayer du code Python, sans exercice ni test
   associé. Écrivez ce que vous voulez, cliquez sur <strong>Exécuter</strong>, et observez le
-  résultat : c'est l'endroit idéal pour tester une instruction, comprendre un message d'erreur
-  ou vérifier une idée avant de l'utiliser dans un exercice.
-</p>
-<p>
-  Rien n'est corrigé ni comptabilisé dans votre progression. Le code n'est pas envoyé au
-  serveur : il reste dans votre navigateur (et est simplement conservé sur cet appareil pour
-  que vous le retrouviez à votre prochaine visite).
+  résultat.
 </p>
 <p>
   La fenêtre de résultat affiche uniquement ce qui a été écrit avec <code>print()</code>,
   ainsi que les éventuelles erreurs. Pensez donc à utiliser <code>print()</code> pour voir
-  une valeur. Si la page se fige à cause d'une boucle infinie, rechargez-la.
+  une valeur. Si le programme ne s'arrête pas (boucle infinie, par exemple), le bouton
+  <strong>Arrêter</strong> permet de l'interrompre.
 </p>
 
 <span class="section-label">Code</span>
@@ -30,6 +25,7 @@
   </div>
   <div class="actions">
     <button id="sandbox-run-btn" class="run-btn" type="button" disabled>Chargement de Python…</button>
+    <button id="sandbox-stop-btn" class="stop-btn" type="button" hidden>Arrêter</button>
     <button id="sandbox-clear-btn" class="reset-btn" type="button" title="Vider l'éditeur et les résultats">Effacer</button>
   </div>
 </div>
@@ -46,6 +42,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/anyword-hint.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/rulers.min.js"></script>
-<script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+<!-- Pyodide tourne dans un worker (voir sandbox-worker.js), pas dans la page : c'est ce qui
+     permet au bouton « Arrêter » d'interrompre un programme qui ne se termine pas. -->
+<script>
+const SANDBOX_WORKER_URL = "{% static 'js/sandbox-worker.js' %}";
+</script>
 <script src="{% static 'js/sandbox.js' %}"></script>
 {% endblock %}
