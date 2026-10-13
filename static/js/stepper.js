@@ -575,7 +575,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     prevBtn.hidden = true;
     nextBtn.hidden = true;
     rerunBtn.hidden = false;
-    showMessage("Code modifié : clique sur « Relancer » pour le parcourir à nouveau.", false);
+    showMessage("Code modifié : cliquer sur « Relancer » pour le parcourir à nouveau.", false);
   }
   // Le code modifié est renvoyé à la page de l'exercice, qui le reprendra à son prochain chargement.
   function onChange(editor, change) {
