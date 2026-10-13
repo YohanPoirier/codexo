@@ -7,11 +7,11 @@
 <h1>Pas à pas — {{ exercise.title }}</h1>
 
 <div class="stepper-page">
-  <div class="stepper-code">
-    <textarea id="stepper-code" spellcheck="false"></textarea>
-  </div>
+  <div class="stepper-main">
+    <div class="stepper-code">
+      <textarea id="stepper-code" spellcheck="false"></textarea>
+    </div>
 
-  <div class="stepper-side">
     <div id="stepper-case-row" class="stepper-case-row" hidden>
       <label for="stepper-case">Test tracé :</label>
       <select id="stepper-case" class="stepper-case"></select>
@@ -25,6 +25,9 @@
 
     <h2 class="stepper-vars-title">Commentaire</h2>
     <div id="stepper-msg" class="stepper-msg" aria-live="polite">Chargement de Python…</div>
+  </div>
+
+  <div class="stepper-side">
     <div id="stepper-vars" class="stepper-vars"></div>
   </div>
 </div>
