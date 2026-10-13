@@ -48,6 +48,7 @@
 <script>
 const EXERCISE_ID = {{ exercise.id }};
 const TESTS_URL = "{% url 'exercise_tests' exercise.id %}";
+const STEP_USAGE_URL = "{% url 'stepper_usage' exercise.id %}";
 const INITIAL_CODE = "{{ initial_code|escapejs }}";
 </script>
 <script src="{% static 'js/stepper.js' %}"></script>

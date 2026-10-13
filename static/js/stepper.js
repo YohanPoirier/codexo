@@ -245,6 +245,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   let steps = [];
   let truncated = false;
   let dirty = false; // code modifié depuis le dernier tracé
+  let unsentClicks = 0; // clics Avancer/Reculer pas encore envoyés (page Trafic)
   let output = []; // sortie des print(), en caractères (comme les longueurs comptées côté Python)
   let index = 0;
   let currentLine = null; // ligne CodeMirror (base 0) actuellement surlignée en entier
@@ -590,10 +591,28 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   caseSel.addEventListener("change", function () { renderCallLine(); trace(); }); // autre test : on retrace depuis le début
   rerunBtn.addEventListener("click", trace);
   nextBtn.addEventListener("click", function () {
-    if (index < steps.length - 1) { index++; render(); }
+    if (index < steps.length - 1) { index++; unsentClicks++; render(); }
   });
   prevBtn.addEventListener("click", function () {
-    if (index > 0) { index--; render(); }
+    if (index > 0) { index--; unsentClicks++; render(); }
+  });
+
+  // Envoi du nombre de clics au serveur quand on quitte la page ou qu'elle passe en
+  // arrière-plan (même principe que la sauvegarde du code dans exercise.js).
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp("(^|;\\s*)" + name + "=([^;]*)"));
+    return match ? decodeURIComponent(match[2]) : "";
+  }
+  function sendUsage() {
+    if (!unsentClicks || typeof STEP_USAGE_URL === "undefined" || !navigator.sendBeacon) return;
+    const payload = new URLSearchParams();
+    payload.set("steps", String(unsentClicks));
+    payload.set("csrfmiddlewaretoken", getCookie("csrftoken"));
+    if (navigator.sendBeacon(STEP_USAGE_URL, payload)) unsentClicks = 0;
+  }
+  window.addEventListener("pagehide", sendUsage);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") sendUsage();
   });
   init();
 })();

@@ -19,6 +19,7 @@
         <span><strong>{{ jour.totaux.tentative }}</strong> tentative{{ jour.totaux.tentative|pluralize }}</span>
         <span><strong>{{ jour.totaux.fini }}</strong> exercice{{ jour.totaux.fini|pluralize }} fini{{ jour.totaux.fini|pluralize }}</span>
         <span><strong>{{ jour.totaux.abandon }}</strong> abandon{{ jour.totaux.abandon|pluralize }}</span>
+        <span><strong>{{ jour.totaux.pas_a_pas }}</strong> étape{{ jour.totaux.pas_a_pas|pluralize }} de pas à pas</span>
       </span>
     </summary>
     <div class="table-scroll">
@@ -29,6 +30,7 @@
             <th class="stats-cell-center">Tentatives</th>
             <th class="stats-cell-center">Finis</th>
             <th class="stats-cell-center">Abandons</th>
+            <th class="stats-cell-center" title="Nombre de clics sur Avancer / Reculer dans le mode pas à pas">Pas à pas</th>
           </tr>
         </thead>
         <tbody>
@@ -54,6 +56,7 @@
               <td class="stats-cell-center{% if not d.tentative %} trafic-zero{% endif %}">{{ d.tentative }}</td>
               <td class="stats-cell-center{% if not d.fini %} trafic-zero{% endif %}">{{ d.fini }}</td>
               <td class="stats-cell-center{% if not d.abandon %} trafic-zero{% endif %}">{{ d.abandon }}</td>
+              <td class="stats-cell-center{% if not d.pas_a_pas %} trafic-zero{% endif %}">{{ d.pas_a_pas }}</td>
             </tr>
           {% endfor %}
         </tbody>

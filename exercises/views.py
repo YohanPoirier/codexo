@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 
 from accounts.models import User, Classe
-from .models import Theme, Exercise, Result, Abandonment, Hint, HintReveal, DemandeAide
+from .models import Theme, Exercise, Result, Abandonment, Hint, HintReveal, DemandeAide, StepperUsage
 
 # Durée pendant laquelle un exercice est verrouillé après un abandon (voir abandon_exercise
 # ci-dessous). Passé ce délai, l'étudiant peut retenter l'exercice normalement.
@@ -192,6 +192,28 @@ def exercise_stepper(request, theme_slug, exercise_slug):
         "exercises/exercise_stepper.html",
         {"theme": theme, "exercise": exercise, "initial_code": initial_code},
     )
+
+
+# Garde-fou : un envoi ne peut pas compter plus d'étapes que ça (la trace est de toute
+# façon limitée à 5000 étapes, et on peut aller et venir).
+MAX_ETAPES_PAR_ENVOI = 20000
+
+
+@login_required
+def stepper_usage(request, exercise_id):
+    """Enregistre le nombre de clics Avancer/Reculer faits sur la page pas à pas (envoyé par
+    navigator.sendBeacon depuis static/js/stepper.js). Compté sur la page Trafic."""
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+    exercise = get_object_or_404(Exercise, id=exercise_id)
+    try:
+        steps = int(request.POST.get("steps", ""))
+    except ValueError:
+        return JsonResponse({"error": "steps invalide"}, status=400)
+    if steps < 1:
+        return JsonResponse({"error": "steps invalide"}, status=400)
+    StepperUsage.objects.create(user=request.user, exercise=exercise, steps=min(steps, MAX_ETAPES_PAR_ENVOI))
+    return JsonResponse({"ok": True})
 
 
 @login_required
@@ -553,7 +575,7 @@ def trafic(request):
     )
 
     # jour -> {"totaux": {type: nb}, "etudiants": {user_id: {type: nb}}}
-    types = ["tentative", "fini", "abandon"]
+    types = ["tentative", "fini", "abandon", "pas_a_pas"]
     jours = {}
 
     def _ajouter(lignes, type_):
@@ -597,6 +619,15 @@ def trafic(request):
         .annotate(nb=Count("id"))
     )
     _ajouter(abandons, "abandon")
+
+    # Pas à pas : somme des clics Avancer/Reculer (et non le nombre d'ouvertures de la page).
+    pas_a_pas = (
+        StepperUsage.objects.filter(created_at__gte=debut, user__is_staff=False)
+        .annotate(jour=TruncDate("created_at"))
+        .values("jour", "user_id")
+        .annotate(nb=Sum("steps"))
+    )
+    _ajouter(pas_a_pas, "pas_a_pas")
 
     # Une seule requête pour les noms (et classes) de tous les étudiants concernés.
     ids = {uid for jour in jours.values() for uid in jour["etudiants"]}

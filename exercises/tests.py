@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from accounts.models import User
 
-from .models import Exercise, TestCase as CasDeTest, Theme
+from .models import Exercise, StepperUsage, TestCase as CasDeTest, Theme
 
 
 @override_settings(STORAGES={"default": {"BACKEND": "django.core.files.storage.FileSystemStorage"}, "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}})
@@ -114,3 +114,45 @@ class ErreurPendantUnTestTests(TestCase):
     def test_resultat_correct_inchange(self):
         (ok, msg, _), = self.lancer("def f(n):\n    return n\n")
         self.assertTrue(ok)
+
+
+@override_settings(STORAGES={"default": {"BACKEND": "django.core.files.storage.FileSystemStorage"}, "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}})
+class PasAPasTraficTests(TestCase):
+    """Les clics Avancer/Reculer envoyés par la page pas à pas sont additionnés, par jour et
+    par élève, dans la colonne « Pas à pas » de la page Trafic (le staff n'y est pas compté)."""
+
+    @classmethod
+    def setUpTestData(cls):
+        theme = Theme.objects.create(name="T", slug="t")
+        cls.exercise = Exercise.objects.create(
+            theme=theme, title="Ex", slug="ex", statement="x", function_name="f",
+            solution_code="def f(n):\n    return n\n",
+        )
+        cls.eleve = User.objects.create_user("eleve-pap", "mdp-test-123", role=User.ELEVE)
+        cls.prof = User.objects.create_user("prof-pap", "mdp-test-123", role=User.PROF)
+
+    def envoyer(self, user, steps):
+        self.client.force_login(user)
+        return self.client.post(reverse("stepper_usage", args=[self.exercise.id]), {"steps": steps})
+
+    def test_envois_additionnes_dans_trafic(self):
+        self.assertEqual(self.envoyer(self.eleve, "7").status_code, 200)
+        self.assertEqual(self.envoyer(self.eleve, "5").status_code, 200)
+        self.client.force_login(self.prof)
+        r = self.client.get(reverse("trafic"))
+        self.assertContains(r, "<strong>12</strong> étapes de pas à pas", html=False)
+        self.assertContains(r, ">Pas à pas</th>")
+
+    def test_valeurs_invalides_refusees(self):
+        for valeur in ("", "abc", "0", "-3"):
+            with self.subTest(valeur=valeur):
+                self.assertEqual(self.envoyer(self.eleve, valeur).status_code, 400)
+        self.assertEqual(StepperUsage.objects.count(), 0)
+
+    def test_get_refuse_et_anonyme_redirige(self):
+        self.client.force_login(self.eleve)
+        self.assertEqual(self.client.get(reverse("stepper_usage", args=[self.exercise.id])).status_code, 405)
+        self.client.logout()
+        r = self.client.post(reverse("stepper_usage", args=[self.exercise.id]), {"steps": "3"})
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(StepperUsage.objects.count(), 0)

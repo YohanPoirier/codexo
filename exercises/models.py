@@ -491,6 +491,23 @@ class Abandonment(models.Model):
         return f"{self.user} a abandonné {self.exercise} le {self.created_at:%d/%m/%Y %H:%M}"
 
 
+class StepperUsage(models.Model):
+    """Utilisation du mode pas à pas : nombre de clics sur Avancer/Reculer, envoyé par la
+    page (static/js/stepper.js) quand on la quitte ou qu'elle passe en arrière-plan. Une
+    ligne par envoi ; la page Trafic en fait la somme par jour et par étudiant."""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="stepper_usages", on_delete=models.CASCADE)
+    exercise = models.ForeignKey(Exercise, related_name="stepper_usages", on_delete=models.CASCADE)
+    steps = models.PositiveIntegerField("étapes parcourues")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user} : {self.steps} étape(s) de pas à pas sur {self.exercise}"
+
+
 class Result(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="results", on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, related_name="results", on_delete=models.CASCADE)

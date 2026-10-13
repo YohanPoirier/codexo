@@ -37,6 +37,7 @@ urlpatterns = [
     path('api/exercise/<int:exercise_id>/tests/', ex_views.exercise_tests, name='exercise_tests'),
     path('api/exercise/<int:exercise_id>/submit/', ex_views.submit_result, name='submit_result'),
     path('api/exercise/<int:exercise_id>/abandon/', ex_views.abandon_exercise, name='abandon_exercise'),
+    path('api/exercise/<int:exercise_id>/pas-a-pas/', ex_views.stepper_usage, name='stepper_usage'),
     path('api/exercise/<int:exercise_id>/demander-aide/', ex_views.demander_aide, name='demander_aide'),
     path('api/hint/<int:hint_id>/viewed/', ex_views.hint_viewed, name='hint_viewed'),
     path("anki/", include("anki_review.urls")),
