@@ -313,7 +313,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     if (!stack || stack.length === 0) return; // niveau global uniquement : rien à montrer
     // L'appelant en haut, la fonction appelée en dessous (la plus récente = la dernière).
     const heading = document.createElement("h2");
-    heading.className = "stepper-vars-title";
+    heading.className = "stepper-vars-title visually-hidden"; // pour les lecteurs d'écran seulement
     heading.textContent = "État des variables";
     varsBox.appendChild(heading);
     const ordered = stack.slice().reverse();

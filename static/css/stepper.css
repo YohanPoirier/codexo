@@ -97,7 +97,8 @@
 .stepper-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: .85rem; }
 .stepper-table td { padding: 4px 6px; vertical-align: top; border-bottom: 1px solid var(--rule); }
 .stepper-table tr:last-child td { border-bottom: 0; }
-.stepper-table td:first-child { width: 1%; padding-right: 14px; white-space: nowrap; color: var(--indigo); }
+.stepper-table td:first-child { width: 1%; padding-right: 10px; white-space: nowrap; color: var(--indigo); border-right: 1px solid var(--rule); }
+.stepper-table td:nth-child(2) { padding-left: 10px; }
 .stepper-table td:last-child { word-break: break-all; }
 
 /* Éditeur CodeMirror (fond sombre) */
@@ -123,3 +124,9 @@
 }
 
 .stepper-vars-title { margin: 0 0 6px; font-size: 1.05rem; }
+
+/* Masqué à l'écran, mais lu par les lecteurs d'écran */
+.stepper-vars .visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
