@@ -170,6 +170,30 @@ def exercise_detail(request, theme_slug, exercise_slug):
     )
 
 
+@superuser_required
+def exercise_stepper(request, theme_slug, exercise_slug):
+    """Page du mode pas à pas (en test, superusers uniquement) : le code d'un exercice Python
+    exécuté ligne par ligne, sur une page épurée (voir static/js/stepper.js).
+
+    Le code de départ de la page est le dernier code enregistré pour cet exercice (ou le code
+    de départ de l'exercice) : exercise.js transmet en plus, via le navigateur, le code actuel
+    de l'éditeur quand on arrive depuis la page de l'exercice."""
+    theme = get_object_or_404(Theme, slug=theme_slug)
+    exercise = get_object_or_404(Exercise, theme=theme, slug=exercise_slug, kind=Exercise.PYTHON)
+    last_result = (
+        Result.objects.filter(user=request.user, exercise=exercise).order_by("-created_at").first()
+    )
+    if last_result is not None and last_result.submitted_code:
+        initial_code = last_result.submitted_code
+    else:
+        initial_code = exercise.starter_code
+    return render(
+        request,
+        "exercises/exercise_stepper.html",
+        {"theme": theme, "exercise": exercise, "initial_code": initial_code},
+    )
+
+
 @login_required
 def abandon_exercise(request, exercise_id):
     """Enregistre l'abandon d'un exercice (l'étudiant a confirmé vouloir voir la solution).

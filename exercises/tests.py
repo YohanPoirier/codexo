@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from accounts.models import User
@@ -6,6 +6,7 @@ from accounts.models import User
 from .models import Exercise, TestCase as CasDeTest, Theme
 
 
+@override_settings(STORAGES={"default": {"BACKEND": "django.core.files.storage.FileSystemStorage"}, "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}})
 class StepCallsTests(TestCase):
     """Mode pas à pas (admins) : la vue exercise_tests fournit un appel par cas de test,
     mais seulement aux superusers, et seulement pour les exercices Python."""
@@ -55,3 +56,29 @@ class StepCallsTests(TestCase):
     def test_le_reste_de_la_reponse_est_inchange(self):
         data = self.get_json(self.eleve, self.exercise)
         self.assertEqual(set(data), {"starter_code", "test_code", "solution_code"})
+
+    def test_page_superuser(self):
+        self.client.force_login(self.admin)
+        r = self.client.get(reverse("exercise_stepper", args=[self.theme.slug, self.exercise.slug]))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'id="stepper-code"')
+
+    def test_page_refusee_aux_autres(self):
+        url = reverse("exercise_stepper", args=[self.theme.slug, self.exercise.slug])
+        for user in (self.prof, self.eleve):
+            self.client.force_login(user)
+            self.assertNotEqual(self.client.get(url).status_code, 200)
+
+    def test_page_sql_et_inconnu_404(self):
+        self.client.force_login(self.admin)
+        r = self.client.get(reverse("exercise_stepper", args=[self.theme.slug, self.sql_exercise.slug]))
+        self.assertEqual(r.status_code, 404)
+        r = self.client.get(reverse("exercise_stepper", args=[self.theme.slug, "inconnu"]))
+        self.assertEqual(r.status_code, 404)
+
+    def test_bouton_sur_la_page_exercice(self):
+        url = reverse("exercise_detail", args=[self.theme.slug, self.exercise.slug])
+        self.client.force_login(self.admin)
+        self.assertContains(self.client.get(url), 'id="stepper-btn"')
+        self.client.force_login(self.eleve)
+        self.assertNotContains(self.client.get(url), 'id="stepper-btn"')

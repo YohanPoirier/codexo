@@ -9,7 +9,6 @@
   let pyodide = null;
   let testCode = "";
   let solutionCode = "";
-  let stepCalls = []; // appels des cas de test (ex: "puissance(2, 3)"), fournis aux superusers pour le pas à pas
   let cm = null; // instance CodeMirror de l'éditeur, créée dans init()
   let solutionCM = null; // instance CodeMirror (lecture seule) du corrigé, créée à la 1ère réussite
 
@@ -277,7 +276,6 @@
       starterCode = data.starter_code || "";
       testCode = data.test_code || "";
       solutionCode = data.solution_code || "";
-      stepCalls = data.step_calls || [];
     } catch (e) {
       runBtn.textContent = "Erreur : exercice non chargé";
       return;
@@ -306,15 +304,6 @@
     }
     runBtn.disabled = false;
     runBtn.textContent = "Vérifier";
-
-    // Mis à disposition du mode pas à pas (stepper.js, admins uniquement) : Python est prêt.
-    window.codexoCtx = {
-      getPyodide: () => pyodide,
-      getCM: () => cm,
-      getCode: getCode,
-      getStepCalls: () => stepCalls,
-    };
-    document.dispatchEvent(new Event("codexo:ready"));
   }
 
   async function submitResult(code, success, isAttempt) {
@@ -530,6 +519,22 @@ __RESULTS__ = __EXEC_NS__["__RESULTS__"]
         saveConfirm.classList.add("visible");
         setTimeout(() => saveConfirm.classList.remove("visible"), 1500);
       }
+    });
+  }
+
+  // Bouton "Pas à pas" (admins, en test) : ouvre la page dédiée (voir stepper.js). Le code ACTUEL
+  // de l'éditeur, même non enregistré, lui est transmis via localStorage ; la page le lit une
+  // seule fois, puis retombe sur le dernier code enregistré (la sauvegarde au départ de la page,
+  // saveDraftOnLeave, s'en charge aussi).
+  const stepperBtn = document.getElementById("stepper-btn");
+  if (stepperBtn && typeof STEPPER_URL !== "undefined") {
+    stepperBtn.addEventListener("click", function () {
+      try {
+        localStorage.setItem("codexo-stepper-code-" + EXERCISE_ID, getCode());
+      } catch (e) {
+        /* silencieux : la page utilisera le dernier code enregistré */
+      }
+      window.location.href = STEPPER_URL;
     });
   }
 

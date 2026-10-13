@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Pas à pas — {{ exercise.title }} — Codexo{% endblock %}
+{% block content %}
+<!-- Mode pas à pas (en test, superusers uniquement) : voir static/js/stepper.js -->
+<span class="eyebrow"><a href="{% url 'exercise_detail' theme.slug exercise.slug %}">← Retour à l'exercice</a></span>
+<h1>Pas à pas — {{ exercise.title }}</h1>
+
+<div class="stepper-page">
+  <div class="stepper-code">
+    <textarea id="stepper-code" spellcheck="false"></textarea>
+  </div>
+
+  <div class="stepper-side">
+    <div id="stepper-case-row" class="stepper-case-row" hidden>
+      <label for="stepper-case">Test tracé :</label>
+      <select id="stepper-case" class="stepper-case"></select>
+    </div>
+
+    <div class="stepper-controls">
+      <button id="stepper-prev" type="button" class="reset-btn" disabled>◀ Reculer</button>
+      <button id="stepper-next" type="button" class="run-btn" disabled>Avancer ▶</button>
+      <span id="stepper-pos" class="stepper-pos"></span>
+    </div>
+
+    <div id="stepper-msg" class="stepper-msg" aria-live="polite">Chargement de Python…</div>
+    <div id="stepper-vars" class="stepper-vars"></div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="{% static 'css/stepper.css' %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+<script>
+const EXERCISE_ID = {{ exercise.id }};
+const TESTS_URL = "{% url 'exercise_tests' exercise.id %}";
+const INITIAL_CODE = "{{ initial_code|escapejs }}";
+</script>
+<script src="{% static 'js/stepper.js' %}"></script>
+{% endblock %}

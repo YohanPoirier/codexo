@@ -33,6 +33,7 @@ urlpatterns = [
     path('journal/', ex_views.journal, name='journal'),
     path('theme/<slug:theme_slug>/', ex_views.exercise_list, name='exercise_list'),
     path('theme/<slug:theme_slug>/<slug:exercise_slug>/', ex_views.exercise_detail, name='exercise_detail'),
+    path('theme/<slug:theme_slug>/<slug:exercise_slug>/pas-a-pas/', ex_views.exercise_stepper, name='exercise_stepper'),
     path('api/exercise/<int:exercise_id>/tests/', ex_views.exercise_tests, name='exercise_tests'),
     path('api/exercise/<int:exercise_id>/submit/', ex_views.submit_result, name='submit_result'),
     path('api/exercise/<int:exercise_id>/abandon/', ex_views.abandon_exercise, name='abandon_exercise'),
