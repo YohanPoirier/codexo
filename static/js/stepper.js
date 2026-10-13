@@ -4,18 +4,22 @@
   // Mode pas à pas (EN TEST, réservé aux admins : voir exercise_detail.html).
   //
   // Principe : au clic sur « Pas à pas », le code de l'éditeur est exécuté UNE SEULE FOIS sous
-  // sys.settrace côté Python, qui enregistre pour chaque ligne sur le point d'être exécutée
-  // l'état des variables (sous forme de texte). « Avancer » et « Reculer » ne font ensuite que
-  // parcourir cet enregistrement : reculer est donc exact et gratuit, sans jamais ré-exécuter
-  // le code.
+  // sys.settrace côté Python, qui enregistre pour chaque ligne TERMINÉE l'état des variables
+  // (sous forme de texte). Chaque étape montre donc la ligne surlignée ET son effet : l'état
+  // affiché est celui qui SUIT la ligne. « Avancer » et « Reculer » ne font ensuite que parcourir
+  // cet enregistrement : reculer est exact et gratuit, sans jamais ré-exécuter le code.
   //
   // Les exercices sont des fonctions que les tests appellent : le serveur fournit donc un appel
   // par cas de test (step_calls, ex : "puissance(2, 3)") et le mode pas à pas ajoute l'appel
-  // choisi à la suite du code de l'éditeur avant de tracer. Un sélecteur permet de changer de
-  // test ; « Code seul » trace le code sans aucun appel.
+  // choisi à la suite du code de l'éditeur avant de tracer. Un menu permet de changer de test.
+  // La ligne d'appel ajoutée n'existe pas dans l'éditeur : elle n'est pas montrée comme étape.
+  //
+  // Ordre des étapes : une ligne est terminée une fois ses appels terminés. Pour
+  // « b = carre(a) », on voit donc d'abord les lignes de carre, puis la ligne « b = carre(a) ».
   //
   // Limites connues (volontaires pour cette première version) :
   // - seul l'appel d'UN cas de test est tracé (pas la comparaison avec le corrigé) ;
+  // - les variables globales ne sont pas affichées, seulement celles des fonctions ;
   // - ce que le code affiche avec print() n'est pas montré ;
   // - exercices Python uniquement (pas SQL).
 
@@ -30,6 +34,8 @@ def __trace_student__(source, max_steps):
     FILENAME = "<student>"
     MAX_FRAMES = 25
     steps = []
+    pending = {}       # id(cadre) -> numéro de la ligne en cours d'exécution dans ce cadre
+    unwinding = set()  # cadres que traverse une exception (leur ligne en cours n'a pas abouti)
     truncated = False
 
     rep = reprlib.Repr()
@@ -51,16 +57,28 @@ def __trace_student__(source, max_steps):
         return out
 
     def snap_stack(frame):
+        # Les appels de fonction en cours, le plus récent en premier. Le niveau global
+        # (<module>) est volontairement ignoré : il n'est pas affiché.
         stack = []
         while frame is not None and frame.f_code.co_filename == FILENAME:
-            if len(stack) >= MAX_FRAMES:
-                stack.append({"scope": "... appels plus anciens non affichés", "vars": None})
-                break
             name = frame.f_code.co_name
-            label = "Variables globales" if name == "<module>" else "Dans " + name + "()"
-            stack.append({"scope": label, "vars": snap_vars(frame.f_locals)})
+            if name != "<module>":
+                if len(stack) >= MAX_FRAMES:
+                    stack.append({"scope": "... appels plus anciens non affichés", "vars": None})
+                    break
+                stack.append({"scope": "Dans " + name + "()", "vars": snap_vars(frame.f_locals)})
             frame = frame.f_back
         return stack
+
+    def finish(frame, extra=None):
+        # La ligne en cours de ce cadre est terminée : on enregistre l'état qui la suit.
+        line = pending.pop(id(frame), None)
+        if line is None:
+            return
+        step = {"line": line, "stack": snap_stack(frame)}
+        if extra:
+            step.update(extra)
+        steps.append(step)
 
     class _Stop(BaseException):
         pass
@@ -69,11 +87,28 @@ def __trace_student__(source, max_steps):
         nonlocal truncated
         if frame.f_code.co_filename != FILENAME:
             return None
-        if event == "line" and frame.f_lineno >= 1:
+        key = id(frame)
+        if event == "line":
+            if frame.f_lineno < 1:
+                return tracer
+            unwinding.discard(key)
+            finish(frame)  # la ligne précédente de ce cadre vient de se terminer
             if len(steps) >= max_steps:
                 truncated = True
                 raise _Stop()
-            steps.append({"line": frame.f_lineno, "stack": snap_stack(frame)})
+            pending[key] = frame.f_lineno
+        elif event == "exception":
+            unwinding.add(key)
+        elif event == "return":
+            if key in unwinding:
+                # sortie par une exception : la ligne en cours n'a pas abouti, pas d'étape
+                unwinding.discard(key)
+                pending.pop(key, None)
+            else:
+                extra = None
+                if frame.f_code.co_name != "<module>":
+                    extra = {"renvoie": rep.repr(arg)}
+                finish(frame, extra)
         return tracer
 
     try:
@@ -104,13 +139,6 @@ def __trace_student__(source, max_steps):
     finally:
         sys.settrace(None)
 
-    if error is None and not truncated:
-        end = {"line": None, "end": True,
-               "stack": [{"scope": "Variables globales", "vars": snap_vars(ns)}]}
-        if "__retour_test__" in ns:
-            end["retour"] = rep.repr(ns["__retour_test__"])
-        steps.append(end)
-
     return json.dumps({"steps": steps, "truncated": truncated, "error": error})
 
 __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
@@ -133,8 +161,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
   let truncated = false;
   let index = 0;
   let currentLine = null; // numéro de ligne CodeMirror (base 0) actuellement surlignée
-  let callLine = null; // numéro (base 1) de la ligne d'appel du test, ajoutée après le code ; null si « Code seul »
-  let callText = ""; // l'appel tracé, ex : "puissance(2, 3)"
+  let callLine = null; // numéro (base 1) de la ligne d'appel du test, ajoutée après le code ; null sans appel
 
   function ctx() {
     return window.codexoCtx || null;
@@ -159,13 +186,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
 
   function renderVars(stack) {
     varsBox.textContent = "";
-    if (!stack || stack.length === 0) {
-      const none = document.createElement("div");
-      none.className = "stepper-empty";
-      none.textContent = "Aucune variable.";
-      varsBox.appendChild(none);
-      return;
-    }
+    if (!stack || stack.length === 0) return; // niveau global uniquement : rien à montrer
     stack.forEach(function (scope, i) {
       const section = document.createElement("div");
       section.className = "stepper-scope" + (i === 0 ? " current" : "");
@@ -206,9 +227,9 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
     clearHighlight();
 
     const step = steps[index];
-    // La ligne d'appel du test n'existe pas dans l'éditeur : rien à surligner, on l'indique en message.
-    const onCall = callLine !== null && step.line === callLine;
-    if (step.line >= 1 && !onCall && cm) {
+    const isLast = index === steps.length - 1;
+    // Une erreur sur la ligne d'appel du test (ex : fonction mal nommée) n'a pas de ligne dans l'éditeur.
+    if (step.line >= 1 && step.line !== callLine && cm) {
       currentLine = step.line - 1;
       cm.addLineClass(currentLine, "background", LINE_CLASS);
       cm.scrollIntoView({ line: currentLine, ch: 0 }, 80);
@@ -216,31 +237,27 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
 
     posEl.textContent = "Étape " + (index + 1) + " / " + steps.length;
     prevBtn.disabled = index === 0;
-    nextBtn.disabled = index === steps.length - 1;
+    nextBtn.disabled = isLast;
 
     if (step.error) {
       showMessage("Erreur : " + step.error, true);
-    } else if (step.end) {
-      showMessage(
-        "Fin du programme." +
-          (step.retour !== undefined ? " " + callText + " a renvoyé " + step.retour + "." : ""),
-        false
-      );
-    } else if (onCall) {
-      showMessage("Appel du test : " + callText, false);
-    } else if (truncated && index === steps.length - 1) {
-      showMessage(
-        "Trace interrompue après " + MAX_STEPS + " étapes (boucle infinie ou programme très long ?).",
-        true
-      );
     } else {
-      showMessage("", false);
+      const parts = [];
+      if (step.renvoie !== undefined) parts.push("Renvoie " + step.renvoie + ".");
+      if (isLast) {
+        parts.push(
+          truncated
+            ? "Trace interrompue après " + MAX_STEPS + " étapes (boucle infinie ou programme très long ?)."
+            : "Fin du programme."
+        );
+      }
+      showMessage(parts.join(" "), isLast && truncated);
     }
     renderVars(step.stack);
   }
 
-  // Remplit le sélecteur avec un appel par cas de test (le premier est choisi d'office) plus
-  // « Code seul ». Masqué s'il n'y a aucun cas de test.
+  // Remplit le menu avec un appel par cas de test (le premier est choisi d'office).
+  // Masqué s'il n'y a aucun cas de test : le code est alors tracé seul.
   function fillCases(calls) {
     caseSel.textContent = "";
     calls.forEach(function (call, i) {
@@ -249,26 +266,21 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
       opt.textContent = call;
       caseSel.appendChild(opt);
     });
-    const none = document.createElement("option");
-    none.value = "";
-    none.textContent = "Code seul (sans appel)";
-    caseSel.appendChild(none);
-    caseSel.value = calls.length ? "0" : "";
+    if (calls.length) caseSel.value = "0";
     caseRow.hidden = calls.length === 0;
   }
 
-  // Trace le code de l'éditeur suivi de l'appel choisi dans le sélecteur, puis affiche l'étape 1.
+  // Trace le code de l'éditeur suivi de l'appel choisi dans le menu, puis affiche l'étape 1.
   async function trace() {
     const c = ctx();
     const calls = c.getStepCalls ? c.getStepCalls() : [];
     const code = c.getCode();
 
-    callText = caseSel.value !== "" ? calls[Number(caseSel.value)] || "" : "";
+    const callText = caseSel.value !== "" ? calls[Number(caseSel.value)] || "" : "";
     let source = code;
     callLine = null;
     if (callText) {
-      // L'appel est ajouté APRÈS le code, dans le même module : la pile d'appels garde ainsi le
-      // niveau « Variables globales ». Sa ligne = nombre de lignes du code + 1.
+      // L'appel est ajouté APRÈS le code, dans le même module. Sa ligne = nombre de lignes du code + 1.
       source = code + "\n__retour_test__ = " + callText + "\n";
       callLine = code.split("\n").length + 1;
     }
@@ -286,7 +298,10 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
     caseSel.disabled = false;
 
     clearHighlight();
-    steps = result.steps;
+    // La ligne d'appel ajoutée n'est pas une vraie étape (sauf si elle plante : on garde l'erreur).
+    steps = result.steps.filter(function (s) {
+      return s.error || callLine === null || s.line !== callLine;
+    });
     truncated = !!result.truncated;
     index = 0;
     panel.hidden = false;
