@@ -9,9 +9,13 @@
   // parcourir cet enregistrement : reculer est donc exact et gratuit, sans jamais ré-exécuter
   // le code.
   //
+  // Les exercices sont des fonctions que les tests appellent : le serveur fournit donc un appel
+  // par cas de test (step_calls, ex : "puissance(2, 3)") et le mode pas à pas ajoute l'appel
+  // choisi à la suite du code de l'éditeur avant de tracer. Un sélecteur permet de changer de
+  // test ; « Code seul » trace le code sans aucun appel.
+  //
   // Limites connues (volontaires pour cette première version) :
-  // - seul le code de l'éditeur est exécuté, pas les tests : une fonction n'est visible « en
-  //   action » que si le code contient un appel (ex : print(ma_fonction(3)) en bas) ;
+  // - seul l'appel d'UN cas de test est tracé (pas la comparaison avec le corrigé) ;
   // - ce que le code affiche avec print() n'est pas montré ;
   // - exercices Python uniquement (pas SQL).
 
@@ -101,8 +105,11 @@ def __trace_student__(source, max_steps):
         sys.settrace(None)
 
     if error is None and not truncated:
-        steps.append({"line": None, "end": True,
-                      "stack": [{"scope": "Variables globales", "vars": snap_vars(ns)}]})
+        end = {"line": None, "end": True,
+               "stack": [{"scope": "Variables globales", "vars": snap_vars(ns)}]}
+        if "__retour_test__" in ns:
+            end["retour"] = rep.repr(ns["__retour_test__"])
+        steps.append(end)
 
     return json.dumps({"steps": steps, "truncated": truncated, "error": error})
 
@@ -119,11 +126,15 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
   const posEl = document.getElementById("stepper-pos");
   const msgEl = document.getElementById("stepper-msg");
   const varsBox = document.getElementById("stepper-vars");
+  const caseRow = document.getElementById("stepper-case-row");
+  const caseSel = document.getElementById("stepper-case");
 
   let steps = [];
   let truncated = false;
   let index = 0;
   let currentLine = null; // numéro de ligne CodeMirror (base 0) actuellement surlignée
+  let callLine = null; // numéro (base 1) de la ligne d'appel du test, ajoutée après le code ; null si « Code seul »
+  let callText = ""; // l'appel tracé, ex : "puissance(2, 3)"
 
   function ctx() {
     return window.codexoCtx || null;
@@ -195,7 +206,9 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
     clearHighlight();
 
     const step = steps[index];
-    if (step.line >= 1 && cm) {
+    // La ligne d'appel du test n'existe pas dans l'éditeur : rien à surligner, on l'indique en message.
+    const onCall = callLine !== null && step.line === callLine;
+    if (step.line >= 1 && !onCall && cm) {
       currentLine = step.line - 1;
       cm.addLineClass(currentLine, "background", LINE_CLASS);
       cm.scrollIntoView({ line: currentLine, ch: 0 }, 80);
@@ -208,7 +221,13 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
     if (step.error) {
       showMessage("Erreur : " + step.error, true);
     } else if (step.end) {
-      showMessage("Fin du programme.", false);
+      showMessage(
+        "Fin du programme." +
+          (step.retour !== undefined ? " " + callText + " a renvoyé " + step.retour + "." : ""),
+        false
+      );
+    } else if (onCall) {
+      showMessage("Appel du test : " + callText, false);
     } else if (truncated && index === steps.length - 1) {
       showMessage(
         "Trace interrompue après " + MAX_STEPS + " étapes (boucle infinie ou programme très long ?).",
@@ -220,24 +239,53 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
     renderVars(step.stack);
   }
 
-  async function start() {
-    const c = ctx();
-    if (!c) return;
-    const label = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = "Analyse…";
+  // Remplit le sélecteur avec un appel par cas de test (le premier est choisi d'office) plus
+  // « Code seul ». Masqué s'il n'y a aucun cas de test.
+  function fillCases(calls) {
+    caseSel.textContent = "";
+    calls.forEach(function (call, i) {
+      const opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = call;
+      caseSel.appendChild(opt);
+    });
+    const none = document.createElement("option");
+    none.value = "";
+    none.textContent = "Code seul (sans appel)";
+    caseSel.appendChild(none);
+    caseSel.value = calls.length ? "0" : "";
+    caseRow.hidden = calls.length === 0;
+  }
 
+  // Trace le code de l'éditeur suivi de l'appel choisi dans le sélecteur, puis affiche l'étape 1.
+  async function trace() {
+    const c = ctx();
+    const calls = c.getStepCalls ? c.getStepCalls() : [];
+    const code = c.getCode();
+
+    callText = caseSel.value !== "" ? calls[Number(caseSel.value)] || "" : "";
+    let source = code;
+    callLine = null;
+    if (callText) {
+      // L'appel est ajouté APRÈS le code, dans le même module : la pile d'appels garde ainsi le
+      // niveau « Variables globales ». Sa ligne = nombre de lignes du code + 1.
+      source = code + "\n__retour_test__ = " + callText + "\n";
+      callLine = code.split("\n").length + 1;
+    }
+
+    caseSel.disabled = true;
     let result;
     try {
       const pyodide = c.getPyodide();
-      pyodide.globals.set("__STEP_SOURCE__", c.getCode());
+      pyodide.globals.set("__STEP_SOURCE__", source);
       pyodide.globals.set("__STEP_MAX__", MAX_STEPS);
       result = JSON.parse(await pyodide.runPythonAsync(PY_TRACER));
     } catch (e) {
       result = { steps: [], truncated: false, error: "Erreur inattendue : " + e.message };
     }
-    btn.textContent = label;
+    caseSel.disabled = false;
 
+    clearHighlight();
     steps = result.steps;
     truncated = !!result.truncated;
     index = 0;
@@ -245,7 +293,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
     varsBox.textContent = "";
 
     if (steps.length === 0) {
-      // Rien à parcourir (erreur de syntaxe, code vide...) : on l'indique, l'éditeur reste libre.
+      // Rien à parcourir (erreur de syntaxe...) : on l'indique, l'éditeur reste libre.
       posEl.textContent = "";
       prevBtn.disabled = true;
       nextBtn.disabled = true;
@@ -259,6 +307,22 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
     render();
   }
 
+  async function start() {
+    const c = ctx();
+    if (!c) return;
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Analyse…";
+
+    fillCases(c.getStepCalls ? c.getStepCalls() : []);
+    await trace();
+
+    btn.textContent = label;
+    // Pendant un pas à pas le bouton reste grisé (on en sort avec « Quitter ») ; s'il n'y avait
+    // rien à parcourir, on le laisse actif pour pouvoir corriger le code et réessayer.
+    btn.disabled = steps.length > 0;
+  }
+
   function exit() {
     clearHighlight();
     const c = ctx();
@@ -270,6 +334,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__)
   }
 
   btn.addEventListener("click", start);
+  caseSel.addEventListener("change", trace); // autre test choisi : on retrace depuis le début
   nextBtn.addEventListener("click", function () {
     if (index < steps.length - 1) { index++; render(); }
   });

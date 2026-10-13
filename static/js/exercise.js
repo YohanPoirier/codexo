@@ -9,6 +9,7 @@
   let pyodide = null;
   let testCode = "";
   let solutionCode = "";
+  let stepCalls = []; // appels des cas de test (ex: "puissance(2, 3)"), fournis aux superusers pour le pas à pas
   let cm = null; // instance CodeMirror de l'éditeur, créée dans init()
   let solutionCM = null; // instance CodeMirror (lecture seule) du corrigé, créée à la 1ère réussite
 
@@ -276,6 +277,7 @@
       starterCode = data.starter_code || "";
       testCode = data.test_code || "";
       solutionCode = data.solution_code || "";
+      stepCalls = data.step_calls || [];
     } catch (e) {
       runBtn.textContent = "Erreur : exercice non chargé";
       return;
@@ -306,7 +308,12 @@
     runBtn.textContent = "Vérifier";
 
     // Mis à disposition du mode pas à pas (stepper.js, admins uniquement) : Python est prêt.
-    window.codexoCtx = { getPyodide: () => pyodide, getCM: () => cm, getCode: getCode };
+    window.codexoCtx = {
+      getPyodide: () => pyodide,
+      getCM: () => cm,
+      getCode: getCode,
+      getStepCalls: () => stepCalls,
+    };
     document.dispatchEvent(new Event("codexo:ready"));
   }
 

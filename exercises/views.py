@@ -243,11 +243,36 @@ def exercise_tests(request, exercise_id):
     façon inspecter cette réponse réseau et y trouver le corrigé, même avant ce changement."""
     exercise = get_object_or_404(Exercise, id=exercise_id)
     solution = exercise.sql_solution if exercise.kind == exercise.SQL else exercise.solution_code
-    return JsonResponse({
+    payload = {
         "starter_code": exercise.starter_code,
         "test_code": exercise.build_test_code(),
         "solution_code": solution,
-    })
+    }
+    # Mode pas à pas (en test, superusers uniquement, voir stepper.js) : les appels des cas de
+    # test sous forme de code Python (ex: "puissance(2, 3)"), pour que le pas à pas puisse
+    # exécuter la fonction de l'étudiant sur l'un d'eux. Réservé aux superusers : inutile
+    # d'exposer davantage de champs aux étudiants.
+    if request.user.is_superuser and exercise.kind != exercise.SQL:
+        payload["step_calls"] = _step_calls(exercise)
+    return JsonResponse(payload)
+
+
+def _step_calls(exercise):
+    """Un appel par cas de test valide, ex: ["puissance(2, 3)", "puissance(5, 0)"]. Même
+    lecture des arguments que Exercise._build_python_test_code : un cas dont les arguments
+    sont invalides est simplement ignoré ici (le test, lui, le signale à l'étudiant)."""
+    import ast
+
+    calls = []
+    for tc in exercise.test_cases.order_by("order", "id"):
+        try:
+            parsed = ast.literal_eval(tc.args)
+        except Exception:
+            continue
+        if not isinstance(parsed, (list, tuple)):
+            continue
+        calls.append(f"{exercise.function_name}({', '.join(repr(a) for a in parsed)})")
+    return calls
 
 
 @login_required
