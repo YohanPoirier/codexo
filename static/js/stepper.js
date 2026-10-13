@@ -62,7 +62,7 @@ def __trace_student__(source, max_steps, trace_module):
         code = compile(source, FILENAME, "exec")
     except SyntaxError as e:
         return json.dumps({"steps": [], "truncated": False,
-                           "error": "SyntaxError (ligne %s) : %s" % (e.lineno, e.msg)})
+                           "error": "%s: %s (ligne %s)" % (type(e).__name__, e.msg, e.lineno)})
 
     def visible(name, value):
         if name.startswith("__"):
@@ -205,7 +205,7 @@ def __trace_student__(source, max_steps, trace_module):
     except _Stop:
         pass
     except BaseException as e:
-        error = "%s : %s" % (type(e).__name__, e)
+        error = "%s: %s" % (type(e).__name__, e) if str(e) else type(e).__name__   # format de Python
         tb = e.__traceback__
         last = None
         while tb is not None:
@@ -417,7 +417,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     if (printEl) printEl.textContent = output.slice(0, step.out || 0).join("");
 
     if (step.error) {
-      showMessage("Erreur : " + step.error, true);
+      showMessage(step.error, true);
     } else {
       const parts = [];
       if (step.renvoie !== undefined) parts.push("Renvoie " + step.renvoie + ".");
