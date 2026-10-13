@@ -233,6 +233,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   const varsBox = document.getElementById("stepper-vars");
   const caseRow = document.getElementById("stepper-case-row");
   const caseSel = document.getElementById("stepper-case");
+  const rerunBtn = document.getElementById("stepper-rerun");
   const codeArea = document.getElementById("stepper-code");
   if (!prevBtn || !nextBtn || !msgEl || !codeArea) return;
 
@@ -241,6 +242,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   let calls = [];
   let steps = [];
   let truncated = false;
+  let dirty = false; // code modifié depuis le dernier tracé
   let output = []; // sortie des print(), en caractères (comme les longueurs comptées côté Python)
   let index = 0;
   let currentLine = null; // ligne CodeMirror (base 0) actuellement surlignée en entier
@@ -438,6 +440,10 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
 
   // Trace le code suivi de l'appel choisi dans le menu, puis affiche l'étape 1.
   async function trace() {
+    dirty = false;
+    rerunBtn.hidden = true;
+    prevBtn.hidden = false;
+    nextBtn.hidden = false;
     const code = cm.getValue();
     const callText = caseSel.value !== "" ? calls[Number(caseSel.value)] || "" : "";
     let source = code;
@@ -484,11 +490,20 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       mode: "python",
       lineNumbers: true,
       indentUnit: 4,
-      readOnly: true,
+      extraKeys: {
+        // Tabulation = 4 espaces (ou indentation de la sélection), comme sur la page de l'exercice
+        Tab: function (editor) {
+          if (editor.somethingSelected()) editor.indentSelection("add");
+          else editor.replaceSelection("    ");
+        },
+        "Shift-Tab": "indentLess",
+      },
       lineWrapping: true,
       viewportMargin: Infinity,
     });
     cm.setValue(initialCode());
+    cm.on("beforeChange", onBeforeChange);
+    cm.on("change", onChange);
 
     try {
       const res = await fetch(TESTS_URL);
@@ -505,7 +520,33 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     await trace();
   }
 
+  // Code modifié : la trace enregistrée ne correspond plus. On efface le surlignage AVANT la
+  // modification (les numéros de ligne peuvent bouger), et « Relancer » remplace les boutons.
+  function onBeforeChange(editor, change) {
+    if (change.origin === "setValue" || dirty) return;
+    dirty = true;
+    clearHighlight();
+    steps = [];
+    varsBox.textContent = "";
+    posEl.textContent = "";
+    if (printEl) printEl.textContent = "";
+    prevBtn.hidden = true;
+    nextBtn.hidden = true;
+    rerunBtn.hidden = false;
+    showMessage("Code modifié : clique sur « Relancer » pour le parcourir à nouveau.", false);
+  }
+  // Le code modifié est renvoyé à la page de l'exercice, qui le reprendra à son prochain chargement.
+  function onChange(editor, change) {
+    if (change.origin === "setValue") return;
+    try {
+      localStorage.setItem("codexo-stepper-back-" + EXERCISE_ID, editor.getValue());
+    } catch (e) {
+      /* stockage indisponible : la modification reste dans cette page */
+    }
+  }
+
   caseSel.addEventListener("change", trace); // autre test choisi : on retrace depuis le début
+  rerunBtn.addEventListener("click", trace);
   nextBtn.addEventListener("click", function () {
     if (index < steps.length - 1) { index++; render(); }
   });

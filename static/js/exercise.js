@@ -283,8 +283,11 @@
 
     // LAST_SUBMITTED_CODE est injecté par le template : le code de la dernière
     // tentative enregistrée en base pour cet exercice (ou null si aucune).
+    const fromStepper = takeStepperCode();
     const initialCode =
-      LAST_SUBMITTED_CODE !== null && LAST_SUBMITTED_CODE !== "" ? LAST_SUBMITTED_CODE : starterCode;
+      fromStepper !== null
+        ? fromStepper
+        : LAST_SUBMITTED_CODE !== null && LAST_SUBMITTED_CODE !== "" ? LAST_SUBMITTED_CODE : starterCode;
     initCodeMirror(initialCode);
 
     runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
@@ -526,6 +529,26 @@ __RESULTS__ = __EXEC_NS__["__RESULTS__"]
   // de l'éditeur, même non enregistré, lui est transmis via localStorage ; la page le lit une
   // seule fois, puis retombe sur le dernier code enregistré (la sauvegarde au départ de la page,
   // saveDraftOnLeave, s'en charge aussi).
+  // Retour : si le code a été modifié dans le pas à pas, il est repris ici (une seule fois).
+  function takeStepperCode() {
+    if (typeof STEPPER_URL === "undefined") return null;
+    try {
+      const key = "codexo-stepper-back-" + EXERCISE_ID;
+      const code = localStorage.getItem(key);
+      if (code !== null) localStorage.removeItem(key);
+      return code;
+    } catch (e) {
+      return null;
+    }
+  }
+  // Retour par le bouton « précédent » du navigateur : la page peut être restaurée telle
+  // quelle depuis le cache, sans repasser par init().
+  window.addEventListener("pageshow", function (event) {
+    if (!event.persisted || !cm) return;
+    const code = takeStepperCode();
+    if (code !== null) setCode(code);
+  });
+
   const stepperBtn = document.getElementById("stepper-btn");
   if (stepperBtn && typeof STEPPER_URL !== "undefined") {
     stepperBtn.addEventListener("click", function () {
