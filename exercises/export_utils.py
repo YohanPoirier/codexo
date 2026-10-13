@@ -32,6 +32,10 @@ def export_exercises_to_json():
                 "starter_code": ex.starter_code,
                 "function_name": ex.function_name,
                 "solution_code": ex.solution_code,
+                # Relus par seed_exercises : sans eux, chaque enregistrement dans l'admin
+                # (export automatique, voir signals.py) les effaçait du fichier.
+                "require_recursive": ex.require_recursive,
+                "extra_test_code": ex.extra_test_code,
                 "sql_setup": ex.sql_setup,
                 "sql_solution": ex.sql_solution,
                 "test_cases": [tc.args for tc in ex.test_cases.order_by("order")],

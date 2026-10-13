@@ -13,6 +13,8 @@
         "starter_code": "def dire_bonjour():\n    pass\n",
         "function_name": "dire_bonjour",
         "solution_code": "def dire_bonjour():\n    # return renvoie la valeur au programme appelant, qui peut alors la\n    # stocker, l'afficher, ou la réutiliser — contrairement à print(), qui se\n    # contente d'afficher du texte sans jamais le renvoyer nulle part\n    return \"Hello world!\"\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -31,6 +33,8 @@
         "starter_code": "def score_total(score_manche_1, score_manche_2):\n    pass\n",
         "function_name": "score_total",
         "solution_code": "def score_total(score_manche_1, score_manche_2):\n    # Les deux paramètres reçoivent directement les valeurs fournies par\n    # le programme appelant (ex: score_total(120, 80) donne score_manche_1=120 et\n    # score_manche_2=80) : il suffit de les additionner\n    return score_manche_1 + score_manche_2\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -51,6 +55,8 @@
         "starter_code": "def somme_et_difference(a, b):\n    pass\n",
         "function_name": "somme_et_difference",
         "solution_code": "def somme_et_difference(a, b):\n    somme = a + b\n    difference = a - b\n    # Séparer les deux valeurs par une virgule après return les regroupe\n    # automatiquement dans un tuple (somme, difference)\n    return somme, difference\n\n\n# Version plus concise, sans variables intermédiaires :\ndef somme_et_difference(a, b):\n    return a + b, a - b",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -71,6 +77,8 @@
         "starter_code": "def fahrenheit_vers_celsius(f):\n    return (f - 32) * 5 / 9\n\n\ndef ecart_de_temperature(f1, f2):\n    pass\n",
         "function_name": "ecart_de_temperature",
         "solution_code": "def fahrenheit_vers_celsius(f):\n    return (f - 32) * 5 / 9\n\n\ndef ecart_de_temperature(f1, f2):\n    # On appelle la fonction déjà fournie pour convertir chaque température,\n    # plutôt que de refaire le calcul de conversion nous-mêmes\n    c1 = fahrenheit_vers_celsius(f1)\n    c2 = fahrenheit_vers_celsius(f2)\n    # abs() renvoie la valeur absolue : peu importe laquelle des deux\n    # températures est la plus grande, le résultat est toujours positif\n    return abs(c1 - c2)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -93,6 +101,8 @@
         "starter_code": "def min_et_max(liste):\n    return min(liste), max(liste)\n\n\ndef amplitude_thermique(temperatures):\n    pass\n",
         "function_name": "amplitude_thermique",
         "solution_code": "def min_et_max(liste):\n    return min(liste), max(liste)\n\n\ndef amplitude_thermique(temperatures):\n    # min_et_max renvoie un tuple (minimum, maximum) : on récupère directement\n    # ses deux valeurs dans deux variables séparées, en une seule ligne\n    minimum, maximum = min_et_max(temperatures)\n    return maximum - minimum\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -114,6 +124,8 @@
         "starter_code": "def volume_cube(cote):\n    pass\n",
         "function_name": "volume_cube",
         "solution_code": "def volume_cube(cote):\n    # ** est l'opérateur de puissance : cote ** 3 calcule cote au cube\n    # (cote * cote * cote)\n    return cote ** 3\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -135,6 +147,8 @@
         "starter_code": "def nombre_paquets(total, taille_paquet):\n    pass\n",
         "function_name": "nombre_paquets",
         "solution_code": "def nombre_paquets(total, taille_paquet):\n    # // est l'opérateur de division entière : il renvoie le quotient de la\n    # division, sans la partie décimale (23 // 5 vaut 4, pas 4.6)\n    return total // taille_paquet\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -156,6 +170,8 @@
         "starter_code": "def bonbons_restants(total, taille_paquet):\n    pass\n",
         "function_name": "bonbons_restants",
         "solution_code": "def bonbons_restants(total, taille_paquet):\n    # % est l'opérateur modulo : il renvoie le RESTE d'une division entière\n    # (23 % 5 vaut 3, puisque 23 = 4 * 5 + 3)\n    return total % taille_paquet\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -185,6 +201,8 @@
         "starter_code": "def nombre_de_lettres(mot):\n    pass\n",
         "function_name": "nombre_de_lettres",
         "solution_code": "def nombre_de_lettres(mot):\n    # len() renvoie le nombre de caractères d'une chaîne\n    return len(mot)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -202,6 +220,8 @@
         "starter_code": "def premiere_lettre(mot):\n    pass\n",
         "function_name": "premiere_lettre",
         "solution_code": "def premiere_lettre(mot):\n    # L'indice 0 correspond toujours au premier caractère d'une chaîne\n    return mot[0]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -219,6 +239,8 @@
         "starter_code": "def derniere_lettre(mot):\n    pass\n",
         "function_name": "derniere_lettre",
         "solution_code": "def derniere_lettre(mot):\n    # L'indice -1 correspond toujours au dernier caractère, quelle que soit\n    # la longueur du mot\n    return mot[-1]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -236,6 +258,8 @@
         "starter_code": "def tranche_mot(mot, deb, fin):\n    pass\n",
         "function_name": "tranche_mot",
         "solution_code": "def tranche_mot(mot, deb, fin):\n    # mot[deb:fin+1] : on ajoute 1 car les tranches Python excluent\n    # normalement l'indice de fin, alors qu'ici fin doit être inclus\n    return mot[deb:fin + 1]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -255,6 +279,8 @@
         "starter_code": "def premieres_lettres(mot, n):\n    pass\n",
         "function_name": "premieres_lettres",
         "solution_code": "def premieres_lettres(mot, n):\n    # mot[:n] renvoie tout ce qui précède l'indice n\n    return mot[:n]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -274,6 +300,8 @@
         "starter_code": "def dernieres_lettres(mot, n):\n    pass\n",
         "function_name": "dernieres_lettres",
         "solution_code": "def dernieres_lettres(mot, n):\n    # Comme n != 0 (par hypothèse), mot[-n:] fonctionne directement\n    return mot[-n:]\n\n\n# Version alternative, qui fonctionnerait aussi si n pouvait valoir 0 :\ndef dernieres_lettres(mot, n):\n    return mot[len(mot) - n:]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -293,6 +321,8 @@
         "starter_code": "def repetition(lettre, n):\n    pass\n",
         "function_name": "repetition",
         "solution_code": "def repetition(lettre, n):\n    # La multiplication d'une chaîne par un entier la répète ce nombre de fois\n    return n * lettre\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -310,6 +340,8 @@
         "starter_code": "def concatenation(mot1, mot2):\n    pass\n",
         "function_name": "concatenation",
         "solution_code": "def concatenation(mot1, mot2):\n    # + concatène deux chaînes de caractères bout à bout\n    return mot1 + mot2\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -327,6 +359,8 @@
         "starter_code": "def message_pas(n):\n    pass\n",
         "function_name": "message_pas",
         "solution_code": "def message_pas(n):\n    # + ne fonctionne qu'entre chaînes de caractères : il faut convertir\n    # n en chaîne avec str() avant de le concaténer au reste de la phrase\n    return \"Vous avez fait \" + str(n) + \" pas.\"\n\n\n# Autre version, avec une f-string : {n} est directement remplacé par la\n# valeur de n, sans conversion explicite avec str()\n# (syntaxe f\"...\" hors programme de CPGE, mais très utile en pratique)\ndef message_pas(n):\n    return f\"Vous avez fait {n} pas.\"\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -347,6 +381,8 @@
         "starter_code": "def mot_a_trou(mot, lettre):\n    pass\n",
         "function_name": "mot_a_trou",
         "solution_code": "def mot_a_trou(mot, lettre):\n    resultat = \"\"\n    # On parcourt le mot lettre par lettre\n    for l in mot:\n        if l != lettre:\n            resultat += l\n        else:\n            # On remplace la lettre recherchée par un underscore\n            resultat += \"_\"\n    return resultat\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -367,6 +403,8 @@
         "starter_code": "def consonnes(mot):\n    pass\n",
         "function_name": "consonnes",
         "solution_code": "def consonnes(mot):\n    voyelles = \"aeiouy\"\n    resultat = \"\"\n    for lettre in mot:\n        # On ne garde que les lettres qui ne sont PAS des voyelles\n        if lettre not in voyelles:\n            resultat += lettre\n    return resultat\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -384,6 +422,7 @@
         "starter_code": "def contient_mot(phrase, mot):\n    pass\n",
         "function_name": "contient_mot",
         "solution_code": "def contient_mot(phrase, mot):\n    n_m = len(mot)\n    n_p = len(phrase)\n    # On teste toutes les positions de départ possibles dans phrase : la\n    # dernière position valide est n_p - n_m (+1 car range s'arrête avant\n    # sa borne haute)\n    for i in range(n_p - n_m + 1):\n        if phrase[i:i+n_m] == mot:\n            return True\n    return False\n\n\n# Version interdite dans cet exercice : elle fonctionne et elle est très efficace,\n# mais le but ici est de refaire ce test à la main.\ndef contient_mot_avec_in(phrase, mot):\n    return mot in phrase\n",
+        "require_recursive": false,
         "extra_test_code": "for _n in ast.walk(ast.parse(__STUDENT_CODE__)):\n    if isinstance(_n, ast.Compare) and any(isinstance(_o, (ast.In, ast.NotIn)) for _o in _n.ops):\n        __RESULTS__.append((False, \"L'opérateur « in » est interdit dans cet exercice : à toi de parcourir la chaîne autrement.\", \"\"))\n        break\n",
         "sql_setup": "",
         "sql_solution": "",
@@ -413,6 +452,8 @@
         "starter_code": "def addition(a, b):\r\n    pass",
         "function_name": "addition",
         "solution_code": "def addition(a, b):\n    # On additionne simplement les deux nombres reçus en paramètre\n    return a + b\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -432,6 +473,8 @@
         "starter_code": "def phrase(nombre):\n    pass\n",
         "function_name": "phrase",
         "solution_code": "def phrase(nombre):\n    # str(nombre) convertit le nombre en texte pour pouvoir le concaténer\n    # avec les chaînes de caractères qui l'entourent\n    return \"J'ai \" + str(nombre) + \" pommes\"\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -457,6 +500,8 @@
         "starter_code": "def verifier_majorite(age):\n    pass\n",
         "function_name": "verifier_majorite",
         "solution_code": "def verifier_majorite(age):\n    # Une seule condition, avec if / else : deux issues possibles qui\n    # s'excluent mutuellement (on ne peut pas être à la fois majeur et mineur)\n    if age >= 18:\n        return \"Majeur\"\n    else:\n        return \"Mineur\"\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -475,6 +520,8 @@
         "starter_code": "def parite(n):\n    pass\n",
         "function_name": "parite",
         "solution_code": "def parite(n):\n    # n % 2 donne le reste de la division de n par 2 :\n    # ce reste vaut 0 si n est pair, 1 (ou -1) sinon\n    if n % 2 == 0:\n        return 'pair'\n    else:\n        return 'impair'\n\n\n# Autre version, sans le else : le if se termine par un return, donc\n# si la condition est vraie la fonction s'arrête là ; sinon on continue\n# et on exécute forcément la ligne suivante.\ndef parite(n):\n    if n % 2 == 0:\n        return 'pair'\n    return 'impair'\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -493,6 +540,8 @@
         "starter_code": "def signe(n):\n    pass\n",
         "function_name": "signe",
         "solution_code": "def signe(n):\n    # Trois cas possibles, mutuellement exclusifs : if / elif / else\n    # garantit qu'UNE SEULE des trois branches sera exécutée\n    if n > 0:\n        return \"positif\"\n    elif n < 0:\n        return \"négatif\"\n    else:\n        return \"nul\"\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -512,6 +561,8 @@
         "starter_code": "def reduction_cinema(age, etudiant, jour):\n    pass\n",
         "function_name": "reduction_cinema",
         "solution_code": "def reduction_cinema(age, etudiant, jour):\n    reduction = 0\n\n    # Chaque condition est vérifiée INDÉPENDAMMENT des autres (plusieurs\n    # \"if\" séparés, pas de \"elif\") : plusieurs avantages peuvent s'appliquer\n    # à la fois à la même personne, contrairement à un elif qui ne garderait\n    # que le premier avantage trouvé et ignorerait les suivants\n    if age < 12:\n        reduction += 30\n\n    if etudiant:\n        reduction += 10\n\n    if jour == \"mardi\":\n        reduction += 10\n\n    return reduction\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -533,6 +584,8 @@
         "starter_code": "def mention(moyenne):\n    pass\n",
         "function_name": "mention",
         "solution_code": "def mention(moyenne):\n    # Cinq cas mutuellement exclusifs : chaque elif ne teste que ce qui n'a\n    # pas déjà été capturé par les conditions précédentes (on sait déjà que\n    # moyenne >= 10 en arrivant au 2e elif, >= 12 au 3e, etc.)\n    if moyenne < 10:\n        return \"Recalé\"\n    elif moyenne < 12:\n        return \"Passable\"\n    elif moyenne < 14:\n        return \"Assez bien\"\n    elif moyenne < 16:\n        return \"Bien\"\n    else:\n        return \"Très bien\"\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -557,6 +610,8 @@
         "starter_code": "def est_bissextile(annee):\n    pass\n",
         "function_name": "est_bissextile",
         "solution_code": "def est_bissextile(annee):\n    # Cas 1 : pas divisible par 4 -> jamais bissextile, on s'arrête là\n    if annee % 4 != 0:\n        return False\n    # Cas 2 : divisible par 4, ET pas par 100 -> bissextile (cas le plus courant)\n    elif annee % 100 != 0:\n        return True\n    # Cas 3 : divisible par 100, ET pas par 400 -> exception, PAS bissextile\n    elif annee % 400 != 0:\n        return False\n    # Cas 4 (dernier restant) : divisible par 400 -> bissextile\n    else:\n        return True\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -579,6 +634,8 @@
         "starter_code": "def impot(revenu):\n    pass\n",
         "function_name": "impot",
         "solution_code": "def impot(revenu):\n    # Tranche 1 : jusqu'à 10 000 € inclus, le taux est de 0% -> aucun impôt\n    if revenu <= 10000:\n        return 0\n\n    # Tranche 2 : de 10 000 € à 26 000 €, seule la portion AU-DESSUS de\n    # 10 000 € est taxée à 11% (pas le revenu total)\n    elif revenu <= 26000:\n        return (revenu - 10000) * 0.11\n\n    # Tranche 3 : de 26 000 € à 74 000 €. On paie d'abord l'impôt complet de\n    # la tranche 2 (calculé sur toute sa largeur, 26000 - 10000 = 16000 €),\n    # puis 30% sur la portion du revenu qui dépasse 26 000 €\n    elif revenu <= 74000:\n        impot_tranche_2 = (26000 - 10000) * 0.11\n        impot_tranche_3 = (revenu - 26000) * 0.30\n        return impot_tranche_2 + impot_tranche_3\n\n    # Tranche 4 : au-delà de 74 000 €. Même logique : on cumule l'impôt\n    # complet des tranches 2 et 3 (déjà \"pleines\"), puis 41% sur la portion\n    # qui dépasse 74 000 €\n    else:\n        impot_tranche_2 = (26000 - 10000) * 0.11\n        impot_tranche_3 = (74000 - 26000) * 0.30\n        impot_tranche_4 = (revenu - 74000) * 0.41\n        return impot_tranche_2 + impot_tranche_3 + impot_tranche_4\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -602,6 +659,8 @@
         "starter_code": "def vainqueur(coup1, coup2):\n    pass\n",
         "function_name": "vainqueur",
         "solution_code": "def vainqueur(coup1, coup2):\n    # Cas particulier à traiter en premier : les deux joueurs ont fait le\n    # même coup, personne ne gagne\n    if coup1 == coup2:\n        return \"égalité\"\n\n    # Liste des combinaisons (coup1, coup2) où le joueur 1 gagne : plutôt\n    # qu'une longue suite de elif pour chaque cas, on teste l'appartenance\n    # du tuple (coup1, coup2) à cette liste avec \"in\"\n    victoires_joueur1 = [(\"pierre\", \"ciseaux\"), (\"feuille\", \"pierre\"), (\"ciseaux\", \"feuille\")]\n\n    if (coup1, coup2) in victoires_joueur1:\n        return \"joueur1\"\n    else:\n        # Le seul cas restant (coups différents, joueur 1 pas gagnant) :\n        # c'est forcément le joueur 2 qui gagne\n        return \"joueur2\"\n\n\n# Autre version, avec plein de if : on énumère explicitement les trois\n# combinaisons où le joueur 1 gagne.\ndef vainqueur(coup1, coup2):\n    if coup1 == coup2:\n        return \"égalité\"\n    if coup1 == \"pierre\" and coup2 == \"ciseaux\":\n        return \"joueur1\"\n    if coup1 == \"feuille\" and coup2 == \"pierre\":\n        return \"joueur1\"\n    if coup1 == \"ciseaux\" and coup2 == \"feuille\":\n        return \"joueur1\"\n    return \"joueur2\"\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -623,6 +682,8 @@
         "starter_code": "def calculette(a, b, operation):\n    pass\n",
         "function_name": "calculette",
         "solution_code": "def calculette(a, b, operation):\n    if operation == \"+\":\n        return a + b\n    elif operation == \"-\":\n        return a - b\n    elif operation == \"*\":\n        return a * b\n    elif operation == \"/\":\n        # Cas particulier imbriqué DANS la branche \"/\" : on ne le teste que\n        # quand l'opération demandée est bien une division\n        if b == 0:\n            return \"Erreur : division par zéro\"\n        else:\n            return a / b\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -652,6 +713,8 @@
         "starter_code": "def majeur(age):\n    pass\n",
         "function_name": "majeur",
         "solution_code": "def majeur(age):\n    # True si age est supérieur ou égal à 18, False sinon\n    return age >= 18\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -670,6 +733,8 @@
         "starter_code": "def est_pair(n):\n    pass\n",
         "function_name": "est_pair",
         "solution_code": "def est_pair(n):\n    # Un nombre est pair si le reste de sa division par 2 vaut 0\n    return n % 2 == 0\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -688,6 +753,8 @@
         "starter_code": "def mauvais_mot_de_passe(saisie):\n    pass\n",
         "function_name": "mauvais_mot_de_passe",
         "solution_code": "def mauvais_mot_de_passe(saisie):\n    # != signifie \"différent de\" : on renvoie True si saisie\n    # n'est PAS égale au mot de passe attendu \"python\"\n    return saisie != \"python\"\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -706,6 +773,8 @@
         "starter_code": "def reduction(age):\n    pass\n",
         "function_name": "reduction",
         "solution_code": "def reduction(age):\n    # or : True si AU MOINS UNE des deux conditions est vraie\n    # ici : moins de 18 ans, OU 60 ans et plus\n    return age < 18 or age >= 60\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -724,6 +793,8 @@
         "starter_code": "def reduction(age):\n    pass\n",
         "function_name": "reduction",
         "solution_code": "def reduction(age):\n    # Le contraire de \"age < 18 ou age >= 60\" est \"age >= 18 et age < 60\",\n    # que l'on peut écrire en une seule comparaison : 18 <= age < 60\n    # Il ne reste plus qu'à inverser ce résultat avec not\n    return not (18 <= age < 60)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -744,6 +815,8 @@
         "starter_code": "def acces_attraction(age, taille):\n    pass\n",
         "function_name": "acces_attraction",
         "solution_code": "def acces_attraction(age, taille):\n    # and : True seulement si LES DEUX conditions sont vraies à la fois\n    # il faut à la fois avoir 10 ans ou plus ET mesurer 1m40 ou plus\n    return age >= 10 and taille >= 1.40\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -762,6 +835,8 @@
         "starter_code": "def est_voyelle(lettre):\n    pass\n",
         "function_name": "est_voyelle",
         "solution_code": "def est_voyelle(lettre):\n    # \"in\" teste si lettre est un des caractères présents dans la chaîne\n    # \"aeiouy\" : équivalent à lettre == 'a' or lettre == 'e' or ...\n    return lettre in \"aeiouy\"\n\n\n# Autre version, avec or\ndef est_voyelle(lettre):\n    return (lettre == 'a' or lettre == 'e' or lettre == 'i' or lettre == 'o'\n            or lettre == 'u' or lettre == 'y')\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -780,6 +855,8 @@
         "starter_code": "def peut_conduire(age, permis):\n    pass\n",
         "function_name": "peut_conduire",
         "solution_code": "def peut_conduire(age, permis):\n    # permis est déjà un booléen (True/False), pas besoin de le comparer :\n    # on peut l'utiliser directement dans le and\n    return age >= 18 and permis\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -798,6 +875,8 @@
         "starter_code": "def week_end(jour):\n    pass\n",
         "function_name": "week_end",
         "solution_code": "def week_end(jour):\n    # == compare deux chaînes de caractères : True si elles sont identiques\n    # or : True si jour correspond à l'un OU l'autre des deux jours\n    return jour == \"samedi\" or jour == \"dimanche\"\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -816,6 +895,8 @@
         "starter_code": "def pret(salaire, cdi, apport):\n    pass\n",
         "function_name": "pret",
         "solution_code": "def pret(salaire, cdi, apport):\n    # Les parenthèses regroupent la première condition : (salaire >= 1800 and cdi)\n    # Le prêt est accordé si CETTE condition est vraie, OU si son apport est suffisant à lui seul\n    return (salaire >= 1800 and cdi) or apport >= 20000\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -834,6 +915,8 @@
         "starter_code": "def traverser(feu_vert, voiture):\n    pass\n",
         "function_name": "traverser",
         "solution_code": "def traverser(feu_vert, voiture):\n    # not voiture inverse le booléen : True si aucune voiture n'arrive\n    # and : il faut à la fois le feu vert ET l'absence de voiture\n    return feu_vert and not voiture\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -860,6 +943,8 @@
         "starter_code": "def somme(n):\n    pass\n",
         "function_name": "somme",
         "solution_code": "def somme(n):\n    total = 0\n    # range(1, n + 1) parcourt les entiers de 1 à n inclus\n    # (range s'arrête juste avant sa borne haute, d'où le +1)\n    for i in range(1, n + 1):\n        total += i  # équivalent à total = total + i\n    return total\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -878,6 +963,8 @@
         "starter_code": "def puissance_de_2(x):\n    pass\n",
         "function_name": "puissance_de_2",
         "solution_code": "def puissance_de_2(x):\n    nb = 1\n    n = 0\n    # Tant que nb (qui vaut 2**n) est strictement inférieur à x, on double\n    # nb et on incrémente n : on avance de puissance de 2 en puissance de 2\n    while nb < x:\n        nb *= 2\n        n += 1\n    return n\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -899,6 +986,8 @@
         "starter_code": "def somme_pairs(n):\n    pass\n",
         "function_name": "somme_pairs",
         "solution_code": "def somme_pairs(n):\n    somme = 0\n    # range(0, n, 2) parcourt 0, 2, 4, ... en s'arrêtant avant n\n    for i in range(0, n, 2):\n        somme += i\n    return somme\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -920,6 +1009,8 @@
         "starter_code": "def somme_chiffres_entier(n):\n    pass\n",
         "function_name": "somme_chiffres_entier",
         "solution_code": "def somme_chiffres_entier(n):\n    # str(n) convertit le nombre en texte, ce qui permet de parcourir\n    # chaque chiffre comme un caractère\n    chaine = str(n)\n    somme = 0\n    for i in range(len(chaine)):\n        # int(chaine[i]) reconvertit ce caractère en nombre pour l'additionner\n        somme += int(chaine[i])\n    return somme\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -940,6 +1031,8 @@
         "starter_code": "def pgcd(a, b):\n    pass\n",
         "function_name": "pgcd",
         "solution_code": "def pgcd(a, b):\n    if a == 0:\n        return b\n    if b == 0:\n        return a\n\n    # Tant que a et b sont différents, on soustrait le plus petit au plus\n    # grand : le PGCD reste inchangé à chaque étape, et a finit par\n    # rejoindre b (ou l'inverse)\n    while a != b:\n        if a > b:\n            a = a - b\n        else:\n            b = b - a\n    return a\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -962,6 +1055,8 @@
         "starter_code": "def est_premier(n):\n    pass\n",
         "function_name": "est_premier",
         "solution_code": "def est_premier(n):\n    # Par définition, aucun nombre inférieur à 2 n'est premier\n    if n < 2:\n        return False\n\n    # On teste tous les diviseurs possibles de 2 à n-1 : si l'un d'eux\n    # divise n exactement, n n'est pas premier\n    for diviseur in range(2, n):\n        if n % diviseur == 0:\n            return False\n\n    return True\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -981,6 +1076,8 @@
         "starter_code": "def nombre_diviseurs(n):\n    pass\n",
         "function_name": "nombre_diviseurs",
         "solution_code": "def nombre_diviseurs(n):\n    compteur = 0\n\n    # On teste chaque nombre de 1 à n : s'il divise n sans reste, c'est\n    # un diviseur\n    for diviseur in range(1, n + 1):\n        if n % diviseur == 0:\n            compteur += 1\n\n    return compteur\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -999,12 +1096,14 @@
         "starter_code": "def comparaison_placements(capital_initial, versement_B):\n    pass\n",
         "function_name": "comparaison_placements",
         "solution_code": "def comparaison_placements(capital_initial, versement_B):\n    placement_A = capital_initial\n    placement_B = capital_initial\n\n    annees = 0\n\n    # Tant que B n'a pas dépassé A, on fait évoluer les deux placements\n    # d'une année supplémentaire\n    while placement_B <= placement_A:\n        placement_A = placement_A * 1.02\n        placement_B = placement_B * 1.01 + versement_B\n\n        annees += 1\n\n    return annees\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
           "[1000, 50]",
           "[5000, 100]",
-          "[10000, 20]",
+          "[10000, 150]",
           "[2000, 1000]"
         ],
         "hints": [
@@ -1019,6 +1118,8 @@
         "starter_code": "def est_palindrome(mot):\n    pass\n",
         "function_name": "est_palindrome",
         "solution_code": "def est_palindrome(mot):\n    n = len(mot)\n\n    # On compare le caractère d'indice i (depuis le début) à celui\n    # d'indice -1-i (depuis la fin) ; n//2 suffit car au-delà on\n    # recomparerait les mêmes paires en sens inverse\n    for i in range(n // 2):\n        if mot[i] != mot[-1 - i]:\n            return False\n\n    return True\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1048,6 +1149,8 @@
         "starter_code": "def doubler(liste):\n    pass\n",
         "function_name": "doubler",
         "solution_code": "def doubler(liste):\n    resultat = []\n    for x in liste:\n        resultat.append(x * 2)\n    return resultat\n\n\n# Autre version, avec une liste en compréhension : construit directement la\n# nouvelle liste en appliquant \"x * 2\" à chaque élément x de la liste\n# d'origine, sans la modifier\ndef doubler(liste):\n    return [x * 2 for x in liste]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1065,6 +1168,8 @@
         "starter_code": "def dernier(liste):\n    pass\n",
         "function_name": "dernier",
         "solution_code": "def dernier(liste):\n    # L'indice -1 correspond toujours au dernier élément d'une liste,\n    # quelle que soit sa longueur\n    return liste[-1]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1083,6 +1188,8 @@
         "starter_code": "def inverser(liste):\n    pass\n",
         "function_name": "inverser",
         "solution_code": "def inverser(liste):\n    inversee = []\n    for i in range(len(liste)):\n        # liste[-1-i] parcourt la liste depuis la fin :\n        # i=0 -> dernier élément (-1), i=1 -> avant-dernier (-2), etc.\n        inversee.append(liste[-1-i])\n    return inversee  # une NOUVELLE liste : liste d'origine jamais modifiée\n\n\n# Autre version, avec une liste en compréhension\ndef inverser(liste):\n    return [liste[-1-i] for i in range(len(liste))]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1101,6 +1208,8 @@
         "starter_code": "def minimum(liste):\n    pass\n",
         "function_name": "minimum",
         "solution_code": "def minimum(liste):\n    # On part du premier élément comme \"meilleur candidat\" pour le minimum\n    mini = liste[0]\n    # Puis on compare chaque élément suivant : si on trouve plus petit,\n    # on met à jour mini\n    for i in range(1, len(liste)):\n        if liste[i] < mini:\n            mini = liste[i]\n    return mini\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1119,6 +1228,8 @@
         "starter_code": "def indice_minimum(liste):\n    pass\n",
         "function_name": "indice_minimum",
         "solution_code": "def indice_minimum(liste):\n    # On mémorise l'INDICE du plus petit élément trouvé jusqu'ici, pas sa valeur\n    imini = 0\n    for i in range(1, len(liste)):\n        # On compare à liste[imini] (la valeur du minimum actuel),\n        # pas à une variable \"mini\" séparée\n        if liste[i] < liste[imini]:\n            imini = i\n    return imini\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1137,6 +1248,8 @@
         "starter_code": "def deuxieme_maximum(liste):\n    pass\n",
         "function_name": "deuxieme_maximum",
         "solution_code": "def deuxieme_maximum(liste):\n    # Premier passage : trouve le maximum de la liste\n    maximum = liste[0]\n    for x in liste:\n        if x > maximum:\n            maximum = x\n\n    # Deuxième passage : trouve le plus grand élément parmi ceux qui sont\n    # strictement inférieurs au maximum, donc en ignorant TOUTES les\n    # occurrences du maximum (même s'il apparaît plusieurs fois)\n    deuxieme = None\n    for x in liste:\n        if x != maximum:\n            if deuxieme is None or x > deuxieme:\n                deuxieme = x\n    return deuxieme\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1158,6 +1271,8 @@
         "starter_code": "def indices_zeros(liste):\n    pass\n",
         "function_name": "indices_zeros",
         "solution_code": "def indices_zeros(liste):\n    indices = []\n    for i in range(len(liste)):\n        # On vérifie la VALEUR à l'indice i avant de décider de l'ajouter\n        if liste[i] == 0:\n            indices.append(i)  # on stocke l'indice i, pas la valeur liste[i]\n    return indices\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1176,6 +1291,8 @@
         "starter_code": "def elements_negatifs(liste):\n    pass\n",
         "function_name": "elements_negatifs",
         "solution_code": "def elements_negatifs(liste):\n    negatifs = []\n    # On parcourt directement les valeurs (pas besoin des indices ici)\n    for x in liste:\n        if x < 0:\n            negatifs.append(x)\n    return negatifs\n\n\n# Autre version, avec les indices (range) : moins bonne ici, car l'indice i\n# ne sert à rien d'autre qu'à retrouver liste[i] — la version précédente,\n# qui parcourt directement les valeurs, est plus simple et plus lisible\ndef elements_negatifs(liste):\n    negatifs = []\n    for i in range(len(liste)):\n        if liste[i] < 0:\n            negatifs.append(liste[i])\n    return negatifs\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1194,6 +1311,8 @@
         "starter_code": "def element_present(liste, element):\n    pass\n",
         "function_name": "element_present",
         "solution_code": "def element_present(liste, element):\n    # \"in\" teste directement l'appartenance d'une valeur à une liste\n    return element in liste\n\n\n# Autre façon de faire, sans utiliser \"in\" : on parcourt la liste élément\n# par élément, et on renvoie True dès qu'on trouve une correspondance.\ndef element_present_sans_in(liste, element):\n    for x in liste:\n        if x == element:\n            return True\n    return False\n\n\n# Remarque sur la complexité : la première version ne fait pas apparaître de\n# boucle explicitement, mais Python doit quand même parcourir la liste en\n# interne pour vérifier la présence de element, donc la complexité des deux\n# versions est exactement la même\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1212,6 +1331,8 @@
         "starter_code": "def premiers_pairs(n):\n    pass\n",
         "function_name": "premiers_pairs",
         "solution_code": "def premiers_pairs(n):\n    # range(1, n + 1) parcourt les entiers de 1 à n inclus\n    # Pour chaque i, \"2 * i\" donne le i-ème nombre pair positif : 2, 4, 6, ...\n    # La liste en compréhension construit directement le résultat, sans\n    # boucle for classique ni .append()\n    return [2 * i for i in range(1, n + 1)]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1233,6 +1354,8 @@
         "starter_code": "def creer_matrice(m, n):\n    pass\n",
         "function_name": "creer_matrice",
         "solution_code": "def creer_matrice(m, n):\n    matrice = []\n    for _ in range(m):\n        ligne = []\n        for _ in range(n):\n            ligne.append(0)\n        matrice.append(ligne)\n    return matrice\n\n\n# Autre version, avec des listes en compréhension imbriquées : la liste en\n# compréhension EXTÉRIEURE crée m lignes...\n# ...et pour CHAQUE ligne, la liste en compréhension INTÉRIEURE crée\n# une nouvelle liste de n zéros. \"_\" signifie qu'on n'utilise pas la\n# valeur de la variable de boucle, seulement le nombre de répétitions.\ndef creer_matrice(m, n):\n    return [[0 for _ in range(n)] for _ in range(m)]\n\n    # ATTENTION, ERREUR CLASSIQUE : écrire à la place \"[[0] * n] * m\" est\n    # FAUX, bien que le résultat semble identique en apparence. Cette\n    # écriture crée m fois la MÊME liste en mémoire (pas m listes\n    # indépendantes) : modifier une valeur dans une ligne modifierait\n    # alors TOUTES les autres lignes en même temps (effet de bord\n    # invisible au premier abord).\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1254,6 +1377,8 @@
         "starter_code": "def identite(n):\n    pass\n",
         "function_name": "identite",
         "solution_code": "def identite(n):\n    # On initialise d'abord une matrice de zéros par compréhension...\n    matrice = [[0 for _ in range(n)] for _ in range(n)]\n    # ...puis on balaie la diagonale avec une boucle for classique pour\n    # y placer des 1.\n    for i in range(n):\n        matrice[i][i] = 1\n    return matrice\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1272,6 +1397,8 @@
         "starter_code": "def transposer(matrice):\n    pass\n",
         "function_name": "transposer",
         "solution_code": "def transposer(matrice):\n    m = len(matrice)\n    n = len(matrice[0])\n    # Dans le résultat, la ligne j est construite en prenant l'élément\n    # d'indice j de CHAQUE ligne de la matrice d'origine : on parcourt donc\n    # les colonnes (j) à l'extérieur, et les lignes (i) à l'intérieur\n    return [[matrice[i][j] for i in range(m)] for j in range(n)]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1297,6 +1424,8 @@
         "starter_code": "def dictionnaire_vide():\n    pass\n",
         "function_name": "dictionnaire_vide",
         "solution_code": "def dictionnaire_vide():\n    return {}\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1312,6 +1441,8 @@
         "starter_code": "def nombre_cles(dictionnaire):\n    pass\n",
         "function_name": "nombre_cles",
         "solution_code": "def nombre_cles(dictionnaire):\n    # len() sur un dictionnaire renvoie son nombre de clés\n    return len(dictionnaire)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1330,6 +1461,8 @@
         "starter_code": "def carnet_de_notes(noms, notes):\n    pass\n",
         "function_name": "carnet_de_notes",
         "solution_code": "def carnet_de_notes(noms, notes):\n    dictionnaire = {}\n    # On associe chaque prénom (noms[i]) à la note de MÊME position (notes[i])\n    for i in range(len(noms)):\n        dictionnaire[noms[i]] = notes[i]\n    return dictionnaire\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1348,6 +1481,8 @@
         "starter_code": "def fusionner_emprunts(dict1, dict2):\n    pass\n",
         "function_name": "fusionner_emprunts",
         "solution_code": "def fusionner_emprunts(dict1, dict2):\n    fusion = {}\n    for cle, valeur in dict1.items():\n        # valeur.copy() fait une COPIE de la liste plutôt que de réutiliser\n        # directement la même : sans cela, fusion[cle] pointerait vers exactement\n        # le même objet liste que dict1[cle], et une modification future du\n        # résultat modifierait aussi dict1 à son insu (effet de bord caché)\n        fusion[cle] = valeur.copy()\n    for cle, valeur in dict2.items():\n        if cle in fusion:\n            fusion[cle] = fusion[cle] + valeur\n        else:\n            fusion[cle] = valeur.copy()\n    return fusion\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1366,6 +1501,8 @@
         "starter_code": "def cle_presente(dictionnaire, cle):\n    pass\n",
         "function_name": "cle_presente",
         "solution_code": "def cle_presente(dictionnaire, cle):\n    # \"in\" sur un dictionnaire teste la présence parmi les CLÉS (pas les valeurs),\n    # et le fait à temps constant (grâce à la table de hachage du dictionnaire),\n    # quel que soit le nombre de clés.\n    return cle in dictionnaire\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1384,6 +1521,8 @@
         "starter_code": "def valeur_presente(dictionnaire, valeur):\n    pass\n",
         "function_name": "valeur_presente",
         "solution_code": "def valeur_presente(dictionnaire, valeur):\n    # .values() renvoie toutes les valeurs du dictionnaire, sans les clés.\n    # Contrairement à la recherche d'une clé, cette recherche ne se fait PAS à\n    # temps constant : il faut parcourir toutes les valeurs une par une pour\n    # savoir si \"valeur\" y figure.\n    return valeur in dictionnaire.values()\n\n\n# Autre façon de faire, sans \"in\" : on parcourt les valeurs une par une\ndef valeur_presente_avec_boucle(dictionnaire, valeur):\n    for v in dictionnaire.values():\n        if v == valeur:\n            return True\n    return False\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1402,6 +1541,8 @@
         "starter_code": "def compter_occurrences(liste):\n    pass\n",
         "function_name": "compter_occurrences",
         "solution_code": "def compter_occurrences(liste):\n    compteur = {}\n    for element in liste:\n        if element in compteur:\n            compteur[element] += 1\n        else:\n            compteur[element] = 1\n    return compteur\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1423,6 +1564,8 @@
         "starter_code": "def regrouper_par_longueur(mots):\n    pass\n",
         "function_name": "regrouper_par_longueur",
         "solution_code": "def regrouper_par_longueur(mots):\n    groupes = {}\n    for mot in mots:\n        longueur = len(mot)\n        if longueur in groupes:\n            groupes[longueur].append(mot)\n        else:\n            groupes[longueur] = [mot]\n    return groupes\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1452,6 +1595,8 @@
         "starter_code": "def tri_insertion(L):\n    pass\n",
         "function_name": "tri_insertion",
         "solution_code": "def tri_insertion(L):\n    # Ltriee est la nouvelle liste qu'on construit progressivement ; on ne\n    # modifie jamais L, qui reste intacte tout au long de la fonction\n    Ltriee = []\n    for i in range(len(L)):\n        x = L[i]\n        # On ajoute d'abord x à la fin de Ltriee...\n        Ltriee.append(x)\n        j = i\n        # ...puis on le fait \"remonter\" tant qu'il est plus petit que son\n        # voisin de gauche, en échangeant les deux à chaque fois\n        while j > 0 and Ltriee[j] < Ltriee[j-1]:\n            Ltriee[j], Ltriee[j-1] = Ltriee[j-1], Ltriee[j]\n            j -= 1\n    return Ltriee\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1475,6 +1620,8 @@
         "starter_code": "def tri_selection(L):\n    pass\n",
         "function_name": "tri_selection",
         "solution_code": "def tri_selection(L):\n    for i in range(len(L)):\n        # i_min mémorise l'indice du plus petit élément trouvé parmi les\n        # éléments restants (à partir de la position i)\n        i_min = i\n        for j in range(i + 1, len(L)):\n            if L[j] < L[i_min]:\n                i_min = j\n        # On échange l'élément courant avec le minimum trouvé, ce qui place\n        # définitivement ce minimum à sa position triée finale\n        L[i], L[i_min] = L[i_min], L[i]\n    # On renvoie quand même L par commodité (pour pouvoir écrire\n    # resultat = tri_selection(ma_liste)), même si L est déjà modifiée en place\n    return L\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1498,6 +1645,8 @@
         "starter_code": "def fusion(L1, L2):\n    pass\n",
         "function_name": "fusion",
         "solution_code": "def fusion(L1, L2):\n    resultat = []\n    i, j = 0, 0\n    # Tant qu'il reste des éléments des DEUX côtés, on compare et on prend le plus petit\n    while i < len(L1) and j < len(L2):\n        if L1[i] <= L2[j]:\n            resultat.append(L1[i])\n            i += 1\n        else:\n            resultat.append(L2[j])\n            j += 1\n    # Il reste des éléments dans L1 (L2 est épuisée) : on les ajoute un par un\n    while i < len(L1):\n        resultat.append(L1[i])\n        i += 1\n    # Il reste des éléments dans L2 (L1 est épuisée) : on les ajoute un par un\n    while j < len(L2):\n        resultat.append(L2[j])\n        j += 1\n    return resultat\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1522,6 +1671,8 @@
         "starter_code": "def fusion(L1, L2):\n    resultat = []\n    i, j = 0, 0\n    while i < len(L1) and j < len(L2):\n        if L1[i] <= L2[j]:\n            resultat.append(L1[i])\n            i += 1\n        else:\n            resultat.append(L2[j])\n            j += 1\n    while i < len(L1):\n        resultat.append(L1[i])\n        i += 1\n    while j < len(L2):\n        resultat.append(L2[j])\n        j += 1\n    return resultat\n\n\ndef tri_fusion(L):\n    pass\n",
         "function_name": "tri_fusion",
         "solution_code": "def fusion(L1, L2):\n    resultat = []\n    i, j = 0, 0\n    while i < len(L1) and j < len(L2):\n        if L1[i] <= L2[j]:\n            resultat.append(L1[i])\n            i += 1\n        else:\n            resultat.append(L2[j])\n            j += 1\n    while i < len(L1):\n        resultat.append(L1[i])\n        i += 1\n    while j < len(L2):\n        resultat.append(L2[j])\n        j += 1\n    return resultat\n\n\ndef tri_fusion(L):\n    # Cas de base : une liste de 0 ou 1 élément est déjà triée\n    if len(L) <= 1:\n        return L\n    # On coupe la liste en deux moitiés...\n    milieu = len(L) // 2\n    # ...et on trie CHAQUE moitié récursivement (diviser pour régner)\n    gauche = tri_fusion(L[:milieu])\n    droite = tri_fusion(L[milieu:])\n    # On fusionne ensuite les deux moitiés triées en une seule liste triée\n    return fusion(gauche, droite)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1545,6 +1696,8 @@
         "starter_code": "def tri_rapide(L):\n    pass\n",
         "function_name": "tri_rapide",
         "solution_code": "def tri_rapide(L):\n    # Cas de base : une liste de 0 ou 1 élément est déjà triée\n    if len(L) <= 1:\n        return L\n    # On choisit le premier élément de L comme pivot.\n    pivot = L[0]\n    inferieurs = []\n    egaux = []\n    superieurs = []\n    # On répartit chaque élément de L selon sa comparaison au pivot\n    for x in L:\n        if x < pivot:\n            inferieurs.append(x)\n        elif x == pivot:\n            egaux.append(x)\n        else:\n            superieurs.append(x)\n    # On trie récursivement les deux listes extrêmes, puis on recolle le tout :\n    # inférieurs triés + égaux (déjà à leur place, au milieu) + supérieurs triés\n    return tri_rapide(inferieurs) + egaux + tri_rapide(superieurs)\n\n\n# Point important : le choix du pivot influence fortement la performance de\n# l'algorithme (voir l'exercice de complexité associé) — un pivot toujours pris\n# comme premier élément est simple à implémenter, mais peut se révéler très\n# défavorable sur certaines listes (par exemple une liste déjà triée).\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1573,6 +1726,8 @@
         "starter_code": "from collections import deque\n\ndef parcours_largeur(graphe, depart):\n    pass\n",
         "function_name": "parcours_largeur",
         "solution_code": "from collections import deque\n\ndef parcours_largeur(graphe, depart):\n    # \"visites\" garde la liste des nœuds déjà rencontrés, DANS L'ORDRE de visite\n    visites = [depart]\n    prochain = deque([depart])\n    while prochain:\n        # .popleft() retire ET renvoie le premier élément de la file\n        noeud = prochain.popleft()\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                # On marque le voisin comme visité DÈS qu'on le découvre,\n                # pas seulement quand on le traite : sinon un même nœud\n                # pourrait être ajouté plusieurs fois à la file\n                visites.append(voisin)\n                prochain.append(voisin)\n    return visites\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1595,6 +1750,8 @@
         "starter_code": "def parcours_profondeur(graphe, depart):\r\n    pass",
         "function_name": "parcours_profondeur",
         "solution_code": "def parcours_profondeur(graphe, depart):\n    visites = []\n\n    def visiter(noeud):\n        # Si le nœud est déjà visité, on arrête cette branche (évite les boucles infinies)\n        if noeud in visites:\n            return\n        # On marque le nœud comme visité en l'ajoutant tout de suite au résultat,\n        # AVANT d'explorer ses voisins\n        visites.append(noeud)\n        for voisin in graphe[noeud]:\n            # Appel récursif : on va aussi loin que possible dans cette branche\n            # avant de passer au voisin suivant\n            visiter(voisin)\n\n    visiter(depart)\n    return visites\n\n\n# Autre version, sans récursivité, avec une pile manuelle (LIFO)\ndef parcours_profondeur(graphe, depart):\n    visites = []\n    pile = [depart]\n    while pile:\n        noeud = pile.pop()\n        if noeud in visites:\n            continue\n        visites.append(noeud)\n        # On empile les voisins dans l'ORDRE INVERSE de la liste d'adjacence :\n        # une pile étant LIFO, c'est le dernier empilé qui sera dépilé en\n        # premier — il faut donc empiler en dernier celui qu'on veut traiter\n        # en premier, pour respecter l'ordre demandé par l'énoncé\n        for voisin in reversed(graphe[noeud]):\n            pile.append(voisin)\n    return visites\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1617,6 +1774,8 @@
         "starter_code": "def plus_court_chemin(graphe, depart, arrivee):\n    pass\n",
         "function_name": "plus_court_chemin",
         "solution_code": "def plus_court_chemin(graphe, depart, arrivee):\n    # distances[noeud] = plus courte distance connue depuis \"depart\" (au\n    # depart de l'algorithme, seul \"depart\" est connu, a distance 0)\n    distances = {depart: 0}\n    # predecesseurs[noeud] = nœud precedent sur le plus court chemin vers\n    # \"noeud\" (permet de reconstruire le chemin complet a la fin)\n    predecesseurs = {}\n    # \"valides\" contient les nœuds dont la distance minimale est confirmée\n    # (seules les clés comptent, la valeur associée à chacune n'a pas\n    # d'importance)\n    valides = {}\n    # Devient True quand on a trouvé \"arrivee\", ou quand il n'y a plus aucun\n    # nœud a valider (arrivee est alors inaccessible) : dans les deux cas,\n    # on arrete la boucle\n    fini = False\n    # Dernier nœud choisi dans la boucle : une fois la boucle terminee, sert\n    # a savoir si on s'est arreté parce qu'on a trouvé \"arrivee\", ou parce\n    # que plus rien n'était atteignable (candidat vaut alors toujours None)\n    candidat = None\n\n    while not fini:\n        # Parmi les nœuds découverts mais pas encore validés, on cherche\n        # celui qui a la plus petite distance connue\n        candidat = None\n        for noeud, distance in distances.items():\n            if noeud not in valides and (candidat is None or distance < distances[candidat]):\n                candidat = noeud\n\n        if candidat is None or candidat == arrivee:\n            # Soit plus rien n'est atteignable, soit on vient de trouver\n            # \"arrivee\" avec une distance garantie minimale : dans les deux\n            # cas, inutile de continuer la boucle\n            fini = True\n        else:\n            valides[candidat] = True\n            for voisin, poids in graphe[candidat]:\n                nouvelle_distance = distances[candidat] + poids\n                # On met à jour la distance du voisin seulement si on a\n                # trouvé un chemin plus court que ce qui était connu\n                if voisin not in distances or nouvelle_distance < distances[voisin]:\n                    distances[voisin] = nouvelle_distance\n                    predecesseurs[voisin] = candidat\n\n    if candidat != arrivee:\n        # La boucle s'est arretee sans jamais trouver \"arrivee\" : elle est\n        # inaccessible depuis \"depart\"\n        return None, None\n\n    # On reconstruit le chemin en remontant les prédécesseurs depuis l'arrivée\n    chemin = [arrivee]\n    while chemin[-1] != depart:\n        chemin.append(predecesseurs[chemin[-1]])\n    chemin.reverse()\n    return distances[arrivee], chemin\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1639,6 +1798,8 @@
         "starter_code": "def est_connexe(graphe):\n    pass\n",
         "function_name": "est_connexe",
         "solution_code": "def est_connexe(graphe):\n    # On choisit un nœud de départ arbitraire : le premier de la liste des\n    # clés du dictionnaire\n    depart = list(graphe)[0]\n    # \"visites\" est un dictionnaire utilisé pour tester l'appartenance\n    # (seules les clés comptent, la valeur associée à chacune n'a pas\n    # d'importance)\n    visites = {depart: True}\n    file = [depart]\n    while file:\n        noeud = file.pop(0)\n        for voisin in graphe[noeud]:\n            if voisin not in visites:\n                visites[voisin] = True\n                file.append(voisin)\n    # Le graphe est connexe si on a réussi à atteindre TOUS ses nœuds\n    # depuis un seul point de départ\n    return len(visites) == len(graphe)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1660,6 +1821,8 @@
         "starter_code": "def contient_cycle(graphe):\n    pass\n",
         "function_name": "contient_cycle",
         "solution_code": "def contient_cycle(graphe):\n    # Nœuds déjà visités, tous parcours confondus (seules les clés comptent,\n    # la valeur associée à chacune n'a pas d'importance)\n    deja_visites = {}\n\n    # On boucle sur \"depart\" pour couvrir aussi les graphes non connexes\n    # (plusieurs morceaux séparés) : un cycle peut être dans n'importe laquelle\n    # des composantes\n    for depart in graphe:\n        if depart not in deja_visites:\n            # On marque un nœud comme visité DÈS qu'on l'empile (comme dans\n            # parcours_largeur), pas seulement quand on le traite : chaque\n            # nœud n'est ainsi jamais empilé plus d'une fois\n            deja_visites[depart] = True\n            pile = [(depart, None)]\n\n            while pile:\n                noeud, parent = pile.pop()\n\n                for voisin in graphe[noeud]:\n                    if voisin not in deja_visites:\n                        # Nouveau nœud : on le marque visité et on l'empile,\n                        # avec \"noeud\" comme parent\n                        deja_visites[voisin] = True\n                        pile.append((voisin, noeud))\n                    elif voisin != parent:\n                        # \"voisin\" est déjà visité ET ce n'est PAS le parent\n                        # direct de \"noeud\" (celui par lequel on vient\n                        # d'arriver) : il existe donc un second chemin vers\n                        # lui => cycle\n                        return True\n\n    return False\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1691,6 +1854,8 @@
         "starter_code": "def puissance(a, n):\n    pass\n",
         "function_name": "puissance",
         "solution_code": "def puissance(a, n):\n    # Cas de base : n = 0, a**0 vaut toujours 1, quelle que soit la valeur de a\n    if n == 0:\n        return 1\n    # Cas général : a**n = a * a**(n-1)\n    # n - 1 se rapproche du cas de base (n = 0) à chaque appel\n    return a * puissance(a, n - 1)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1714,6 +1879,8 @@
         "starter_code": "def factorielle(n):\n    pass\n",
         "function_name": "factorielle",
         "solution_code": "def factorielle(n):\n    # Cas de base : par convention, la factorielle de 0 vaut 1\n    if n == 0:\n        return 1\n    # Cas général : n! = n * (n-1)!\n    # n - 1 se rapproche du cas de base (n = 0) à chaque appel\n    return n * factorielle(n - 1)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1735,6 +1902,8 @@
         "starter_code": "def somme_liste(liste):\n    pass\n",
         "function_name": "somme_liste",
         "solution_code": "def somme_liste(liste):\n    # Cas de base : une liste vide n'a rien à additionner, sa somme vaut 0\n    if liste == []:\n        return 0\n    # Cas général : la somme de liste = son premier élément + la somme du reste\n    # liste[1:] est une liste plus courte d'un élément : elle se rapproche du\n    # cas de base (liste vide) à chaque appel récursif\n    return liste[0] + somme_liste(liste[1:])\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1756,6 +1925,8 @@
         "starter_code": "def pgcd(a, b):\n    pass\n",
         "function_name": "pgcd",
         "solution_code": "def pgcd(a, b):\n    # Cas de base : quand b vaut 0, le pgcd est a (rappel : pgcd(a, 0) = a)\n    if b == 0:\n        return a\n    # Cas général : pgcd(a, b) = pgcd(b, a % b)\n    # a % b se rapproche de 0 à chaque appel, ce qui garantit d'atteindre\n    # le cas de base au bout d'un nombre fini d'appels\n    return pgcd(b, a % b)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1777,6 +1948,8 @@
         "starter_code": "def ajouter_lettres(mot, lettre, n):\n    pass\n",
         "function_name": "ajouter_lettres",
         "solution_code": "def ajouter_lettres(mot, lettre, n):\n    # Cas de base : n = 0, il ne reste plus aucune lettre à ajouter\n    if n == 0:\n        return mot\n    # Cas général : on ajoute une occurrence de lettre à la fin de mot,\n    # puis on appelle récursivement avec n - 1 (une lettre de moins à ajouter),\n    # ce qui se rapproche du cas de base à chaque appel\n    return ajouter_lettres(mot + lettre, lettre, n - 1)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1795,6 +1968,8 @@
         "starter_code": "def inverser_chaine(mot):\n    pass\n",
         "function_name": "inverser_chaine",
         "solution_code": "def inverser_chaine(mot):\n    # Cas de base : une chaîne vide est déjà son propre inverse\n    if mot == \"\":\n        return mot\n    # Cas général : l'inverse de mot est l'inverse de \"mot privé de sa première\n    # lettre\", suivi de cette première lettre placée à la fin\n    # mot[1:] est plus courte d'un caractère : elle se rapproche du cas de\n    # base (chaîne vide) à chaque appel\n    return inverser_chaine(mot[1:]) + mot[0]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1816,6 +1991,8 @@
         "starter_code": "def est_palindrome(mot):\n    pass\n",
         "function_name": "est_palindrome",
         "solution_code": "def est_palindrome(mot):\n    # Cas de base : une chaîne de 0 ou 1 caractère est toujours un palindrome\n    # (rien à comparer, ou une seule lettre qui se lit forcément pareil dans\n    # les deux sens)\n    if len(mot) <= 1:\n        return True\n    # Si la première et la dernière lettre diffèrent, mot n'est PAS un\n    # palindrome : inutile d'aller plus loin\n    if mot[0] != mot[-1]:\n        return False\n    # Cas général : première et dernière lettre identiques -> mot est un\n    # palindrome SI ET SEULEMENT SI le milieu (mot privé de ses deux\n    # extrémités) en est un aussi. mot[1:-1] est plus court de 2 caractères :\n    # il se rapproche du cas de base à chaque appel\n    return est_palindrome(mot[1:-1])\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1836,6 +2013,8 @@
         "starter_code": "def somme_chiffres(n):\n    pass\n",
         "function_name": "somme_chiffres",
         "solution_code": "def somme_chiffres(n):\n    # Cas de base : n a un seul chiffre (n < 10), la somme de ses chiffres\n    # est n lui-même\n    if n < 10:\n        return n\n    # Cas général : n % 10 donne le dernier chiffre de n, et n // 10 donne\n    # n privé de ce dernier chiffre (division entière)\n    # n // 10 est un nombre plus petit : il se rapproche du cas de base\n    # (un seul chiffre) à chaque appel\n    return n % 10 + somme_chiffres(n // 10)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1859,6 +2038,8 @@
         "starter_code": "def fibonacci(n):\n    pass\n",
         "function_name": "fibonacci",
         "solution_code": "def fibonacci(n):\n    # Cas de base : les deux premiers termes de la suite sont donnés\n    # directement (0 et 1)\n    if n <= 1:\n        return n\n    # Cas général : DEUX appels récursifs cette fois, sur n-1 et n-2, tous\n    # les deux plus petits que n -> on se rapproche bien du cas de base,\n    # mais par deux chemins différents à chaque étape\n    return fibonacci(n - 1) + fibonacci(n - 2)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1878,6 +2059,8 @@
         "starter_code": "def aplatir(liste):\n    pass\n",
         "function_name": "aplatir",
         "solution_code": "def aplatir(liste):\n    # Cas de base : une liste vide n'a rien à aplatir\n    if liste == []:\n        return []\n    tete = liste[0]\n    reste = liste[1:]\n    # type(tete) == list teste si tete est elle-même une liste (donc à\n    # aplatir aussi), ou une valeur simple (à garder telle quelle)\n    if type(tete) == list:\n        # tete est une liste imbriquée : on l'aplatit récursivement, puis on\n        # aplatit le reste, et on concatène les deux résultats (tous les\n        # deux déjà \"à plat\")\n        return aplatir(tete) + aplatir(reste)\n    else:\n        # tete est une valeur simple : on la place dans une liste à un seul\n        # élément, puis on aplatit le reste\n        return [tete] + aplatir(reste)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1900,6 +2083,8 @@
         "starter_code": "def recherche_dichotomique(liste, cible, borne_inf, borne_sup):\n    pass\n",
         "function_name": "recherche_dichotomique",
         "solution_code": "def recherche_dichotomique(liste, cible, borne_inf, borne_sup):\n    # Cas de base : la portion à explorer est vide (borne_inf a dépassé\n    # borne_sup) -> cible n'a été trouvée nulle part\n    if borne_inf > borne_sup:\n        return -1\n\n    milieu = (borne_inf + borne_sup) // 2\n\n    if liste[milieu] == cible:\n        # Cas de base : on a trouvé cible exactement au milieu\n        return milieu\n    elif liste[milieu] < cible:\n        # cible est plus grande : elle ne peut être que dans la moitié\n        # DROITE (liste triée), on réduit donc la portion explorée en\n        # excluant le milieu et tout ce qui est à sa gauche\n        return recherche_dichotomique(liste, cible, milieu + 1, borne_sup)\n    else:\n        # cible est plus petite : elle ne peut être que dans la moitié\n        # GAUCHE, on réduit la portion explorée en excluant le milieu et\n        # tout ce qui est à sa droite\n        return recherche_dichotomique(liste, cible, borne_inf, milieu - 1)\n\n# Remarque : borne_inf et borne_sup pourraient être des paramètres optionnels\n# (borne_inf=0, borne_sup=None, avec une initialisation\n# \"if borne_sup is None: borne_sup = len(liste) - 1\" au tout début de la\n# fonction), ce qui permettrait à l'appelant de se contenter d'écrire\n# recherche_dichotomique(liste, cible). C'est une astuce Python classique\n# pour donner une valeur par défaut qui dépend d'un autre paramètre\n# (impossible à écrire directement dans l'en-tête, puisque liste n'existe\n# pas encore à ce moment-là).\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1932,6 +2117,8 @@
         "starter_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    pass\n",
         "function_name": "distance",
         "solution_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    # On récupère le poids et le diamètre de chaque fruit\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    # Distance euclidienne : racine carrée de la somme des carrés des écarts\n    # sur chaque coordonnée (théorème de Pythagore en 2 dimensions)\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1952,6 +2139,8 @@
         "starter_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n\n\ndef plus_proches_voisins(fruit, echantillons, k):\n    pass\n",
         "function_name": "plus_proches_voisins",
         "solution_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n\n\ndef plus_proches_voisins(fruit, echantillons, k):\n    # On calcule la distance entre \"fruit\" et chaque échantillon connu, en gardant\n    # sa distance ET son étiquette ensemble dans un tuple (distance, etiquette)\n    distances = []\n    for poids, diametre, etiquette in echantillons:\n        d = distance(fruit, [poids, diametre])\n        distances.append((d, etiquette))\n\n    resultat = []\n    # On sélectionne k fois le plus proche restant, exactement comme le tri par\n    # sélection : à chaque tour, on cherche le minimum parmi ce qu'il reste,\n    # on le retient, puis on le retire (.pop) pour ne plus le reconsidérer\n    for _ in range(k):\n        indice_min = 0\n        for i in range(1, len(distances)):\n            if distances[i][0] < distances[indice_min][0]:\n                indice_min = i\n        _, etiquette = distances.pop(indice_min)\n        resultat.append(etiquette)\n    return resultat\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1972,6 +2161,8 @@
         "starter_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n\n\ndef plus_proches_voisins(fruit, echantillons, k):\n    distances = []\n    for poids, diametre, etiquette in echantillons:\n        d = distance(fruit, [poids, diametre])\n        distances.append((d, etiquette))\n    resultat = []\n    for _ in range(k):\n        indice_min = 0\n        for i in range(1, len(distances)):\n            if distances[i][0] < distances[indice_min][0]:\n                indice_min = i\n        _, etiquette = distances.pop(indice_min)\n        resultat.append(etiquette)\n    return resultat\n\n\ndef classifier_fruit(fruit, echantillons, k):\n    pass\n",
         "function_name": "classifier_fruit",
         "solution_code": "from math import sqrt\n\ndef distance(fruit1, fruit2):\n    poids1, diametre1 = fruit1\n    poids2, diametre2 = fruit2\n    return sqrt((poids1 - poids2) ** 2 + (diametre1 - diametre2) ** 2)\n\n\ndef plus_proches_voisins(fruit, echantillons, k):\n    distances = []\n    for poids, diametre, etiquette in echantillons:\n        d = distance(fruit, [poids, diametre])\n        distances.append((d, etiquette))\n    resultat = []\n    for _ in range(k):\n        indice_min = 0\n        for i in range(1, len(distances)):\n            if distances[i][0] < distances[indice_min][0]:\n                indice_min = i\n        _, etiquette = distances.pop(indice_min)\n        resultat.append(etiquette)\n    return resultat\n\n\ndef classifier_fruit(fruit, echantillons, k):\n    voisins = plus_proches_voisins(fruit, echantillons, k)\n    # On compte le nombre d'occurrences de chaque étiquette parmi les voisins\n    compteur = {}\n    for etiquette in voisins:\n        if etiquette in compteur:\n            compteur[etiquette] += 1\n        else:\n            compteur[etiquette] = 1\n    # On cherche l'étiquette dont le compteur est le plus élevé, en parcourant\n    # les voisins DANS L'ORDRE (du plus proche au plus éloigné). Ainsi, en cas\n    # d'égalité entre deux étiquettes, celle qui atteint la première ce score\n    # maximal est celle du voisin le plus proche parmi les deux — exactement\n    # la règle de départage demandée dans l'énoncé.\n    meilleure_etiquette = None\n    meilleur_compte = -1\n    for etiquette in voisins:\n        if compteur[etiquette] > meilleur_compte:\n            meilleur_compte = compteur[etiquette]\n            meilleure_etiquette = etiquette\n    return meilleure_etiquette\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -1992,6 +2183,8 @@
         "starter_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    pass\n",
         "function_name": "assigner_client",
         "solution_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    # On part du premier centroïde comme meilleur candidat...\n    meilleur_indice = 0\n    meilleure_distance = distance(client, centroides[0])\n    # ...puis on compare aux suivants : si l'un d'eux est plus proche, on\n    # met à jour l'indice ET la distance de référence\n    for i in range(1, len(centroides)):\n        d = distance(client, centroides[i])\n        if d < meilleure_distance:\n            meilleure_distance = d\n            meilleur_indice = i\n    return meilleur_indice\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2011,6 +2204,8 @@
         "starter_code": "def recalculer_centroide(clients):\n    pass\n",
         "function_name": "recalculer_centroide",
         "solution_code": "def recalculer_centroide(clients):\n    n = len(clients)\n    # On additionne d'un côté tous les montants, de l'autre tous les nombres\n    # de commandes, en parcourant les clients un par un\n    total_montant = 0\n    total_commandes = 0\n    for client in clients:\n        total_montant += client[0]\n        total_commandes += client[1]\n    # La moyenne de chaque coordonnée : le total divisé par le nombre de clients\n    return [total_montant / n, total_commandes / n]\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2030,6 +2225,8 @@
         "starter_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    meilleur_indice = 0\n    meilleure_distance = distance(client, centroides[0])\n    for i in range(1, len(centroides)):\n        d = distance(client, centroides[i])\n        if d < meilleure_distance:\n            meilleure_distance = d\n            meilleur_indice = i\n    return meilleur_indice\n\n\ndef recalculer_centroide(clients):\n    n = len(clients)\n    total_montant = 0\n    total_commandes = 0\n    for client in clients:\n        total_montant += client[0]\n        total_commandes += client[1]\n    return [total_montant / n, total_commandes / n]\n\n\ndef kmeans(clients, centroides_initiaux, nb_iterations):\n    pass\n",
         "function_name": "kmeans",
         "solution_code": "from math import sqrt\n\ndef distance(point1, point2):\n    x1, y1 = point1\n    x2, y2 = point2\n    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n\ndef assigner_client(client, centroides):\n    meilleur_indice = 0\n    meilleure_distance = distance(client, centroides[0])\n    for i in range(1, len(centroides)):\n        d = distance(client, centroides[i])\n        if d < meilleure_distance:\n            meilleure_distance = d\n            meilleur_indice = i\n    return meilleur_indice\n\n\ndef recalculer_centroide(clients):\n    n = len(clients)\n    total_montant = 0\n    total_commandes = 0\n    for client in clients:\n        total_montant += client[0]\n        total_commandes += client[1]\n    return [total_montant / n, total_commandes / n]\n\n\ndef kmeans(clients, centroides_initiaux, nb_iterations):\n    # On part d'une COPIE des centroïdes initiaux, pour ne jamais modifier\n    # centroides_initiaux (comme pour les tris \"non en place\")\n    centroides = [list(c) for c in centroides_initiaux]\n\n    for _ in range(nb_iterations):\n        # On répartit chaque client dans le groupe de son centroïde le plus\n        # proche. groupes[i] contient les clients assignés au centroïde d'indice i\n        groupes = [[] for _ in centroides]\n        for client in clients:\n            indice = assigner_client(client, centroides)\n            groupes[indice].append(client)\n\n        # Chaque centroïde devient le barycentre de son groupe. On ne\n        # recalcule que les groupes non vides, pour éviter une division par\n        # zéro dans recalculer_centroide (cas non rencontré dans les tests de\n        # cet exercice, mais qui évite un plantage si un centroïde se\n        # retrouve sans aucun client assigné)\n        for i in range(len(centroides)):\n            if groupes[i]:\n                centroides[i] = recalculer_centroide(groupes[i])\n\n    return centroides\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2058,6 +2255,8 @@
         "starter_code": "def fibonacci_td(n):\r\n    cache = {}\r\n\r\n    def aux(k):\r\n        pass\r\n        \r\n    return aux(n)",
         "function_name": "fibonacci_td",
         "solution_code": "def fibonacci_td(n):\r\n    cache = {}\r\n\r\n    def aux(k):\r\n        if k in cache:\r\n            return cache[k]\r\n        if k <= 1:\r\n            resultat = k\r\n        else:\r\n            resultat = aux(k - 1) + aux(k - 2)\r\n        cache[k] = resultat\r\n        return resultat\r\n\r\n    return aux(n)",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2081,6 +2280,8 @@
         "starter_code": "def fibonacci_bu(n):\r\n    pass",
         "function_name": "fibonacci_bu",
         "solution_code": "def fibonacci_bu(n):\r\n    # Cas évident\r\n    if n <= 1:\r\n        return n\r\n\r\n    # table[i] contiendra fibonacci(i), pour i allant de 0 à n\r\n    table = [0] * (n + 1)\r\n    table[1] = 1\r\n\r\n    # On remonte du plus petit vers le plus grand : chaque case ne dépend\r\n    # que des deux précédentes, déjà calculées à ce stade\r\n    for i in range(2, n + 1):\r\n        table[i] = table[i - 1] + table[i - 2]\r\n\r\n    return table[n]",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2104,6 +2305,8 @@
         "starter_code": "def chemin_grille_td(m, n):\r\n    cache = {}\r\n\r\n    def aux(i, j):\r\n        pass\r\n\r\n    return aux(m - 1, n - 1)",
         "function_name": "chemin_grille_td",
         "solution_code": "def chemin_grille_td(m, n):\r\n    # Le cache mémorise, pour chaque case (i, j) déjà rencontrée, le nombre de\r\n    # chemins qui y mènent — évite de recalculer plusieurs fois le même\r\n    # sous-problème (ex : aux(1, 2) est redemandé à la fois par aux(2, 2) et\r\n    # aux(1, 3))\r\n    cache = {}\r\n\r\n    def aux(i, j):\r\n        if (i, j) in cache:\r\n            return cache[(i, j)]\r\n        # Cas de base : sur la première ligne ou la première colonne, il\r\n        # n'existe qu'un seul chemin possible (tout droit)\r\n        if i == 0 or j == 0:\r\n            resultat = 1\r\n        else:\r\n            # Sinon, on vient forcément soit de la case du dessus (i-1, j),\r\n            # soit de la case de gauche (i, j-1) : le nombre de chemins vers\r\n            # (i, j) est la somme des deux\r\n            resultat = aux(i - 1, j) + aux(i, j - 1)\r\n        cache[(i, j)] = resultat\r\n        return resultat\r\n\r\n    return aux(m - 1, n - 1)",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2127,6 +2330,8 @@
         "starter_code": "def chemin_grille_bu(m, n):\r\n    pass",
         "function_name": "chemin_grille_bu",
         "solution_code": "def chemin_grille_bu(m, n):\r\n    # Double liste en compréhension : grille de m lignes et n colonnes,\r\n    # chaque case initialisée à 1 (un seul chemin possible pour atteindre la\r\n    # première ligne ou la première colonne)\r\n    table = [[1 for _ in range(n)] for _ in range(m)]\r\n\r\n    for i in range(1, m):\r\n        for j in range(1, n):\r\n            # Comme en top-down : le nombre de chemins vers (i, j) est la\r\n            # somme du nombre de chemins vers la case du dessus et vers\r\n            # celle de gauche, déjà calculées à ce stade (on parcourt les\r\n            # lignes puis les colonnes dans l'ordre croissant)\r\n            table[i][j] = table[i - 1][j] + table[i][j - 1]\r\n\r\n    return table[m - 1][n - 1]",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2151,6 +2356,8 @@
         "starter_code": "def rendu_glouton(montant, pieces):\r\n    pass",
         "function_name": "rendu_glouton",
         "solution_code": "def rendu_glouton(montant, pieces):\r\n    # pieces est déjà donnée dans l'ordre décroissant : pas besoin de la\r\n    # retrier avant de l'utiliser\r\n    nb_pieces = 0\r\n    reste = montant\r\n\r\n    for piece in pieces:\r\n        if piece <= reste:\r\n            # reste // piece donne directement le nombre de fois qu'on peut\r\n            # utiliser cette pièce sans dépasser reste (pas besoin d'une\r\n            # boucle qui la soustrairait une par une)\r\n            nb_pieces += reste // piece\r\n            reste -= (reste // piece) * piece\r\n\r\n    return nb_pieces\r\n\r\n\r\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\r\n# donne le résultat optimal pour un système de pièces classique (comme\r\n# l'euro), mais pas pour n'importe quel système. Exemple concret avec les\r\n# pièces [4, 3, 1] pour un montant de 6 : le glouton choisit 4 + 1 + 1 = 3\r\n# pièces, alors que 3 + 3 = 2 pièces suffiraient (essaie rendu_glouton(6,\r\n# [4, 3, 1]) pour t'en convaincre). C'est exactement pour corriger ce genre\r\n# de cas que la programmation dynamique (top-down et bottom-up, voir la\r\n# suite) est nécessaire : elle explore toutes les combinaisons possibles,\r\n# au lieu de s'engager sans retour possible sur le plus grand choix\r\n# immédiat.",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2172,6 +2379,8 @@
         "starter_code": "def rendu_td(montant, pieces):\r\n    pass",
         "function_name": "rendu_td",
         "solution_code": "def rendu_td(montant, pieces):\r\n    # Le cache mémorise, pour chaque montant déjà traité, le nombre minimal de\r\n    # pièces trouvé (ou None si aucune combinaison n'est possible) — évite de\r\n    # retraiter plusieurs fois le même sous-problème\r\n    cache = {}\r\n\r\n    def aux(m):\r\n        # Cas de base : rendre 0, c'est ne poser aucune pièce\r\n        if m == 0:\r\n            return 0\r\n        if m in cache:\r\n            return cache[m]\r\n\r\n        # On essaie chaque pièce utilisable (valeur <= m) : l'utiliser revient\r\n        # à ajouter 1 pièce au résultat optimal pour rendre m - p. On garde le\r\n        # meilleur (le plus petit) de tous les essais.\r\n        meilleur = None\r\n        for p in pieces:\r\n            if p <= m:\r\n                sous_resultat = aux(m - p)\r\n                if sous_resultat is not None:\r\n                    candidat = sous_resultat + 1\r\n                    if meilleur is None or candidat < meilleur:\r\n                        meilleur = candidat\r\n\r\n        cache[m] = meilleur\r\n        return meilleur\r\n\r\n    resultat = aux(montant)\r\n    # Si meilleur est resté à None jusqu'au bout, aucune combinaison de pièces\r\n    # ne permet de rendre exactement le montant demandé\r\n    if resultat is not None:\r\n        return resultat\r\n    else:\r\n        return -1",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2193,6 +2402,8 @@
         "starter_code": "def rendu_bu(montant, pieces):\r\n    pass",
         "function_name": "rendu_bu",
         "solution_code": "def rendu_bu(montant, pieces):\r\n    INFINI = float('inf')\r\n    # table[m] contiendra le nombre minimal de pièces pour rendre m\r\n    table = [0] + [INFINI] * montant\r\n\r\n    for m in range(1, montant + 1):\r\n        for p in pieces:\r\n            if p <= m and table[m - p] + 1 < table[m]:\r\n                # Utiliser cette pièce donne un résultat meilleur que ce\r\n                # qu'on avait trouvé jusqu'ici pour ce montant m\r\n                table[m] = table[m - p] + 1\r\n\r\n    # Si table[montant] est resté à l'infini, aucune combinaison de pièces\r\n    # ne permet de l'atteindre exactement\r\n    if table[montant] != INFINI:\r\n        return table[montant]\r\n    else:\r\n        return -1",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2216,6 +2427,8 @@
         "starter_code": "def sac_a_dos_glouton(objets, capacite):\r\n    # Trie les objets par rapport valeur/poids décroissant (le plus\r\n    # rentable au kilo en premier) — hors programme, ligne déjà fournie\r\n    objets_tries = sorted(objets, key=lambda o: o[1] / o[0], reverse=True)\r\n    pass",
         "function_name": "sac_a_dos_glouton",
         "solution_code": "def sac_a_dos_glouton(objets, capacite):\r\n    # Trie les objets par rapport valeur/poids décroissant (le plus\r\n    # rentable au kilo en premier) — hors programme, ligne déjà fournie\r\n    objets_tries = sorted(objets, key=lambda o: o[1] / o[0], reverse=True)\r\n\r\n    poids_total = 0\r\n    valeur_totale = 0\r\n\r\n    for poids, valeur in objets_tries:\r\n        # On ajoute l'objet seulement s'il reste assez de place ; sinon on\r\n        # l'ignore définitivement (pas de retour en arrière possible)\r\n        if poids_total + poids <= capacite:\r\n            poids_total += poids\r\n            valeur_totale += valeur\r\n\r\n    return valeur_totale\r\n\r\n\r\n# Limite de cette stratégie (voir les deux exercices suivants) : le glouton\r\n# n'est pas toujours optimal pour le sac à dos 0/1. Sur l'exemple de\r\n# l'énoncé ([(10, 60), (20, 100), (30, 120)], 50), le glouton s'arrête à\r\n# une valeur de 160, alors que la meilleure solution possible est en\r\n# réalité de prendre les objets (20, 100) et (30, 120) (poids total 50,\r\n# valeur 220). Ce regroupement n'est jamais considéré par le glouton, qui\r\n# prend l'objet (10, 60) dès le départ pour son bon rapport valeur/poids,\r\n# sans jamais revenir sur ce choix ensuite.",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2237,6 +2450,8 @@
         "starter_code": "def sac_a_dos_td(objets, capacite):\r\n    pass",
         "function_name": "sac_a_dos_td",
         "solution_code": "def sac_a_dos_td(objets, capacite):\r\n    # Le cache mémorise, pour chaque sous-problème (i, capacite_restante) déjà\r\n    # rencontré, la valeur maximale déjà calculée — évite de recalculer\r\n    # plusieurs fois le même sous-problème\r\n    cache = {}\r\n\r\n    def aux(i, capacite_restante):\r\n        # Cas de base : plus d'objet à considérer, ou plus de place dans le sac\r\n        # -> valeur maximale nulle\r\n        if i == len(objets) or capacite_restante == 0:\r\n            return 0\r\n        if (i, capacite_restante) in cache:\r\n            return cache[(i, capacite_restante)]\r\n\r\n        poids, valeur = objets[i]\r\n\r\n        # Option 1 : ne pas prendre l'objet i\r\n        meilleur = aux(i + 1, capacite_restante)\r\n        # Option 2 : le prendre, si son poids le permet — on garde la meilleure\r\n        # des deux options\r\n        if poids <= capacite_restante:\r\n            avec_objet = valeur + aux(i + 1, capacite_restante - poids)\r\n            if avec_objet > meilleur:\r\n                meilleur = avec_objet\r\n\r\n        cache[(i, capacite_restante)] = meilleur\r\n        return meilleur\r\n\r\n    return aux(0, capacite)",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2259,6 +2474,8 @@
         "starter_code": "def sac_a_dos_bu(objets, capacite):\r\n    pass",
         "function_name": "sac_a_dos_bu",
         "solution_code": "def sac_a_dos_bu(objets, capacite):\r\n    n = len(objets)\r\n    # table[i][c] : valeur maximale en ne considérant que les i premiers\r\n    # objets, avec une capacité c. table[0][c] = 0 pour toute capacité c\r\n    # (aucun objet considéré) : déjà garanti par l'initialisation à 0\r\n    table = [[0] * (capacite + 1) for _ in range(n + 1)]\r\n\r\n    for i in range(1, n + 1):\r\n        # objets[i - 1] : le i-ème objet correspond à l'indice i-1 dans la\r\n        # liste (le tableau, lui, réserve la ligne 0 au cas aucun objet)\r\n        poids, valeur = objets[i - 1]\r\n        for c in range(capacite + 1):\r\n            # Option 1 par défaut : ne pas prendre l'objet i\r\n            table[i][c] = table[i - 1][c]\r\n            # Option 2 : le prendre, si son poids le permet, si c'est meilleur\r\n            if poids <= c:\r\n                avec_objet = valeur + table[i - 1][c - poids]\r\n                if avec_objet > table[i][c]:\r\n                    table[i][c] = avec_objet\r\n\r\n    return table[n][capacite]",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2290,6 +2507,8 @@
         "starter_code": "def minimax_nim(n, maximise):\n    pass\n",
         "function_name": "minimax_nim",
         "solution_code": "def minimax_nim(n, maximise):\n    # Cas de base : il ne reste plus d'allumette à prendre. Le joueur dont\n    # c'est le tour ne peut donc pas jouer : c'est l'ADVERSAIRE qui vient de\n    # prendre la dernière allumette au coup précédent, et qui a donc gagné.\n    if n == 0:\n        # Si c'est le tour de A (maximise) mais qu'il ne peut pas jouer,\n        # c'est B qui a gagné : la valeur (du point de vue de A) est -1.\n        # Si c'est le tour de B, c'est A qui a gagné : la valeur est +1.\n        if maximise:\n            return -1\n        else:\n            return 1\n\n    if maximise:\n        # Le joueur A cherche à MAXIMISER la valeur : on essaie chaque coup\n        # possible (retirer 1, 2 ou 3 allumettes, sans dépasser n), et on\n        # garde la meilleure valeur trouvée parmi tous les coups\n        meilleure_valeur = -2  # plus petit que toute valeur possible (-1 au minimum)\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de B (maximise devient False)\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        # Le joueur B cherche à MINIMISER la valeur (du point de vue de A) :\n        # on garde cette fois la PIRE valeur trouvée parmi tous les coups\n        pire_valeur = 2  # plus grand que toute valeur possible (1 au maximum)\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de A (maximise devient True)\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2317,6 +2536,8 @@
         "starter_code": "def minimax_nim(n, maximise):\n    if n == 0:\n        return -1 if maximise else 1\n    if maximise:\n        meilleure_valeur = -2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        pire_valeur = 2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n\n\ndef meilleur_coup_nim(n):\n    pass\n",
         "function_name": "meilleur_coup_nim",
         "solution_code": "def minimax_nim(n, maximise):\n    if n == 0:\n        if maximise:\n            return -1\n        else:\n            return 1\n    if maximise:\n        meilleure_valeur = -2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, False)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n    else:\n        pire_valeur = 2\n        for coup in (1, 2, 3):\n            if coup <= n:\n                valeur = minimax_nim(n - coup, True)\n                if valeur < pire_valeur:\n                    pire_valeur = valeur\n        return pire_valeur\n\n\ndef meilleur_coup_nim(n):\n    # On part du principe qu'il s'agit du tout premier coup : c'est donc à A\n    # de jouer (le joueur maximisant). meilleur_coup mémorise le coup retenu\n    # jusqu'ici, meilleure_valeur la valeur (du point de vue de A) qu'il procure\n    meilleur_coup = None\n    meilleure_valeur = -2  # plus petit que toute valeur possible (-1 au minimum)\n\n    for coup in (1, 2, 3):\n        if coup <= n:\n            # Après ce coup, la pile passe à n - coup et c'est au tour de B\n            # (maximise=False) : minimax_nim nous dit ce que VAUT cette position\n            # pour A, en supposant que les deux joueurs jouent ensuite parfaitement\n            valeur = minimax_nim(n - coup, False)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n\n    return meilleur_coup\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2342,6 +2563,8 @@
         "starter_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    # Heuristique simple (et volontairement approximative) : un nombre impair\n    # d'allumettes restantes est supposé favorable au joueur qui a le trait\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    pass\n",
         "function_name": "meilleur_coup_minimax_profondeur",
         "solution_code": "VALEUR_VICTOIRE = 10\nVALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_minimax_profondeur(n, profondeur):\n    # Minimax classique (comme dans le premier exercice), mais avec deux\n    # cas de base au lieu d'un seul : la vraie fin de partie (n == 0, valeur\n    # exacte) et l'arrêt anticipé faute de profondeur (valeur estimée)\n    def score(n, maximise, profondeur):\n        if n == 0:\n            # Fin de partie réelle : valeur exacte, garantie correcte\n            if maximise:\n                return VALEUR_DEFAITE\n            else:\n                return VALEUR_VICTOIRE\n        if profondeur == 0:\n            # On s'arrête là : on renvoie une estimation plutôt que la vraie\n            # valeur. evaluation_nim(n) est exprimée du point de vue du joueur\n            # au trait : si ce joueur est A (maximise), on la garde telle\n            # quelle ; si c'est B, on l'inverse pour revenir au point de vue\n            # de A — exactement comme pour VALEUR_VICTOIRE/VALEUR_DEFAITE\n            # juste au-dessus\n            if maximise:\n                return evaluation_nim(n)\n            else:\n                return -evaluation_nim(n)\n        if maximise:\n            meilleure_valeur = float('-inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, False, profondeur - 1)\n                    if valeur > meilleure_valeur:\n                        meilleure_valeur = valeur\n            return meilleure_valeur\n        else:\n            pire_valeur = float('inf')\n            for coup in (1, 2, 3):\n                if coup <= n:\n                    valeur = score(n - coup, True, profondeur - 1)\n                    if valeur < pire_valeur:\n                        pire_valeur = valeur\n            return pire_valeur\n\n    # Au tout premier coup, c'est à A de jouer : on essaie chaque coup et on\n    # garde celui qui donne la meilleure valeur (du point de vue de A)\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = score(n - coup, False, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n\r\n\r\n\r\n# Remarque sur les valeurs : VALEUR_VICTOIRE et VALEUR_DEFAITE valent 10 et -10,\r\n# bien plus grands en valeur absolue que les ±1 d'evaluation_nim : ainsi un résultat\r\n# certain l'emporte toujours sur une simple estimation.",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2373,6 +2596,8 @@
         "starter_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    pass\n",
         "function_name": "meilleur_coup_negamax_profondeur",
         "solution_code": "VALEUR_DEFAITE = -10\n\n\ndef evaluation_nim(n):\n    if n % 2 == 1:\n        return 1\n    else:\n        return -1\n\n\ndef meilleur_coup_negamax_profondeur(n, profondeur):\n    # Négamax, avec les deux mêmes cas de base que pour le minimax de\n    # l'exercice précédent : la vraie fin de partie (n == 0) et l'arrêt\n    # anticipé faute de profondeur (estimation)\n    def score(n, profondeur):\n        if n == 0:\n            # Fin de partie réelle : le joueur au trait ne peut pas jouer,\n            # il a donc perdu — valeur exacte\n            return VALEUR_DEFAITE\n        if profondeur == 0:\n            # On s'arrête là : evaluation_nim(n) est déjà exprimée du point\n            # de vue du joueur au trait, exactement la convention du\n            # négamax — pas besoin de l'adapter, contrairement au minimax\n            return evaluation_nim(n)\n        meilleure_valeur = float('-inf')\n        for coup in (1, 2, 3):\n            if coup <= n:\n                # Après ce coup, c'est au tour de l'adversaire : sa valeur\n                # est l'opposée de la nôtre\n                valeur = -score(n - coup, profondeur - 1)\n                if valeur > meilleure_valeur:\n                    meilleure_valeur = valeur\n        return meilleure_valeur\n\n    meilleur_coup = None\n    meilleure_valeur = float('-inf')\n    for coup in (1, 2, 3):\n        if coup <= n:\n            valeur = -score(n - coup, profondeur - 1)\n            if valeur > meilleure_valeur:\n                meilleure_valeur = valeur\n                meilleur_coup = coup\n    return meilleur_coup\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2412,6 +2637,8 @@
         "starter_code": "from math import log\n\ndef complexite_tri_insertion(L):\n    pass\n",
         "function_name": "complexite_tri_insertion",
         "solution_code": "from math import log\n\ndef complexite_tri_insertion(L):\n    n = len(L)\n    # Meilleur cas : liste déjà triée, chaque tour de la boucle for ne fait\n    # aucun échange (la condition du while est fausse dès le premier essai) :\n    # seule la boucle for (n tours) compte, donc une complexité linéaire\n    #\n    # Pire cas : liste triée en ordre décroissant, chaque élément doit\n    # remonter jusqu'au tout début : le while s'exécute jusqu'à i fois\n    # pour chaque i, soit au total de l'ordre de n²\n    return n, n**2\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2434,6 +2661,8 @@
         "starter_code": "from math import log\n\ndef complexite_tri_selection(L):\n    pass\n",
         "function_name": "complexite_tri_selection",
         "solution_code": "from math import log\n\ndef complexite_tri_selection(L):\n    n = len(L)\n    # Contrairement au tri par insertion, la boucle interne (recherche du minimum\n    # restant) s'exécute TOUJOURS entièrement, qu'importe l'état de départ de L :\n    # même si L est déjà triée, on doit quand même comparer chaque élément restant\n    # pour confirmer qu'aucun n'est plus petit que le candidat actuel.\n    # Résultat : meilleur cas et pire cas sont tous les deux en n²\n    return n**2, n**2\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2454,6 +2683,8 @@
         "starter_code": "from math import log\n\ndef complexite_tri_fusion(L):\n    pass\n",
         "function_name": "complexite_tri_fusion",
         "solution_code": "from math import log\n\ndef complexite_tri_fusion(L):\n    n = len(L)\n    # La liste est divisée en deux à chaque appel récursif : il y a environ\n    # log(n) \"niveaux\" de division. À chaque niveau, fusion() parcourt\n    # l'ensemble des éléments une fois, soit n opérations par niveau.\n    # Ce découpage ne dépend jamais des valeurs de L, seulement de sa taille :\n    # cas moyen et pire cas sont donc identiques ici\n    # Total : n opérations x log(n) niveaux\n    return n * log(n), n * log(n)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2474,6 +2705,8 @@
         "starter_code": "from math import log\n\ndef complexite_tri_rapide(L):\n    pass\n",
         "function_name": "complexite_tri_rapide",
         "solution_code": "from math import log\n\ndef complexite_tri_rapide(L):\n    n = len(L)\n    # Cas moyen : le pivot partage la liste en deux parts à peu près égales\n    # à chaque appel -> environ log(n) niveaux de récursion, n opérations\n    # par niveau (comme le tri fusion) : n * log(n)\n    #\n    # Pire cas : le pivot tombe systématiquement sur le plus petit ou le\n    # plus grand élément (ex : une liste déjà triée, avec ce choix de\n    # pivot = premier élément). La liste ne se réduit alors que d'UN\n    # élément à chaque appel récursif : n + (n-1) + ... + 1, de l'ordre de n²\n    return n * log(n), n**2\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2493,6 +2726,8 @@
         "starter_code": "from math import log\n\ndef complexite_recherche_min(L):\n    pass\n",
         "function_name": "complexite_recherche_min",
         "solution_code": "from math import log\n\ndef complexite_recherche_min(L):\n    n = len(L)\n    # Que la liste soit déjà triée ou non, la boucle parcourt TOUJOURS tous les\n    # éléments restants : on ne peut être sûr d'avoir trouvé le minimum qu'après\n    # avoir tout comparé, il n'y a donc jamais de \"sortie anticipée\" possible.\n    # Meilleur cas et pire cas sont donc identiques : n\n    return n, n\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2511,6 +2746,8 @@
         "starter_code": "from math import log\n\ndef complexite_recherche_element(L):\n    pass\n",
         "function_name": "complexite_recherche_element",
         "solution_code": "from math import log\n\ndef complexite_recherche_element(L):\n    n = len(L)\n    # Meilleur cas : l'élément recherché est trouvé dès la première comparaison\n    # (par exemple s'il est en tout premier dans la liste) : une seule opération,\n    # donc un coût CONSTANT, indépendant de n\n    #\n    # Pire cas : l'élément n'est pas dans la liste (ou se trouve tout à la fin) :\n    # il faut alors comparer tous les éléments un par un, soit n opérations\n    return 1, n\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2529,6 +2766,8 @@
         "starter_code": "from math import log\n\ndef complexite_recherche_element_in(L):\n    pass\n",
         "function_name": "complexite_recherche_element_in",
         "solution_code": "from math import log\n\ndef complexite_recherche_element_in(L):\n    n = len(L)\n    # L'opérateur \"in\" fonctionne de la même façon \"sous le capot\" qu'une boucle\n    # manuelle : il s'arrête dès qu'il trouve une correspondance. Le résultat est\n    # donc identique à la recherche avec boucle de l'exercice précédent :\n    # meilleur cas constant, pire cas linéaire\n    return 1, n\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2547,6 +2786,8 @@
         "starter_code": "from math import log\n\ndef complexite_recherche_element_dictionnaire(dictionnaire):\n    pass\n",
         "function_name": "complexite_recherche_element_dictionnaire",
         "solution_code": "from math import log\n\ndef complexite_recherche_element_dictionnaire(dictionnaire):\n    n = len(dictionnaire)\n    # Recherche par clé dans un dictionnaire : temps constant, quelle que soit la\n    # situation (meilleur cas et pire cas sont donc identiques ici)\n    return 1, 1\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2564,6 +2805,8 @@
         "starter_code": "from math import log\n\ndef complexite_transposition(matrice):\n    pass\n",
         "function_name": "complexite_transposition",
         "solution_code": "from math import log\n\ndef complexite_transposition(matrice):\n    m = len(matrice)\n    p = len(matrice[0]) if m > 0 else 0\n    n = m * p\n    # Chaque case de la matrice doit être visitée EXACTEMENT une fois, quelles que\n    # soient les valeurs qu'elle contient : il n'existe aucune sortie anticipée\n    # possible. Meilleur cas et pire cas sont donc identiques : n opérations, où n\n    # est le nombre total d'éléments de la matrice\n    return n, n\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2582,6 +2825,8 @@
         "starter_code": "from math import log\n\ndef complexite_cle_presente(dictionnaire):\n    pass\n",
         "function_name": "complexite_cle_presente",
         "solution_code": "from math import log\n\ndef complexite_cle_presente(dictionnaire):\n    n = len(dictionnaire)\n    # Recherche par clé dans un dictionnaire : temps constant, quelle que soit\n    # la situation (pas de distinction meilleur/pire cas ici, contrairement à une\n    # recherche dans une liste)\n    return 1\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -2607,6 +2852,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- SELECT nom, prenom : on choisit précisément quelles colonnes récupérer\n-- (séparées par une virgule), plutôt que SELECT * qui prendrait tout\n-- FROM eleves : indique la table dans laquelle chercher les données\n-- ORDER BY nom, prenom : trie d'abord par nom, puis par prenom SEULEMENT\n-- pour départager deux élèves de même nom. Par défaut le tri est croissant\n-- (ASC, implicite) ; pour un tri décroissant, il faudrait écrire DESC\n-- après la colonne concernée, ex: ORDER BY nom DESC\nSELECT nom, prenom FROM eleves ORDER BY nom, prenom;",
         "test_cases": [],
@@ -2620,6 +2867,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- WHERE difficulte = 'facile' : filtre par égalité EXACTE sur une colonne texte\n-- (contrairement à LIKE, qui permet une recherche approximative avec un motif)\nSELECT titre FROM exercices WHERE difficulte = 'facile' ORDER BY id;",
         "test_cases": [],
@@ -2633,6 +2882,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- LIKE permet une recherche par motif (pattern matching) sur du texte,\n-- au lieu d'une égalité stricte comme avec =\n-- Le caractère % est un joker : il représente n'importe quelle suite de\n-- caractères (y compris aucun). 'M%' signifie donc \"commence par M\"\nSELECT nom, prenom FROM eleves WHERE prenom LIKE 'M%' ORDER BY nom, prenom;",
         "test_cases": [],
@@ -2646,6 +2897,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- JOIN relie deux tables entre elles à partir d'une colonne commune :\n-- ici, exercices.theme_id correspond à themes.id (clé étrangère -> clé primaire)\n-- AS permet de donner un alias (surnom) à une table, pour écrire des requêtes\n-- plus courtes : \"e\" à la place de \"exercices\", \"t\" à la place de \"themes\"\nSELECT e.titre\nFROM exercices AS e\nJOIN themes AS t ON e.theme_id = t.id\nWHERE t.nom = 'Boucles'\nORDER BY e.id;",
         "test_cases": [],
@@ -2659,6 +2912,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- Deux jointures à la suite dans la même requête : on relie resultats à\n-- eleves (pour le prénom) ET resultats à exercices (pour le titre)\nSELECT el.prenom, ex.titre\nFROM resultats AS r\nJOIN eleves AS el ON r.eleve_id = el.id\nJOIN exercices AS ex ON r.exercice_id = ex.id\nWHERE r.reussi = 1\nORDER BY el.prenom, ex.titre;",
         "test_cases": [],
@@ -2672,6 +2927,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- COUNT(*) compte le nombre total de lignes de la table\nSELECT COUNT(*) FROM exercices;",
         "test_cases": [],
@@ -2685,6 +2942,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- GROUP BY regroupe les lignes ayant la même valeur dans la colonne indiquée\n-- (ici, un groupe par thème) ; COUNT(*) compte alors le nombre de lignes\n-- DANS CHAQUE groupe, plutôt que sur toute la table comme avant\nSELECT t.nom, COUNT(*)\nFROM exercices AS e\nJOIN themes AS t ON e.theme_id = t.id\nGROUP BY t.nom\nORDER BY t.nom;",
         "test_cases": [],
@@ -2698,6 +2957,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- SUM additionne les valeurs numériques d'une colonne, GROUPÉES par élève\n-- (même logique que COUNT(*) plus haut, mais on additionne une valeur\n-- au lieu de compter des lignes)\nSELECT e.nom, e.prenom, SUM(r.temps_secondes)\nFROM resultats AS r\nJOIN eleves AS e ON r.eleve_id = e.id\nGROUP BY e.id\nORDER BY e.nom, e.prenom;",
         "test_cases": [],
@@ -2711,6 +2972,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- AVG calcule la moyenne des valeurs numériques d'une colonne, par groupe\nSELECT ex.titre, AVG(r.temps_secondes)\nFROM resultats AS r\nJOIN exercices AS ex ON r.exercice_id = ex.id\nGROUP BY ex.id\nORDER BY AVG(r.temps_secondes);",
         "test_cases": [],
@@ -2724,6 +2987,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- MIN renvoie la plus petite valeur d'une colonne, par groupe\n-- WHERE reussi = 1 : on ne garde que les tentatives réussies, un temps\n-- sur une tentative ratée n'aurait pas de sens pour un \"meilleur temps\"\nSELECT ex.titre, MIN(r.temps_secondes)\nFROM resultats AS r\nJOIN exercices AS ex ON r.exercice_id = ex.id\nWHERE r.reussi = 1\nGROUP BY ex.id\nORDER BY ex.titre;",
         "test_cases": [],
@@ -2737,6 +3002,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- HAVING filtre les GROUPES après un GROUP BY, contrairement à WHERE qui\n-- filtre les lignes AVANT le regroupement. On ne peut pas écrire\n-- \"WHERE COUNT(*) > 6\" : COUNT(*) n'existe qu'une fois les groupes formés,\n-- donc son filtre doit se faire APRÈS, avec HAVING\nSELECT t.nom\nFROM exercices AS e\nJOIN themes AS t ON e.theme_id = t.id\nGROUP BY t.id\nHAVING COUNT(*) > 6\nORDER BY t.nom;",
         "test_cases": [],
@@ -2750,6 +3017,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- WHERE difficulte = 'facile' : filtre les LIGNES avant tout regroupement\n-- (on ne garde que les exercices faciles, dès le départ)\n-- GROUP BY : regroupe ensuite ces lignes déjà filtrées, par thème\n-- HAVING COUNT(*) >= 2 : filtre les GROUPES obtenus, en ne gardant que\n-- ceux qui contiennent au moins 2 lignes (donc au moins 2 exercices faciles)\n--\n-- Résumé de l'ordre d'exécution : WHERE (lignes) -> GROUP BY (groupes)\n-- -> HAVING (groupes filtrés)\nSELECT t.nom\nFROM exercices AS e\nJOIN themes AS t ON e.theme_id = t.id\nWHERE e.difficulte = 'facile'\nGROUP BY t.id\nHAVING COUNT(*) >= 2\nORDER BY t.nom;",
         "test_cases": [],
@@ -2771,6 +3040,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- Filtre simple par égalité sur une colonne texte\nSELECT nom FROM equipes WHERE ville = 'Lyon';",
         "test_cases": [],
@@ -2784,6 +3055,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "SELECT nom, prenom FROM joueurs WHERE poste = 'attaquant' ORDER BY nom;",
         "test_cases": [],
@@ -2797,6 +3070,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- % est un joker représentant n'importe quelle suite de caractères :\n-- 'D%' signifie \"commence par D\"\nSELECT nom, prenom FROM joueurs WHERE nom LIKE 'D%' ORDER BY nom, prenom;",
         "test_cases": [],
@@ -2810,6 +3085,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- JOIN relie joueurs.equipe_id (clé étrangère) à equipes.id (clé primaire)\nSELECT j.nom, j.prenom, e.nom\nFROM joueurs AS j\nJOIN equipes AS e ON j.equipe_id = e.id\nORDER BY e.nom, j.nom;",
         "test_cases": [],
@@ -2823,6 +3100,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "SELECT j.nom, j.prenom, b.minute\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nWHERE b.match_id = 4\nORDER BY b.minute;",
         "test_cases": [],
@@ -2836,6 +3115,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- GROUP BY regroupe les lignes de \"buts\" par joueur ; COUNT(*) compte alors\n-- le nombre de buts DANS CHAQUE groupe (un joueur qui n'a jamais marqué\n-- n'apparaît dans aucun groupe, donc n'apparaît pas dans le résultat)\nSELECT j.nom, j.prenom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nGROUP BY j.id\nORDER BY j.nom;",
         "test_cases": [],
@@ -2849,6 +3130,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- Double jointure : buts -> joueurs (pour connaître le buteur), puis\n-- joueurs -> equipes (pour connaître son équipe), avant de regrouper par équipe\nSELECT e.nom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nGROUP BY e.id\nORDER BY e.nom;",
         "test_cases": [],
@@ -2862,6 +3145,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- WHERE filtre les LIGNES de buts (via leur match) AVANT le regroupement\n-- par équipe : seuls les buts marqués à partir du 1er février comptent\nSELECT e.nom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nJOIN matchs AS m ON b.match_id = m.id\nWHERE m.date >= '2026-02-01'\nGROUP BY e.id\nORDER BY e.nom;",
         "test_cases": [],
@@ -2875,6 +3160,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- HAVING filtre les GROUPES formés par GROUP BY, après leur calcul :\n-- on ne garde que les équipes dont le COUNT(*) dépasse 5\nSELECT e.nom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nGROUP BY e.id\nHAVING COUNT(*) > 5\nORDER BY e.nom;",
         "test_cases": [],
@@ -2888,6 +3175,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- WHERE : un but compte seulement si l'équipe du buteur était l'équipe\n-- qui recevait pour CE match (m.equipe_domicile_id = j.equipe_id)\n-- GROUP BY : on regroupe ensuite ces buts filtrés, par joueur\n-- HAVING : on ne garde que les joueurs atteignant au moins 2 buts\n-- dans ces conditions précises\nSELECT j.nom, j.prenom, COUNT(*)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN matchs AS m ON b.match_id = m.id\nWHERE m.equipe_domicile_id = j.equipe_id\nGROUP BY j.id\nHAVING COUNT(*) >= 2\nORDER BY j.nom;",
         "test_cases": [],
@@ -2901,6 +3190,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- COUNT(DISTINCT b.match_id) : ne compte chaque match_id qu'UNE SEULE\n-- fois par joueur, même si ce joueur a marqué plusieurs buts dans le\n-- même match (contrairement à COUNT(*), qui compterait chaque but)\nSELECT j.nom, j.prenom, COUNT(DISTINCT b.match_id)\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nGROUP BY j.id\nHAVING COUNT(DISTINCT b.match_id) >= 2\nORDER BY j.nom;",
         "test_cases": [],
@@ -2916,6 +3207,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- Autojointure : on joint \"joueurs\" avec elle-même via deux alias (a et b)\n-- a.nom = b.nom : les deux joueurs partagent le même nom\n-- a.id < b.id : évite qu'un joueur soit apparié avec lui-même (id = id),\n-- et évite d'obtenir chaque paire en double (une fois (a,b), une fois (b,a))\nSELECT a.nom, a.prenom, b.prenom\nFROM joueurs AS a\nJOIN joueurs AS b ON a.nom = b.nom AND a.id < b.id\nORDER BY a.nom;",
         "test_cases": [],
@@ -2933,6 +3226,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- Même principe que l'autojointure précédente, avec DEUX conditions\n-- de correspondance cette fois : même équipe ET même poste\nSELECT e.nom, a.poste, a.prenom, b.prenom\nFROM joueurs AS a\nJOIN joueurs AS b ON a.equipe_id = b.equipe_id AND a.poste = b.poste AND a.id < b.id\nJOIN equipes AS e ON a.equipe_id = e.id\nORDER BY e.nom;",
         "test_cases": [],
@@ -2946,6 +3241,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- Même requête que \"Nombre de buts par équipe\", mais triée par total décroissant\n-- et limitée à la première ligne : l'équipe avec le plus grand total\nSELECT e.nom, COUNT(*) AS total\nFROM buts AS b\nJOIN joueurs AS j ON b.joueur_id = j.id\nJOIN equipes AS e ON j.equipe_id = e.id\nGROUP BY e.id\nORDER BY total DESC\nLIMIT 1;",
         "test_cases": [],
@@ -2961,6 +3258,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- La sous-requête (SELECT joueur_id FROM buts) donne l'ensemble des\n-- identifiants de joueurs ayant marqué AU MOINS une fois\n-- NOT IN exclut alors tous les joueurs présents dans cette liste\nSELECT nom, prenom\nFROM joueurs\nWHERE id NOT IN (SELECT joueur_id FROM buts)\nORDER BY nom;",
         "test_cases": [],
@@ -2976,6 +3275,8 @@
         "starter_code": "",
         "function_name": "",
         "solution_code": "",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "-- La sous-requête calcule la moyenne des scores totaux, sur TOUS les\n-- matchs (une seule valeur renvoyée, réutilisable dans une comparaison)\nSELECT id, score_domicile, score_exterieur\nFROM matchs\nWHERE (score_domicile + score_exterieur) > (\n    SELECT AVG(score_domicile + score_exterieur) FROM matchs\n)\nORDER BY id;",
         "test_cases": [],
@@ -2997,6 +3298,8 @@
         "starter_code": "import numpy as np\n\ndef tableau_zeros(n):\n    pass\n",
         "function_name": "tableau_zeros",
         "solution_code": "import numpy as np\n\ndef tableau_zeros(n):\n    # np.zeros(n) crée directement un tableau numpy de taille n rempli de 0.0\n    return np.zeros(n)\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -3014,6 +3317,8 @@
         "starter_code": "import numpy as np\n\ndef tableau_rempli(n, x):\n    pass\n",
         "function_name": "tableau_rempli",
         "solution_code": "import numpy as np\n\ndef tableau_rempli(n, x):\n    return np.ones(n) * x\n\n\n# Autre écriture possible, tout aussi valide :\n#\n# def tableau_rempli(n, x):\n#     return np.zeros(n) + x\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -3031,6 +3336,8 @@
         "starter_code": "import numpy as np\n\ndef integration_rectangles(vitesses, dt, x0):\n    pass\n",
         "function_name": "integration_rectangles",
         "solution_code": "import numpy as np\n\ndef integration_rectangles(vitesses, dt, x0):\n    n = len(vitesses)\n    positions = np.zeros(n)\n    positions[0] = x0\n    # Méthode des rectangles : on avance en supposant la vitesse constante\n    # (égale à sa valeur au DÉBUT de l'intervalle) sur toute la durée dt\n    for i in range(1, n):\n        positions[i] = positions[i - 1] + vitesses[i - 1] * dt\n    return positions\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -3050,6 +3357,8 @@
         "starter_code": "import numpy as np\n\ndef integration_trapezes(vitesses, dt, x0):\n    pass\n",
         "function_name": "integration_trapezes",
         "solution_code": "import numpy as np\n\ndef integration_trapezes(vitesses, dt, x0):\n    n = len(vitesses)\n    positions = np.zeros(n)\n    positions[0] = x0\n    # Méthode des trapèzes : on prend la MOYENNE des vitesses de début et\n    # de fin d'intervalle, plus précise que la méthode des rectangles\n    for i in range(1, n):\n        positions[i] = positions[i - 1] + (vitesses[i - 1] + vitesses[i]) / 2 * dt\n    return positions\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -3069,6 +3378,8 @@
         "starter_code": "import numpy as np\n\ndef euler_rc(u0, R, C, dt, n):\n    pass\n",
         "function_name": "euler_rc",
         "solution_code": "import numpy as np\n\ndef euler_rc(u0, R, C, dt, n):\n    tau = R * C\n    u = np.zeros(n + 1)\n    u[0] = u0\n    # Méthode d'Euler explicite : on avance pas à pas en utilisant la dérivée\n    # calculée au point courant (ici, la loi du/dt = -u/tau)\n    for k in range(n):\n        u[k + 1] = u[k] + dt * (-u[k] / tau)\n    return u\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
@@ -3088,6 +3399,8 @@
         "starter_code": "import numpy as np\n\ndef euler_masse_ressort(x0, v0, k, m, dt, n):\n    pass\n",
         "function_name": "euler_masse_ressort",
         "solution_code": "import numpy as np\n\ndef euler_masse_ressort(x0, v0, k, m, dt, n):\n    x = np.zeros(n + 1)\n    v = np.zeros(n + 1)\n    x[0] = x0\n    v[0] = v0\n    # On met à jour position ET vitesse à CHAQUE pas, en utilisant les valeurs\n    # du pas précédent (x[step], v[step]) : c'est le principe de la méthode\n    # d'Euler appliquée au système d'ordre 1 équivalent (x' = v, v' = -(k/m)*x)\n    for step in range(n):\n        x[step + 1] = x[step] + dt * v[step]\n        v[step + 1] = v[step] + dt * (-(k / m) * x[step])\n    return x\n",
+        "require_recursive": false,
+        "extra_test_code": "",
         "sql_setup": "",
         "sql_solution": "",
         "test_cases": [
