@@ -304,6 +304,10 @@
     }
     runBtn.disabled = false;
     runBtn.textContent = "Vérifier";
+
+    // Mis à disposition du mode pas à pas (stepper.js, admins uniquement) : Python est prêt.
+    window.codexoCtx = { getPyodide: () => pyodide, getCM: () => cm, getCode: getCode };
+    document.dispatchEvent(new Event("codexo:ready"));
   }
 
   async function submitResult(code, success, isAttempt) {

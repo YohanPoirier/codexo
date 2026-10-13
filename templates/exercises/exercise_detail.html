@@ -41,8 +41,25 @@
       <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
       <button id="reset-btn" class="reset-btn" type="button" title="Revenir au code de départ">Réinitialiser</button>
       <button id="save-btn" class="reset-btn" type="button" title="Enregistrer maintenant">Enregistrer</button>
+      {% if user.is_superuser and exercise.kind != "sql" %}
+        <button id="stepper-btn" class="reset-btn" type="button" disabled title="Mode pas à pas (en test, réservé aux admins)">Pas à pas</button>
+      {% endif %}
       <span id="save-confirm" class="save-confirm">Enregistré ✓</span>
     </div>
+
+    {% if user.is_superuser and exercise.kind != "sql" %}
+    <!-- Mode pas à pas (en test, admins uniquement) : voir static/js/stepper.js -->
+    <div id="stepper-panel" class="stepper-panel" hidden>
+      <div class="stepper-controls">
+        <button id="stepper-prev" type="button" class="reset-btn">◀ Reculer</button>
+        <button id="stepper-next" type="button" class="run-btn">Avancer ▶</button>
+        <span id="stepper-pos" class="stepper-pos"></span>
+        <button id="stepper-exit" type="button" class="reset-btn stepper-exit">Quitter</button>
+      </div>
+      <p id="stepper-msg" class="stepper-msg" hidden></p>
+      <div id="stepper-vars" class="stepper-vars"></div>
+    </div>
+    {% endif %}
 
     <div class="code-block-secondary">
       <button id="abandon-btn" class="abandon-link" type="button">Abandonner cet exercice</button>
@@ -119,5 +136,9 @@
   const MES_DEMANDES_AIDE_URL = "{% url 'mes_demandes_aide' %}";
   </script>
   <script src="{% static 'js/exercise.js' %}"></script>
+  {% if user.is_superuser and exercise.kind != "sql" %}
+    <link rel="stylesheet" href="{% static 'css/stepper.css' %}">
+    <script src="{% static 'js/stepper.js' %}"></script>
+  {% endif %}
 {% endif %}
 {% endblock %}

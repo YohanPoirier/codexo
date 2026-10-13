@@ -1,0 +1,51 @@
+/* Mode pas à pas (en test, réservé aux admins) — voir static/js/stepper.js */
+
+.stepper-panel {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-alt);
+}
+.stepper-panel[hidden] { display: none; }
+
+.stepper-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.stepper-controls button:disabled { cursor: not-allowed; }
+.stepper-pos { font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--ink-soft); }
+.stepper-exit { margin-left: auto; }
+
+.stepper-msg { margin: 10px 0 0; font-size: .9rem; color: var(--ink-soft); }
+.stepper-msg[hidden] { display: none; }
+.stepper-msg.error { color: var(--err); font-weight: 600; }
+
+.stepper-vars { margin-top: 12px; display: grid; gap: 10px; }
+.stepper-scope {
+  padding: 8px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--paper);
+}
+.stepper-scope.current { border-color: var(--amber); }
+.stepper-scope-title {
+  margin-bottom: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--ink-soft);
+}
+.stepper-empty { font-size: .85rem; color: var(--ink-soft); font-style: italic; }
+
+.stepper-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: .85rem; }
+.stepper-table td { padding: 3px 6px; vertical-align: top; }
+.stepper-table td:first-child { width: 1%; padding-right: 14px; white-space: nowrap; color: var(--indigo); }
+.stepper-table td:last-child { word-break: break-all; }
+
+/* Ligne sur le point d'être exécutée, dans l'éditeur CodeMirror (fond sombre) */
+.stepper-current-line { background: rgba(217, 142, 43, .35); }
+
+@media (max-width: 640px) {
+  .stepper-controls button { width: 100%; }
+  .stepper-pos { width: 100%; text-align: center; }
+  .stepper-exit { margin-left: 0; }
+}
