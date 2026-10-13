@@ -30,47 +30,40 @@
 
 /* Cadre commentaire */
 .stepper-msg {
-  position: relative;
   min-height: 3.2em;
-  padding: 22px 12px 10px;
-  border: 1px solid var(--rule);
+  padding: 10px 12px;
+  border: 2px solid var(--ink-soft);
   border-radius: 8px;
-  background: var(--paper-alt);
+  background: var(--paper);
   font-size: .9rem;
   color: var(--ink);
   white-space: pre-line;
-}
-.stepper-msg::before {
-  content: "Commentaire";
-  position: absolute;
-  top: 5px;
-  left: 12px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: .7rem;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
 }
 .stepper-msg.error { color: var(--err); font-weight: 600; border-color: var(--err); }
 
 .stepper-vars { display: grid; gap: 10px; }
 .stepper-scope {
-  padding: 8px 10px;
-  border: 1px solid var(--rule);
+  border: 2px solid var(--ink-soft);
   border-radius: 8px;
   background: var(--paper);
+  overflow: hidden;
 }
 .stepper-scope.current { border-color: var(--amber); }
 .stepper-scope-title {
-  margin-bottom: 4px;
+  padding: 5px 10px;
+  background: var(--indigo-deep);
+  color: var(--paper);
   font-family: 'JetBrains Mono', monospace;
-  font-size: .8rem;
-  color: var(--ink-soft);
+  font-size: .85rem;
+  font-weight: 600;
 }
+.stepper-scope.current .stepper-scope-title { box-shadow: inset 0 -3px 0 var(--amber); }
+.stepper-scope > .stepper-empty, .stepper-scope > .stepper-table { margin: 6px 10px 8px; width: calc(100% - 20px); }
 .stepper-empty { font-size: .85rem; color: var(--ink-soft); font-style: italic; }
 
 .stepper-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: .85rem; }
-.stepper-table td { padding: 3px 6px; vertical-align: top; }
+.stepper-table td { padding: 4px 6px; vertical-align: top; border-bottom: 1px solid var(--rule); }
+.stepper-table tr:last-child td { border-bottom: 0; }
 .stepper-table td:first-child { width: 1%; padding-right: 14px; white-space: nowrap; color: var(--indigo); }
 .stepper-table td:last-child { word-break: break-all; }
 
@@ -92,7 +85,8 @@
   padding-left: 10px;
   white-space: nowrap;
   font-size: .75rem;
-  color: var(--amber);
+  color: #9a5a12;
+  font-weight: 600;
 }
 
 .stepper-vars-title { margin: 0; font-size: 1.05rem; }
