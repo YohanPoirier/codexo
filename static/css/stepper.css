@@ -53,18 +53,18 @@
 .stepper-msg { color: #a9b3d1; font-style: italic; white-space: pre-line; }
 .stepper-msg.error { color: #ff9b85; font-style: normal; font-weight: 600; }
 
-.stepper-vars { display: grid; gap: 4px; }
-.stepper-call-arrow { text-align: center; font-size: .8rem; line-height: 1; color: var(--ink-soft); }
+.stepper-vars { display: grid; gap: 0; }
+.stepper-call-arrow { margin: -1px 0; text-align: center; font-size: .75rem; line-height: 1; color: var(--ink-soft); }
 .stepper-scope {
-  border: 2px solid #b9ae95;
+  border: 2px solid #737a94;
   border-radius: 8px;
   background: var(--paper);
   overflow: hidden;
 }
 .stepper-scope-title {
   padding: 5px 10px;
-  background: var(--rule);
-  color: var(--ink-soft);
+  background: #737a94;
+  color: #f4f5fa;
   font-family: 'JetBrains Mono', monospace;
   font-size: .85rem;
   font-weight: 600;
