@@ -112,13 +112,33 @@ def __trace_student__(source, max_steps, trace_module):
     class _Stop(BaseException):
         pass
 
+    class _Capture:
+        # Sortie des print() : on garde tout (jusqu'à MAX_OUT caractères) et chaque étape
+        # note la longueur déjà écrite, pour n'afficher que ce qui a été imprimé jusque-là.
+        MAX_OUT = 100000
+        def __init__(self):
+            self.parts = []
+            self.size = 0
+        def write(self, text):
+            text = str(text)
+            room = self.MAX_OUT - self.size
+            if room > 0:
+                text = text[:room]
+                self.parts.append(text)
+                self.size += len(text)
+            return len(text)
+        def flush(self):
+            pass
+
+    out = _Capture()
+
     def entry_step(frame):
         nonlocal truncated
         if len(steps) >= max_steps:
             truncated = True
             raise _Stop()
         code = frame.f_code
-        step = {"line": code.co_firstlineno, "stack": snap_stack(frame)}
+        step = {"line": code.co_firstlineno, "stack": snap_stack(frame), "out": out.size}
         pos = call_position(frame.f_back)
         if pos is not None:
             step["call"] = pos
@@ -129,7 +149,7 @@ def __trace_student__(source, max_steps, trace_module):
         line = pending.pop(id(frame), None)
         if line is None:
             return
-        step = {"line": line, "stack": snap_stack(frame)}
+        step = {"line": line, "stack": snap_stack(frame), "out": out.size}
         if extra:
             step.update(extra)
         steps.append(step)
@@ -177,6 +197,8 @@ def __trace_student__(source, max_steps, trace_module):
 
     ns = {"__name__": "__main__"}
     error = None
+    old_stdout = sys.stdout
+    sys.stdout = out
     sys.settrace(tracer)
     try:
         exec(code, ns)
@@ -191,13 +213,14 @@ def __trace_student__(source, max_steps, trace_module):
                 last = tb
             tb = tb.tb_next
         if last is not None:
-            steps.append({"line": last.tb_lineno, "stack": snap_stack(last.tb_frame), "error": error})
+            steps.append({"line": last.tb_lineno, "stack": snap_stack(last.tb_frame), "error": error, "out": out.size})
         else:
-            steps.append({"line": None, "stack": [], "error": error})
+            steps.append({"line": None, "stack": [], "error": error, "out": out.size})
     finally:
         sys.settrace(None)
+        sys.stdout = old_stdout
 
-    return json.dumps({"steps": steps, "truncated": truncated, "error": error})
+    return json.dumps({"steps": steps, "truncated": truncated, "error": error, "output": "".join(out.parts)})
 
 __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
 `;
@@ -206,6 +229,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   const nextBtn = document.getElementById("stepper-next");
   const posEl = document.getElementById("stepper-pos");
   const msgEl = document.getElementById("stepper-msg");
+  const printEl = document.getElementById("stepper-print");
   const varsBox = document.getElementById("stepper-vars");
   const caseRow = document.getElementById("stepper-case-row");
   const caseSel = document.getElementById("stepper-case");
@@ -217,6 +241,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   let calls = [];
   let steps = [];
   let truncated = false;
+  let output = []; // sortie des print(), en caractères (comme les longueurs comptées côté Python)
   let index = 0;
   let currentLine = null; // ligne CodeMirror (base 0) actuellement surlignée en entier
   let callMark = null; // surlignage de l'expression d'appel (CodeMirror TextMarker)
@@ -370,6 +395,8 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     prevBtn.disabled = index === 0;
     nextBtn.disabled = isLast;
 
+    if (printEl) printEl.textContent = output.slice(0, step.out || 0).join("");
+
     if (step.error) {
       showMessage("Erreur : " + step.error, true);
     } else {
@@ -430,8 +457,10 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     clearHighlight();
     steps = result.steps;
     truncated = !!result.truncated;
+    output = Array.from(result.output || "");
     index = 0;
     varsBox.textContent = "";
+    if (printEl) printEl.textContent = "";
 
     if (steps.length === 0) {
       // Rien à parcourir (erreur de syntaxe, code vide...) : on l'indique.

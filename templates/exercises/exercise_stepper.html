@@ -8,13 +8,13 @@
 
 <div class="stepper-page">
   <div class="stepper-main">
-    <div class="stepper-code">
-      <textarea id="stepper-code" spellcheck="false"></textarea>
-    </div>
-
     <div id="stepper-case-row" class="stepper-case-row" hidden>
       <label for="stepper-case">Test tracé :</label>
       <select id="stepper-case" class="stepper-case"></select>
+    </div>
+
+    <div class="stepper-code">
+      <textarea id="stepper-code" spellcheck="false"></textarea>
     </div>
 
     <div class="stepper-controls">
@@ -23,7 +23,13 @@
       <span id="stepper-pos" class="stepper-pos"></span>
     </div>
 
-    <div id="stepper-msg" class="stepper-msg" aria-live="polite">Chargement de Python…</div>
+    <div>
+      <h2 class="stepper-vars-title">Output</h2>
+      <div class="stepper-output" aria-live="polite">
+        <pre id="stepper-print" class="stepper-print"></pre>
+        <div id="stepper-msg" class="stepper-msg">Chargement de Python…</div>
+      </div>
+    </div>
   </div>
 
   <div class="stepper-side">
