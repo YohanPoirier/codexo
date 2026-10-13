@@ -233,6 +233,8 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   const varsBox = document.getElementById("stepper-vars");
   const caseRow = document.getElementById("stepper-case-row");
   const caseSel = document.getElementById("stepper-case");
+  const callEl = document.getElementById("stepper-call");
+  const editorBox = document.getElementById("stepper-editor");
   const rerunBtn = document.getElementById("stepper-rerun");
   const codeArea = document.getElementById("stepper-code");
   if (!prevBtn || !nextBtn || !msgEl || !codeArea) return;
@@ -270,6 +272,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     currentLine = null;
     if (callMark) callMark.clear();
     callMark = null;
+    if (callEl) callEl.classList.remove("active");
   }
 
   function showMessage(text, isError) {
@@ -376,6 +379,12 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     // Une erreur sur la ligne d'appel du test (ex : fonction mal nommée) n'a pas de ligne dans le code.
     const showLine = step.line >= 1 && step.line !== callLine;
     const showCall = !!step.call && step.call.line !== callLine;
+    // Entrée dans la fonction testée (ou erreur sur l'appel lui-même) : on surligne l'appel
+    // dans la ligne de console sous l'éditeur.
+    if (callEl && callLine !== null) {
+      const onCallLine = (!!step.call && step.call.line === callLine) || step.line === callLine;
+      callEl.classList.toggle("active", onCallLine);
+    }
     if (cm) {
       if (showLine) {
         currentLine = step.line - 1;
@@ -431,11 +440,44 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     calls.forEach(function (call, i) {
       const opt = document.createElement("option");
       opt.value = String(i);
-      opt.textContent = "Test " + (i + 1) + " : " + call;
+      opt.textContent = call + "  # test " + (i + 1);
       caseSel.appendChild(opt);
     });
     if (calls.length) caseSel.value = "0";
     caseRow.hidden = calls.length === 0;
+    if (editorBox) editorBox.classList.toggle("with-call", calls.length > 0);
+    renderCallLine();
+  }
+
+  // Affiche « >>> appel  # test n » avec une coloration simple (comme dans l'éditeur).
+  function addSpan(parent, cls, text) {
+    const span = document.createElement("span");
+    if (cls) span.className = cls;
+    span.textContent = text;
+    parent.appendChild(span);
+    return span;
+  }
+  function renderCallLine() {
+    if (!callEl) return;
+    callEl.textContent = "";
+    callEl.classList.remove("active");
+    const i = Number(caseSel.value);
+    const call = calls[i];
+    if (call === undefined) return;
+    addSpan(callEl, "p", ">>> ");
+    const expr = addSpan(callEl, "stepper-call-expr", "");
+    const open = call.indexOf("(");
+    addSpan(expr, "f", open > 0 ? call.slice(0, open) : call);
+    const rest = open > 0 ? call.slice(open) : "";
+    const token = /('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")|(-?\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b)|\b(True|False|None)\b/g;
+    let last = 0, m;
+    while ((m = token.exec(rest)) !== null) {
+      if (m.index > last) addSpan(expr, "", rest.slice(last, m.index));
+      addSpan(expr, m[1] ? "s" : m[2] ? "n" : "k", m[0]);
+      last = token.lastIndex;
+    }
+    if (last < rest.length) addSpan(expr, "", rest.slice(last));
+    addSpan(callEl, "c", "  # test " + (i + 1));
   }
 
   // Trace le code suivi de l'appel choisi dans le menu, puis affiche l'étape 1.
@@ -545,7 +587,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     }
   }
 
-  caseSel.addEventListener("change", trace); // autre test choisi : on retrace depuis le début
+  caseSel.addEventListener("change", function () { renderCallLine(); trace(); }); // autre test : on retrace depuis le début
   rerunBtn.addEventListener("click", trace);
   nextBtn.addEventListener("click", function () {
     if (index < steps.length - 1) { index++; render(); }

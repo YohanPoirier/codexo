@@ -8,12 +8,17 @@
 
 <div class="stepper-page">
   <div class="stepper-main">
-    <div id="stepper-case-row" class="stepper-case-row" hidden>
-      <select id="stepper-case" class="stepper-case" aria-label="Test tracé"></select>
-    </div>
-
-    <div class="stepper-code">
-      <textarea id="stepper-code" spellcheck="false"></textarea>
+    <div id="stepper-editor" class="stepper-editor">
+      <div class="stepper-code">
+        <textarea id="stepper-code" spellcheck="false"></textarea>
+      </div>
+      <!-- Appel du test, sous le code comme une ligne de console : le texte coloré est affiché
+           dans #stepper-call, le vrai menu (transparent) est posé par-dessus. -->
+      <div id="stepper-case-row" class="stepper-case-row" hidden>
+        <div id="stepper-call" class="stepper-call" aria-hidden="true"></div>
+        <select id="stepper-case" class="stepper-case" aria-label="Test tracé"></select>
+        <span class="stepper-call-caret" aria-hidden="true">▾</span>
+      </div>
     </div>
 
     <div class="stepper-controls">

@@ -14,20 +14,39 @@
 .stepper-controls button:disabled { cursor: not-allowed; }
 .stepper-pos { font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--ink-soft); }
 
-.stepper-case-row { display: flex; align-items: center; gap: 10px; }
-.stepper-case-row[hidden] { display: none; }
-.stepper-case-row label { font-size: .85rem; color: var(--ink-soft); white-space: nowrap; }
-.stepper-case {
-  flex: 1;
-  min-width: 0;
-  padding: 6px 8px;
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  background: var(--paper);
-  color: var(--ink);
+/* Appel du test, collé sous l'éditeur comme une ligne de console */
+.stepper-editor.with-call .CodeMirror { border-radius: var(--radius) var(--radius) 0 0; }
+.stepper-case-row {
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: var(--indigo-deep);
+  color: #eef1fb;
   font-family: 'JetBrains Mono', monospace;
-  font-size: .85rem;
+  font-size: .92rem;
 }
+.stepper-case-row[hidden] { display: none; }
+.stepper-case-row:focus-within { outline: 2px solid var(--amber); outline-offset: 2px; }
+.stepper-call { padding: 10px 40px 10px 16px; white-space: pre-wrap; word-break: break-word; border-radius: 0 0 var(--radius) var(--radius); }
+.stepper-call.active .stepper-call-expr { background: rgba(217, 142, 43, .6); border-radius: 3px; }
+.stepper-call .p { color: #7f8bae; }
+.stepper-call .f { color: #82aaff; }
+.stepper-call .n { color: #f78c6c; }
+.stepper-call .s { color: #c3e88d; }
+.stepper-call .k { color: #c792ea; }
+.stepper-call .c { color: #9aa5c9; font-style: italic; white-space: pre; }
+.stepper-call-caret { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #7f8bae; pointer-events: none; }
+/* Le vrai menu, transparent, couvre toute la ligne : un clic ouvre la liste des tests. */
+.stepper-case {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font: inherit;
+}
+.stepper-case option { background: var(--indigo-deep); color: #eef1fb; }
+.stepper-case:disabled { cursor: progress; }
 
 /* Cadre Output, aux couleurs de l'éditeur : sortie des print() puis informations
    (valeur renvoyée, fin du programme, erreur). */
