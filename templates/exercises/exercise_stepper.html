@@ -9,8 +9,7 @@
 <div class="stepper-page">
   <div class="stepper-main">
     <div id="stepper-case-row" class="stepper-case-row" hidden>
-      <label for="stepper-case">Test tracé :</label>
-      <select id="stepper-case" class="stepper-case"></select>
+      <select id="stepper-case" class="stepper-case" aria-label="Test tracé"></select>
     </div>
 
     <div class="stepper-code">
@@ -23,12 +22,10 @@
       <span id="stepper-pos" class="stepper-pos"></span>
     </div>
 
-    <div>
-      <h2 class="stepper-vars-title">Output</h2>
-      <div class="stepper-output" aria-live="polite">
-        <pre id="stepper-print" class="stepper-print"></pre>
-        <div id="stepper-msg" class="stepper-msg">Chargement de Python…</div>
-      </div>
+    <div class="stepper-output" aria-live="polite">
+      <div class="stepper-output-label">Output</div>
+      <pre id="stepper-print" class="stepper-print"></pre>
+      <div id="stepper-msg" class="stepper-msg">Chargement de Python…</div>
     </div>
   </div>
 

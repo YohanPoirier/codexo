@@ -31,7 +31,6 @@
 
 /* Cadre Output, aux couleurs de l'éditeur : sortie des print() puis informations
    (valeur renvoyée, fin du programme, erreur). */
-.stepper-vars-title + .stepper-output { margin-top: 6px; }
 .stepper-output {
   min-height: 64px;
   padding: 12px 16px;
@@ -41,13 +40,21 @@
   font-family: 'JetBrains Mono', monospace;
   font-size: .88rem;
 }
+.stepper-output-label {
+  margin-bottom: 6px;
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #7f8bae;
+}
 .stepper-print { margin: 0; white-space: pre-wrap; word-break: break-word; font: inherit; }
 .stepper-print:empty { display: none; }
 .stepper-print:not(:empty) + .stepper-msg:not(:empty) { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(238, 241, 251, .2); }
 .stepper-msg { color: #a9b3d1; font-style: italic; white-space: pre-line; }
 .stepper-msg.error { color: #ff9b85; font-style: normal; font-weight: 600; }
 
-.stepper-vars { display: grid; gap: 10px; }
+.stepper-vars { display: grid; gap: 4px; }
+.stepper-call-arrow { text-align: center; font-size: .8rem; line-height: 1; color: var(--ink-soft); }
 .stepper-scope {
   border: 2px solid #b9ae95;
   border-radius: 8px;
@@ -96,4 +103,4 @@
   font-weight: 600;
 }
 
-.stepper-vars-title { margin: 0; font-size: 1.05rem; }
+.stepper-vars-title { margin: 0 0 6px; font-size: 1.05rem; }

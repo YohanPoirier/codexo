@@ -313,6 +313,14 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     varsBox.appendChild(heading);
     const ordered = stack.slice().reverse();
     ordered.forEach(function (scope, i) {
+      if (i > 0) {
+        // Petit triangle entre deux cadres : la fonction du dessus appelle celle du dessous.
+        const arrow = document.createElement("div");
+        arrow.className = "stepper-call-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "▼";
+        varsBox.appendChild(arrow);
+      }
       const section = document.createElement("div");
       section.className = "stepper-scope" + (i === ordered.length - 1 ? " current" : "");
       const title = document.createElement("div");
@@ -421,7 +429,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     calls.forEach(function (call, i) {
       const opt = document.createElement("option");
       opt.value = String(i);
-      opt.textContent = call;
+      opt.textContent = "Test " + (i + 1) + " : " + call;
       caseSel.appendChild(opt);
     });
     if (calls.length) caseSel.value = "0";
