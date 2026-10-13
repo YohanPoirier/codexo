@@ -7,6 +7,11 @@
   const solutionCodeEl = document.getElementById("solution-reveal-code");
 
   let pyodide = null;
+  // numpy n'est chargé que si le code (corrigé ou test) l'importe vraiment : chercher le simple
+  // mot « numpy » ne suffit pas, il apparaît aussi dans un commentaire du code de test
+  // commun à tous les exercices (voir Exercise._build_python_test_code), ce qui faisait
+  // charger numpy partout.
+  const USES_NUMPY = /(import|from)\s+numpy\b/;
   let testCode = "";
   let solutionCode = "";
   let cm = null; // instance CodeMirror de l'éditeur, créée dans init()
@@ -298,7 +303,7 @@
       // testCode. On ne charge donc le package que pour les exercices qui en ont besoin,
       // pas systématiquement pour tous (évite d'alourdir le chargement des exercices
       // qui n'en ont pas l'usage).
-      if (testCode.includes("numpy")) {
+      if (USES_NUMPY.test(testCode)) {
         await pyodide.loadPackage("numpy");
       }
     } catch (e) {
@@ -525,7 +530,7 @@ __RESULTS__ = __EXEC_NS__["__RESULTS__"]
     });
   }
 
-  // Bouton "Pas à pas" (admins, en test) : ouvre la page dédiée (voir stepper.js). Le code ACTUEL
+  // Bouton "Pas à pas" (superusers, ou tous si PAS_A_PAS_ELEVES) : ouvre la page dédiée (voir stepper.js). Le code ACTUEL
   // de l'éditeur, même non enregistré, lui est transmis via localStorage ; la page le lit une
   // seule fois, puis retombe sur le dernier code enregistré (la sauvegarde au départ de la page,
   // saveDraftOnLeave, s'en charge aussi).

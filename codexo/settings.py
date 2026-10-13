@@ -38,6 +38,11 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
+# Mode pas à pas : réservé aux superusers tant que cette variable ne vaut pas "1" (à mettre
+# dans le fichier .env du serveur, puis redémarrer). Une fois ouvert aux élèves, chacun voit
+# aussi UNE fois la page de présentation (exercises/middleware.py).
+PAS_A_PAS_ELEVES = os.environ.get('CODEXO_PAS_A_PAS_ELEVES', '') == '1'
+
 ALLOWED_HOSTS = [h for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if h]
 if DEBUG:
     ALLOWED_HOSTS += ['localhost', '127.0.0.1']
@@ -69,6 +74,8 @@ MIDDLEWARE = [
     # Ajouté le 06/09/2026 (refonte de l'authentification, voir contexte-technique.md) :
     # doit rester APRÈS AuthenticationMiddleware (a besoin de request.user déjà résolu).
     'accounts.middleware.ForcerChangementMotDePasseMiddleware',
+    # Présentation du pas à pas, affichée une fois (après le changement de mot de passe).
+    'exercises.middleware.IntroPasAPasMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

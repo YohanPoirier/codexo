@@ -112,7 +112,7 @@
     runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
     try {
       pyodide = await loadPyodide();
-      if (testCode.includes("numpy")) {
+      if (/(import|from)\s+numpy\b/.test(testCode)) {
         await pyodide.loadPackage("numpy");
       }
     } catch (e) {

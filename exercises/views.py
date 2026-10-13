@@ -11,6 +11,7 @@ from django.db.models.functions import TruncDate
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.csrf import csrf_protect
 
 from accounts.models import User, Classe
@@ -34,6 +35,12 @@ ABANDON_LOCK_ENABLED = not settings.DEBUG
 # aberrantes (ex: un exercice "fini" en 15h) qui fausseraient les stats et la
 # page Trafic. 1h par envoi est largement suffisant pour un exercice normal.
 TEMPS_MAX_PAR_ENVOI_SECONDES = 3600
+
+
+def pas_a_pas_autorise(user):
+    """Le mode pas à pas est réservé aux superusers, sauf une fois ouvert aux élèves
+    (réglage PAS_A_PAS_ELEVES, voir settings.py)."""
+    return user.is_authenticated and (user.is_superuser or settings.PAS_A_PAS_ELEVES)
 
 
 def superuser_required(view_func):
@@ -166,20 +173,35 @@ def exercise_detail(request, theme_slug, exercise_slug):
             "show_solution_once": just_abandoned,
             "retry_at": retry_at,
             "pending_demande_aide": pending_demande_aide,
+            "pas_a_pas": pas_a_pas_autorise(request.user) and exercise.kind != Exercise.SQL,
         },
     )
 
 
-@superuser_required
+@login_required
 def exercise_stepper(request, theme_slug, exercise_slug):
-    """Page du mode pas à pas (en test, superusers uniquement) : le code d'un exercice Python
-    exécuté ligne par ligne, sur une page épurée (voir static/js/stepper.js).
+    """Page du mode pas à pas : le code d'un exercice Python exécuté ligne par ligne, sur une
+    page épurée (voir static/js/stepper.js). Réservée aux superusers tant que le pas à pas
+    n'est pas ouvert aux élèves (voir pas_a_pas_autorise).
 
     Le code de départ de la page est le dernier code enregistré pour cet exercice (ou le code
     de départ de l'exercice) : exercise.js transmet en plus, via le navigateur, le code actuel
     de l'éditeur quand on arrive depuis la page de l'exercice."""
     theme = get_object_or_404(Theme, slug=theme_slug)
     exercise = get_object_or_404(Exercise, theme=theme, slug=exercise_slug, kind=Exercise.PYTHON)
+    if not pas_a_pas_autorise(request.user):
+        return redirect("exercise_detail", theme_slug=theme.slug, exercise_slug=exercise.slug)
+    # Mêmes règles que la page de l'exercice : exercice visible pour la classe, et pas
+    # verrouillé après un abandon (sinon le pas à pas permettrait de le contourner).
+    if not exercise.is_visible_for(request.user):
+        messages.info(request, f"« {exercise.title} » n'est pas disponible pour ta classe.")
+        return redirect("exercise_list", theme_slug=theme.slug)
+    last_abandonment = (
+        Abandonment.objects.filter(user=request.user, exercise=exercise).order_by("-created_at").first()
+    )
+    if (ABANDON_LOCK_ENABLED and last_abandonment is not None
+            and timezone.now() < last_abandonment.created_at + ABANDON_LOCK_DURATION):
+        return redirect("exercise_detail", theme_slug=theme.slug, exercise_slug=exercise.slug)
     last_result = (
         Result.objects.filter(user=request.user, exercise=exercise).order_by("-created_at").first()
     )
@@ -231,6 +253,23 @@ def abandon_exercise(request, exercise_id):
     Abandonment.objects.create(user=request.user, exercise=exercise)
     request.session["just_abandoned_exercise_id"] = exercise.id
     return redirect("exercise_detail", theme_slug=exercise.theme.slug, exercise_slug=exercise.slug)
+
+
+@login_required
+def intro_pas_a_pas(request):
+    """Présentation du mode pas à pas, montrée une fois à chaque élève (voir
+    exercises/middleware.py). « J'ai compris » (POST) la marque comme vue et renvoie vers la
+    page que l'élève demandait au départ."""
+    suite = request.POST.get("next") or request.GET.get("next") or ""
+    if not url_has_allowed_host_and_scheme(suite, allowed_hosts={request.get_host()},
+                                           require_https=request.is_secure()):
+        suite = ""
+    if request.method == "POST":
+        if not request.user.a_vu_intro_pas_a_pas:
+            request.user.a_vu_intro_pas_a_pas = True
+            request.user.save(update_fields=["a_vu_intro_pas_a_pas"])
+        return redirect(suite or "theme_list")
+    return render(request, "exercises/intro_pas_a_pas.html", {"next": suite})
 
 
 @login_required
@@ -294,11 +333,10 @@ def exercise_tests(request, exercise_id):
         "test_code": exercise.build_test_code(),
         "solution_code": solution,
     }
-    # Mode pas à pas (en test, superusers uniquement, voir stepper.js) : les appels des cas de
-    # test sous forme de code Python (ex: "puissance(2, 3)"), pour que le pas à pas puisse
-    # exécuter la fonction de l'étudiant sur l'un d'eux. Réservé aux superusers : inutile
-    # d'exposer davantage de champs aux étudiants.
-    if request.user.is_superuser and exercise.kind != exercise.SQL:
+    # Mode pas à pas (voir stepper.js) : les appels des cas de test sous forme de code Python
+    # (ex: "puissance(2, 3)"), pour que le pas à pas puisse exécuter la fonction de l'étudiant
+    # sur l'un d'eux. Seulement pour qui a accès au pas à pas.
+    if pas_a_pas_autorise(request.user) and exercise.kind != exercise.SQL:
         payload["step_calls"] = _step_calls(exercise)
     return JsonResponse(payload)
 

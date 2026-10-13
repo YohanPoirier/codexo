@@ -104,6 +104,10 @@ class User(AbstractUser):
         ),
     )
 
+    # Page de présentation du mode pas à pas : affichée une seule fois, dès que le pas à pas
+    # est ouvert aux élèves (voir exercises/middleware.py).
+    a_vu_intro_pas_a_pas = models.BooleanField("a vu la présentation du pas à pas", default=False)
+
     USERNAME_FIELD = "identifiant"
     REQUIRED_FIELDS = []
 

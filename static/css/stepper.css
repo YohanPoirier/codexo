@@ -1,4 +1,4 @@
-/* Page « Pas à pas » (en test, réservée aux admins) — voir static/js/stepper.js */
+/* Page « Pas à pas » (accès : views.pas_a_pas_autorise) — voir static/js/stepper.js */
 
 .stepper-page {
   display: grid;

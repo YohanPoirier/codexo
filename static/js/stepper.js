@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  // Page du mode pas à pas (EN TEST, superusers uniquement : voir exercise_stepper.html).
+  // Page du mode pas à pas (superusers, ou tout le monde si PAS_A_PAS_ELEVES : voir views.pas_a_pas_autorise).
   //
   // Principe : le code est exécuté UNE SEULE FOIS sous sys.settrace côté Python, qui enregistre
   // chaque étape avec l'état des variables (sous forme de texte). « Avancer » et « Reculer » ne
@@ -421,7 +421,12 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       showMessage(step.error, true);
     } else {
       const parts = [];
-      if (step.renvoie !== undefined) parts.push("Renvoie " + step.renvoie + ".");
+      // Valeur renvoyée : pas affichée pour les appels internes (la variable qui la reçoit
+      // change, ça suffit). Seul le résultat final du test s'affiche, comme dans une console
+      // Python après « >>> appel ».
+      if (isLast && callLine !== null && step.renvoie !== undefined && step.stack.length === 1) {
+        parts.push(step.renvoie);
+      }
       if (isLast) {
         parts.push(
           truncated
@@ -554,7 +559,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       calls = data.step_calls || [];
       pyodide = await loadPyodide();
       // Même règle que la page de l'exercice : numpy n'est chargé que pour les exercices qui l'utilisent.
-      if ((data.test_code || "").includes("numpy")) await pyodide.loadPackage("numpy");
+      if (/(import|from)\s+numpy\b/.test(data.test_code || "")) await pyodide.loadPackage("numpy");
     } catch (e) {
       showMessage("Erreur de chargement de Python.", true);
       return;

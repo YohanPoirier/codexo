@@ -41,8 +41,8 @@
       <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
       <button id="reset-btn" class="reset-btn" type="button" title="Revenir au code de départ">Réinitialiser</button>
       <button id="save-btn" class="reset-btn" type="button" title="Enregistrer maintenant">Enregistrer</button>
-      {% if user.is_superuser and exercise.kind != "sql" %}
-        <button id="stepper-btn" class="reset-btn" type="button" title="Mode pas à pas (en test, réservé aux admins)">Pas à pas</button>
+      {% if pas_a_pas %}
+        <button id="stepper-btn" class="reset-btn" type="button" title="Exécuter le code ligne par ligne">Pas à pas</button>
       {% endif %}
       <span id="save-confirm" class="save-confirm">Enregistré ✓</span>
     </div>
@@ -120,8 +120,8 @@
   const LAST_SUBMITTED_CODE = {% if last_result %}"{{ last_result.submitted_code|escapejs }}"{% else %}null{% endif %};
   const DEMANDER_AIDE_URL = "{% url 'demander_aide' exercise.id %}";
   const MES_DEMANDES_AIDE_URL = "{% url 'mes_demandes_aide' %}";
-  {% if user.is_superuser and exercise.kind != "sql" %}
-  // Mode pas à pas (en test, admins uniquement) : page dédiée, voir exercise_stepper.html.
+  {% if pas_a_pas %}
+  // Mode pas à pas : page dédiée, voir exercise_stepper.html.
   const STEPPER_URL = "{% url 'exercise_stepper' theme.slug exercise.slug %}";
   {% endif %}
   </script>

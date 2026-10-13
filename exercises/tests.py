@@ -156,3 +156,57 @@ class PasAPasTraficTests(TestCase):
         r = self.client.post(reverse("stepper_usage", args=[self.exercise.id]), {"steps": "3"})
         self.assertEqual(r.status_code, 302)
         self.assertEqual(StepperUsage.objects.count(), 0)
+
+
+@override_settings(STORAGES={"default": {"BACKEND": "django.core.files.storage.FileSystemStorage"}, "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}})
+class OuvertureAuxElevesTests(TestCase):
+    """Réglage PAS_A_PAS_ELEVES : ouvre le pas à pas aux élèves et leur montre UNE fois la page
+    de présentation. Désactivé, rien ne change pour eux."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.theme = Theme.objects.create(name="T", slug="t")
+        cls.exercise = Exercise.objects.create(
+            theme=cls.theme, title="Ex", slug="ex", statement="x", function_name="f",
+            solution_code="def f(n):\n    return n\n",
+        )
+        CasDeTest.objects.create(exercise=cls.exercise, args="[3]", order=1)
+        cls.eleve = User.objects.create_user("eleve-ouv", "mdp-test-123", role=User.ELEVE)
+        cls.prof = User.objects.create_user("prof-ouv", "mdp-test-123", role=User.PROF)
+
+    def url_stepper(self):
+        return reverse("exercise_stepper", args=[self.theme.slug, self.exercise.slug])
+
+    def test_ferme_par_defaut(self):
+        self.client.force_login(self.eleve)
+        self.assertEqual(self.client.get(reverse("theme_list")).status_code, 200)  # pas de redirection
+        self.assertEqual(self.client.get(self.url_stepper()).status_code, 302)
+        data = self.client.get(reverse("exercise_tests", args=[self.exercise.id])).json()
+        self.assertNotIn("step_calls", data)
+
+    @override_settings(PAS_A_PAS_ELEVES=True)
+    def test_ouvert_presentation_une_seule_fois(self):
+        self.client.force_login(self.eleve)
+        r = self.client.get(reverse("guide"))
+        self.assertRedirects(r, reverse("intro_pas_a_pas") + "?next=%2Fguide%2F", fetch_redirect_response=False)
+        # Ni les appels d'API ni les envois de formulaire ne sont redirigés.
+        self.assertEqual(self.client.get(reverse("exercise_tests", args=[self.exercise.id])).status_code, 200)
+        r = self.client.post(reverse("intro_pas_a_pas"), {"next": "/guide/"})
+        self.assertRedirects(r, "/guide/", fetch_redirect_response=False)
+        self.eleve.refresh_from_db()
+        self.assertTrue(self.eleve.a_vu_intro_pas_a_pas)
+        self.assertEqual(self.client.get(reverse("guide")).status_code, 200)
+        self.assertEqual(self.client.get(self.url_stepper()).status_code, 200)
+        data = self.client.get(reverse("exercise_tests", args=[self.exercise.id])).json()
+        self.assertEqual(data["step_calls"], ["f(3)"])
+
+    @override_settings(PAS_A_PAS_ELEVES=True)
+    def test_suite_externe_ignoree(self):
+        self.client.force_login(self.eleve)
+        r = self.client.post(reverse("intro_pas_a_pas"), {"next": "https://exemple.com/"})
+        self.assertRedirects(r, reverse("theme_list"), fetch_redirect_response=False)
+
+    @override_settings(PAS_A_PAS_ELEVES=True)
+    def test_staff_non_redirige(self):
+        self.client.force_login(self.prof)
+        self.assertEqual(self.client.get(reverse("guide")).status_code, 200)

@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Pas à pas — {{ exercise.title }} — Codexo{% endblock %}
 {% block content %}
-<!-- Mode pas à pas (en test, superusers uniquement) : voir static/js/stepper.js -->
+<!-- Mode pas à pas (accès : views.pas_a_pas_autorise) : voir static/js/stepper.js -->
 <span class="eyebrow"><a href="{% url 'exercise_detail' theme.slug exercise.slug %}">← Retour à l'exercice</a></span>
 <h1>Pas à pas — {{ exercise.title }}</h1>
 

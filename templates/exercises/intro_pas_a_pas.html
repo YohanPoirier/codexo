@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Nouveau : le mode pas à pas — Codexo{% endblock %}
+{% block content %}
+<!-- Montrée une fois à chaque élève dès que le pas à pas leur est ouvert (voir
+     exercises/middleware.py et la vue intro_pas_a_pas). -->
+<span class="eyebrow">Nouveau</span>
+<h1>Le mode pas à pas</h1>
+
+<div class="intro-pas-a-pas">
+  <p>
+    Le mode pas à pas permet de regarder un programme s'exécuter ligne par ligne, et de suivre
+    l'évolution des variables à chaque étape. Il est utile pour comprendre ce que fait vraiment
+    un code, ou pour trouver l'endroit où il ne fait pas ce qui était prévu.
+  </p>
+
+  <figure>
+    <img src="{% static 'img/pas-a-pas/vue-generale.png' %}" width="976" height="470"
+         alt="La page du pas à pas : le code avec la ligne exécutée surlignée, l'appel du test sous le code, les boutons Reculer et Avancer, les cadres de variables à droite et la console en bas.">
+  </figure>
+  <ol class="intro-legende">
+    <li><strong>La ligne surlignée</strong> est celle qui vient d'être exécutée.</li>
+    <li><strong>L'appel du test</strong> qui est exécuté, sous le code. Un clic sur cette ligne permet de choisir un autre test.</li>
+    <li><strong>Avancer</strong> exécute la ligne suivante ; <strong>Reculer</strong> revient d'une étape en arrière.</li>
+    <li><strong>Un cadre par fonction</strong> en cours d'exécution, avec ses variables et leur valeur. Le cadre foncé est celui de la fonction qui s'exécute en ce moment ; le triangle ▼ le relie à la fonction qui l'a appelée.</li>
+    <li><strong>La console</strong> affiche ce que le programme écrit avec <code>print()</code>, la valeur renvoyée à la fin du test, et l'éventuelle erreur.</li>
+  </ol>
+
+  <h2>Quand une fonction en appelle une autre</h2>
+  <figure>
+    <img src="{% static 'img/pas-a-pas/appel-de-fonction.png' %}" width="976" height="328"
+         alt="Entrée dans une fonction appelée : l'appel ajouter_un(age) et l'en-tête def ajouter_un(n) sont surlignés, et le paramètre n apparaît dans un nouveau cadre, marqué Créée.">
+  </figure>
+  <ol class="intro-legende">
+    <li><strong>L'appel</strong> en cours est surligné…</li>
+    <li>… ainsi que <strong>l'en-tête de la fonction appelée</strong>.</li>
+    <li>Ses paramètres apparaissent dans un nouveau cadre. Les variables qui viennent d'être
+      <strong>créées</strong> ou <strong>modifiées</strong> sont colorées.</li>
+  </ol>
+
+  <h2>Lancer le pas à pas</h2>
+  <p>
+    Sur la page d'un exercice, le bouton <strong>Pas à pas</strong> ouvre le code actuel de
+    l'éditeur, même s'il n'a pas été enregistré.
+  </p>
+
+  <h2>Modifier le code</h2>
+  <p>
+    Le code peut être corrigé directement dans le pas à pas : le bouton <strong>Relancer</strong>
+    le parcourt alors depuis le début. De retour sur l'exercice, la version modifiée est reprise
+    dans l'éditeur.
+  </p>
+  <p>
+    Le pas à pas ne valide pas l'exercice : pour cela, il faut revenir à l'exercice et cliquer
+    sur <strong>Vérifier</strong>.
+  </p>
+
+  <form method="post" action="{% url 'intro_pas_a_pas' %}" class="intro-actions">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="run-btn">J'ai compris</button>
+  </form>
+</div>
+
+<style>
+  .intro-pas-a-pas { max-width: 760px; }
+  .intro-pas-a-pas figure { margin: 18px 0 8px; }
+  .intro-pas-a-pas img { display: block; width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--rule); }
+  .intro-legende { margin: 8px 0 24px; padding-left: 0; list-style: none; counter-reset: legende; }
+  .intro-legende li { position: relative; margin: 6px 0; padding-left: 36px; counter-increment: legende; }
+  .intro-legende li::before {
+    content: counter(legende);
+    position: absolute; left: 0; top: 0;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--amber); color: #fff;
+    font: 700 .8rem/24px Inter, sans-serif; text-align: center;
+  }
+  .intro-actions { margin: 28px 0 8px; }
+</style>
+{% endblock %}
