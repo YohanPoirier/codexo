@@ -28,7 +28,7 @@
 .stepper-case-row[hidden] { display: none; }
 .stepper-case-row:focus-within { outline: 2px solid var(--amber); outline-offset: 2px; }
 .stepper-call { padding: 10px 40px 10px 16px; white-space: pre-wrap; word-break: break-word; border-radius: 0 0 var(--radius) var(--radius); }
-.stepper-call.active .stepper-call-expr { background: rgba(217, 142, 43, .6); border-radius: 3px; }
+.stepper-call.active .stepper-call-expr { background: rgba(217, 142, 43, .35); }
 .stepper-call .p { color: #7f8bae; }
 .stepper-call .f { color: #82aaff; }
 .stepper-call .n { color: #f78c6c; }
@@ -104,7 +104,7 @@
 /* Éditeur CodeMirror (fond sombre) */
 .stepper-code .CodeMirror { height: auto; min-height: 200px; border-radius: var(--radius); }
 .stepper-current-line { background: rgba(217, 142, 43, .35); }
-.stepper-call-range { background: rgba(217, 142, 43, .6); border-radius: 3px; }
+.stepper-call-range { background: rgba(217, 142, 43, .35); padding: 3px 0; } /* même couleur que la ligne en cours, sans arrondi : surlignage continu */
 
 @media (max-width: 760px) {
   .stepper-page { grid-template-columns: 1fr; }
