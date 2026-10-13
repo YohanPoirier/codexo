@@ -83,3 +83,14 @@
   .stepper-page { grid-template-columns: 1fr; }
   .stepper-side { position: static; }
 }
+
+/* Variable créée ou modifiée par l'étape qui vient d'être exécutée */
+.stepper-table tr.stepper-changed td { background: rgba(217, 142, 43, .18); }
+.stepper-table tr.stepper-changed td:first-child { font-weight: 700; }
+.stepper-table td.stepper-tag {
+  width: 1%;
+  padding-left: 10px;
+  white-space: nowrap;
+  font-size: .75rem;
+  color: var(--amber);
+}

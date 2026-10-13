@@ -324,7 +324,40 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     msgEl.classList.toggle("error", !!isError);
   }
 
-  function renderVars(stack) {
+  // Compare l'état avant/après : pour chaque cadre (même fonction, même profondeur),
+  // les variables créées ou modifiées. Renvoie { cadres: [{nom: "nouvelle"|"modifiee"}], phrases: [...] }.
+  function shorten(text) {
+    return text.length > 40 ? text.slice(0, 37) + "..." : text;
+  }
+  function diffStacks(prevStack, stack) {
+    const out = { cadres: [], phrases: [] };
+    if (!prevStack || !stack) return out;
+    const before = prevStack.slice().reverse();
+    const after = stack.slice().reverse();
+    after.forEach(function (scope, i) {
+      const marks = {};
+      out.cadres.push(marks);
+      const old = before[i];
+      if (!old || old.scope !== scope.scope || !old.vars || !scope.vars) return;
+      const oldVars = {};
+      old.vars.forEach(function (pair) { oldVars[pair[0]] = pair[1]; });
+      scope.vars.forEach(function (pair) {
+        const name = pair[0];
+        if (!(name in oldVars)) {
+          marks[name] = "nouvelle";
+          out.phrases.push(name + " est créée et vaut " + shorten(pair[1]) + ".");
+        } else if (oldVars[name] !== pair[1]) {
+          marks[name] = "modifiee";
+          out.phrases.push(name + " passe de " + shorten(oldVars[name]) + " à " + shorten(pair[1]) + ".");
+        }
+      });
+    });
+    return out;
+  }
+
+  const TITLE_PREFIX = "État des variables dans ";
+
+  function renderVars(stack, marks) {
     varsBox.textContent = "";
     if (!stack || stack.length === 0) return; // niveau global uniquement : rien à montrer
     // L'appelant en haut, la fonction appelée en dessous (la plus récente = la dernière).
@@ -334,7 +367,10 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       section.className = "stepper-scope" + (i === ordered.length - 1 ? " current" : "");
       const title = document.createElement("div");
       title.className = "stepper-scope-title";
-      title.textContent = scope.scope;
+      // « État des variables dans » une seule fois (sur le premier cadre), ensuite le nom seul.
+      title.textContent = i === 0 || scope.scope.indexOf(TITLE_PREFIX) !== 0
+        ? scope.scope
+        : scope.scope.slice(TITLE_PREFIX.length);
       section.appendChild(title);
 
       if (scope.vars !== null) {
@@ -354,6 +390,14 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
             tdValue.textContent = pair[1]; // textContent : jamais d'HTML issu du code testé
             tr.appendChild(tdName);
             tr.appendChild(tdValue);
+            const mark = marks && marks[i] && marks[i][pair[0]];
+            if (mark) {
+              tr.className = "stepper-changed";
+              const tdTag = document.createElement("td");
+              tdTag.className = "stepper-tag";
+              tdTag.textContent = mark === "nouvelle" ? "Créée" : "Modifiée";
+              tr.appendChild(tdTag);
+            }
             table.appendChild(tr);
           });
           section.appendChild(table);
@@ -395,6 +439,8 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       }
     }
 
+    const changed = diffStacks(index > 0 ? steps[index - 1].stack : null, step.stack);
+
     posEl.textContent = "Étape " + (index + 1) + " / " + steps.length;
     prevBtn.disabled = index === 0;
     nextBtn.disabled = isLast;
@@ -404,6 +450,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     } else {
       const parts = [];
       if (step.note) parts.push(step.note);
+      parts.push.apply(parts, changed.phrases);
       if (step.renvoie !== undefined) parts.push("Renvoie " + step.renvoie + ".");
       if (isLast) {
         parts.push(
@@ -414,7 +461,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       }
       showMessage(parts.join("\n"), isLast && truncated);
     }
-    renderVars(step.stack);
+    renderVars(step.stack, changed.cadres);
   }
 
   // Remplit le menu avec un appel par cas de test (le premier est choisi d'office).
