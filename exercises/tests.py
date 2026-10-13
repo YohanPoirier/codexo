@@ -82,3 +82,35 @@ class StepCallsTests(TestCase):
         self.assertContains(self.client.get(url), 'id="stepper-btn"')
         self.client.force_login(self.eleve)
         self.assertNotContains(self.client.get(url), 'id="stepper-btn"')
+
+
+class ErreurPendantUnTestTests(TestCase):
+    """Une erreur levée par la fonction de l'étudiant pendant un test indique son type et la
+    ligne du code de l'étudiant (comme dans exercise.js : code de l'élève puis code de test,
+    exécutés dans le même espace de noms)."""
+
+    def lancer(self, code_etudiant):
+        theme = Theme.objects.create(name="T", slug="t")
+        exercise = Exercise.objects.create(
+            theme=theme, title="Ex", slug="ex", statement="x", function_name="f",
+            solution_code="def f(n):\n    return n\n",
+        )
+        CasDeTest.objects.create(exercise=exercise, args="[3]", order=1)
+        ns = {"__RESULTS__": [], "__STUDENT_CODE__": code_etudiant}
+        exec(code_etudiant, ns)
+        exec(exercise.build_test_code(), ns)
+        return ns["__RESULTS__"]
+
+    def test_type_et_ligne_dans_le_code_de_l_etudiant(self):
+        code = "def aide(L, i):\n    return L[i]\n\ndef f(n):\n    L = [1, 2]\n    return aide(L, n)\n"
+        (ok, msg, _), = self.lancer(code)
+        self.assertFalse(ok)
+        self.assertEqual(msg, "f(3) a levé une erreur : IndexError: list index out of range (ligne 2)")
+
+    def test_erreur_sans_message(self):
+        (ok, msg, _), = self.lancer("def f(n):\n    raise StopIteration\n")
+        self.assertEqual(msg, "f(3) a levé une erreur : StopIteration (ligne 2)")
+
+    def test_resultat_correct_inchange(self):
+        (ok, msg, _), = self.lancer("def f(n):\n    return n\n")
+        self.assertTrue(ok)

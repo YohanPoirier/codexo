@@ -299,6 +299,22 @@ class Exercise(models.Model):
 
         template = '''__RESULTS__ = []
 import json as _json, io as _io, contextlib as _contextlib, ast
+def _decrire_erreur(e):
+    # « IndexError: list index out of range (ligne 6) » : type, message, et ligne du code
+    # de l'étudiant où l'erreur s'est produite. Les cadres du code de l'étudiant partagent
+    # l'espace de noms de ce test (même globals) ; le premier cadre de la trace est ce test
+    # lui-même, qu'on exclut. On garde le plus profond (là où l'erreur a vraiment eu lieu).
+    _texte = type(e).__name__ + (": " + str(e) if str(e) else "")
+    _tb = e.__traceback__
+    _ce_test = _tb.tb_frame.f_code if _tb is not None else None
+    _ligne = None
+    while _tb is not None:
+        if _tb.tb_frame.f_globals is globals() and _tb.tb_frame.f_code is not _ce_test:
+            _ligne = _tb.tb_lineno
+        _tb = _tb.tb_next
+    if _ligne is not None:
+        _texte += " (ligne " + str(_ligne) + ")"
+    return _texte
 %(recursion_check)s_cases = _json.loads(%(cases_json)r)
 _parse_errors = _json.loads(%(errors_json)r)
 for _err in _parse_errors:
@@ -330,7 +346,7 @@ for _case in _cases:
                 _ok = False
         __RESULTS__.append((_ok, f"__FN__({_args_repr}) doit valoir {_attendu!r} (obtenu : {_obtenu!r})", _out.getvalue()))
     except Exception as e:
-        __RESULTS__.append((False, f"__FN__({_args_repr}) a levé une erreur : {e}", _out.getvalue()))
+        __RESULTS__.append((False, f"__FN__({_args_repr}) a levé une erreur : {_decrire_erreur(e)}", _out.getvalue()))
 %(extra_test_code)s''' % {
             "cases_json": cases_json,
             "errors_json": errors_json,
