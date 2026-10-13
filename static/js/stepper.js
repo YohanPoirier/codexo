@@ -325,31 +325,26 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   }
 
   // Compare l'état avant/après : pour chaque cadre (même fonction, même profondeur),
-  // les variables créées ou modifiées. Renvoie { cadres: [{nom: "nouvelle"|"modifiee"}], phrases: [...] }.
-  function shorten(text) {
-    return text.length > 40 ? text.slice(0, 37) + "..." : text;
-  }
+  // les variables créées ou modifiées. Un cadre qui vient d'apparaître (entrée dans une
+  // fonction) a toutes ses variables — ses paramètres — marquées « créées ».
+  // Renvoie une liste (de l'appelant vers l'appelé) de { nom: "nouvelle" | "modifiee" }.
   function diffStacks(prevStack, stack) {
-    const out = { cadres: [], phrases: [] };
-    if (!prevStack || !stack) return out;
-    const before = prevStack.slice().reverse();
+    const out = [];
+    if (!stack) return out;
+    const before = (prevStack || []).slice().reverse();
     const after = stack.slice().reverse();
     after.forEach(function (scope, i) {
       const marks = {};
-      out.cadres.push(marks);
+      out.push(marks);
+      if (!scope.vars) return;
       const old = before[i];
-      if (!old || old.scope !== scope.scope || !old.vars || !scope.vars) return;
+      const fresh = !old || old.scope !== scope.scope || !old.vars;
       const oldVars = {};
-      old.vars.forEach(function (pair) { oldVars[pair[0]] = pair[1]; });
+      if (!fresh) old.vars.forEach(function (pair) { oldVars[pair[0]] = pair[1]; });
       scope.vars.forEach(function (pair) {
         const name = pair[0];
-        if (!(name in oldVars)) {
-          marks[name] = "nouvelle";
-          out.phrases.push(name + " est créée et vaut " + shorten(pair[1]) + ".");
-        } else if (oldVars[name] !== pair[1]) {
-          marks[name] = "modifiee";
-          out.phrases.push(name + " passe de " + shorten(oldVars[name]) + " à " + shorten(pair[1]) + ".");
-        }
+        if (fresh || !(name in oldVars)) marks[name] = "nouvelle";
+        else if (oldVars[name] !== pair[1]) marks[name] = "modifiee";
       });
     });
     return out;
@@ -454,7 +449,6 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     } else {
       const parts = [];
       if (step.note) parts.push(step.note);
-      parts.push.apply(parts, changed.phrases);
       if (step.renvoie !== undefined) parts.push("Renvoie " + step.renvoie + ".");
       if (isLast) {
         parts.push(
@@ -465,7 +459,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       }
       showMessage(parts.join("\n"), isLast && truncated);
     }
-    renderVars(step.stack, changed.cadres);
+    renderVars(step.stack, changed);
   }
 
   // Remplit le menu avec un appel par cas de test (le premier est choisi d'office).
