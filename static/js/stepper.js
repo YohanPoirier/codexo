@@ -37,7 +37,7 @@
 
   // Le code Python est dans une chaîne JS : pas de backtick, de "${" ni d'antislash dedans.
   const PY_TRACER = `
-import sys, json, types, reprlib, ast
+import sys, json, types, reprlib
 
 def __trace_student__(source, max_steps, trace_module):
     FILENAME = "<student>"
@@ -45,11 +45,8 @@ def __trace_student__(source, max_steps, trace_module):
     MAX_EVENTS = 200000   # garde-fou sur TOUTES les lignes exécutées (même celles qui ne sont pas des étapes)
     CO_GENERATORS = 0x20 | 0x80 | 0x100 | 0x200   # générateur, coroutine, coroutine itérable, générateur asynchrone
     steps = []
-    pending = {}       # id(cadre) -> (ligne en cours d'exécution dans ce cadre, ligne qui la précédait)
-    last_line = {}     # id(cadre) -> dernière ligne atteinte dans ce cadre
+    pending = {}       # id(cadre) -> ligne en cours d'exécution dans ce cadre
     unwinding = set()  # cadres que traverse une exception (leur ligne en cours n'a pas abouti)
-    loops = {}         # (id(cadre), ligne du for) -> boucle en cours
-    all_loops = []
     pos_cache = {}
     events = 0
     truncated = False
@@ -63,30 +60,9 @@ def __trace_student__(source, max_steps, trace_module):
 
     try:
         code = compile(source, FILENAME, "exec")
-        tree = ast.parse(source)
     except SyntaxError as e:
         return json.dumps({"steps": [], "truncated": False,
                            "error": "SyntaxError (ligne %s) : %s" % (e.lineno, e.msg)})
-
-    # if / while / for dont le corps est sur d'autres lignes que le test : on y ajoute un commentaire
-    ctrl = {}
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.If, ast.While, ast.For)) and node.body:
-            if node.body[0].lineno != node.lineno and node.lineno not in ctrl:
-                ctrl[node.lineno] = node
-
-    def target_names(target):
-        if isinstance(target, ast.Name):
-            return [target.id]
-        if isinstance(target, (ast.Tuple, ast.List)):
-            names = []
-            for elt in target.elts:
-                sub = target_names(elt)
-                if sub is None:
-                    return None
-                names.extend(sub)
-            return names
-        return None
 
     def visible(name, value):
         if name.startswith("__"):
@@ -142,55 +118,20 @@ def __trace_student__(source, max_steps, trace_module):
             truncated = True
             raise _Stop()
         code = frame.f_code
-        params = code.co_varnames[:code.co_argcount + code.co_kwonlyargcount]
-        local = frame.f_locals
-        args = ", ".join(rep.repr(local[p]) for p in params if p in local)
-        step = {"line": code.co_firstlineno, "stack": snap_stack(frame),
-                "note": "Appel de %s(%s)." % (code.co_name, args)}
+        step = {"line": code.co_firstlineno, "stack": snap_stack(frame)}
         pos = call_position(frame.f_back)
         if pos is not None:
             step["call"] = pos
         steps.append(step)
 
-    def annotate(step, node, frame, prev, next_line):
-        # La condition est respectée si la ligne suivante de ce cadre est dans le corps.
-        first, last = node.body[0].lineno, node.body[-1].end_lineno
-        inside = next_line is not None and first <= next_line <= last
-        if isinstance(node, ast.If):
-            step["note"] = "La condition est respectée." if inside else "La condition n'est pas respectée."
-        elif isinstance(node, ast.While):
-            step["note"] = ("La condition est respectée." if inside
-                            else "La condition n'est pas respectée : on sort de la boucle.")
-        else:
-            names = target_names(node.target)
-            if names is None:
-                return
-            key = (id(frame), node.lineno)
-            loop = loops.get(key)
-            # nouvelle boucle si on arrive du dehors (la ligne précédente n'est pas dans le corps)
-            if loop is None or prev is None or not (first <= prev <= last):
-                loop = {"names": names, "vals": [], "steps": [], "exits": []}
-                loops[key] = loop
-                all_loops.append(loop)
-            if inside:
-                values = [rep.repr(frame.f_locals[n]) for n in names if n in frame.f_locals]
-                loop["vals"].append(values[0] if len(values) == 1 else "(" + ", ".join(values) + ")")
-                loop["steps"].append(step)
-            else:
-                loop["exits"].append(step)
-
-    def finish(frame, extra=None, next_line=None):
+    def finish(frame, extra=None):
         # La ligne en cours de ce cadre est terminée : on enregistre l'état qui la suit.
-        entry = pending.pop(id(frame), None)
-        if entry is None:
+        line = pending.pop(id(frame), None)
+        if line is None:
             return
-        line, prev = entry
         step = {"line": line, "stack": snap_stack(frame)}
         if extra:
             step.update(extra)
-        node = ctrl.get(line)
-        if node is not None:
-            annotate(step, node, frame, prev, next_line)
         steps.append(step)
 
     def tracer(frame, event, arg):
@@ -215,16 +156,14 @@ def __trace_student__(source, max_steps, trace_module):
             if frame.f_lineno < 1 or (is_module and not trace_module):
                 return tracer
             unwinding.discard(key)
-            finish(frame, None, frame.f_lineno)   # la ligne précédente de ce cadre vient de se terminer
+            finish(frame)   # la ligne précédente de ce cadre vient de se terminer
             if len(steps) >= max_steps:
                 truncated = True
                 raise _Stop()
-            pending[key] = (frame.f_lineno, last_line.get(key))
-            last_line[key] = frame.f_lineno
+            pending[key] = frame.f_lineno
         elif event == "exception":
             unwinding.add(key)
         elif event == "return":
-            last_line.pop(key, None)
             if key in unwinding:
                 # sortie par une exception : la ligne en cours n'a pas abouti, pas d'étape
                 unwinding.discard(key)
@@ -233,7 +172,7 @@ def __trace_student__(source, max_steps, trace_module):
                 extra = None
                 if not is_module and not (code.co_flags & CO_GENERATORS):
                     extra = {"renvoie": rep.repr(arg)}
-                finish(frame, extra, None)
+                finish(frame, extra)
         return tracer
 
     ns = {"__name__": "__main__"}
@@ -257,19 +196,6 @@ def __trace_student__(source, max_steps, trace_module):
             steps.append({"line": None, "stack": [], "error": error})
     finally:
         sys.settrace(None)
-
-    def fmt_values(vals):
-        items = vals if len(vals) <= 5 else vals[:3] + ["..."] + vals[-1:]
-        return "[" + ", ".join(items) + "]"
-
-    for loop in all_loops:
-        names = ", ".join(loop["names"])
-        verb = "prend" if len(loop["names"]) == 1 else "prennent"
-        for st in loop["steps"]:
-            st["note"] = "%s %s les valeurs %s." % (names, verb, fmt_values(loop["vals"]))
-        for st in loop["exits"]:
-            st["note"] = ("La boucle est terminée." if loop["vals"]
-                          else "Il n'y a rien à parcourir : la boucle ne s'exécute pas.")
 
     return json.dumps({"steps": steps, "truncated": truncated, "error": error})
 
@@ -448,7 +374,6 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       showMessage("Erreur : " + step.error, true);
     } else {
       const parts = [];
-      if (step.note) parts.push(step.note);
       if (step.renvoie !== undefined) parts.push("Renvoie " + step.renvoie + ".");
       if (isLast) {
         parts.push(
