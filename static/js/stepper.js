@@ -327,9 +327,11 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   function renderVars(stack) {
     varsBox.textContent = "";
     if (!stack || stack.length === 0) return; // niveau global uniquement : rien à montrer
-    stack.forEach(function (scope, i) {
+    // L'appelant en haut, la fonction appelée en dessous (la plus récente = la dernière).
+    const ordered = stack.slice().reverse();
+    ordered.forEach(function (scope, i) {
       const section = document.createElement("div");
-      section.className = "stepper-scope" + (i === 0 ? " current" : "");
+      section.className = "stepper-scope" + (i === ordered.length - 1 ? " current" : "");
       const title = document.createElement("div");
       title.className = "stepper-scope-title";
       title.textContent = scope.scope;
