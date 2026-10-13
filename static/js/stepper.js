@@ -361,16 +361,20 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     varsBox.textContent = "";
     if (!stack || stack.length === 0) return; // niveau global uniquement : rien à montrer
     // L'appelant en haut, la fonction appelée en dessous (la plus récente = la dernière).
+    const heading = document.createElement("h2");
+    heading.className = "stepper-vars-title";
+    heading.textContent = "État des variables";
+    varsBox.appendChild(heading);
     const ordered = stack.slice().reverse();
     ordered.forEach(function (scope, i) {
       const section = document.createElement("div");
       section.className = "stepper-scope" + (i === ordered.length - 1 ? " current" : "");
       const title = document.createElement("div");
       title.className = "stepper-scope-title";
-      // « État des variables dans » une seule fois (sur le premier cadre), ensuite le nom seul.
-      title.textContent = i === 0 || scope.scope.indexOf(TITLE_PREFIX) !== 0
-        ? scope.scope
-        : scope.scope.slice(TITLE_PREFIX.length);
+      // Le grand titre « État des variables » est au-dessus ; chaque cadre porte le nom de sa fonction.
+      title.textContent = scope.scope.indexOf(TITLE_PREFIX) === 0
+        ? scope.scope.slice(TITLE_PREFIX.length)
+        : scope.scope;
       section.appendChild(title);
 
       if (scope.vars !== null) {

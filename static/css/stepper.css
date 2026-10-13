@@ -94,3 +94,5 @@
   font-size: .75rem;
   color: var(--amber);
 }
+
+.stepper-vars-title { margin: 0; font-size: 1.05rem; }
