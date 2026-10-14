@@ -26,28 +26,61 @@
   font-size: .92rem;
 }
 .stepper-case-row[hidden] { display: none; }
-.stepper-case-row:focus-within { outline: 2px solid var(--amber); outline-offset: 2px; }
-.stepper-call { padding: 10px 40px 10px 16px; white-space: pre-wrap; word-break: break-word; border-radius: 0 0 var(--radius) var(--radius); }
+.stepper-call-btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.stepper-call-btn:hover { background: rgba(255, 255, 255, .04); }
+.stepper-call-btn:focus { outline: none; }
+.stepper-call-btn:focus-visible { box-shadow: inset 0 0 0 2px rgba(217, 142, 43, .7); }
+.stepper-call-btn:disabled { cursor: progress; }
+.stepper-case-row.single .stepper-call-btn { cursor: default; }
+.stepper-case-row.single .stepper-call-btn:hover { background: transparent; }
+.stepper-case-row.single .stepper-call-caret { display: none; }
+.stepper-call { display: block; padding: 10px 40px 10px 16px; white-space: pre-wrap; word-break: break-word; }
 .stepper-call.active .stepper-call-expr { background: rgba(217, 142, 43, .35); }
 .stepper-call.full .stepper-call-stmt { background: rgba(217, 142, 43, .35); }
-.stepper-call .p { color: #7f8bae; }
-.stepper-call .f { color: #82aaff; }
-.stepper-call .n { color: #f78c6c; }
-.stepper-call .s { color: #c3e88d; }
-.stepper-call .k { color: #c792ea; }
-.stepper-call .c { color: #9aa5c9; font-style: italic; white-space: pre; }
+.stepper-case-row .f { color: #82aaff; }
+.stepper-case-row .n { color: #f78c6c; }
+.stepper-case-row .s { color: #c3e88d; }
+.stepper-case-row .k { color: #c792ea; }
+.stepper-case-row .c { color: #9aa5c9; font-style: italic; white-space: pre; }
 .stepper-call-caret { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #7f8bae; pointer-events: none; }
-/* Le vrai menu, transparent, couvre toute la ligne : un clic ouvre la liste des tests. */
-.stepper-case {
+/* Liste des tests, aux couleurs de l'éditeur */
+.stepper-case-list {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  opacity: 0;
-  cursor: pointer;
-  font: inherit;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  border-radius: var(--radius);
+  background: var(--indigo-deep);
+  box-shadow: 0 10px 28px rgba(28, 39, 71, .35);
 }
-.stepper-case option { background: var(--indigo-deep); color: #eef1fb; }
-.stepper-case:disabled { cursor: progress; }
+.stepper-case-list[hidden] { display: none; }
+.stepper-case-list li {
+  padding: 8px 16px 8px 13px;
+  border-left: 3px solid transparent;
+  white-space: pre-wrap;
+  word-break: break-word;
+  cursor: pointer;
+}
+.stepper-case-list li:hover, .stepper-case-list li:focus { outline: none; background: rgba(255, 255, 255, .08); }
+.stepper-case-list li[aria-selected="true"] { border-left-color: var(--amber); }
 
 /* Cadre Output, aux couleurs de l'éditeur : sortie des print() puis informations
    (valeur renvoyée, fin du programme, erreur). */
@@ -89,6 +122,8 @@
   font-size: .85rem;
   font-weight: 600;
 }
+/* Fonction qui vient de se terminer (return + ligne appelante fusionnés) : cadre grisé */
+.stepper-scope.done { opacity: .45; }
 /* Fonction en cours : bandeau sombre ; les fonctions en attente ont un bandeau terni. */
 .stepper-scope.current { border-color: var(--indigo-deep); }
 .stepper-scope.current .stepper-scope-title { background: var(--indigo-deep); color: var(--paper); }

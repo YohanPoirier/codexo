@@ -46,6 +46,10 @@ def __trace_student__(source, max_steps, trace_module):
     CO_GENERATORS = 0x20 | 0x80 | 0x100 | 0x200   # générateur, coroutine, coroutine itérable, générateur asynchrone
     steps = []
     pending = {}       # id(cadre) -> ligne en cours d'exécution dans ce cadre
+    # Dernier « return » enregistré : (indice de son étape, id du cadre appelant, ligne de
+    # l'appel). Si la ligne appelante se termine juste après, les deux étapes n'en font
+    # qu'une (voir add_step).
+    last_return = [None]
     unwinding = set()  # cadres que traverse une exception (leur ligne en cours n'a pas abouti)
     pos_cache = {}
     events = 0
@@ -147,15 +151,31 @@ def __trace_student__(source, max_steps, trace_module):
             step["call"] = pos
         steps.append(step)
 
-    def finish(frame, extra=None):
+    def add_step(step, caller_key):
+        # Fusion « return + ligne qui récupère la valeur » : si l'étape précédente est le
+        # return d'une fonction appelée depuis cette ligne, et que cette ligne se termine
+        # juste après (rien entre les deux), une seule étape surligne les deux lignes, montre
+        # l'appelant après réception de la valeur, et garde le cadre de la fonction appelée,
+        # grisé (« done »). Renvoie True si l'étape a été fusionnée.
+        lr = last_return[0]
+        last_return[0] = None
+        if lr is not None and lr[0] == len(steps) - 1 and lr[1] == caller_key and lr[2] == step["line"]:
+            previous = steps[-1]
+            ghost = dict(previous["stack"][0])
+            ghost["done"] = True
+            step["ret"] = previous["line"]
+            step["stack"] = [ghost] + step["stack"]
+            steps[-1] = step
+            return True
+        steps.append(step)
+        return False
+
+    def finish(frame):
         # La ligne en cours de ce cadre est terminée : on enregistre l'état qui la suit.
         line = pending.pop(id(frame), None)
         if line is None:
-            return
-        step = {"line": line, "stack": snap_stack(frame), "out": out.size}
-        if extra:
-            step.update(extra)
-        steps.append(step)
+            return None   # rien à enregistrer
+        return add_step({"line": line, "stack": snap_stack(frame), "out": out.size}, id(frame))
 
     def tracer(frame, event, arg):
         nonlocal truncated, events
@@ -192,7 +212,20 @@ def __trace_student__(source, max_steps, trace_module):
                 unwinding.discard(key)
                 pending.pop(key, None)
             else:
-                finish(frame)
+                appended = finish(frame) is False   # nouvelle étape (ni fusionnée, ni absente)
+                caller = frame.f_back
+                if (appended and not is_module and not (code.co_flags & CO_GENERATORS)
+                        and caller is not None and caller.f_code.co_filename == FILENAME):
+                    # Le return vient d'être enregistré : à fusionner avec la ligne appelante
+                    # si elle se termine juste après. Appelant = programme principal non tracé
+                    # (test) : la ligne d'appel se termine avec l'étape finale « res ».
+                    caller_key = "module" if caller.f_code.co_name == "<module>" and not trace_module else id(caller)
+                    last_return[0] = (len(steps) - 1, caller_key, caller.f_lineno)
+                    # Si la fusion n'a pas lieu (la ligne appelante n'est pas finie, ex :
+                    # f(a) + f(b)), l'étape du return surligne aussi l'appel concerné.
+                    pos = call_position(caller)
+                    if pos is not None:
+                        steps[-1]["call"] = pos
         return tracer
 
     ns = {"__name__": "__main__"}
@@ -205,8 +238,8 @@ def __trace_student__(source, max_steps, trace_module):
         if not trace_module and not truncated:
             # Avec un test : les lignes du programme principal ne sont pas des étapes. On en
             # ajoute une, finale, pour montrer « res » reçu dans le programme principal.
-            steps.append({"line": len(source.rstrip("\\n").split("\\n")), "stack": [{"scope": "programme principal", "vars": snap_vars(ns)}],
-                          "out": out.size})
+            add_step({"line": len(source.rstrip("\\n").split("\\n")), "stack": [{"scope": "programme principal", "vars": snap_vars(ns)}],
+                      "out": out.size}, "module")
     except _Stop:
         pass
     except BaseException as e:
@@ -239,6 +272,8 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   const caseRow = document.getElementById("stepper-case-row");
   const caseSel = document.getElementById("stepper-case");
   const callEl = document.getElementById("stepper-call");
+  const callBtn = document.getElementById("stepper-call-btn");
+  const caseList = document.getElementById("stepper-case-list");
   const editorBox = document.getElementById("stepper-editor");
   const rerunBtn = document.getElementById("stepper-rerun");
   const codeArea = document.getElementById("stepper-code");
@@ -255,6 +290,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   let index = 0;
   let currentLine = null; // ligne CodeMirror (base 0) actuellement surlignée en entier
   let callMark = null; // surlignage de l'expression d'appel (CodeMirror TextMarker)
+  let retLine = null; // ligne CodeMirror (base 0) du return surligné en même temps que la ligne appelante
   const RESULT_VAR = "res"; // le test est lancé par « res = appel » dans le programme principal
   let callLine = null; // ligne (base 1) de l'appel du test ajouté après le code ; null sans appel
 
@@ -277,6 +313,8 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   function clearHighlight() {
     if (cm && currentLine !== null) cm.removeLineClass(currentLine, "background", LINE_CLASS);
     currentLine = null;
+    if (cm && retLine !== null) cm.removeLineClass(retLine, "background", LINE_CLASS);
+    retLine = null;
     if (callMark) callMark.clear();
     callMark = null;
     if (callEl) callEl.classList.remove("active", "full");
@@ -324,6 +362,9 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     heading.textContent = "État des variables";
     varsBox.appendChild(heading);
     const ordered = stack.slice().reverse();
+    // Cadre en cours : le dernier qui n'est pas celui, grisé, d'une fonction qui vient de se terminer.
+    let currentIndex = ordered.length - 1;
+    while (currentIndex > 0 && ordered[currentIndex].done) currentIndex--;
     ordered.forEach(function (scope, i) {
       if (i > 0) {
         // Petit triangle entre deux cadres : la fonction du dessus appelle celle du dessous.
@@ -334,7 +375,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
         varsBox.appendChild(arrow);
       }
       const section = document.createElement("div");
-      section.className = "stepper-scope" + (i === ordered.length - 1 ? " current" : "");
+      section.className = "stepper-scope" + (scope.done ? " done" : i === currentIndex ? " current" : "");
       const title = document.createElement("div");
       title.className = "stepper-scope-title";
       // Le grand titre « État des variables » est au-dessus ; chaque cadre porte le nom de sa fonction.
@@ -381,6 +422,8 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     // Une erreur sur la ligne d'appel du test (ex : fonction mal nommée) n'a pas de ligne dans le code.
     const showLine = step.line >= 1 && step.line !== callLine;
     const showCall = !!step.call && step.call.line !== callLine;
+    // Return + ligne qui récupère la valeur, fusionnés en une étape : le return aussi est surligné.
+    const showRet = step.ret >= 1 && step.ret !== step.line;
     // Entrée dans la fonction testée (ou erreur sur l'appel lui-même) : on surligne l'appel
     // dans la ligne de console sous l'éditeur.
     if (callEl && callLine !== null) {
@@ -394,6 +437,10 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
         currentLine = step.line - 1;
         cm.addLineClass(currentLine, "background", LINE_CLASS);
       }
+      if (showRet) {
+        retLine = step.ret - 1;
+        cm.addLineClass(retLine, "background", LINE_CLASS);
+      }
       if (showCall) {
         callMark = cm.markText(
           { line: step.call.line - 1, ch: step.call.col },
@@ -401,9 +448,10 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
           { className: CALL_CLASS }
         );
       }
-      if (showLine || showCall) {
+      if (showLine || showCall || showRet) {
         const where = [];
         if (showLine) where.push(step.line - 1);
+        if (showRet) where.push(step.ret - 1);
         if (showCall) where.push(step.call.line - 1);
         cm.scrollIntoView(
           { from: { line: Math.min.apply(null, where), ch: 0 }, to: { line: Math.max.apply(null, where), ch: 0 } },
@@ -448,6 +496,17 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     });
     if (calls.length) caseSel.value = "0";
     caseRow.hidden = calls.length === 0;
+    // Liste déroulante (faite maison, pour garder la coloration et le style de l'éditeur).
+    caseList.textContent = "";
+    calls.forEach(function (call, i) {
+      const li = document.createElement("li");
+      li.setAttribute("role", "option");
+      li.tabIndex = -1;
+      li.dataset.index = String(i);
+      fillCall(li, i);
+      caseList.appendChild(li);
+    });
+    caseRow.classList.toggle("single", calls.length < 2); // un seul test : rien à choisir
     if (editorBox) editorBox.classList.toggle("with-call", calls.length > 0);
     renderCallLine();
   }
@@ -462,12 +521,14 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   }
   function renderCallLine() {
     if (!callEl) return;
-    callEl.textContent = "";
     callEl.classList.remove("active", "full");
-    const i = Number(caseSel.value);
+    fillCall(callEl, Number(caseSel.value));
+  }
+  function fillCall(el, i) {
+    el.textContent = "";
     const call = calls[i];
     if (call === undefined) return;
-    const stmt = addSpan(callEl, "stepper-call-stmt", ""); // toute l'instruction « res = appel »
+    const stmt = addSpan(el, "stepper-call-stmt", ""); // toute l'instruction « res = appel »
     addSpan(stmt, "", RESULT_VAR + " = ");
     const expr = addSpan(stmt, "stepper-call-expr", "");
     const open = call.indexOf("(");
@@ -481,8 +542,67 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       last = token.lastIndex;
     }
     if (last < rest.length) addSpan(expr, "", rest.slice(last));
-    addSpan(callEl, "c", "  # test " + (i + 1));
+    addSpan(el, "c", "  # test " + (i + 1));
   }
+
+  // Ouverture / fermeture de la liste des tests, à la souris et au clavier.
+  function openList() {
+    if (calls.length < 2 || callBtn.disabled) return;
+    const current = Number(caseSel.value);
+    Array.prototype.forEach.call(caseList.children, function (li, i) {
+      li.setAttribute("aria-selected", i === current ? "true" : "false");
+    });
+    caseList.hidden = false;
+    callBtn.setAttribute("aria-expanded", "true");
+    const selected = caseList.children[current];
+    if (selected) selected.focus();
+  }
+  function closeList(refocus) {
+    if (caseList.hidden) return;
+    caseList.hidden = true;
+    callBtn.setAttribute("aria-expanded", "false");
+    if (refocus) callBtn.focus();
+  }
+  function chooseCase(i) {
+    closeList(true);
+    if (String(i) === caseSel.value) return;
+    caseSel.value = String(i);
+    caseSel.dispatchEvent(new Event("change"));
+  }
+  callBtn.addEventListener("click", function () {
+    if (caseList.hidden) openList();
+    else closeList(false);
+  });
+  callBtn.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      openList();
+    }
+  });
+  caseList.addEventListener("click", function (event) {
+    const li = event.target.closest("li");
+    if (li) chooseCase(Number(li.dataset.index));
+  });
+  caseList.addEventListener("keydown", function (event) {
+    const li = event.target.closest("li");
+    if (!li) return;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const next = event.key === "ArrowDown" ? li.nextElementSibling : li.previousElementSibling;
+      if (next) next.focus();
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      chooseCase(Number(li.dataset.index));
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      closeList(true);
+    } else if (event.key === "Tab") {
+      closeList(false);
+    }
+  });
+  document.addEventListener("click", function (event) {
+    if (!caseRow.contains(event.target)) closeList(false);
+  });
 
   // Trace le code suivi de l'appel choisi dans le menu, puis affiche l'étape 1.
   async function trace() {
@@ -501,6 +621,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     }
 
     caseSel.disabled = true;
+    callBtn.disabled = true;
     prevBtn.disabled = true;
     nextBtn.disabled = true;
     let result;
@@ -513,6 +634,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       result = { steps: [], truncated: false, error: "Erreur inattendue : " + e.message };
     }
     caseSel.disabled = false;
+    callBtn.disabled = false;
 
     clearHighlight();
     steps = result.steps;

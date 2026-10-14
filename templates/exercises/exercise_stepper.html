@@ -12,12 +12,16 @@
       <div class="stepper-code">
         <textarea id="stepper-code" spellcheck="false"></textarea>
       </div>
-      <!-- Appel du test, sous le code comme une ligne de console : le texte coloré est affiché
-           dans #stepper-call, le vrai menu (transparent) est posé par-dessus. -->
+      <!-- Appel du test, sous le code : un clic ouvre la liste des tests (menu fait maison,
+           voir stepper.js ; le <select> masqué ne sert qu'à mémoriser le test choisi). -->
       <div id="stepper-case-row" class="stepper-case-row" hidden>
-        <div id="stepper-call" class="stepper-call" aria-hidden="true"></div>
-        <select id="stepper-case" class="stepper-case" aria-label="Test tracé"></select>
-        <span class="stepper-call-caret" aria-hidden="true">▾</span>
+        <button id="stepper-call-btn" type="button" class="stepper-call-btn"
+                aria-haspopup="listbox" aria-expanded="false" aria-label="Test tracé : changer de test">
+          <span id="stepper-call" class="stepper-call"></span>
+          <span class="stepper-call-caret" aria-hidden="true">▾</span>
+        </button>
+        <ul id="stepper-case-list" class="stepper-case-list" role="listbox" aria-label="Tests" hidden></ul>
+        <select id="stepper-case" hidden aria-hidden="true" tabindex="-1"></select>
       </div>
     </div>
 
