@@ -15,27 +15,15 @@
   </p>
 
   <figure>
-    <img src="{% static 'img/pas-a-pas/vue-generale.png' %}" width="976" height="470"
-         alt="La page du pas à pas : le code avec la ligne exécutée surlignée, l'appel du test sous le code, les boutons Reculer et Avancer, les cadres de variables à droite et la console en bas.">
+    <img src="{% static 'img/pas-a-pas/vue-generale.png' %}" width="976" height="584"
+         alt="La page du pas à pas : le code avec la ligne exécutée surlignée, l'appel du test sous le code, les boutons Reculer et Avancer, les cadres de variables des fonctions mention et moyenne à droite (total marqué Modifiée) et la console en bas.">
   </figure>
   <ol class="intro-legende">
     <li><strong>La ligne surlignée</strong> est celle qui vient d'être exécutée.</li>
     <li><strong>L'appel du test</strong> qui est exécuté, sous le code. Un clic sur cette ligne permet de choisir un autre test.</li>
     <li><strong>Avancer</strong> exécute la ligne suivante ; <strong>Reculer</strong> revient d'une étape en arrière.</li>
-    <li><strong>Un cadre par fonction</strong> en cours d'exécution, avec ses variables et leur valeur. Le cadre foncé est celui de la fonction qui s'exécute en ce moment ; le triangle ▼ le relie à la fonction qui l'a appelée.</li>
+    <li><strong>Un cadre par fonction</strong> en cours d'exécution, avec ses variables et leur valeur. Le cadre foncé est celui de la fonction qui s'exécute en ce moment ; le triangle ▼ le relie à la fonction qui l'a appelée. Les variables qui viennent d'être <strong>créées</strong> ou <strong>modifiées</strong> sont colorées.</li>
     <li><strong>La console</strong> affiche ce que le programme écrit avec <code>print()</code>, la valeur renvoyée à la fin du test, et l'éventuelle erreur.</li>
-  </ol>
-
-  <h2>Quand une fonction en appelle une autre</h2>
-  <figure>
-    <img src="{% static 'img/pas-a-pas/appel-de-fonction.png' %}" width="976" height="328"
-         alt="Entrée dans une fonction appelée : l'appel ajouter_un(age) et l'en-tête def ajouter_un(n) sont surlignés, et le paramètre n apparaît dans un nouveau cadre, marqué Créée.">
-  </figure>
-  <ol class="intro-legende">
-    <li><strong>L'appel</strong> en cours est surligné…</li>
-    <li>… ainsi que <strong>l'en-tête de la fonction appelée</strong>.</li>
-    <li>Ses paramètres apparaissent dans un nouveau cadre. Les variables qui viennent d'être
-      <strong>créées</strong> ou <strong>modifiées</strong> sont colorées.</li>
   </ol>
 
   <h2>Lancer le pas à pas</h2>
@@ -66,14 +54,14 @@
   .intro-pas-a-pas { max-width: 760px; }
   .intro-pas-a-pas figure { margin: 18px 0 8px; }
   .intro-pas-a-pas img { display: block; width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--rule); }
-  .intro-legende { margin: 8px 0 24px; padding-left: 0; list-style: none; counter-reset: legende; }
-  .intro-legende li { position: relative; margin: 6px 0; padding-left: 36px; counter-increment: legende; }
+  .intro-legende { margin: 8px 0 24px 14px; padding-left: 0; list-style: none; counter-reset: legende; }
+  .intro-legende li { position: relative; margin: 6px 0; padding-left: 28px; counter-increment: legende; }
   .intro-legende li::before {
     content: counter(legende);
-    position: absolute; left: 0; top: 0;
-    width: 24px; height: 24px; border-radius: 50%;
+    position: absolute; left: 0; top: .2em;
+    width: 18px; height: 18px; border-radius: 50%;
     background: var(--amber); color: #fff;
-    font: 700 .8rem/24px Inter, sans-serif; text-align: center;
+    font: 700 .68rem/18px Inter, sans-serif; text-align: center;
   }
   .intro-actions { margin: 28px 0 8px; }
 </style>
