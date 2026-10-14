@@ -54,7 +54,7 @@
 .stepper-case-row .s { color: #c3e88d; }
 .stepper-case-row .k { color: #c792ea; }
 .stepper-case-row .c { color: #9aa5c9; font-style: italic; white-space: pre; }
-.stepper-call-caret { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #7f8bae; pointer-events: none; }
+.stepper-call-caret { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 1.5rem; line-height: 1; color: #9aa5c9; pointer-events: none; }
 /* Liste des tests, aux couleurs de l'éditeur */
 .stepper-case-list {
   position: absolute;
