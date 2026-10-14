@@ -38,10 +38,11 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-# Mode pas à pas : réservé aux superusers tant que cette variable ne vaut pas "1" (à mettre
-# dans le fichier .env du serveur, puis redémarrer). Une fois ouvert aux élèves, chacun voit
-# aussi UNE fois la page de présentation (exercises/middleware.py).
-PAS_A_PAS_ELEVES = os.environ.get('CODEXO_PAS_A_PAS_ELEVES', '') == '1'
+# Mode pas à pas : ouvert aux élèves (ouverture le 14/10/2026). Pour le réserver de nouveau
+# aux superusers, mettre CODEXO_PAS_A_PAS_ELEVES=0 dans le fichier .env du serveur, puis
+# redémarrer. Ouvert, chaque élève voit aussi UNE fois la page de présentation
+# (exercises/middleware.py).
+PAS_A_PAS_ELEVES = os.environ.get('CODEXO_PAS_A_PAS_ELEVES', '1') == '1'
 
 ALLOWED_HOSTS = [h for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if h]
 if DEBUG:

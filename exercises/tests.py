@@ -6,7 +6,8 @@ from accounts.models import User
 from .models import Exercise, StepperUsage, TestCase as CasDeTest, Theme
 
 
-@override_settings(STORAGES={"default": {"BACKEND": "django.core.files.storage.FileSystemStorage"}, "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}})
+# Comportement « pas à pas fermé aux élèves » (réservé aux superusers).
+@override_settings(PAS_A_PAS_ELEVES=False, STORAGES={"default": {"BACKEND": "django.core.files.storage.FileSystemStorage"}, "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"}})
 class StepCallsTests(TestCase):
     """Mode pas à pas (admins) : la vue exercise_tests fournit un appel par cas de test,
     mais seulement aux superusers, et seulement pour les exercices Python."""
@@ -177,7 +178,8 @@ class OuvertureAuxElevesTests(TestCase):
     def url_stepper(self):
         return reverse("exercise_stepper", args=[self.theme.slug, self.exercise.slug])
 
-    def test_ferme_par_defaut(self):
+    @override_settings(PAS_A_PAS_ELEVES=False)
+    def test_ferme(self):
         self.client.force_login(self.eleve)
         self.assertEqual(self.client.get(reverse("theme_list")).status_code, 200)  # pas de redirection
         self.assertEqual(self.client.get(self.url_stepper()).status_code, 302)
@@ -206,6 +208,7 @@ class OuvertureAuxElevesTests(TestCase):
         r = self.client.post(reverse("intro_pas_a_pas"), {"next": "https://exemple.com/"})
         self.assertRedirects(r, reverse("theme_list"), fetch_redirect_response=False)
 
+    @override_settings(PAS_A_PAS_ELEVES=False)
     def test_guide_sans_section_pas_a_pas_si_ferme(self):
         self.client.force_login(self.eleve)
         r = self.client.get(reverse("guide"))
