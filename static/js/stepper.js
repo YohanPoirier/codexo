@@ -263,8 +263,9 @@ def __trace_student__(source, max_steps, trace_module):
 __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
 `;
 
-  // Ordre des tests dans le menu : pour un exercice récursif, les tests les moins profonds
-  // d'abord (mesuré sur le corrigé), mais les cas de base (sans appel récursif) en dernier.
+  // Ordre des tests dans le menu, pour un exercice récursif (mesuré sur le corrigé) : un
+  // exemple pas trop long, puis les cas de base (sans appel récursif), puis les autres tests
+  // du moins au plus profond.
   // Renvoie, pour chaque appel, [profondeur de récursion maximale, nombre d'appels].
   const PY_MESURE = `
 import sys, json
@@ -542,8 +543,8 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
     renderVars(step.stack, changed);
   }
 
-  // Réordonne les appels (voir PY_MESURE) : récursifs du moins profond au plus profond, puis
-  // les cas de base. Exercice non récursif, ou mesure impossible : ordre d'origine.
+  // Réordonne les appels (voir PY_MESURE). Exercice non récursif, ou mesure impossible : ordre
+  // d'origine.
   async function orderCalls(list, solution) {
     if (list.length < 2 || !solution) return list;
     let mesures;
@@ -562,7 +563,11 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
     if (recursifs.length === 0) return list;
     recursifs.sort(function (a, b) { return a.depth - b.depth || a.count - b.count || a.i - b.i; });
     const casDeBase = items.filter(function (it) { return it.depth < 2; });
-    return recursifs.concat(casDeBase).map(function (it) { return it.call; });
+    // D'abord un exemple « normal » pas trop long (le moins profond d'au moins 3 niveaux), puis
+    // les cas de base, puis les autres tests récursifs du moins au plus profond.
+    const premier = recursifs.find(function (it) { return it.depth >= 3; }) || recursifs[0];
+    const autres = recursifs.filter(function (it) { return it !== premier; });
+    return [premier].concat(casDeBase, autres).map(function (it) { return it.call; });
   }
 
   // Remplit le menu avec un appel par cas de test (le premier est choisi d'office).
