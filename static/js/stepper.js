@@ -291,6 +291,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   let currentLine = null; // ligne CodeMirror (base 0) actuellement surlignée en entier
   let callMark = null; // surlignage de l'expression d'appel (CodeMirror TextMarker)
   let retLine = null; // ligne CodeMirror (base 0) du return surligné en même temps que la ligne appelante
+  const MAX_VISIBLE_FRAMES = 3; // cadres de variables affichés au plus (les plus récents)
   const RESULT_VAR = "res"; // le test est lancé par « res = appel » dans le programme principal
   let callLine = null; // ligne (base 1) de l'appel du test ajouté après le code ; null sans appel
 
@@ -365,7 +366,18 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     // Cadre en cours : le dernier qui n'est pas celui, grisé, d'une fonction qui vient de se terminer.
     let currentIndex = ordered.length - 1;
     while (currentIndex > 0 && ordered[currentIndex].done) currentIndex--;
+    // Au plus MAX_VISIBLE_FRAMES cadres affichés : les plus anciens (en haut) sont masqués,
+    // et une ligne indique combien (utile en récursion, où la pile peut être profonde).
+    const firstVisible = Math.max(0, ordered.length - MAX_VISIBLE_FRAMES);
+    if (firstVisible > 0) {
+      const hidden = document.createElement("div");
+      hidden.className = "stepper-hidden-frames";
+      hidden.textContent = "… " + firstVisible + " cadre" + (firstVisible > 1 ? "s" : "") +
+        " précédent" + (firstVisible > 1 ? "s" : "") + " masqué" + (firstVisible > 1 ? "s" : "");
+      varsBox.appendChild(hidden);
+    }
     ordered.forEach(function (scope, i) {
+      if (i < firstVisible) return;
       if (i > 0) {
         // Petit triangle entre deux cadres : la fonction du dessus appelle celle du dessous.
         const arrow = document.createElement("div");
