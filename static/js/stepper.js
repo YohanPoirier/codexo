@@ -77,12 +77,15 @@ def __trace_student__(source, max_steps, trace_module):
         return out
 
     def snap_stack(frame):
-        # Les appels de fonction en cours, le plus récent en premier. Le niveau global
-        # (<module>) et les lambda / générateurs d'expression ne sont pas affichés.
+        # Les appels de fonction en cours, le plus récent en premier, puis le programme
+        # principal (niveau global) tout en bas. Les lambda / générateurs d'expression ne
+        # sont pas affichés.
         stack = []
         while frame is not None and frame.f_code.co_filename == FILENAME:
             name = frame.f_code.co_name
-            if not name.startswith("<"):
+            if name == "<module>":
+                stack.append({"scope": "programme principal", "vars": snap_vars(frame.f_globals)})
+            elif not name.startswith("<"):
                 if len(stack) >= MAX_FRAMES:
                     stack.append({"scope": "... appels plus anciens non affichés", "vars": None})
                     break
@@ -189,10 +192,7 @@ def __trace_student__(source, max_steps, trace_module):
                 unwinding.discard(key)
                 pending.pop(key, None)
             else:
-                extra = None
-                if not is_module and not (code.co_flags & CO_GENERATORS):
-                    extra = {"renvoie": rep.repr(arg)}
-                finish(frame, extra)
+                finish(frame)
         return tracer
 
     ns = {"__name__": "__main__"}
@@ -202,6 +202,11 @@ def __trace_student__(source, max_steps, trace_module):
     sys.settrace(tracer)
     try:
         exec(code, ns)
+        if not trace_module and not truncated:
+            # Avec un test : les lignes du programme principal ne sont pas des étapes. On en
+            # ajoute une, finale, pour montrer « res » reçu dans le programme principal.
+            steps.append({"line": len(source.rstrip("\\n").split("\\n")), "stack": [{"scope": "programme principal", "vars": snap_vars(ns)}],
+                          "out": out.size})
     except _Stop:
         pass
     except BaseException as e:
@@ -250,6 +255,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   let index = 0;
   let currentLine = null; // ligne CodeMirror (base 0) actuellement surlignée en entier
   let callMark = null; // surlignage de l'expression d'appel (CodeMirror TextMarker)
+  const RESULT_VAR = "res"; // le test est lancé par « res = appel » dans le programme principal
   let callLine = null; // ligne (base 1) de l'appel du test ajouté après le code ; null sans appel
 
   // Code à tracer : celui que la page de l'exercice vient de transmettre (lu une seule fois),
@@ -273,7 +279,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     currentLine = null;
     if (callMark) callMark.clear();
     callMark = null;
-    if (callEl) callEl.classList.remove("active");
+    if (callEl) callEl.classList.remove("active", "full");
   }
 
   function showMessage(text, isError) {
@@ -383,8 +389,10 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     // Entrée dans la fonction testée (ou erreur sur l'appel lui-même) : on surligne l'appel
     // dans la ligne de console sous l'éditeur.
     if (callEl && callLine !== null) {
-      const onCallLine = (!!step.call && step.call.line === callLine) || step.line === callLine;
-      callEl.classList.toggle("active", onCallLine);
+      // Entrée dans la fonction testée : seul l'appel est surligné. Fin du test (res reçu)
+      // ou erreur sur cette ligne : toute l'instruction « res = appel ».
+      callEl.classList.toggle("active", !!step.call && step.call.line === callLine);
+      callEl.classList.toggle("full", step.line === callLine);
     }
     if (cm) {
       if (showLine) {
@@ -421,12 +429,6 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       showMessage(step.error, true);
     } else {
       const parts = [];
-      // Valeur renvoyée : pas affichée pour les appels internes (la variable qui la reçoit
-      // change, ça suffit). Seul le résultat final du test s'affiche, comme dans une console
-      // Python après « >>> appel ».
-      if (isLast && callLine !== null && step.renvoie !== undefined && step.stack.length === 1) {
-        parts.push(step.renvoie);
-      }
       if (isLast) {
         parts.push(
           truncated
@@ -446,7 +448,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     calls.forEach(function (call, i) {
       const opt = document.createElement("option");
       opt.value = String(i);
-      opt.textContent = call + "  # test " + (i + 1);
+      opt.textContent = RESULT_VAR + " = " + call + "  # test " + (i + 1);
       caseSel.appendChild(opt);
     });
     if (calls.length) caseSel.value = "0";
@@ -466,12 +468,14 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
   function renderCallLine() {
     if (!callEl) return;
     callEl.textContent = "";
-    callEl.classList.remove("active");
+    callEl.classList.remove("active", "full");
     const i = Number(caseSel.value);
     const call = calls[i];
     if (call === undefined) return;
     addSpan(callEl, "p", ">>> ");
-    const expr = addSpan(callEl, "stepper-call-expr", "");
+    const stmt = addSpan(callEl, "stepper-call-stmt", ""); // toute l'instruction « res = appel »
+    addSpan(stmt, "", RESULT_VAR + " = ");
+    const expr = addSpan(stmt, "stepper-call-expr", "");
     const open = call.indexOf("(");
     addSpan(expr, "f", open > 0 ? call.slice(0, open) : call);
     const rest = open > 0 ? call.slice(open) : "";
@@ -498,7 +502,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     callLine = null;
     if (callText) {
       // L'appel est ajouté APRÈS le code, dans le même module. Sa ligne = nombre de lignes du code + 1.
-      source = code + "\n__retour_test__ = " + callText + "\n";
+      source = code + "\n" + RESULT_VAR + " = " + callText + "\n";
       callLine = code.split("\n").length + 1;
     }
 

@@ -29,6 +29,7 @@
 .stepper-case-row:focus-within { outline: 2px solid var(--amber); outline-offset: 2px; }
 .stepper-call { padding: 10px 40px 10px 16px; white-space: pre-wrap; word-break: break-word; border-radius: 0 0 var(--radius) var(--radius); }
 .stepper-call.active .stepper-call-expr { background: rgba(217, 142, 43, .35); }
+.stepper-call.full .stepper-call-stmt { background: rgba(217, 142, 43, .35); }
 .stepper-call .p { color: #7f8bae; }
 .stepper-call .f { color: #82aaff; }
 .stepper-call .n { color: #f78c6c; }
