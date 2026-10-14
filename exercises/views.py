@@ -275,9 +275,9 @@ def intro_pas_a_pas(request):
 @login_required
 def guide(request):
     """Page statique expliquant le fonctionnement du site aux étudiants (thèmes/exercices,
-    éditeur et bouton Vérifier, indices, abandon vs demande d'aide, page Progression).
-    Pas de contenu dynamique : le texte vit entièrement dans le template."""
-    return render(request, "exercises/guide.html")
+    éditeur et bouton Vérifier, pas à pas, indices, abandon vs demande d'aide). Seule partie
+    dynamique : la section sur le pas à pas n'apparaît que pour qui y a accès."""
+    return render(request, "exercises/guide.html", {"pas_a_pas": pas_a_pas_autorise(request.user)})
 
 
 @login_required
@@ -287,35 +287,6 @@ def sandbox(request):
     static/js/sandbox.js). Aucun contenu dynamique ni enregistrement côté serveur : le code
     est seulement conservé dans le localStorage du navigateur."""
     return render(request, "exercises/sandbox.html")
-
-
-@login_required
-def profile(request):
-    all_success = (
-        Result.objects.filter(user=request.user, success=True)
-        .select_related("exercise", "exercise__theme")
-        .order_by("exercise__theme__order", "exercise__order", "-created_at")
-    )
-    seen = set()
-    results = []
-    for r in all_success:
-        if r.exercise_id not in seen:
-            seen.add(r.exercise_id)
-            results.append(r)
-    # Indices utilisés / abandons / temps passé, par exercice réussi (voir _stats_row,
-    # plus bas — même fonction que pour la page de stats réservée aux profs, réutilisée
-    # ici pour rester cohérent sur la façon dont chaque indicateur est calculé).
-    for r in results:
-        row = _stats_row(request.user, r.exercise, label=r.exercise.title)
-        r.nb_indices = row["nb_indices"]
-        r.nb_abandons = row["nb_abandons"]
-        r.temps_total = row["temps_total"]
-    total_exercises = Exercise.objects.count()
-    return render(
-        request,
-        "exercises/profile.html",
-        {"results": results, "total_exercises": total_exercises},
-    )
 
 
 @login_required
@@ -476,10 +447,7 @@ def demande_aide_detail(request, demande_id):
 def _stats_row(user, exercise, label):
     """Construit une ligne de la page de stats pour un couple (user, exercise) donné.
     Chaque indicateur est calculé INDÉPENDAMMENT des autres (pas de logique croisée du
-    type "réussi si a vu le corrigé") : ce sont des faits distincts qu'on affiche côte à côte.
-
-    Réutilisée aussi par la vue `profile` (page "Ma progression" de l'élève, voir plus haut) :
-    nb_indices/nb_abandons/temps_total y sont affichés par exercice réussi."""
+    type "réussi si a vu le corrigé") : ce sont des faits distincts qu'on affiche côte à côte."""
     results = Result.objects.filter(user=user, exercise=exercise)
     reussi = results.filter(success=True).exists()
     nb_essais = results.filter(is_attempt=True).count()

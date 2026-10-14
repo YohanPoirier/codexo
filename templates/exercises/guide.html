@@ -32,6 +32,18 @@
   de lire ces propositions qui peuvent être instructives.
 </p>
 
+{% if pas_a_pas %}
+<h2>Le mode pas à pas</h2>
+<p>
+  Sur les exercices Python, le bouton <strong>Pas à pas</strong> exécute le code ligne par
+  ligne, sur l'un des tests de l'exercice : on avance ou on recule d'une étape à la fois, en
+  suivant la valeur des variables de chaque fonction et ce que le programme affiche. Utile
+  pour comprendre ce que fait vraiment un code, ou trouver où il ne fait pas ce qui était
+  prévu. Le code peut aussi y être corrigé, puis repris dans l'exercice.
+</p>
+<p><a href="{% url 'intro_pas_a_pas' %}">Présentation détaillée du mode pas à pas</a></p>
+
+{% endif %}
 <h2>Les indices</h2>
 <p>
   Quand des indices existent pour un exercice, un bouton <strong>Indice</strong> apparaît
@@ -49,11 +61,5 @@
   <strong>Demander de l'aide à un professeur</strong> envoie le code actuel (avec un
   commentaire optionnel expliquant où ça bloque) à l'équipe de professeurs, sans verrouiller
   l'exercice. La réponse sera visible sur la page « Mes demandes d'aide ».
-</p>
-
-<h2>Suivre sa progression</h2>
-<p>
-  La page « Progression » liste les exercices réussis, avec pour chacun le nombre d'indices
-  utilisés, le nombre d'abandons et le temps passé dessus.
 </p>
 {% endblock %}

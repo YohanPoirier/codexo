@@ -421,9 +421,6 @@ button.reset-btn:hover { border-color: var(--err); color: var(--err); }
 .auth-card .switch { margin-top: 18px; font-size: .88rem; text-align: center; color: var(--ink-soft); }
 .errorlist { color: var(--err); font-size: .82rem; list-style: none; padding: 0; margin: 4px 0 0; }
 
-.profile-row { padding: 12px 0; border-bottom: 1px dashed var(--rule); }
-.profile-row-main { display: flex; justify-content: space-between; }
-.profile-row-stats { font-size: .85rem; color: var(--ink-soft); margin-top: 4px; }
 .starter-hint { font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--ink-soft); margin-top: -6px; margin-bottom: 18px; }
 
 /* --- Résumé de schéma SQL (auto-généré depuis sql_setup) --- */

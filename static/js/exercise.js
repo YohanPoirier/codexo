@@ -450,7 +450,7 @@ __RESULTS__ = __EXEC_NS__["__RESULTS__"]
   });
 
   // Sauvegarde automatique du code en cours quand l'étudiant quitte la page (ex: clique sur
-  // "Thèmes", "Progression", ferme l'onglet...), même s'il n'a pas cliqué sur "Vérifier".
+  // "Thèmes", "Guide", ferme l'onglet...), même s'il n'a pas cliqué sur "Vérifier".
   // NB : on marque ces sauvegardes success=false (on n'a pas le temps de relancer les tests
   // à ce moment précis) — ça n'affecte pas /profil/, qui ne compte que les tentatives réussies.
   //

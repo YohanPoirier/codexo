@@ -24,7 +24,6 @@ urlpatterns = [
     path('guide/', ex_views.guide, name='guide'),
     path('nouveau/pas-a-pas/', ex_views.intro_pas_a_pas, name='intro_pas_a_pas'),
     path('bac-a-sable/', ex_views.sandbox, name='sandbox'),
-    path('profil/', ex_views.profile, name='profile'),
     path('mes-demandes-aide/', ex_views.mes_demandes_aide, name='mes_demandes_aide'),
     path('demandes-aide/', ex_views.demandes_aide, name='demandes_aide'),
     path('demandes-aide/<int:demande_id>/', ex_views.demande_aide_detail, name='demande_aide_detail'),

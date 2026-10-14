@@ -206,6 +206,21 @@ class OuvertureAuxElevesTests(TestCase):
         r = self.client.post(reverse("intro_pas_a_pas"), {"next": "https://exemple.com/"})
         self.assertRedirects(r, reverse("theme_list"), fetch_redirect_response=False)
 
+    def test_guide_sans_section_pas_a_pas_si_ferme(self):
+        self.client.force_login(self.eleve)
+        r = self.client.get(reverse("guide"))
+        self.assertNotContains(r, "Le mode pas à pas")
+        self.assertNotContains(r, "Progression")
+
+    @override_settings(PAS_A_PAS_ELEVES=True)
+    def test_guide_avec_lien_si_ouvert(self):
+        self.eleve.a_vu_intro_pas_a_pas = True
+        self.eleve.save()
+        self.client.force_login(self.eleve)
+        r = self.client.get(reverse("guide"))
+        self.assertContains(r, "Le mode pas à pas")
+        self.assertContains(r, 'href="%s"' % reverse("intro_pas_a_pas"))
+
     @override_settings(PAS_A_PAS_ELEVES=True)
     def test_staff_non_redirige(self):
         self.client.force_login(self.prof)
