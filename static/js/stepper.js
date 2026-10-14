@@ -457,7 +457,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     renderCallLine();
   }
 
-  // Affiche « >>> appel  # test n » avec une coloration simple (comme dans l'éditeur).
+  // Affiche « res = appel  # test n » avec une coloration simple (comme dans l'éditeur).
   function addSpan(parent, cls, text) {
     const span = document.createElement("span");
     if (cls) span.className = cls;
@@ -472,7 +472,6 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     const i = Number(caseSel.value);
     const call = calls[i];
     if (call === undefined) return;
-    addSpan(callEl, "p", ">>> ");
     const stmt = addSpan(callEl, "stepper-call-stmt", ""); // toute l'instruction « res = appel »
     addSpan(stmt, "", RESULT_VAR + " = ");
     const expr = addSpan(stmt, "stepper-call-expr", "");
