@@ -344,12 +344,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       section.appendChild(title);
 
       if (scope.vars !== null) {
-        if (scope.vars.length === 0) {
-          const empty = document.createElement("div");
-          empty.className = "stepper-empty";
-          empty.textContent = "(aucune variable)";
-          section.appendChild(empty);
-        } else {
+        if (scope.vars.length > 0) { // sans variable : le bandeau seul
           const table = document.createElement("table");
           table.className = "stepper-table";
           scope.vars.forEach(function (pair) {
