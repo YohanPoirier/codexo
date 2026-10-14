@@ -263,6 +263,52 @@ def __trace_student__(source, max_steps, trace_module):
 __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
 `;
 
+  // Ordre des tests dans le menu : pour un exercice récursif, les tests les moins profonds
+  // d'abord (mesuré sur le corrigé), mais les cas de base (sans appel récursif) en dernier.
+  // Renvoie, pour chaque appel, [profondeur de récursion maximale, nombre d'appels].
+  const PY_MESURE = `
+import sys, json
+
+def __mesure_tests__(solution, calls, max_calls):
+    ns = {"__name__": "__main__"}
+    try:
+        exec(solution, ns)
+    except BaseException:
+        return json.dumps(None)
+
+    class _Stop(BaseException):
+        pass
+
+    out = []
+    for call in calls:
+        depth, best, count = {}, [0], [0]
+
+        def prof(frame, event, arg):
+            code = frame.f_code
+            if code.co_filename != "<string>" or code.co_name.startswith("<"):
+                return
+            if event == "call":
+                count[0] += 1
+                if count[0] > max_calls:
+                    raise _Stop()
+                depth[code.co_name] = depth.get(code.co_name, 0) + 1
+                best[0] = max(best[0], depth[code.co_name])
+            elif event == "return":
+                depth[code.co_name] = depth.get(code.co_name, 1) - 1
+
+        sys.setprofile(prof)
+        try:
+            eval(call, dict(ns))
+        except BaseException:
+            pass
+        finally:
+            sys.setprofile(None)
+        out.append([best[0], count[0]])
+    return json.dumps(out)
+
+__mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
+`;
+
   const prevBtn = document.getElementById("stepper-prev");
   const nextBtn = document.getElementById("stepper-next");
   const posEl = document.getElementById("stepper-pos");
@@ -496,6 +542,29 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
     renderVars(step.stack, changed);
   }
 
+  // Réordonne les appels (voir PY_MESURE) : récursifs du moins profond au plus profond, puis
+  // les cas de base. Exercice non récursif, ou mesure impossible : ordre d'origine.
+  async function orderCalls(list, solution) {
+    if (list.length < 2 || !solution) return list;
+    let mesures;
+    try {
+      pyodide.globals.set("__MESURE_SOLUTION__", solution);
+      pyodide.globals.set("__MESURE_CALLS__", pyodide.toPy(list));
+      mesures = JSON.parse(await pyodide.runPythonAsync(PY_MESURE));
+    } catch (e) {
+      return list;
+    }
+    if (!mesures || mesures.length !== list.length) return list;
+    const items = list.map(function (call, i) {
+      return { call: call, depth: mesures[i][0], count: mesures[i][1], i: i };
+    });
+    const recursifs = items.filter(function (it) { return it.depth >= 2; });
+    if (recursifs.length === 0) return list;
+    recursifs.sort(function (a, b) { return a.depth - b.depth || a.count - b.count || a.i - b.i; });
+    const casDeBase = items.filter(function (it) { return it.depth < 2; });
+    return recursifs.concat(casDeBase).map(function (it) { return it.call; });
+  }
+
   // Remplit le menu avec un appel par cas de test (le premier est choisi d'office).
   // Masqué s'il n'y a aucun cas de test : le code est alors tracé seul.
   function fillCases() {
@@ -692,6 +761,7 @@ __trace_student__(__STEP_SOURCE__, __STEP_MAX__, __STEP_MODULE__)
       pyodide = await loadPyodide();
       // Même règle que la page de l'exercice : numpy n'est chargé que pour les exercices qui l'utilisent.
       if (/(import|from)\s+numpy\b/.test(data.test_code || "")) await pyodide.loadPackage("numpy");
+      calls = await orderCalls(calls, data.solution_code || "");
     } catch (e) {
       showMessage("Erreur de chargement de Python.", true);
       return;
