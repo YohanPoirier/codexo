@@ -9,9 +9,27 @@ from accounts.views import (
     importer_eleves_view,
 )
 from django.contrib.auth.views import LogoutView
+from django.http import HttpResponsePermanentRedirect
+from django.templatetags.static import static
 from exercises import views as ex_views
 
+
+def _redirect_static(nom_fichier):
+    """Redirige une URL racine (/favicon.ico...) vers le fichier dans /static/.
+
+    Les navigateurs et iOS réclament ces fichiers à la racine, sans tenir compte
+    des balises <link> du <head> : sans cette redirection, chaque demande finit en
+    404 et pollue django.log.
+    """
+    def vue(request):
+        return HttpResponsePermanentRedirect(static(nom_fichier))
+    return vue
+
+
 urlpatterns = [
+    path('favicon.ico', _redirect_static('favicon.ico')),
+    path('apple-touch-icon.png', _redirect_static('apple-touch-icon.png')),
+    path('apple-touch-icon-precomposed.png', _redirect_static('apple-touch-icon.png')),
     path('admin/', admin.site.urls),
     path('login/', IdentifiantLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
