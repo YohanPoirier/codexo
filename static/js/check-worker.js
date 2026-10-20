@@ -7,6 +7,8 @@
 // Messages envoyés à la page :
 //   {type: "ready"}                       Python est chargé, on peut vérifier
 //   {type: "fatal", message}              Python n'a pas pu être chargé
+//   {type: "start", call}                 un test va démarrer ; call = appel testé, ex.
+//                                         "nombre_de_lettres('a')" (absent si non identifiable)
 //   {type: "result", ok, msg, printed}    résultat d'UN test, envoyé dès qu'il est connu
 //   {type: "done", runtimeError, results} fin de la vérification : runtimeError (texte, ou
 //                                         null) et la liste complète des résultats
@@ -37,6 +39,9 @@ class __StreamList__(list):
         list.append(self, item)
         __EMIT__(bool(item[0]), str(item[1]), str(item[2]) if len(item) > 2 else "")
 
+def __START__(args_repr):
+    __EMIT_START__(args_repr)
+
 __stdout_capture__ = io.StringIO()
 __RUNTIME_ERROR__ = None
 `;
@@ -57,7 +62,7 @@ __RESULTS__ = [tuple(r) for r in __EXEC_NS__["__RESULTS__"]]
 // test (généré côté serveur) l'exécute via sqlite3 et compare au résultat de la requête de correction.
 const RUNNER_SQL =
   PY_PREAMBLE +
-  `__EXEC_NS__ = {"__RESULTS__": [], "__StreamList__": __StreamList__, "__STUDENT_SQL__": __STUDENT_SQL__}
+  `__EXEC_NS__ = {"__RESULTS__": [], "__StreamList__": __StreamList__, "__START__": __START__, "__STUDENT_SQL__": __STUDENT_SQL__}
 ` +
   PY_POSTAMBLE.replace("__BODY__", "    exec(__TEST_CODE__, __EXEC_NS__)");
 
@@ -65,15 +70,30 @@ const RUNNER_SQL =
 // (récursivité exigée, opérateur « in » interdit) font ast.parse(__STUDENT_CODE__).
 const RUNNER_PYTHON =
   PY_PREAMBLE +
-  `__EXEC_NS__ = {"__RESULTS__": [], "__StreamList__": __StreamList__, "__STUDENT_CODE__": __STUDENT_CODE__}
+  `__EXEC_NS__ = {"__RESULTS__": [], "__StreamList__": __StreamList__, "__START__": __START__, "__STUDENT_CODE__": __STUDENT_CODE__}
 ` +
   PY_POSTAMBLE.replace(
     "__BODY__",
     "    exec(__STUDENT_CODE__, __EXEC_NS__)\n    exec(__TEST_CODE__, __EXEC_NS__)"
   );
 
+// Deux retouches du code de test (généré côté serveur, voir Exercise._build_python_test_code),
+// faites ici pour ne rien changer côté Django :
+//  1. « __RESULTS__ = [] » devient « __RESULTS__ = __StreamList__() » (résultats au fil de l'eau) ;
+//  2. juste après la ligne « _args_repr = ... », on annonce le test qui démarre : si la
+//     vérification est coupée, la page peut dire QUEL appel ne se termine pas.
+// Si une retouche ne trouve pas son motif (code de test modifié, exercice SQL...), rien ne casse :
+// on perd seulement la fonctionnalité correspondante.
+let currentFn = null;
+
 function patchTestCode(testCode) {
-  return testCode.replace(/^__RESULTS__ = \[\]/m, "__RESULTS__ = __StreamList__()");
+  const m = testCode.match(/_solution_ns\['(\w+)'\]/);
+  currentFn = m ? m[1] : null;
+  let code = testCode.replace(/^__RESULTS__ = \[\]/m, "__RESULTS__ = __StreamList__()");
+  if (currentFn) {
+    code = code.replace(/^([ \t]*)_args_repr = .*$/m, "$&\n$1__START__(_args_repr)");
+  }
+  return code;
 }
 
 async function init(useNumpy, useSqlite) {
@@ -85,6 +105,9 @@ async function init(useNumpy, useSqlite) {
     if (useSqlite) await pyodide.loadPackage("sqlite3");
     pyodide.globals.set("__EMIT__", function (ok, msg, printed) {
       postMessage({ type: "result", ok: ok, msg: msg, printed: printed });
+    });
+    pyodide.globals.set("__EMIT_START__", function (argsRepr) {
+      postMessage({ type: "start", call: currentFn + "(" + argsRepr + ")" });
     });
     postMessage({ type: "ready" });
   } catch (e) {

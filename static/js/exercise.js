@@ -16,7 +16,8 @@
   let ready = false; // le worker a fini de charger Python
   let useNumpy = false;
   // État de la vérification en cours (null si aucune) : code testé, résultats déjà reçus (un
-  // par test, envoyés au fil de l'eau par le worker) et minuteur de la limite de temps.
+  // par test, envoyés au fil de l'eau par le worker), appel du test en cours (ex.
+  // « nombre_de_lettres('a') », null si inconnu) et minuteur de la limite de temps.
   let running = null;
   // numpy n'est chargé que si le code (corrigé ou test) l'importe vraiment : chercher le simple
   // mot « numpy » ne suffit pas, il apparaît aussi dans un commentaire du code de test
@@ -331,10 +332,15 @@
         ready = true;
         runBtn.disabled = false;
         runBtn.textContent = "Vérifier";
+      } else if (msg.type === "start") {
+        if (running) running.current = msg.call;
       } else if (msg.type === "result") {
         // Résultat d'un test, reçu dès qu'il est connu : gardé pour pouvoir l'afficher si la
         // vérification est interrompue avant la fin (voir interruptCheck).
-        if (running) running.items.push({ ok: msg.ok, msg: msg.msg, printed: msg.printed || "" });
+        if (running) {
+          running.items.push({ ok: msg.ok, msg: msg.msg, printed: msg.printed || "" });
+          running.current = null;
+        }
       } else if (msg.type === "done") {
         onCheckDone(msg);
       } else if (msg.type === "fatal") {
@@ -386,13 +392,15 @@
   function onTimeout() {
     if (!running) return;
     const seconds = Math.round(CHECK_TIMEOUT_MS / 1000);
-    const which = running.items.length === 0
-      ? "le programme ne s'est pas terminé"
-      : "le test n°" + (running.items.length + 1) + " ne s'est pas terminé";
+    // Quand on connaît l'appel qui ne se termine pas, on le nomme ; sinon (blocage avant les
+    // tests, par exemple au chargement du code de l'étudiant) message général.
+    const which = running.current
+      ? running.current + " : le test ne s'est pas terminé"
+      : "La vérification ne s'est pas terminée";
     interruptCheck(
-      "La vérification a été interrompue : " + which + " en " + seconds + " secondes " +
-        "(boucle infinie ?). Vérifier les conditions d'arrêt des boucles et des appels " +
-        "récursifs. Si le code semble correct, demander de l'aide à un professeur.",
+      which + " en moins de " + seconds + " secondes (boucle infinie ?). Vérifier les " +
+        "conditions d'arrêt des boucles et des appels récursifs. Si le code semble correct, " +
+        "demander de l'aide à un professeur.",
       true
     );
   }
@@ -428,7 +436,7 @@
   function runCheck() {
     if (!ready || running) return;
     const code = getCode();
-    running = { code: code, items: [], timer: null };
+    running = { code: code, items: [], current: null, timer: null };
     runBtn.disabled = true;
     runBtn.textContent = "Vérification…";
     if (stopBtn) stopBtn.hidden = false;
