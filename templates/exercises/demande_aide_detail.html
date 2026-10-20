@@ -23,6 +23,7 @@
 
 <div class="actions">
   <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
+  <button id="stop-btn" class="stop-btn" type="button" hidden>Arrêter</button>
   <button id="solution-toggle-btn" class="reset-btn" type="button">Voir le corrigé</button>
 </div>
 
@@ -47,8 +48,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+<!-- Pyodide tourne dans un worker (voir check-worker.js) : permet de couper une vérification
+     qui ne se termine pas (boucle infinie). -->
 <script>
+const CHECK_WORKER_URL = "{% static 'js/check-worker.js' %}";
 const EXERCISE_KIND = "{{ demande.exercise.kind }}";
 const TESTS_URL = "{% url 'exercise_tests' demande.exercise.id %}";
 const INITIAL_CODE = "{{ demande.code_soumis|escapejs }}";

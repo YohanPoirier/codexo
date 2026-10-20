@@ -11,7 +11,18 @@
   const solutionBox = document.getElementById("solution-reveal");
   const solutionCodeEl = document.getElementById("solution-reveal-code");
 
-  let pyodide = null;
+  const stopBtn = document.getElementById("stop-btn");
+
+  // Pyodide tourne dans un worker (voir check-worker.js, le même que pour exercise.js) : un code
+  // qui boucle sans fin ne fige pas la page, la vérification est coupée au bout de
+  // CHECK_TIMEOUT_MS (à garder identique à celui de exercise.js) ou au clic sur « Arrêter ».
+  const CHECK_TIMEOUT_MS = 10000;
+  let worker = null;
+  let ready = false; // le worker a fini de charger Python
+  let useNumpy = false;
+  // Vérification en cours (null si aucune) : résultats déjà reçus (un par test, au fil de
+  // l'eau), appel du test en cours (ex. « nombre_de_lettres('a') », null si inconnu), minuteur.
+  let running = null;
   let testCode = "";
   let solutionCode = "";
   let cm = null;
@@ -109,82 +120,118 @@
 
     initCodeMirror(typeof INITIAL_CODE !== "undefined" && INITIAL_CODE ? INITIAL_CODE : "");
 
-    runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
-    try {
-      pyodide = await loadPyodide();
-      if (/(import|from)\s+numpy\b/.test(testCode)) {
-        await pyodide.loadPackage("numpy");
-      }
-    } catch (e) {
-      runBtn.textContent = "Erreur de chargement de Python";
-      return;
-    }
-    runBtn.disabled = false;
-    runBtn.textContent = "Tester ce code";
+    useNumpy = /(import|from)\s+numpy\b/.test(testCode);
+    startWorker();
   }
 
-  async function runCheck() {
+  // --- Worker : démarrage, messages, arrêt ---
+  function startWorker() {
+    ready = false;
+    runBtn.disabled = true;
+    runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
+
+    const w = new Worker(CHECK_WORKER_URL);
+    worker = w;
+
+    w.onmessage = function (ev) {
+      if (w !== worker) return; // message d'un ancien worker (déjà arrêté)
+      const msg = ev.data;
+      if (msg.type === "ready") {
+        ready = true;
+        runBtn.disabled = false;
+        runBtn.textContent = "Tester ce code";
+      } else if (msg.type === "start") {
+        if (running) running.current = msg.call;
+      } else if (msg.type === "result") {
+        if (running) {
+          running.items.push({ ok: msg.ok, msg: msg.msg, printed: msg.printed || "" });
+          running.current = null;
+        }
+      } else if (msg.type === "done") {
+        onCheckDone(msg);
+      } else if (msg.type === "fatal") {
+        runBtn.textContent = "Erreur de chargement de Python";
+      }
+    };
+
+    // Erreur du worker lui-même (script introuvable, CDN indisponible, plantage...)
+    w.onerror = function () {
+      if (w !== worker) return;
+      if (!ready) {
+        runBtn.textContent = "Erreur de chargement de Python";
+        return;
+      }
+      if (running) interruptCheck("Erreur inattendue du moteur Python.");
+      else startWorker();
+    };
+
+    w.postMessage({ type: "init", numpy: useNumpy, sqlite: EXERCISE_KIND === "sql" });
+  }
+
+  function endRun() {
+    if (running && running.timer) clearTimeout(running.timer);
+    running = null;
+    if (stopBtn) stopBtn.hidden = true;
+  }
+
+  // Coupe net la vérification en cours (limite de temps, bouton « Arrêter ») : on supprime le
+  // worker puis on en relance un neuf. Les résultats des tests déjà terminés restent affichés,
+  // suivis du motif de l'interruption.
+  function interruptCheck(reason) {
+    if (!running) return;
+    const items = running.items.slice();
+    endRun();
+
+    const old = worker;
+    worker = null; // les derniers messages éventuels de l'ancien worker seront ignorés
+    if (old) old.terminate();
+    startWorker();
+
+    showResultLines(items.concat([{ ok: false, msg: reason, printed: "" }]));
+  }
+
+  function onTimeout() {
+    if (!running) return;
+    const seconds = Math.round(CHECK_TIMEOUT_MS / 1000);
+    const which = running.current
+      ? running.current + " : le test ne s'est pas terminé"
+      : "La vérification ne s'est pas terminée";
+    interruptCheck(
+      which + " en moins de " + seconds + " secondes (boucle infinie ?). Vérifier les " +
+        "conditions d'arrêt des boucles et des appels récursifs."
+    );
+  }
+
+  if (stopBtn) {
+    stopBtn.addEventListener("click", function () {
+      interruptCheck("Vérification interrompue.");
+    });
+  }
+
+  function runCheck() {
+    if (!ready || running) return;
     const code = getCode();
+    running = { items: [], current: null, timer: null };
     runBtn.disabled = true;
     runBtn.textContent = "Vérification…";
+    if (stopBtn) stopBtn.hidden = false;
     resultBox.classList.add("hidden");
 
-    try {
-      pyodide.globals.set("__TEST_CODE__", testCode);
+    running.timer = setTimeout(onTimeout, CHECK_TIMEOUT_MS);
+    worker.postMessage({ type: "run", kind: EXERCISE_KIND, code: code, testCode: testCode });
+  }
 
-      let runner;
-      if (EXERCISE_KIND === "sql") {
-        pyodide.globals.set("__STUDENT_SQL__", code);
-        runner = `
-import sys, io, traceback
+  // Fin normale de la vérification (message « done » du worker).
+  function onCheckDone(msg) {
+    if (!running) return;
+    endRun();
 
-__stdout_capture__ = io.StringIO()
-__RESULTS__ = []
-__RUNTIME_ERROR__ = None
-
-_old_stdout = sys.stdout
-sys.stdout = __stdout_capture__
-try:
-    exec(__TEST_CODE__, globals())
-except Exception:
-    __RUNTIME_ERROR__ = traceback.format_exc()
-finally:
-    sys.stdout = _old_stdout
-`;
-      } else {
-        pyodide.globals.set("__STUDENT_CODE__", code);
-        runner = `
-import sys, io, traceback
-
-__stdout_capture__ = io.StringIO()
-__RESULTS__ = []
-__RUNTIME_ERROR__ = None
-
-_old_stdout = sys.stdout
-sys.stdout = __stdout_capture__
-try:
-    exec(__STUDENT_CODE__, globals())
-    exec(__TEST_CODE__, globals())
-except Exception:
-    __RUNTIME_ERROR__ = traceback.format_exc()
-finally:
-    sys.stdout = _old_stdout
-`;
-      }
-      await pyodide.runPythonAsync(runner);
-
-      const runtimeError = pyodide.globals.get("__RUNTIME_ERROR__");
-      if (runtimeError) {
-        showRuntimeError("Erreur dans ce code :\n\n" + runtimeError);
-      } else {
-        const resultsProxy = pyodide.globals.get("__RESULTS__");
-        const results = resultsProxy ? resultsProxy.toJs() : [];
-        const items = results.map((item) => ({ ok: item[0], msg: item[1], printed: item[2] || "" }));
-        if (items.length === 0) items.push({ ok: false, msg: "Aucun test défini pour cet exercice." });
-        showResultLines(items);
-      }
-    } catch (e) {
-      showRuntimeError("Erreur inattendue : " + e.message);
+    if (msg.runtimeError) {
+      showRuntimeError("Erreur dans ce code :\n\n" + msg.runtimeError);
+    } else {
+      const items = (msg.results || []).map((item) => ({ ok: item[0], msg: item[1], printed: item[2] || "" }));
+      if (items.length === 0) items.push({ ok: false, msg: "Aucun test défini pour cet exercice." });
+      showResultLines(items);
     }
 
     runBtn.disabled = false;
