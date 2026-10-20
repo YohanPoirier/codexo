@@ -16,7 +16,7 @@
   // Pyodide tourne dans un worker (voir check-worker.js, le même que pour exercise.js) : un code
   // qui boucle sans fin ne fige pas la page, la vérification est coupée au bout de
   // CHECK_TIMEOUT_MS (à garder identique à celui de exercise.js) ou au clic sur « Arrêter ».
-  const CHECK_TIMEOUT_MS = 10000;
+  const CHECK_TIMEOUT_MS = 5000;
   let worker = null;
   let ready = false; // le worker a fini de charger Python
   let useNumpy = false;
