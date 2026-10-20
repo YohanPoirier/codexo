@@ -6,7 +6,18 @@
   const solutionBox = document.getElementById("solution-reveal");
   const solutionCodeEl = document.getElementById("solution-reveal-code");
 
-  let pyodide = null;
+  const stopBtn = document.getElementById("stop-btn");
+
+  // Pyodide tourne dans un worker (voir check-worker.js), pas dans la page : si le code de
+  // l'étudiant (ou un cas de test mal choisi) boucle sans fin, la page reste utilisable et la
+  // vérification est coupée au bout de CHECK_TIMEOUT_MS (ou au clic sur « Arrêter »).
+  const CHECK_TIMEOUT_MS = 10000;
+  let worker = null;
+  let ready = false; // le worker a fini de charger Python
+  let useNumpy = false;
+  // État de la vérification en cours (null si aucune) : code testé, résultats déjà reçus (un
+  // par test, envoyés au fil de l'eau par le worker) et minuteur de la limite de temps.
+  let running = null;
   // numpy n'est chargé que si le code (corrigé ou test) l'importe vraiment : chercher le simple
   // mot « numpy » ne suffit pas, il apparaît aussi dans un commentaire du code de test
   // commun à tous les exercices (voir Exercise._build_python_test_code), ce qui faisait
@@ -295,23 +306,101 @@
         : LAST_SUBMITTED_CODE !== null && LAST_SUBMITTED_CODE !== "" ? LAST_SUBMITTED_CODE : starterCode;
     initCodeMirror(initialCode);
 
+    // testCode inclut déjà le texte de solution_code (voir Exercise.build_test_code
+    // côté serveur) : si l'exercice utilise numpy, "numpy" apparaît forcément dans
+    // testCode. On ne charge donc le package que pour les exercices qui en ont besoin,
+    // pas systématiquement pour tous (évite d'alourdir le chargement des exercices
+    // qui n'en ont pas l'usage).
+    useNumpy = USES_NUMPY.test(testCode);
+    startWorker();
+  }
+
+  // --- Worker : démarrage, messages, arrêt ---
+  function startWorker() {
+    ready = false;
+    runBtn.disabled = true;
     runBtn.textContent = "Chargement de Python (peut prendre quelques secondes)…";
-    try {
-      pyodide = await loadPyodide();
-      // testCode inclut déjà le texte de solution_code (voir Exercise.build_test_code
-      // côté serveur) : si l'exercice utilise numpy, "numpy" apparaît forcément dans
-      // testCode. On ne charge donc le package que pour les exercices qui en ont besoin,
-      // pas systématiquement pour tous (évite d'alourdir le chargement des exercices
-      // qui n'en ont pas l'usage).
-      if (USES_NUMPY.test(testCode)) {
-        await pyodide.loadPackage("numpy");
+
+    const w = new Worker(CHECK_WORKER_URL);
+    worker = w;
+
+    w.onmessage = function (ev) {
+      if (w !== worker) return; // message d'un ancien worker (déjà arrêté)
+      const msg = ev.data;
+      if (msg.type === "ready") {
+        ready = true;
+        runBtn.disabled = false;
+        runBtn.textContent = "Vérifier";
+      } else if (msg.type === "result") {
+        // Résultat d'un test, reçu dès qu'il est connu : gardé pour pouvoir l'afficher si la
+        // vérification est interrompue avant la fin (voir interruptCheck).
+        if (running) running.items.push({ ok: msg.ok, msg: msg.msg, printed: msg.printed || "" });
+      } else if (msg.type === "done") {
+        onCheckDone(msg);
+      } else if (msg.type === "fatal") {
+        runBtn.textContent = "Erreur de chargement de Python";
       }
-    } catch (e) {
-      runBtn.textContent = "Erreur de chargement de Python";
-      return;
-    }
-    runBtn.disabled = false;
-    runBtn.textContent = "Vérifier";
+    };
+
+    // Erreur du worker lui-même (script introuvable, CDN indisponible, plantage...)
+    w.onerror = function () {
+      if (w !== worker) return;
+      if (!ready) {
+        runBtn.textContent = "Erreur de chargement de Python";
+        return;
+      }
+      if (running) interruptCheck("Erreur inattendue du moteur Python.", true);
+      else startWorker();
+    };
+
+    w.postMessage({ type: "init", numpy: useNumpy, sqlite: EXERCISE_KIND === "sql" });
+  }
+
+  function endRun() {
+    if (running && running.timer) clearTimeout(running.timer);
+    running = null;
+    if (stopBtn) stopBtn.hidden = true;
+  }
+
+  // Coupe net la vérification en cours (boucle infinie, limite de temps, bouton « Arrêter ») :
+  // on supprime le worker puis on en relance un neuf (Python est rechargé, quelques secondes,
+  // le fichier étant alors déjà en cache). Les résultats des tests déjà terminés restent
+  // affichés, suivis du motif de l'interruption. recordAttempt : compte l'interruption comme
+  // un essai raté (limite de temps) ou non (arrêt demandé par l'étudiant).
+  function interruptCheck(reason, recordAttempt) {
+    if (!running) return;
+    const code = running.code;
+    const items = running.items.slice();
+    endRun();
+
+    const old = worker;
+    worker = null; // les derniers messages éventuels de l'ancien worker seront ignorés
+    if (old) old.terminate();
+    startWorker();
+
+    showResultLines(items.concat([{ ok: false, msg: reason, printed: "" }]));
+    showSolutionIfSuccess(false);
+    if (recordAttempt) submitResult(code, false, true);
+  }
+
+  function onTimeout() {
+    if (!running) return;
+    const seconds = Math.round(CHECK_TIMEOUT_MS / 1000);
+    const which = running.items.length === 0
+      ? "le programme ne s'est pas terminé"
+      : "le test n°" + (running.items.length + 1) + " ne s'est pas terminé";
+    interruptCheck(
+      "La vérification a été interrompue : " + which + " en " + seconds + " secondes " +
+        "(boucle infinie ?). Vérifier les conditions d'arrêt des boucles et des appels " +
+        "récursifs. Si le code semble correct, demander de l'aide à un professeur.",
+      true
+    );
+  }
+
+  if (stopBtn) {
+    stopBtn.addEventListener("click", function () {
+      interruptCheck("Vérification interrompue.", false);
+    });
   }
 
   async function submitResult(code, success, isAttempt) {
@@ -336,103 +425,51 @@
     }
   }
 
-  async function runCheck() {
+  function runCheck() {
+    if (!ready || running) return;
     const code = getCode();
+    running = { code: code, items: [], timer: null };
     runBtn.disabled = true;
     runBtn.textContent = "Vérification…";
+    if (stopBtn) stopBtn.hidden = false;
     resultBox.classList.add("hidden");
     if (solutionBox) solutionBox.hidden = true;
 
-    try {
-      pyodide.globals.set("__TEST_CODE__", testCode);
+    // La limite de temps court dès l'envoi : la solution de référence est exécutée dans le
+    // même temps (pour calculer l'attendu de chaque test), donc un cas de test qui la fait
+    // boucler sans fin est coupé exactement comme un code d'étudiant qui boucle.
+    running.timer = setTimeout(onTimeout, CHECK_TIMEOUT_MS);
+    worker.postMessage({ type: "run", kind: EXERCISE_KIND, code: code, testCode: testCode });
+  }
 
-      let runner;
-      if (EXERCISE_KIND === "sql") {
-        // En SQL, le texte de l'étudiant est une REQUÊTE, pas du code Python à exécuter :
-        // on le passe tel quel comme variable, test_code (généré côté serveur) s'occupe
-        // de l'exécuter via sqlite3 et de comparer le résultat à la requête de correction.
-        pyodide.globals.set("__STUDENT_SQL__", code);
-        // __EXEC_NS__ : espace de noms FRAÎCHEMENT créé à CHAQUE clic sur "Vérifier" (cette
-        // chaîne "runner" est ré-exécutée en entier à chaque appel de runPythonAsync). Sans ça,
-        // exec(..., globals()) exécuterait dans les globals persistants de pyodide (le même
-        // objet Python, réutilisé pour tous les clics de toute la session) : toute fonction/
-        // variable définie par test_code lors d'un clic précédent resterait présente et pourrait
-        // fausser silencieusement le résultat du clic suivant (décalage entre le code testé et
-        // le code affiché). Voir même remarque dans la branche Python ci-dessous.
-        runner = `
-import sys, io, traceback
+  // Fin normale de la vérification (message « done » du worker). Les résultats des tests ont
+  // déjà été reçus un par un ; la liste complète du message sert de référence finale.
+  async function onCheckDone(msg) {
+    if (!running) return;
+    const code = running.code;
+    if (running.timer) clearTimeout(running.timer);
+    if (stopBtn) stopBtn.hidden = true;
 
-__stdout_capture__ = io.StringIO()
-__RUNTIME_ERROR__ = None
-__EXEC_NS__ = {"__RESULTS__": []}
-
-_old_stdout = sys.stdout
-sys.stdout = __stdout_capture__
-try:
-    exec(__TEST_CODE__, __EXEC_NS__)
-except Exception:
-    __RUNTIME_ERROR__ = traceback.format_exc()
-finally:
-    sys.stdout = _old_stdout
-__RESULTS__ = __EXEC_NS__["__RESULTS__"]
-`;
-      } else {
-        pyodide.globals.set("__STUDENT_CODE__", code);
-        // __EXEC_NS__ : voir le commentaire équivalent dans la branche SQL ci-dessus. Ici c'est
-        // encore plus important : sans espace de noms frais à chaque clic, une fonction définie
-        // par une ANCIENNE version du code de l'étudiant (clic précédent) pouvait rester dans les
-        // globals persistants de pyodide et être utilisée par erreur si la nouvelle version ne la
-        // redéfinissait pas exactement — donnant l'impression que "Vérifier" teste un code qui
-        // n'est plus celui affiché à l'écran.
-        runner = `
-import sys, io, traceback
-
-__stdout_capture__ = io.StringIO()
-__RUNTIME_ERROR__ = None
-# __STUDENT_CODE__ doit aussi exister DANS cet espace de noms : les contrôles statiques du
-# test (récursivité exigée, opérateur « in » interdit) font ast.parse(__STUDENT_CODE__).
-__EXEC_NS__ = {"__RESULTS__": [], "__STUDENT_CODE__": __STUDENT_CODE__}
-
-_old_stdout = sys.stdout
-sys.stdout = __stdout_capture__
-try:
-    exec(__STUDENT_CODE__, __EXEC_NS__)
-    exec(__TEST_CODE__, __EXEC_NS__)
-except Exception:
-    __RUNTIME_ERROR__ = traceback.format_exc()
-finally:
-    sys.stdout = _old_stdout
-__RESULTS__ = __EXEC_NS__["__RESULTS__"]
-`;
-      }
-      await pyodide.runPythonAsync(runner);
-
-      const runtimeError = pyodide.globals.get("__RUNTIME_ERROR__");
-      if (runtimeError) {
-        showRuntimeError("Erreur dans ton code :\n\n" + runtimeError);
-        showSolutionIfSuccess(false);
-        await submitResult(code, false, true);
-      } else {
-        const resultsProxy = pyodide.globals.get("__RESULTS__");
-        const results = resultsProxy ? resultsProxy.toJs() : [];
-        const items = results.map((item) => ({ ok: item[0], msg: item[1], printed: item[2] || "" }));
-        if (items.length === 0) items.push({ ok: false, msg: "Aucun test défini pour cet exercice." });
-        const allOk = items.length > 0 && items.every((it) => it.ok);
-        // Si tout est bon, inutile d'afficher le détail des tests un par un : le corrigé
-        // (voir showSolutionIfSuccess) suffit comme confirmation. resultBox reste donc caché
-        // (déjà mis à "hidden" en début de runCheck) — on ne l'affiche qu'en cas d'échec,
-        // pour aider l'étudiant à comprendre ce qui ne va pas.
-        if (!allOk) {
-          showResultLines(items);
-        }
-        showSolutionIfSuccess(allOk);
-        await submitResult(code, allOk, true);
-      }
-    } catch (e) {
-      showRuntimeError("Erreur inattendue : " + e.message);
+    if (msg.runtimeError) {
+      showRuntimeError("Erreur dans ton code :\n\n" + msg.runtimeError);
       showSolutionIfSuccess(false);
+      await submitResult(code, false, true);
+    } else {
+      const items = (msg.results || []).map((item) => ({ ok: item[0], msg: item[1], printed: item[2] || "" }));
+      if (items.length === 0) items.push({ ok: false, msg: "Aucun test défini pour cet exercice." });
+      const allOk = items.length > 0 && items.every((it) => it.ok);
+      // Si tout est bon, inutile d'afficher le détail des tests un par un : le corrigé
+      // (voir showSolutionIfSuccess) suffit comme confirmation. resultBox reste donc caché
+      // (déjà mis à "hidden" en début de runCheck) — on ne l'affiche qu'en cas d'échec,
+      // pour aider l'étudiant à comprendre ce qui ne va pas.
+      if (!allOk) {
+        showResultLines(items);
+      }
+      showSolutionIfSuccess(allOk);
+      await submitResult(code, allOk, true);
     }
 
+    running = null;
     runBtn.disabled = false;
     runBtn.textContent = "Vérifier";
   }

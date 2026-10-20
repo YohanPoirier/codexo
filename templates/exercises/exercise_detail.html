@@ -39,6 +39,7 @@
 
     <div class="actions">
       <button id="run-btn" class="run-btn" disabled>Chargement de Python…</button>
+      <button id="stop-btn" class="stop-btn" type="button" hidden>Arrêter</button>
       <button id="reset-btn" class="reset-btn" type="button" title="Revenir au code de départ">Réinitialiser</button>
       <button id="save-btn" class="reset-btn" type="button" title="Enregistrer maintenant">Enregistrer</button>
       {% if pas_a_pas %}
@@ -108,8 +109,10 @@
        exercise.js) : addon officiel, aucune CSS supplémentaire nécessaire. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/rulers.min.js"></script>
 
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.28.3/full/pyodide.js"></script>
+  <!-- Pyodide tourne dans un worker (voir check-worker.js), pas dans la page : c'est ce qui
+       permet de couper une vérification qui ne se termine pas (boucle infinie). -->
   <script>
+  const CHECK_WORKER_URL = "{% static 'js/check-worker.js' %}";
   const EXERCISE_ID = {{ exercise.id }};
   const EXERCISE_KIND = "{{ exercise.kind }}";
   const TESTS_URL = "{% url 'exercise_tests' exercise.id %}";
