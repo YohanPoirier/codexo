@@ -174,6 +174,7 @@ def exercise_detail(request, theme_slug, exercise_slug):
             "retry_at": retry_at,
             "pending_demande_aide": pending_demande_aide,
             "pas_a_pas": pas_a_pas_autorise(request.user) and exercise.kind != Exercise.SQL,
+            "schema_summary": exercise.schema_summary,
         },
     )
 

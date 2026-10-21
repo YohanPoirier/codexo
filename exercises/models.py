@@ -192,6 +192,16 @@ class Exercise(models.Model):
         """Le sql_setup à utiliser : celui de l'exercice s'il est défini, sinon celui du thème."""
         return self.sql_setup or self.theme.sql_setup
 
+    @property
+    def schema_summary(self):
+        """Résumé auto-généré (tables/colonnes/extrait de données) de la base de CET exercice SQL
+        (sa propre base s'il en a une, sinon celle de son thème), affiché sous l'énoncé. Voir
+        schema_utils.py. None pour un exercice qui n'est pas SQL."""
+        if self.kind != self.SQL:
+            return None
+        from .schema_utils import summarize_sql_setup
+        return summarize_sql_setup(self.effective_sql_setup)
+
     def clean(self):
         from django.core.exceptions import ValidationError
 

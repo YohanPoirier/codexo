@@ -464,6 +464,20 @@ table.schema-columns code {
 .schema-sample summary { cursor: pointer; color: #cdd6ef; user-select: none; }
 .schema-sample summary:hover { color: white; }
 .schema-sample table.schema-sample-table { margin-top: 8px; }
+/* Cadre déroulant sous l'énoncé d'un exercice SQL (voir exercise_detail.html) : replié par
+   défaut pour ne pas repousser l'éditeur très bas ; le résumé à l'intérieur n'a plus besoin
+   de ses grandes marges (utilisées sur la page du thème). */
+.schema-details { margin: 18px 0 4px; }
+.schema-details > summary {
+  cursor: pointer; user-select: none; list-style: none;
+  display: inline-block; padding: 8px 14px; border-radius: 8px;
+  background: var(--indigo-deep); color: #eef1fb; font-size: .92rem; font-weight: 500;
+}
+.schema-details > summary::-webkit-details-marker { display: none; }
+.schema-details > summary::before { content: "▸"; display: inline-block; margin-right: 8px; transition: transform .15s; }
+.schema-details[open] > summary::before { transform: rotate(90deg); }
+.schema-details > summary:hover { filter: brightness(1.15); }
+.schema-details .schema-summary { margin: 10px 0 0; padding: 18px 20px; }
 .schema-error {
   background: #fbe9e4; color: #8a3320; border: 1px solid var(--err); border-radius: var(--radius);
   padding: 12px 16px; margin: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: .85rem;

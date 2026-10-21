@@ -8,6 +8,12 @@
 <span class="section-label">Énoncé</span>
 <div class="statement">
   {{ exercise.statement|render_statement }}
+  {% if schema_summary.tables or schema_summary.error %}
+  <details class="schema-details">
+    <summary>Description de la base de données</summary>
+    {% include "exercises/_schema_summary.html" with compact=True %}
+  </details>
+  {% endif %}
   {% if hints %}
   <div class="hints-panel">
     <button id="hint-btn" type="button" class="hint-btn">Indice</button>

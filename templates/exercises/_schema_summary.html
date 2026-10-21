@@ -2,7 +2,7 @@
   <p class="schema-error">{{ schema_summary.error }}</p>
 {% elif schema_summary.tables %}
   <div class="schema-summary">
-    <h3 class="schema-summary-title">Description de la base de données</h3>
+    {% if not compact %}<h3 class="schema-summary-title">Description de la base de données</h3>{% endif %}
     {% for table in schema_summary.tables %}
       <div class="schema-table">
         <h4>{{ table.name }}{% if table.comment %} <span class="schema-table-comment">— {{ table.comment }}</span>{% endif %}</h4>
