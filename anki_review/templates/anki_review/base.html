@@ -17,6 +17,10 @@
 <meta name="theme-color" content="#2b8a7f">
 <meta name="apple-mobile-web-app-title" content="Anki">
 <script defer src="{% static 'js/pwa.js' %}"></script>
+{% if user.is_authenticated %}
+<link rel="stylesheet" href="{% static 'anki_review/css/installation.css' %}">
+<script src="{% static 'anki_review/js/installation.js' %}"></script>
+{% endif %}
 <!-- Réutilise style.css pour les variables/polices communes (--paper, --indigo, Fraunces...)
      mais AUCUN lien, logo ou texte "Codexo" n'apparaît sur ces pages. -->
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -60,6 +64,7 @@
         {% endfor %}
       </ul>
     {% endif %}
+    {% if user.is_authenticated %}{% include "anki_review/_installation.html" %}{% endif %}
     {% block content %}{% endblock %}
   </div>
 </main>
