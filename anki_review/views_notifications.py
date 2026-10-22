@@ -10,7 +10,7 @@ import json
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -147,8 +147,14 @@ def tester(request):
 # réglages et le choix « nouveaux exercices » sont propres à Codexo.
 
 
+def _exiger_codexo_actif():
+    if not settings.NOTIFICATIONS_CODEXO:
+        raise Http404("Les notifications de Codexo sont désactivées.")
+
+
 @login_required
 def page_codexo(request):
+    _exiger_codexo_actif()
     return render(request, "notifications.html", {
         "configure": notifications.configuration_ok(),
         "vapid_public_key": settings.VAPID_PUBLIC_KEY,
@@ -159,6 +165,7 @@ def page_codexo(request):
 @login_required
 @require_POST
 def enregistrer_preferences_codexo(request):
+    _exiger_codexo_actif()
     preferences = PreferencesNotification.pour(request.user)
     preferences.nouveaux_exercices = "nouveaux_exercices" in request.POST
     preferences.save(update_fields=["nouveaux_exercices"])

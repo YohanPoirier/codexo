@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from accounts.models import DemandeReinitialisation
 from exercises.models import DemandeAide
 
@@ -35,3 +37,8 @@ def notifications(request):
         eleve=request.user, traite=True, reponse_vue=False
     ).exists()
     return {"a_reponse_aide_non_lue": a_reponse_aide_non_lue}
+
+
+def reglages(request):
+    """Réglages du site utiles aux templates (voir settings.py)."""
+    return {"notifications_codexo_actives": settings.NOTIFICATIONS_CODEXO}

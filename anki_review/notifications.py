@@ -288,9 +288,15 @@ def envoyer_hebdomadaire(simulation=False, force=False, identifiant=None, mainte
             ligne["nouvelles"] = compter_nouvelles_cartes(eleve, depuis)
         ligne["message"] = construire_message(ligne["a_reviser"], ligne["nouvelles"])
 
-        # Exercices : le premier passage (exercices_connus vide) sert d'état de départ.
+        # Exercices : le premier passage (exercices_connus vide) sert d'état de départ. L'état
+        # continue d'avancer même si les notifications Codexo sont désactivées (réglage
+        # settings.NOTIFICATIONS_CODEXO), pour ne pas annoncer de retard à la réactivation.
         etat_exercices = sorted(exercices_visibles_ids(eleve))
-        if preferences.exercices_connus is not None and preferences.nouveaux_exercices:
+        if (
+            settings.NOTIFICATIONS_CODEXO
+            and preferences.exercices_connus is not None
+            and preferences.nouveaux_exercices
+        ):
             exercices = nouveaux_exercices(eleve, preferences.exercices_connus)
             ligne["exercices"] = len(exercices)
             ligne["message_exercices"] = construire_message_exercices(exercices)

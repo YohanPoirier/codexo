@@ -94,6 +94,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'codexo.context_processors.notifications',
+                'codexo.context_processors.reglages',
             ],
         },
     },
@@ -243,3 +244,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_CONTACT = os.environ.get('VAPID_CONTACT', '')  # ex. mailto:prof@exemple.fr
+
+# Notifications côté CODEXO (nouveaux exercices) : bandeau, page, lien du menu et envoi
+# hebdomadaire. Désactivées pour le moment (22/10/2026) ; passer à True pour les réactiver.
+# Les notifications d'ANKI ne dépendent pas de ce réglage.
+NOTIFICATIONS_CODEXO = False

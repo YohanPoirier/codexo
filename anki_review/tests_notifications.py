@@ -375,7 +375,7 @@ class ClesTests(TestCase):
 
 # ---------------------------------------------------------------- Codexo : nouveaux exercices
 
-@override_settings(**CONFIG)
+@override_settings(**CONFIG, NOTIFICATIONS_CODEXO=True)
 class ExercicesTests(Base):
     """Notification Codexo : les exercices devenus visibles pour la classe de l'élève."""
 
@@ -538,3 +538,45 @@ class ExercicesTests(Base):
         message = envoi.call_args.args[1]
         self.assertEqual(message["appli"], "codexo")
         self.assertEqual(message["url"], reverse("theme_list"))
+
+
+@override_settings(**CONFIG)  # NOTIFICATIONS_CODEXO est False par défaut
+class CodexoDesactiveTests(Base):
+    """Tant que NOTIFICATIONS_CODEXO est faux : ni bandeau, ni page, ni lien, ni envoi."""
+
+    def setUp(self):
+        from accounts.models import Classe
+        from exercises.models import Exercise, Theme
+        self.classe = Classe.objects.create(name="PCSI test", slug="pcsi-test")
+        self.theme = Theme.objects.create(name="Récursivité", slug="rec-notif")
+        self.theme.enabled_for_classes.add(self.classe)
+        self.Exercise = Exercise
+        self.eleve_classe = User.objects.create_user(
+            "eleve-classe", "mdp-test-123", role=User.ELEVE, classe=self.classe)
+        self.abonner(self.eleve_classe, 9)
+
+    def test_interface_masquee(self):
+        self.client.force_login(self.eleve_classe)
+        accueil = self.client.get(reverse("theme_list"))
+        self.assertNotContains(accueil, "cx-notif-invitation")
+        self.assertNotContains(accueil, reverse("notifications_codexo"))
+        self.assertEqual(self.client.get(reverse("notifications_codexo")).status_code, 404)
+        self.assertEqual(self.client.post(reverse("notifications_codexo_preferences")).status_code, 404)
+
+    def test_anki_inchange(self):
+        self.client.force_login(self.eleve_classe)
+        self.assertContains(self.client.get(reverse("anki_review:liste_decks")), "notif-invitation")
+        self.assertEqual(self.client.get(reverse("anki_review:notifications")).status_code, 200)
+
+    def test_pas_de_message_codexo_mais_l_etat_avance(self):
+        with mock.patch("anki_review.notifications.envoyer_push", return_value="ok"):
+            notifications.envoyer_hebdomadaire()  # état de départ
+        ex = self.Exercise.objects.create(
+            theme=self.theme, title="Nouveau", slug="nouveau", statement="x",
+            function_name="f", solution_code="def f():\n    return 1\n")
+        ex.enabled_for_classes.add(self.classe)
+        with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
+            r = notifications.envoyer_hebdomadaire(force=True)
+        envoi.assert_not_called()
+        self.assertEqual(r[0]["exercices"], 0)
+        self.assertIn(ex.id, PreferencesNotification.pour(self.eleve_classe).exercices_connus)

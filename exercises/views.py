@@ -74,12 +74,12 @@ def theme_list(request):
             .count()
         )
         data.append({"theme": theme, "total": total, "done": done})
-    from anki_review.views_notifications import contexte_invitation
+    contexte = {"themes_data": data}
+    if settings.NOTIFICATIONS_CODEXO:  # bandeau d'invitation aux notifications (désactivé pour l'instant)
+        from anki_review.views_notifications import contexte_invitation
 
-    return render(request, "exercises/theme_list.html", {
-        "themes_data": data,
-        **contexte_invitation(request.user),
-    })
+        contexte.update(contexte_invitation(request.user))
+    return render(request, "exercises/theme_list.html", contexte)
 
 
 @login_required
