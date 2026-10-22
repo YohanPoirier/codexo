@@ -1,6 +1,8 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 
+from codexo.pwa import PWA_PATHS
+
 
 class ForcerChangementMotDePasseMiddleware:
     """Redirige systématiquement vers la page de changement de mot de passe tant que
@@ -28,6 +30,8 @@ class ForcerChangementMotDePasseMiddleware:
             and getattr(user, "doit_changer_mot_de_passe", False)
         ):
             urls_exemptees = {reverse("changer_mot_de_passe"), reverse("logout")}
-            if request.path not in urls_exemptees:
+            # /sw.js et les manifestes ne doivent jamais rediriger (un service worker
+            # dont l'adresse redirige est rejeté par le navigateur).
+            if request.path not in urls_exemptees and request.path not in PWA_PATHS:
                 return redirect("changer_mot_de_passe")
         return self.get_response(request)

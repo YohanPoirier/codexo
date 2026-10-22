@@ -3,6 +3,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 
+from codexo.pwa import PWA_PATHS
+
 
 class IntroPasAPasMiddleware:
     """Une fois le mode pas à pas ouvert aux élèves (settings.PAS_A_PAS_ELEVES), chaque élève
@@ -31,6 +33,7 @@ class IntroPasAPasMiddleware:
             and not user.is_staff
             and not getattr(user, "a_vu_intro_pas_a_pas", True)
             and not request.path.startswith(self.PREFIXES_EXEMPTES)
+            and request.path not in PWA_PATHS
         ):
             intro = reverse("intro_pas_a_pas")
             if request.path not in {intro, reverse("logout"), reverse("changer_mot_de_passe")}:

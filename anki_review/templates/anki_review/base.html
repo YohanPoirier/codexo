@@ -12,6 +12,11 @@
 <link rel="icon" type="image/png" sizes="192x192" href="{% static 'anki_review/icons/favicon-192.png' %}">
 <link rel="icon" type="image/png" sizes="512x512" href="{% static 'anki_review/icons/favicon-512.png' %}">
 <link rel="apple-touch-icon" href="{% static 'anki_review/icons/apple-touch-icon.png' %}">
+<!-- PWA propre à Anki (scope /anki/, icône Anki) : voir codexo/pwa.py. -->
+<link rel="manifest" href="{% url 'pwa_manifest_anki' %}">
+<meta name="theme-color" content="#2b8a7f">
+<meta name="apple-mobile-web-app-title" content="Anki">
+<script defer src="{% static 'js/pwa.js' %}"></script>
 <!-- Réutilise style.css pour les variables/polices communes (--paper, --indigo, Fraunces...)
      mais AUCUN lien, logo ou texte "Codexo" n'apparaît sur ces pages. -->
 <link rel="stylesheet" href="{% static 'css/style.css' %}">

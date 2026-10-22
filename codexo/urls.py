@@ -12,6 +12,7 @@ from django.contrib.auth.views import LogoutView
 from django.http import HttpResponsePermanentRedirect
 from django.templatetags.static import static
 from exercises import views as ex_views
+from . import pwa
 
 
 def _redirect_static(nom_fichier):
@@ -30,6 +31,9 @@ urlpatterns = [
     path('favicon.ico', _redirect_static('favicon.ico')),
     path('apple-touch-icon.png', _redirect_static('apple-touch-icon.png')),
     path('apple-touch-icon-precomposed.png', _redirect_static('apple-touch-icon.png')),
+    path('sw.js', pwa.service_worker, name='pwa_sw'),
+    path('manifest.webmanifest', pwa.manifeste_codexo, name='pwa_manifest'),
+    path('anki.webmanifest', pwa.manifeste_anki, name='pwa_manifest_anki'),
     path('admin/', admin.site.urls),
     path('login/', IdentifiantLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
