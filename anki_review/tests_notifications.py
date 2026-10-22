@@ -215,6 +215,14 @@ class EnvoiPushTests(Base):
         self.assertEqual(entetes["ttl"], str(notifications.TTL_SECONDES))
         self.assertTrue(post.call_args.kwargs["data"])  # charge utile chiffrée
 
+    def test_charge_contient_les_icones_d_anki(self):
+        abonnement = self.abonner(self.eleve)
+        with mock.patch("pywebpush.webpush", return_value=mock.Mock(status_code=201)) as envoi:
+            notifications.envoyer_push(abonnement, {"titre": "T", "corps": "C", "url": "/anki/"})
+        charge = json.loads(envoi.call_args.kwargs["data"])
+        self.assertIn("anki_review/icons/favicon-192", charge["icone"])
+        self.assertIn("anki_review/icons/badge-96", charge["badge"])
+
     def _erreur(self, statut):
         from pywebpush import WebPushException
         return WebPushException("echec", response=mock.Mock(status_code=statut))
@@ -301,12 +309,9 @@ class VuesTests(Base):
         page = self.client.get(reverse("anki_review:notifications"))
         self.assertContains(page, "Cet appareil")
         self.assertContains(page, "Ce que tu veux recevoir")
-        self.assertNotContains(page, "Tester")  # aucun appareil enregistré
+        self.assertContains(page, "data-test hidden")  # masqué tant que l'appareil n'est pas abonné
         self.assertContains(self.client.get(reverse("anki_review:liste_decks")), "notif-invitation")
         self.assertContains(self.client.get(reverse("anki_review:liste_decks")), PUBLIQUE)
-
-        self.abonner(self.eleve)
-        self.assertContains(self.client.get(reverse("anki_review:notifications")), "1 appareil enregistré")
 
         # Prof : pas de bandeau, pas de réglages hebdomadaires, mais le test reste possible.
         self.client.force_login(self.prof)
@@ -366,3 +371,170 @@ class ClesTests(TestCase):
         recalculee = _b64url(v.public_key.public_bytes(
             serialization.Encoding.X962, serialization.PublicFormat.UncompressedPoint))
         self.assertEqual(publique, recalculee)
+
+
+# ---------------------------------------------------------------- Codexo : nouveaux exercices
+
+@override_settings(**CONFIG)
+class ExercicesTests(Base):
+    """Notification Codexo : les exercices devenus visibles pour la classe de l'élève."""
+
+    def setUp(self):
+        from accounts.models import Classe
+        from exercises.models import Exercise, Theme
+        self.Exercise = Exercise
+        self.classe = Classe.objects.create(name="PCSI test", slug="pcsi-test")
+        self.autre_classe = Classe.objects.create(name="MP test", slug="mp-test")
+        self.theme = Theme.objects.create(name="Récursivité", slug="recursivite-notif", order=1)
+        self.theme.enabled_for_classes.add(self.classe)
+        self.eleve_classe = User.objects.create_user(
+            "eleve-classe", "mdp-test-123", role=User.ELEVE, classe=self.classe)
+        self.abonner(self.eleve_classe, 9)
+
+    def exercice(self, titre, ouvert_a=None, theme=None):
+        ex = self.Exercise.objects.create(
+            theme=theme or self.theme, title=titre, slug=titre.lower().replace(" ", "-"),
+            statement="x", function_name="f", solution_code="def f():\n    return 1\n")
+        ex.enabled_for_classes.add(ouvert_a or self.classe)
+        return ex
+
+    def passage(self, **kw):
+        with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
+            r = notifications.envoyer_hebdomadaire(**kw)
+        return r, envoi
+
+    def test_visibilite_par_classe(self):
+        a = self.exercice("Factorielle")
+        self.exercice("Fibonacci", ouvert_a=self.autre_classe)      # ouvert à une autre classe
+        theme_ferme = type(self.theme).objects.create(name="Fermé", slug="ferme-notif")
+        self.exercice("Caché", theme=theme_ferme)                    # thème fermé à la classe
+        self.assertEqual(notifications.exercices_visibles_ids(self.eleve_classe), {a.id})
+
+    def test_messages(self):
+        self.assertIsNone(notifications.construire_message_exercices([]))
+        a, b, c, d = (self.exercice(t) for t in ("Un", "Deux", "Trois", "Quatre"))
+        m = notifications.construire_message_exercices([a])
+        self.assertEqual((m["titre"], m["corps"]), ("Nouvel exercice", "Nouvel exercice : « Un »."))
+        self.assertEqual(m["url"], reverse("exercise_list", args=[self.theme.slug]))
+        self.assertEqual(m["appli"], "codexo")
+        m = notifications.construire_message_exercices([a, b, c])
+        self.assertEqual(m["corps"], "3 nouveaux exercices : « Un », « Deux », « Trois ».")
+        m = notifications.construire_message_exercices([a, b, c, d])
+        self.assertEqual(m["corps"], "4 nouveaux exercices, dont « Un », « Deux » et « Trois ».")
+        autre = type(self.theme).objects.create(name="Autre", slug="autre-notif")
+        e = self.exercice("Cinq", theme=autre)
+        self.assertEqual(notifications.construire_message_exercices([a, e])["url"], reverse("theme_list"))
+
+    def test_premier_passage_sert_d_etat_de_depart(self):
+        self.exercice("Existant")
+        r, envoi = self.passage()
+        envoi.assert_not_called()
+        self.assertEqual(r[0]["exercices"], 0)
+        prefs = PreferencesNotification.pour(self.eleve_classe)
+        self.assertEqual(len(prefs.exercices_connus), 1)
+
+    def test_nouvel_exercice_annonce_par_une_notification_codexo_separee(self):
+        self.exercice("Existant")
+        self.passage()
+        # Un exercice ajouté + des cartes à réviser : deux messages distincts.
+        nouveau = self.exercice("Nouveau")
+        note = self.note(il_y_a=timedelta(days=30))
+        Card.objects.create(note=note, etudiant=self.eleve_classe)
+        r, envoi = self.passage(force=True)
+        messages_envoyes = [c.args[1] for c in envoi.call_args_list]
+        self.assertEqual(len(messages_envoyes), 2)
+        anki, codexo = messages_envoyes
+        self.assertNotIn("appli", anki)
+        self.assertEqual(codexo["appli"], "codexo")
+        self.assertEqual(codexo["corps"], "Nouvel exercice : « Nouveau ».")
+        self.assertTrue(nouveau.pk)
+        self.assertEqual(r[0]["exercices"], 1)
+        self.assertIn("Anki : ", r[0]["statut"])
+        self.assertIn("Codexo : ", r[0]["statut"])
+        # Annoncé une fois : le passage suivant ne le répète pas.
+        r, envoi = self.passage(force=True)
+        self.assertEqual(r[0]["exercices"], 0)
+        self.assertEqual(envoi.call_count, 1)  # seulement les cartes à réviser (Anki)
+
+    def test_exercice_rendu_visible_apres_coup(self):
+        ex = self.exercice("Plus tard", ouvert_a=self.autre_classe)
+        self.passage()
+        ex.enabled_for_classes.add(self.classe)  # le prof l'ouvre à la classe
+        r, envoi = self.passage(force=True)
+        self.assertEqual(r[0]["exercices"], 1)
+        self.assertEqual(envoi.call_args.args[1]["corps"], "Nouvel exercice : « Plus tard ».")
+
+    def test_option_desactivee(self):
+        self.passage()
+        prefs = PreferencesNotification.pour(self.eleve_classe)
+        prefs.nouveaux_exercices = False
+        prefs.save()
+        self.exercice("Nouveau")
+        r, envoi = self.passage(force=True)
+        envoi.assert_not_called()
+        self.assertEqual(r[0]["statut"], "rien à annoncer")
+        # Réactivée : l'exercice déjà passé pendant la coupure n'est pas annoncé après coup.
+        prefs.refresh_from_db()
+        prefs.nouveaux_exercices = True
+        prefs.save()
+        r, envoi = self.passage(force=True)
+        self.assertEqual(r[0]["exercices"], 0)
+
+    def test_echec_d_envoi_conserve_l_annonce_pour_la_semaine_suivante(self):
+        self.passage()
+        self.exercice("Nouveau")
+        with mock.patch("anki_review.notifications.envoyer_push", return_value="erreur"):
+            r = notifications.envoyer_hebdomadaire(force=True)
+        self.assertEqual(r[0]["statut"], "échec de l'envoi")
+        r, envoi = self.passage(force=True)
+        self.assertEqual(r[0]["exercices"], 1)
+
+    def test_simulation_n_avance_pas_l_etat(self):
+        self.passage()
+        self.exercice("Nouveau")
+        r, envoi = self.passage(simulation=True, force=True)
+        envoi.assert_not_called()
+        self.assertEqual(r[0]["exercices"], 1)
+        r, envoi = self.passage(force=True)
+        self.assertEqual(r[0]["exercices"], 1)
+
+    def test_charge_codexo(self):
+        abonnement = AbonnementPush.objects.filter(etudiant=self.eleve_classe).first()
+        with mock.patch("pywebpush.webpush", return_value=mock.Mock(status_code=201)) as envoi:
+            notifications.envoyer_push(abonnement, {"titre": "T", "corps": "C", "url": "/", "appli": "codexo"})
+        charge = json.loads(envoi.call_args.kwargs["data"])
+        self.assertEqual(charge["tag"], "codexo-nouveautes")
+        self.assertRegex(charge["icone"], r"favicon-192")
+        self.assertNotIn("anki_review", charge["icone"])
+        self.assertRegex(charge["badge"], r"badge-96")
+        self.assertNotIn("anki_review", charge["badge"])
+        self.assertNotIn("appli", charge)
+
+    def test_pages_codexo(self):
+        self.client.force_login(self.eleve_classe)
+        page = self.client.get(reverse("notifications_codexo"))
+        self.assertContains(page, "Nouveaux exercices disponibles pour ta classe")
+        self.assertContains(page, "data-test hidden")
+        self.assertContains(self.client.get(reverse("theme_list")), "cx-notif-invitation")
+        self.assertContains(self.client.get(reverse("theme_list")), reverse("notifications_codexo"))
+        self.client.post(reverse("notifications_codexo_preferences"), {})
+        self.assertFalse(PreferencesNotification.pour(self.eleve_classe).nouveaux_exercices)
+        self.client.post(reverse("notifications_codexo_preferences"), {"nouveaux_exercices": "on"})
+        self.assertTrue(PreferencesNotification.pour(self.eleve_classe).nouveaux_exercices)
+
+        self.client.force_login(self.prof)
+        self.assertNotContains(self.client.get(reverse("theme_list")), "cx-notif-invitation")
+        self.assertContains(self.client.get(reverse("notifications_codexo")), "qu'aux élèves")
+
+    def test_connexion_exigee(self):
+        for nom in ("notifications_codexo", "notifications_codexo_preferences"):
+            self.assertEqual(self.client.get(reverse(nom)).status_code, 302)
+
+    def test_bouton_de_test_codexo(self):
+        self.client.force_login(self.eleve_classe)
+        with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
+            r = self.client.post(reverse("anki_review:notifications_test"), {"appli": "codexo"})
+        self.assertRedirects(r, reverse("notifications_codexo"), fetch_redirect_response=False)
+        message = envoi.call_args.args[1]
+        self.assertEqual(message["appli"], "codexo")
+        self.assertEqual(message["url"], reverse("theme_list"))

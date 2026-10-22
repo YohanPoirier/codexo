@@ -13,6 +13,7 @@ from django.http import HttpResponsePermanentRedirect
 from django.templatetags.static import static
 from exercises import views as ex_views
 from . import pwa
+from anki_review import views_notifications
 
 
 def _redirect_static(nom_fichier):
@@ -49,6 +50,8 @@ urlpatterns = [
     path('mes-demandes-aide/', ex_views.mes_demandes_aide, name='mes_demandes_aide'),
     path('demandes-aide/', ex_views.demandes_aide, name='demandes_aide'),
     path('demandes-aide/<int:demande_id>/', ex_views.demande_aide_detail, name='demande_aide_detail'),
+    path('notifications/', views_notifications.page_codexo, name='notifications_codexo'),
+    path('notifications/preferences/', views_notifications.enregistrer_preferences_codexo, name='notifications_codexo_preferences'),
     path('stats/', ex_views.stats, name='stats'),
     path('stats/visibilite/', ex_views.classe_visibility, name='classe_visibility'),
     path('trafic/', ex_views.trafic, name='trafic'),

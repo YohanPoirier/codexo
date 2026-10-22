@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                     "nouvelles_cartes",
                     models.BooleanField(
                         default=True,
-                        verbose_name="nouvelles cartes partagées par le prof",
+                        verbose_name="nouvelles cartes partagées par le professeur",
                     ),
                 ),
                 (

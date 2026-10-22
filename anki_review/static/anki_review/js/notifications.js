@@ -122,12 +122,15 @@
     var aide = el('[data-aide]');
     var boutonActiver = el('[data-action="activer"]');
     var boutonDesactiver = el('[data-action="desactiver"]');
+    // Bloc « Tester » : visible seulement si CET appareil est abonné (hors de la section).
+    var blocTest = document.querySelector('[data-test]');
 
     function montrerAide(texte) { aide.textContent = texte; aide.hidden = !texte; }
 
     async function rafraichir() {
       boutonActiver.hidden = true;
       boutonDesactiver.hidden = true;
+      if (blocTest) blocTest.hidden = true;
       montrerAide('');
       if (!supporte || !cle) {
         statut.textContent = "Cet appareil ne permet pas les notifications ici.";
@@ -143,14 +146,15 @@
       if (abonnement) {
         statut.textContent = 'Notifications activées sur cet appareil.';
         boutonDesactiver.hidden = false;
+        if (blocTest) blocTest.hidden = false;
       } else {
         statut.textContent = "Notifications désactivées sur cet appareil.";
         boutonActiver.hidden = false;
       }
     }
 
-    // Après un changement réussi on recharge la page : le bloc « Tester » (nombre d'appareils
-    // enregistrés) est calculé côté serveur.
+    // Aucun rechargement de page : sur Android, une navigation vers une adresse couverte par
+    // une appli installée peut ouvrir cette appli au lieu de rester dans le navigateur.
     boutonActiver.addEventListener('click', async function () {
       boutonActiver.disabled = true;
       var reussi = false;
@@ -160,7 +164,7 @@
         montrerAide("L'activation a échoué. Réessaie dans un instant.");
       }
       boutonActiver.disabled = false;
-      if (reussi) window.location.reload(); else await rafraichir();
+      await rafraichir();
     });
     boutonDesactiver.addEventListener('click', async function () {
       boutonDesactiver.disabled = true;
@@ -172,7 +176,7 @@
         montrerAide("La désactivation a échoué. Réessaie dans un instant.");
       }
       boutonDesactiver.disabled = false;
-      if (reussi) window.location.reload(); else await rafraichir();
+      await rafraichir();
     });
 
     await rafraichir();

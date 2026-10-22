@@ -1,9 +1,12 @@
-"""Notifications push d'Anki : calcul du contenu et envoi.
+"""Notifications push (Anki et Codexo) : calcul du contenu et envoi.
 
-Deux informations, regroupées en UN seul message par élève et par semaine :
-  - les cartes à réviser (échéance dépassée, hors cartes suspendues) ;
-  - les nouvelles cartes partagées par un prof depuis le dernier passage, que
-    l'élève n'a pas encore ajoutées à ses révisions.
+Chaque élève reçoit, au plus une fois par semaine, jusqu'à DEUX notifications distinctes,
+chacune avec l'icône de son appli et ouvrant son appli :
+  - Anki : les cartes à réviser (échéance dépassée, hors cartes suspendues) et les
+    nouvelles cartes partagées par un professeur depuis le dernier passage, que l'élève
+    n'a pas encore ajoutées — regroupées en UN seul message ;
+  - Codexo : les nouveaux exercices, c'est-à-dire ceux qui sont devenus visibles pour la
+    classe de l'élève depuis le dernier passage (créés, ou rendus visibles ensuite).
 Aucun message n'est envoyé s'il n'y a rien à dire.
 
 L'envoi hebdomadaire est lancé par la commande `envoyer_notifications` (tâche
@@ -33,6 +36,22 @@ INTERVALLE_MIN_JOURS = 6
 # est éteint ou hors ligne.
 TTL_SECONDES = 3 * 24 * 3600
 
+# Pour chaque appli : grande image de la notification, petite icône monochrome de la barre
+# d'état d'Android (sans elle, Android montre une cloche générique) et « tag » : deux
+# notifications de tags différents ne se remplacent pas l'une l'autre.
+APPLIS = {
+    "anki": {
+        "icone": "anki_review/icons/favicon-192.png",
+        "badge": "anki_review/icons/badge-96.png",
+        "tag": "anki-rappel",
+    },
+    "codexo": {
+        "icone": "favicon-192.png",
+        "badge": "badge-96.png",
+        "tag": "codexo-nouveautes",
+    },
+}
+
 
 def configuration_ok():
     """Clés d'envoi présentes dans l'environnement (voir settings.VAPID_*)."""
@@ -41,7 +60,7 @@ def configuration_ok():
     )
 
 
-# ---------------------------------------------------------------- contenu
+# ---------------------------------------------------------------- contenu : Anki
 
 
 def compter_a_reviser(etudiant, maintenant=None):
@@ -52,7 +71,7 @@ def compter_a_reviser(etudiant, maintenant=None):
 
 
 def compter_nouvelles_cartes(etudiant, depuis):
-    """Cartes partagées par un prof depuis `depuis`, que l'élève n'a pas encore."""
+    """Cartes partagées par un professeur depuis `depuis`, que l'élève n'a pas encore."""
     deja = Card.objects.filter(etudiant=etudiant).values("note_id")
     return (
         Note.objects.filter(
@@ -70,7 +89,7 @@ def _cartes(n):
 
 
 def construire_message(nb_a_reviser, nb_nouvelles):
-    """Dictionnaire {titre, corps, url} ou None s'il n'y a rien à annoncer."""
+    """Message Anki : dictionnaire {titre, corps, url} ou None s'il n'y a rien à annoncer."""
     url_accueil = reverse("anki_review:liste_decks")
     url_partage = reverse("anki_review:partage_etudiants")
     if nb_a_reviser and nb_nouvelles:
@@ -93,7 +112,7 @@ def construire_message(nb_a_reviser, nb_nouvelles):
         return {
             "titre": "Nouvelles cartes",
             "corps": (
-                f"Ton prof a partagé {nb_nouvelles} nouvelle{'s' if nb_nouvelles > 1 else ''} "
+                f"Ton professeur a partagé {nb_nouvelles} nouvelle{'s' if nb_nouvelles > 1 else ''} "
                 f"carte{'s' if nb_nouvelles > 1 else ''} : ajoute-les à tes révisions."
             ),
             "url": url_partage,
@@ -101,13 +120,68 @@ def construire_message(nb_a_reviser, nb_nouvelles):
     return None
 
 
+# ---------------------------------------------------------------- contenu : Codexo
+
+
+def exercices_visibles_ids(etudiant):
+    """Identifiants des exercices visibles pour l'élève (thème ET exercice ouverts à sa
+    classe, comme Exercise.is_visible_for) ; tous si l'élève n'a pas de classe."""
+    from exercises.models import Exercise
+
+    exercices = Exercise.objects.all()
+    if etudiant.classe_id is not None:
+        exercices = exercices.filter(
+            enabled_for_classes=etudiant.classe_id,
+            theme__enabled_for_classes=etudiant.classe_id,
+        )
+    return set(exercices.values_list("id", flat=True))
+
+
+def nouveaux_exercices(etudiant, connus):
+    """Exercices visibles pour l'élève et absents de la liste `connus` (identifiants)."""
+    from exercises.models import Exercise
+
+    nouveaux = exercices_visibles_ids(etudiant) - set(connus or [])
+    return list(
+        Exercise.objects.filter(id__in=nouveaux)
+        .select_related("theme")
+        .order_by("theme__order", "theme__name", "order", "id")
+    )
+
+
+def construire_message_exercices(exercices):
+    """Message Codexo : dictionnaire {titre, corps, url, appli} ou None."""
+    n = len(exercices)
+    if not n:
+        return None
+    titres = [f"« {e.title} »" for e in exercices]
+    if n == 1:
+        corps = f"Nouvel exercice : {titres[0]}."
+    elif n <= 3:
+        corps = f"{n} nouveaux exercices : {', '.join(titres)}."
+    else:
+        corps = f"{n} nouveaux exercices, dont {titres[0]}, {titres[1]} et {titres[2]}."
+    themes = {e.theme_id for e in exercices}
+    url = (
+        reverse("exercise_list", args=[exercices[0].theme.slug])
+        if len(themes) == 1 else reverse("theme_list")
+    )
+    return {
+        "titre": "Nouvel exercice" if n == 1 else "Nouveaux exercices",
+        "corps": corps,
+        "url": url,
+        "appli": "codexo",
+    }
+
+
 # ---------------------------------------------------------------- envoi
 
 
-def _icone():
+def _url_statique(chemin):
+    """Adresse d'un fichier statique, ou None s'il est introuvable (ex. avant collectstatic)."""
     try:
-        return static("anki_review/icons/favicon-192.png")
-    except ValueError:  # fichier absent du manifeste statique (ex. avant collectstatic)
+        return static(chemin)
+    except ValueError:
         return None
 
 
@@ -117,9 +191,14 @@ def envoyer_push(abonnement, message):
     from pywebpush import WebPushException, webpush
 
     charge = dict(message)
-    icone = _icone()
+    appli = APPLIS[charge.pop("appli", "anki")]
+    icone = _url_statique(appli["icone"])
+    badge = _url_statique(appli["badge"])
     if icone:
         charge["icone"] = icone
+    if badge:
+        charge["badge"] = badge
+    charge["tag"] = appli["tag"]
     try:
         webpush(
             subscription_info={
@@ -158,15 +237,21 @@ def envoyer_message(etudiant, message):
 # ---------------------------------------------------------------- tâche hebdomadaire
 
 
+def _texte_envoi(envoyes):
+    if not envoyes:
+        return "échec de l'envoi"
+    return f"envoyé sur {envoyes} appareil{'s' if envoyes > 1 else ''}"
+
+
 def envoyer_hebdomadaire(simulation=False, force=False, identifiant=None, maintenant=None):
-    """Passe sur les élèves abonnés et envoie le message hebdomadaire.
+    """Passe sur les élèves abonnés et envoie les notifications de la semaine.
 
     simulation : calcule tout et retourne le détail, sans rien envoyer ni enregistrer.
     force      : ignore le délai minimal entre deux passages.
     identifiant: ne traite que cet élève.
 
-    Retourne une liste de dictionnaires {etudiant, a_reviser, nouvelles, message, statut,
-    envoyes} utilisée par la commande pour afficher le détail.
+    Retourne une liste de dictionnaires {etudiant, a_reviser, nouvelles, exercices, message,
+    message_exercices, statut, envoyes} utilisée par la commande pour afficher le détail.
     """
     maintenant = maintenant or timezone.now()
     User = get_user_model()
@@ -181,8 +266,8 @@ def envoyer_hebdomadaire(simulation=False, force=False, identifiant=None, mainte
     resultats = []
     for eleve in eleves:
         preferences = PreferencesNotification.pour(eleve)
-        ligne = {"etudiant": eleve, "a_reviser": 0, "nouvelles": 0, "message": None,
-                 "statut": "", "envoyes": 0}
+        ligne = {"etudiant": eleve, "a_reviser": 0, "nouvelles": 0, "exercices": 0,
+                 "message": None, "message_exercices": None, "statut": "", "envoyes": 0}
         resultats.append(ligne)
 
         if (
@@ -203,20 +288,44 @@ def envoyer_hebdomadaire(simulation=False, force=False, identifiant=None, mainte
             ligne["nouvelles"] = compter_nouvelles_cartes(eleve, depuis)
         ligne["message"] = construire_message(ligne["a_reviser"], ligne["nouvelles"])
 
-        if ligne["message"] is None:
+        # Exercices : le premier passage (exercices_connus vide) sert d'état de départ.
+        etat_exercices = sorted(exercices_visibles_ids(eleve))
+        if preferences.exercices_connus is not None and preferences.nouveaux_exercices:
+            exercices = nouveaux_exercices(eleve, preferences.exercices_connus)
+            ligne["exercices"] = len(exercices)
+            ligne["message_exercices"] = construire_message_exercices(exercices)
+
+        a_envoyer = [
+            (nom, m) for nom, m in (("Anki", ligne["message"]), ("Codexo", ligne["message_exercices"]))
+            if m is not None
+        ]
+        envoyes = {}
+        if not a_envoyer:
             ligne["statut"] = "rien à annoncer"
         elif simulation:
             ligne["statut"] = "simulation (rien envoyé)"
         else:
-            ligne["envoyes"] = envoyer_message(eleve, ligne["message"])
-            ligne["statut"] = (
-                f"envoyé sur {ligne['envoyes']} appareil{'s' if ligne['envoyes'] > 1 else ''}"
-                if ligne["envoyes"] else "échec de l'envoi"
-            )
+            for nom, m in a_envoyer:
+                envoyes[nom] = envoyer_message(eleve, m)
+            ligne["envoyes"] = max(envoyes.values())
+            if len(a_envoyer) == 1:
+                ligne["statut"] = _texte_envoi(ligne["envoyes"])
+            else:
+                ligne["statut"] = " ; ".join(f"{nom} : {_texte_envoi(n)}" for nom, n in envoyes.items())
 
-        # On marque le passage sauf en simulation, et sauf si l'envoi a échoué partout
-        # (pour qu'un nouvel essai ne considère pas la semaine comme traitée).
-        if not simulation and (ligne["message"] is None or ligne["envoyes"]):
+        if simulation:
+            continue
+        # On marque le passage sauf si l'envoi a échoué partout (pour qu'un nouvel essai ne
+        # considère pas la semaine comme traitée).
+        champs = []
+        if not a_envoyer or ligne["envoyes"]:
             preferences.dernier_passage = maintenant
-            preferences.save(update_fields=["dernier_passage"])
+            champs.append("dernier_passage")
+        # L'état des exercices n'avance que si leur annonce est partie (ou s'il n'y en avait
+        # pas) : sinon ils seraient annoncés la semaine suivante.
+        if ligne["message_exercices"] is None or envoyes.get("Codexo"):
+            preferences.exercices_connus = etat_exercices
+            champs.append("exercices_connus")
+        if champs:
+            preferences.save(update_fields=champs)
     return resultats

@@ -74,7 +74,12 @@ def theme_list(request):
             .count()
         )
         data.append({"theme": theme, "total": total, "done": done})
-    return render(request, "exercises/theme_list.html", {"themes_data": data})
+    from anki_review.views_notifications import contexte_invitation
+
+    return render(request, "exercises/theme_list.html", {
+        "themes_data": data,
+        **contexte_invitation(request.user),
+    })
 
 
 @login_required

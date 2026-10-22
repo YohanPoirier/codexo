@@ -5,8 +5,9 @@ le dimanche à 18 h :
 
     0 18 * * 0  cd /home/codexo/codexo && venv/bin/python manage.py envoyer_notifications
 
-Un seul message par élève : cartes à réviser et/ou nouvelles cartes partagées par un
-prof, selon ses réglages ; rien n'est envoyé s'il n'y a rien à dire. Un élève déjà traité
+Au plus deux messages par élève, séparés : Anki (cartes à réviser et/ou nouvelles cartes
+partagées par un professeur) et Codexo (nouveaux exercices), selon ses réglages ; rien
+n'est envoyé s'il n'y a rien à dire. Un élève déjà traité
 depuis moins de 6 jours est ignoré (protège d'un double lancement).
 
     --simulation   affiche ce qui serait envoyé, sans rien envoyer ni enregistrer
@@ -46,7 +47,10 @@ class Command(BaseCommand):
 
         envoyes = 0
         for r in resultats:
-            detail = f"{r['a_reviser']} à réviser, {r['nouvelles']} nouvelles"
+            detail = (
+                f"{r['a_reviser']} à réviser, {r['nouvelles']} nouvelles, "
+                f"{r['exercices']} exercices"
+            )
             self.stdout.write(f"{r['etudiant']} : {r['statut']} ({detail})")
             if r["envoyes"]:
                 envoyes += 1

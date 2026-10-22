@@ -302,9 +302,15 @@ class PreferencesNotification(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="preferences_notification"
     )
     nouvelles_cartes = models.BooleanField(
-        "nouvelles cartes partagées par le prof", default=True
+        "nouvelles cartes partagées par le professeur", default=True
     )
     cartes_a_reviser = models.BooleanField("cartes à réviser", default=True)
+    nouveaux_exercices = models.BooleanField("nouveaux exercices Codexo", default=True)
+    # Identifiants des exercices visibles pour l'élève au dernier passage de la tâche
+    # hebdomadaire : ceux qui n'y figurent pas sont « nouveaux » (créés, ou rendus visibles
+    # pour sa classe depuis). None = pas encore de passage : le premier sert d'état de
+    # départ, sans rien annoncer (sinon tout le catalogue passerait pour une nouveauté).
+    exercices_connus = models.JSONField(null=True, blank=True)
     # Dernier passage de la tâche hebdomadaire sur cet étudiant (qu'il y ait eu un envoi
     # ou non) : évite un double envoi si la tâche est lancée deux fois, et délimite la
     # période des « nouvelles cartes ».

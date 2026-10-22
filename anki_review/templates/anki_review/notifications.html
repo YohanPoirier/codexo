@@ -44,23 +44,21 @@
       </label>
       <label class="notif-choix">
         <input type="checkbox" name="nouvelles_cartes" {% if preferences.nouvelles_cartes %}checked{% endif %}>
-        <span>Nouvelles cartes partagées par ton prof</span>
+        <span>Nouvelles cartes partagées par ton professeur</span>
       </label>
       <button type="submit" class="notif-btn notif-btn--principal">Enregistrer</button>
     </form>
   </section>
 {% endif %}
 
-{% if nb_appareils %}
-  <section class="notif-bloc">
-    <h2>Tester</h2>
-    <p>{{ nb_appareils }} appareil{{ nb_appareils|pluralize }} enregistré{{ nb_appareils|pluralize }} sur ton compte.</p>
-    <form method="post" action="{% url 'anki_review:notifications_test' %}">
-      {% csrf_token %}
-      <button type="submit" class="notif-btn">M'envoyer une notification de test</button>
-    </form>
-  </section>
-{% endif %}
+<section class="notif-bloc" data-test hidden>
+  <h2>Tester</h2>
+  <p>Envoie une notification de test à tous tes appareils où elles sont activées.</p>
+  <form method="post" action="{% url 'anki_review:notifications_test' %}">
+    {% csrf_token %}
+    <button type="submit" class="notif-btn">M'envoyer une notification de test</button>
+  </form>
+</section>
 
 <details class="notif-bloc notif-iphone">
   <summary>Sur iPhone</summary>

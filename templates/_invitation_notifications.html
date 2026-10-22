@@ -1,0 +1,22 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+{# Bandeau d'invitation de Codexo : masqué par défaut, affiché par notifications.js seulement #}
+{# si l'appareil sait recevoir des notifications et que l'élève n'a encore rien décidé. #}
+<div class="cx-notif-invitation" hidden
+     data-notifications data-mode="invitation"
+     data-cle="{{ vapid_public_key }}"
+     data-url-abonner="{% url 'anki_review:notifications_abonner' %}"
+     data-url-desabonner="{% url 'anki_review:notifications_desabonner' %}"
+     data-csrf="{{ csrf_token }}">
+  <div class="cx-notif-texte">
+    <strong>Un rappel quand de nouveaux exercices arrivent ?</strong>
+    <span>Au plus une notification par semaine, seulement s'il y a du nouveau.
+      <a href="{% url 'notifications_codexo' %}">Réglages</a></span>
+  </div>
+  <div class="cx-notif-actions">
+    <button type="button" class="cx-notif-btn cx-notif-btn--principal" data-action="activer">Activer</button>
+    <button type="button" class="cx-notif-btn" data-action="plus-tard">Plus tard</button>
+  </div>
+  <p class="notif-invitation-retour" data-retour hidden></p>
+</div>
+<script defer src="{% static 'anki_review/js/notifications.js' %}"></script>

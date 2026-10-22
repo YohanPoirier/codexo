@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Notifications — Codexo{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+<span class="eyebrow">Réglages</span>
+<h1>Notifications</h1>
+
+{% if not configure %}
+  <p>Les notifications ne sont pas encore activées sur ce site.</p>
+{% else %}
+
+<section class="cx-notif-bloc" data-notifications data-mode="page"
+         data-cle="{{ vapid_public_key }}"
+         data-url-abonner="{% url 'anki_review:notifications_abonner' %}"
+         data-url-desabonner="{% url 'anki_review:notifications_desabonner' %}"
+         data-csrf="{{ csrf_token }}">
+  <h2>Cet appareil</h2>
+  <p class="cx-notif-statut" data-statut>Vérification…</p>
+  <div class="cx-notif-actions">
+    <button type="button" class="cx-notif-btn cx-notif-btn--principal" data-action="activer" hidden>Activer sur cet appareil</button>
+    <button type="button" class="cx-notif-btn" data-action="desactiver" hidden>Désactiver sur cet appareil</button>
+  </div>
+  <p class="cx-notif-aide" data-aide hidden></p>
+</section>
+
+{% if user.is_staff %}
+  <section class="cx-notif-bloc">
+    <h2>Envois hebdomadaires</h2>
+    <p>Les rappels de la semaine ne sont envoyés qu'aux élèves. Ici, tu peux seulement
+      vérifier que les notifications arrivent bien sur tes appareils.</p>
+  </section>
+{% else %}
+  <section class="cx-notif-bloc">
+    <h2>Ce que tu veux recevoir</h2>
+    <p>Au plus un message par semaine, le dimanche en fin d'après-midi, et seulement
+      s'il y a quelque chose à te dire.</p>
+    <form method="post" action="{% url 'notifications_codexo_preferences' %}">
+      {% csrf_token %}
+      <label class="cx-notif-choix">
+        <input type="checkbox" name="nouveaux_exercices" {% if preferences.nouveaux_exercices %}checked{% endif %}>
+        <span>Nouveaux exercices disponibles pour ta classe</span>
+      </label>
+      <button type="submit" class="cx-notif-btn cx-notif-btn--principal">Enregistrer</button>
+    </form>
+    <p class="cx-notif-aide">Les rappels d'Anki (cartes à réviser, nouvelles cartes) se règlent depuis Anki.</p>
+  </section>
+{% endif %}
+
+<section class="cx-notif-bloc" data-test hidden>
+  <h2>Tester</h2>
+  <p>Envoie une notification de test à tous tes appareils où elles sont activées.</p>
+  <form method="post" action="{% url 'anki_review:notifications_test' %}">
+    {% csrf_token %}
+    <input type="hidden" name="appli" value="codexo">
+    <button type="submit" class="cx-notif-btn">M'envoyer une notification de test</button>
+  </form>
+</section>
+
+<details class="cx-notif-bloc">
+  <summary>Sur iPhone</summary>
+  <p>Les notifications ne fonctionnent que si Codexo est ajouté à l'écran d'accueil :
+    dans Safari, touche Partager puis « Sur l'écran d'accueil », et ouvre ensuite Codexo
+    depuis cette icône (iOS 16.4 ou plus récent).</p>
+</details>
+
+{% endif %}
+<script defer src="{% static 'anki_review/js/notifications.js' %}"></script>
+{% endblock %}

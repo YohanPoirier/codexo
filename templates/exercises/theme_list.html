@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Thèmes — Codexo{% endblock %}
 {% block content %}
+{% if invitation_notifications %}{% include "_invitation_notifications.html" %}{% endif %}
 <span class="eyebrow">Sommaire</span>
 <h1>Choisis un thème</h1>
 <div class="theme-grid">

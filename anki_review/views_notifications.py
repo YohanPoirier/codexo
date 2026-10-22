@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from . import notifications
@@ -38,7 +39,6 @@ def page(request):
         "configure": notifications.configuration_ok(),
         "vapid_public_key": settings.VAPID_PUBLIC_KEY,
         "preferences": preferences,
-        "nb_appareils": AbonnementPush.objects.filter(etudiant=request.user).count(),
     })
 
 
@@ -107,15 +107,27 @@ def desabonner(request):
 @login_required
 @require_POST
 def tester(request):
-    """Envoie une notification de test à tous les appareils de l'utilisateur."""
+    """Envoie une notification de test à tous les appareils de l'utilisateur. Le champ
+    « appli » (anki par défaut, ou codexo) choisit l'icône, le message et la page de retour."""
+    codexo = request.POST.get("appli") == "codexo"
+    retour = "notifications_codexo" if codexo else "anki_review:notifications"
     if not notifications.configuration_ok():
         messages.error(request, "Les notifications ne sont pas configurées sur le serveur.")
     else:
-        envoyes = notifications.envoyer_message(request.user, {
-            "titre": "Notification de test",
-            "corps": "Tout fonctionne : tu recevras tes rappels Anki sur cet appareil.",
-            "url": "/anki/",
-        })
+        if codexo:
+            message = {
+                "titre": "Notification de test",
+                "corps": "Tout fonctionne : tu recevras tes rappels Codexo sur cet appareil.",
+                "url": reverse("theme_list"),
+                "appli": "codexo",
+            }
+        else:
+            message = {
+                "titre": "Notification de test",
+                "corps": "Tout fonctionne : tu recevras tes rappels Anki sur cet appareil.",
+                "url": "/anki/",
+            }
+        envoyes = notifications.envoyer_message(request.user, message)
         if envoyes:
             messages.success(
                 request,
@@ -127,4 +139,28 @@ def tester(request):
                 "Aucune notification envoyée : active-les d'abord sur cet appareil, "
                 "ou l'envoi a échoué.",
             )
-    return redirect("anki_review:notifications")
+    return redirect(retour)
+
+
+# ---------------------------------------------------------------- côté Codexo
+# Même abonnement d'appareil que pour Anki (un seul par navigateur) : seule la page de
+# réglages et le choix « nouveaux exercices » sont propres à Codexo.
+
+
+@login_required
+def page_codexo(request):
+    return render(request, "notifications.html", {
+        "configure": notifications.configuration_ok(),
+        "vapid_public_key": settings.VAPID_PUBLIC_KEY,
+        "preferences": PreferencesNotification.pour(request.user),
+    })
+
+
+@login_required
+@require_POST
+def enregistrer_preferences_codexo(request):
+    preferences = PreferencesNotification.pour(request.user)
+    preferences.nouveaux_exercices = "nouveaux_exercices" in request.POST
+    preferences.save(update_fields=["nouveaux_exercices"])
+    messages.success(request, "Réglages enregistrés.")
+    return redirect("notifications_codexo")

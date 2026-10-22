@@ -11,7 +11,7 @@
  * ce qui n'est pas un GET. Les pages dépendent du compte connecté ; les garder en
  * cache risquerait d'afficher les données d'un autre utilisateur.
  *
- * Il affiche aussi les notifications push d'Anki (voir anki_review/notifications.py).
+ * Il affiche aussi les notifications push d'Anki et de Codexo (voir anki_review/notifications.py).
  *
  * Pas de liste de fichiers à maintenir : tout est mis en cache à la première demande.
  * Pour forcer le renouvellement complet des caches, incrémenter VERSION.
@@ -111,20 +111,25 @@ self.addEventListener('push', (event) => {
   const options = {
     body: donnees.corps || '',
     icon: donnees.icone || undefined,
-    // Un nouveau message remplace l'ancien au lieu de s'empiler.
-    tag: 'anki-rappel',
-    data: { url: donnees.url || '/anki/' },
+    badge: donnees.badge || undefined, // petite icône monochrome de la barre d'état
+    // Un nouveau message de la même appli remplace l'ancien au lieu de s'empiler ;
+    // Anki et Codexo ont des tags différents et ne se remplacent pas entre eux.
+    tag: donnees.tag || 'rappel',
+    data: { url: donnees.url || '/' },
   };
-  event.waitUntil(self.registration.showNotification(donnees.titre || 'Anki', options));
+  event.waitUntil(self.registration.showNotification(donnees.titre || 'Codexo', options));
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = (event.notification.data && event.notification.data.url) || '/anki/';
+  const url = (event.notification.data && event.notification.data.url) || '/';
+  const enAnki = url.startsWith('/anki/');
   event.waitUntil((async () => {
+    // Réutilise une fenêtre déjà ouverte sur la même appli (Anki ou Codexo), sinon en ouvre une.
     const fenetres = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const fenetre of fenetres) {
-      if (new URL(fenetre.url).pathname.startsWith('/anki/') && 'focus' in fenetre) {
+      const fenetreAnki = new URL(fenetre.url).pathname.startsWith('/anki/');
+      if (fenetreAnki === enAnki && 'focus' in fenetre) {
         if ('navigate' in fenetre) await fenetre.navigate(url);
         return fenetre.focus();
       }
