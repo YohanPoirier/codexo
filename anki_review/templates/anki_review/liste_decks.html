@@ -3,6 +3,7 @@
 {% block title %}Paquets — Anki{% endblock %}
 
 {% block content %}
+{% if invitation_notifications %}{% include "anki_review/_invitation_notifications.html" %}{% endif %}
 <h1>Tes paquets</h1>
 
 {% for m in matieres %}

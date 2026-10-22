@@ -11,6 +11,8 @@
  * ce qui n'est pas un GET. Les pages dépendent du compte connecté ; les garder en
  * cache risquerait d'afficher les données d'un autre utilisateur.
  *
+ * Il affiche aussi les notifications push d'Anki (voir anki_review/notifications.py).
+ *
  * Pas de liste de fichiers à maintenir : tout est mis en cache à la première demande.
  * Pour forcer le renouvellement complet des caches, incrémenter VERSION.
  */
@@ -95,4 +97,38 @@ self.addEventListener('fetch', (event) => {
   if (HOTES_CDN.includes(url.hostname)) {
     event.respondWith(cacheEnPremier(request, CACHE_CDN));
   }
+});
+
+// ---------------------------------------------------------------- notifications push
+
+self.addEventListener('push', (event) => {
+  let donnees = {};
+  try {
+    donnees = event.data ? event.data.json() : {};
+  } catch (e) {
+    donnees = {};
+  }
+  const options = {
+    body: donnees.corps || '',
+    icon: donnees.icone || undefined,
+    // Un nouveau message remplace l'ancien au lieu de s'empiler.
+    tag: 'anki-rappel',
+    data: { url: donnees.url || '/anki/' },
+  };
+  event.waitUntil(self.registration.showNotification(donnees.titre || 'Anki', options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/anki/';
+  event.waitUntil((async () => {
+    const fenetres = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const fenetre of fenetres) {
+      if (new URL(fenetre.url).pathname.startsWith('/anki/') && 'focus' in fenetre) {
+        if ('navigate' in fenetre) await fenetre.navigate(url);
+        return fenetre.focus();
+      }
+    }
+    return self.clients.openWindow(url);
+  })());
 });

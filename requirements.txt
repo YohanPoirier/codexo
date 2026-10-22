@@ -8,3 +8,4 @@ markdown>=3.6
 bleach>=6.1
 zstandard
 genanki
+pywebpush>=2.0

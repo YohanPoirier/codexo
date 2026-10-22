@@ -236,3 +236,10 @@ SESSION_COOKIE_AGE = 5000000 #Environ 2 mois
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Notifications push (Anki). Clés générées une fois par
+# "python manage.py generer_cles_vapid", à copier dans le .env du serveur. Tant que
+# VAPID_PUBLIC_KEY est vide, la fonctionnalité reste masquée sur le site.
+VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
+VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
+VAPID_CONTACT = os.environ.get('VAPID_CONTACT', '')  # ex. mailto:prof@exemple.fr

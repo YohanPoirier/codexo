@@ -36,6 +36,7 @@
       <a href="{% url 'anki_review:liste_decks' %}">Révision</a>
       <a href="{% url 'anki_review:edition' %}">Edition</a>
       <a href="{% url 'anki_review:import_export_accueil' %}">Import/Export</a>
+      <a href="{% url 'anki_review:notifications' %}">Notifications</a>
       {% if user.is_staff %}
         <a href="{% url 'anki_review:trafic' %}">Trafic</a>
       {% endif %}

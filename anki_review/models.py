@@ -88,6 +88,11 @@ class Note(models.Model):
     # partagée ne la duplique plus — l'étudiant reçoit juste sa propre Card
     # (progression) sur CETTE MÊME Note, cf. anki_review.views.ajouter_carte_partagee.
     partagee_avec_classe = models.BooleanField(default=False)
+    # Date à laquelle la note a été partagée (None si privée, ou partagée avant l'ajout de
+    # ce champ). Sert aux notifications hebdomadaires « nouvelles cartes » : posée par les
+    # vues qui (dé)partagent une note, PAS par save() — sinon chaque modification d'une
+    # vieille note partagée la ferait passer pour une nouveauté.
+    partagee_le = models.DateTimeField(null=True, blank=True)
 
     # Carte réversible (cf. NoteForm.CHOIX_TYPE_CARTE) : lien vers l'autre
     # moitié de la paire, comme Anki où une note "Basic (and reversed
@@ -267,3 +272,48 @@ class Activite(models.Model):
     @classmethod
     def journaliser(cls, etudiant, type_activite, carte=None):
         return cls.objects.create(etudiant=etudiant, type=type_activite, carte=carte)
+
+
+class AbonnementPush(models.Model):
+    """Un appareil (navigateur) d'un étudiant qui a accepté les notifications.
+
+    `endpoint`, `p256dh` et `auth` viennent tels quels de PushSubscription.toJSON()
+    côté navigateur ; un même étudiant peut avoir plusieurs appareils. Une ligne est
+    supprimée quand le service de notifications répond 404/410 (appareil désinscrit).
+    """
+
+    etudiant = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="abonnements_push"
+    )
+    endpoint = models.TextField(unique=True)
+    p256dh = models.CharField(max_length=200)
+    auth = models.CharField(max_length=100)
+    user_agent = models.CharField(max_length=200, blank=True)
+    cree_le = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Abonnement de {self.etudiant} ({self.cree_le:%d/%m/%Y})"
+
+
+class PreferencesNotification(models.Model):
+    """Réglages de notification d'un étudiant (communs à tous ses appareils)."""
+
+    etudiant = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="preferences_notification"
+    )
+    nouvelles_cartes = models.BooleanField(
+        "nouvelles cartes partagées par le prof", default=True
+    )
+    cartes_a_reviser = models.BooleanField("cartes à réviser", default=True)
+    # Dernier passage de la tâche hebdomadaire sur cet étudiant (qu'il y ait eu un envoi
+    # ou non) : évite un double envoi si la tâche est lancée deux fois, et délimite la
+    # période des « nouvelles cartes ».
+    dernier_passage = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Notifications de {self.etudiant}"
+
+    @classmethod
+    def pour(cls, etudiant):
+        preferences, _ = cls.objects.get_or_create(etudiant=etudiant)
+        return preferences

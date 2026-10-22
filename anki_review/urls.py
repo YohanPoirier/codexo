@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, views_notifications
 
 app_name = "anki_review"
 
@@ -44,6 +44,13 @@ urlpatterns = [
     path("propositions/<int:proposition_id>/", views.voir_proposition, name="voir_proposition"),
     path("propositions/<int:proposition_id>/accepter/", views.accepter_proposition, name="accepter_proposition"),
     path("propositions/<int:proposition_id>/refuser/", views.refuser_proposition, name="refuser_proposition"),
+
+    # Notifications push (réglages, abonnement des appareils, test).
+    path("notifications/", views_notifications.page, name="notifications"),
+    path("notifications/preferences/", views_notifications.enregistrer_preferences, name="notifications_preferences"),
+    path("notifications/abonner/", views_notifications.abonner, name="notifications_abonner"),
+    path("notifications/desabonner/", views_notifications.desabonner, name="notifications_desabonner"),
+    path("notifications/test/", views_notifications.tester, name="notifications_test"),
 
     # Générique : à laisser en dernier (capte tout slug restant = un paquet à réviser)
     path("<slug:deck_slug>/", views.reviser, name="reviser"),

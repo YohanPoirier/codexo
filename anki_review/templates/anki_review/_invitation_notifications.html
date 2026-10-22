@@ -1,0 +1,22 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'anki_review/css/notifications.css' %}">
+{# Bandeau d'invitation : masqué par défaut, affiché par notifications.js seulement si #}
+{# l'appareil sait recevoir des notifications et que l'élève n'a encore rien décidé. #}
+<div class="notif-invitation" hidden
+     data-notifications data-mode="invitation"
+     data-cle="{{ vapid_public_key }}"
+     data-url-abonner="{% url 'anki_review:notifications_abonner' %}"
+     data-url-desabonner="{% url 'anki_review:notifications_desabonner' %}"
+     data-csrf="{{ csrf_token }}">
+  <div class="notif-invitation-texte">
+    <strong>Un rappel chaque semaine ?</strong>
+    <span>Une seule notification : tes cartes à réviser et les nouvelles cartes de ton prof.
+      <a href="{% url 'anki_review:notifications' %}">Réglages</a></span>
+  </div>
+  <div class="notif-invitation-actions">
+    <button type="button" class="notif-btn notif-btn--principal" data-action="activer">Activer</button>
+    <button type="button" class="notif-btn" data-action="plus-tard">Plus tard</button>
+  </div>
+  <p class="notif-invitation-retour" data-retour hidden></p>
+</div>
+<script defer src="{% static 'anki_review/js/notifications.js' %}"></script>

@@ -19,6 +19,7 @@ from .models import Activite, Card, Deck, Note, PropositionModification
 from .sm2 import Reponse, appliquer, calculer_prochaine_etape
 from .apkg_import import importer_apkg, analyser_apkg, ErreurImportApkg
 from .apkg_export import exporter_notes_apkg
+from . import views_notifications
 
 EXTENSIONS_IMAGE_AUTORISEES = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
 
@@ -111,7 +112,10 @@ def liste_decks(request):
             "total": sum(p["total"] for p in paquets_sans_matiere),
         })
 
-    return render(request, "anki_review/liste_decks.html", {"matieres": matieres})
+    return render(request, "anki_review/liste_decks.html", {
+        "matieres": matieres,
+        **views_notifications.contexte_invitation(request.user),
+    })
 
 
 def _prochaine_carte_due(decks_qs, etudiant):
@@ -520,6 +524,7 @@ def _creer_miroir_pour_note_existante(form, note):
     miroir = Note.objects.create(
         guid=uuid.uuid4(), deck=deck, question=reponse, reponse=question,
         tags=tags, cree_par=note.cree_par, partagee_avec_classe=note.partagee_avec_classe,
+        partagee_le=note.partagee_le,
     )
     if note.cree_par_id:
         carte_miroir, cree = Card.objects.get_or_create(note=miroir, etudiant=note.cree_par)
@@ -932,7 +937,11 @@ def partager_paquet_toggle(request, deck_id):
     if request.method == "POST":
         mes_notes = Note.objects.filter(deck_id=deck_id, cree_par=request.user)
         tout_deja_partage = not mes_notes.filter(partagee_avec_classe=False).exists()
-        mes_notes.update(partagee_avec_classe=not tout_deja_partage)
+        partage = not tout_deja_partage
+        mes_notes.update(
+            partagee_avec_classe=partage,
+            partagee_le=timezone.now() if partage else None,
+        )
         if _est_ajax(request):
             return JsonResponse({"partagee": not tout_deja_partage})
     return redirect("anki_review:partage_etudiants")
@@ -976,7 +985,8 @@ def partager_note_toggle(request, note_id):
         return HttpResponseForbidden("Tu ne peux partager que tes propres cartes.")
     if request.method == "POST":
         note.partagee_avec_classe = not note.partagee_avec_classe
-        note.save(update_fields=["partagee_avec_classe"])
+        note.partagee_le = timezone.now() if note.partagee_avec_classe else None
+        note.save(update_fields=["partagee_avec_classe", "partagee_le"])
         if _est_ajax(request):
             return JsonResponse({"partagee": note.partagee_avec_classe})
     return redirect("anki_review:partage_etudiants")

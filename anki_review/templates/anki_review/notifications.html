@@ -1,0 +1,74 @@
+{% extends "anki_review/base.html" %}
+{% load static %}
+
+{% block title %}Notifications — Anki{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'anki_review/css/notifications.css' %}">
+<h1>Notifications</h1>
+
+{% if not configure %}
+  <p>Les notifications ne sont pas encore activées sur ce site.</p>
+{% else %}
+
+<section class="notif-bloc" data-notifications data-mode="page"
+         data-cle="{{ vapid_public_key }}"
+         data-url-abonner="{% url 'anki_review:notifications_abonner' %}"
+         data-url-desabonner="{% url 'anki_review:notifications_desabonner' %}"
+         data-csrf="{{ csrf_token }}">
+  <h2>Cet appareil</h2>
+  <p class="notif-statut" data-statut>Vérification…</p>
+  <div class="notif-actions">
+    <button type="button" class="notif-btn notif-btn--principal" data-action="activer" hidden>Activer sur cet appareil</button>
+    <button type="button" class="notif-btn" data-action="desactiver" hidden>Désactiver sur cet appareil</button>
+  </div>
+  <p class="notif-aide" data-aide hidden></p>
+</section>
+
+{% if user.is_staff %}
+  <section class="notif-bloc">
+    <h2>Envois hebdomadaires</h2>
+    <p>Les rappels de la semaine ne sont envoyés qu'aux élèves. Ici, tu peux seulement
+      vérifier que les notifications arrivent bien sur tes appareils.</p>
+  </section>
+{% else %}
+  <section class="notif-bloc">
+    <h2>Ce que tu veux recevoir</h2>
+    <p>Au plus un message par semaine, le dimanche en fin d'après-midi, et seulement
+      s'il y a quelque chose à te dire.</p>
+    <form method="post" action="{% url 'anki_review:notifications_preferences' %}">
+      {% csrf_token %}
+      <label class="notif-choix">
+        <input type="checkbox" name="cartes_a_reviser" {% if preferences.cartes_a_reviser %}checked{% endif %}>
+        <span>Cartes à réviser</span>
+      </label>
+      <label class="notif-choix">
+        <input type="checkbox" name="nouvelles_cartes" {% if preferences.nouvelles_cartes %}checked{% endif %}>
+        <span>Nouvelles cartes partagées par ton prof</span>
+      </label>
+      <button type="submit" class="notif-btn notif-btn--principal">Enregistrer</button>
+    </form>
+  </section>
+{% endif %}
+
+{% if nb_appareils %}
+  <section class="notif-bloc">
+    <h2>Tester</h2>
+    <p>{{ nb_appareils }} appareil{{ nb_appareils|pluralize }} enregistré{{ nb_appareils|pluralize }} sur ton compte.</p>
+    <form method="post" action="{% url 'anki_review:notifications_test' %}">
+      {% csrf_token %}
+      <button type="submit" class="notif-btn">M'envoyer une notification de test</button>
+    </form>
+  </section>
+{% endif %}
+
+<details class="notif-bloc notif-iphone">
+  <summary>Sur iPhone</summary>
+  <p>Les notifications ne fonctionnent que si Anki est ajouté à l'écran d'accueil :
+    dans Safari, touche Partager puis « Sur l'écran d'accueil », et ouvre ensuite Anki
+    depuis cette icône (iOS 16.4 ou plus récent).</p>
+</details>
+
+{% endif %}
+<script defer src="{% static 'anki_review/js/notifications.js' %}"></script>
+{% endblock %}
