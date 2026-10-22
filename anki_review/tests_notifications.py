@@ -313,9 +313,11 @@ class VuesTests(Base):
         self.assertContains(self.client.get(reverse("anki_review:liste_decks")), "notif-invitation")
         self.assertContains(self.client.get(reverse("anki_review:liste_decks")), PUBLIQUE)
 
-        # Prof : pas de bandeau, pas de réglages hebdomadaires, mais le test reste possible.
+        # Prof : pas de réglages hebdomadaires, mais le test reste possible.
+        # (TEMPORAIRE : le bandeau est aussi visible aux professeurs ; à remettre en
+        # assertNotContains en même temps que contexte_invitation.)
         self.client.force_login(self.prof)
-        self.assertNotContains(self.client.get(reverse("anki_review:liste_decks")), "notif-invitation")
+        self.assertContains(self.client.get(reverse("anki_review:liste_decks")), "notif-invitation")
         page = self.client.get(reverse("anki_review:notifications"))
         self.assertContains(page, "qu'aux élèves")
         self.assertNotContains(page, "Ce que tu veux recevoir")
@@ -523,7 +525,8 @@ class ExercicesTests(Base):
         self.assertTrue(PreferencesNotification.pour(self.eleve_classe).nouveaux_exercices)
 
         self.client.force_login(self.prof)
-        self.assertNotContains(self.client.get(reverse("theme_list")), "cx-notif-invitation")
+        # TEMPORAIRE : visible aussi aux professeurs (à remettre en assertNotContains).
+        self.assertContains(self.client.get(reverse("theme_list")), "cx-notif-invitation")
         self.assertContains(self.client.get(reverse("notifications_codexo")), "qu'aux élèves")
 
     def test_connexion_exigee(self):

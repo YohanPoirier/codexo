@@ -22,11 +22,14 @@ LONGUEUR_ENDPOINT_MAX = 2000
 
 
 def contexte_invitation(user):
-    """Contexte du bandeau d'invitation de l'accueil : seulement pour un élève, et seulement
-    si les clés d'envoi sont configurées sur le serveur."""
+    """Contexte du bandeau d'invitation de l'accueil : seulement si les clés d'envoi sont
+    configurées sur le serveur.
+
+    TEMPORAIRE : les professeurs voient aussi le bandeau, pour pouvoir le tester. À remettre
+    ensuite : `user.is_authenticated and not user.is_staff and notifications.configuration_ok()`."""
     return {
         "invitation_notifications": (
-            user.is_authenticated and not user.is_staff and notifications.configuration_ok()
+            user.is_authenticated and notifications.configuration_ok()
         ),
         "vapid_public_key": settings.VAPID_PUBLIC_KEY,
     }
