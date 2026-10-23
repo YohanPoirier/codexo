@@ -69,6 +69,15 @@
   </div>
 </main>
 <script>
+// Page en cours : l'entrée dont l'adresse correspond le mieux à la page affichée est mise en avant.
+(function () {
+  const chemin = location.pathname; let meilleur = null, longueur = -1;
+  document.querySelectorAll('#anki-nav a[href]').forEach(a => {
+    const h = a.pathname;
+    if ((h === chemin || (h.length > 1 && chemin.startsWith(h))) && h.length > longueur) { meilleur = a; longueur = h.length; }
+  });
+  if (meilleur) meilleur.setAttribute('aria-current', 'page');
+})();
 document.getElementById('anki-nav-toggle')?.addEventListener('click', function () {
   const nav = document.getElementById('anki-nav');
   const ouvert = nav.classList.toggle('anki-nav-ouvert');

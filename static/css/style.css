@@ -124,6 +124,39 @@ header.site nav a:hover { color: var(--indigo); }
   header.site nav.open { display: flex; }
   header.site nav a { padding: 8px 0; font-size: .95rem; }
   .nav-link-btn { padding: 8px 0; font-size: .95rem; }
+
+  /* Entrées du menu : lignes séparées, grandes zones d'appui, page en cours mise en avant. */
+  header.site nav a, header.site nav .nav-link-btn {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+    padding: 13px 10px; font-size: 1rem; color: var(--ink);
+    border-top: 1px solid var(--rule); border-left: 3px solid transparent; border-radius: 0;
+    box-sizing: border-box; text-align: left;
+  }
+  header.site nav a:first-child { border-top: none; }
+    header.site nav a[aria-current="page"] {
+    font-weight: 600; color: var(--indigo); border-left-color: var(--indigo);
+  }
+    /* Menu déroulant « Espace prof » : même ligne que les autres entrées, sous-liste en retrait. */
+  header.site nav .nav-dropdown { width: 100%; }
+  header.site nav .nav-dropdown-toggle {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+    padding: 13px 10px; font-size: 1rem; color: var(--ink); box-sizing: border-box;
+    border-top: 1px solid var(--rule); border-left: 3px solid transparent;
+  }
+  header.site nav .nav-dropdown-toggle .caret { font-size: 1rem; margin-left: auto; color: var(--ink-soft); }
+  header.site nav .nav-dropdown-toggle .nav-badge-dot { margin-left: 8px; }
+  header.site nav .nav-dropdown-menu {
+    width: 100%; box-sizing: border-box; padding: 0 0 0 14px; margin: 0 0 6px;
+    background: none; border: none; border-radius: 0; box-shadow: none;
+  }
+  /* Sous-entrées : simple retrait, avec un trait vertical fin qui les rattache à « Espace prof ». */
+  header.site nav .nav-dropdown-menu a {
+    padding: 10px 10px 10px 14px; font-size: .95rem; color: var(--ink-soft);
+    border-top: none; border-left: 2px solid var(--rule);
+  }
+  header.site nav .nav-dropdown-menu a[aria-current="page"] { color: var(--indigo); border-left-color: var(--indigo); }
+  header.site nav .logout-form { display: block; width: 100%; border-top: 1px solid var(--rule); margin-top: 4px; }
+  header.site nav .nav-link-btn { border-top: none; color: var(--ink-soft); }
   /* Même hauteur de ligne que les autres entrées du menu (liens et "Déconnexion"),
      sinon "Espace prof" est plus collé à l'entrée suivante. */
   .nav-dropdown-toggle { padding: 8px 0; font-size: .95rem; }

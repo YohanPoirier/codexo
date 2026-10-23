@@ -519,7 +519,20 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
     background: rgba(28, 39, 71, .4); z-index: -1;
   }
   header.anki-site nav.anki-nav-ouvert { display: flex; }
-  header.anki-site nav a, header.anki-site nav .nav-link-btn { padding: 4px 0; }
+
+  /* Entrées du menu : lignes séparées, grandes zones d'appui, page en cours mise en avant. */
+  header.anki-site nav a, header.anki-site nav .nav-link-btn {
+    display: flex; align-items: center; justify-content: space-between; width: 100%;
+    padding: 13px 10px; font-size: 1rem; color: var(--ink);
+    border-top: 1px solid var(--rule); border-left: 3px solid transparent; border-radius: 0;
+    box-sizing: border-box; text-align: left;
+  }
+  header.anki-site nav a:first-child { border-top: none; }
+    header.anki-site nav a[aria-current="page"] {
+    font-weight: 600; color: var(--anki-accent-deep); border-left-color: var(--anki-accent-deep);
+  }
+    header.anki-site nav .logout-form { display: block; width: 100%; border-top: 1px solid var(--rule); margin-top: 4px; }
+  header.anki-site nav .nav-link-btn { border-top: none; color: var(--ink-soft); }
 
   /* Titre et actions empilés plutôt que côte à côte — évite que le bouton
      ("Tout partager", l'œil d'aperçu...) chevauche le texte du paquet ou

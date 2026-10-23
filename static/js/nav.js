@@ -3,6 +3,17 @@
   const nav = document.getElementById("site-nav");
   if (!toggle || !nav) return;
 
+  // Page en cours : l'entrée dont l'adresse correspond le mieux à la page affichée est mise en avant.
+  (function () {
+    var chemin = location.pathname, meilleur = null, longueur = -1;
+    nav.querySelectorAll("a[href]").forEach(function (a) {
+      var h = a.pathname;
+      var ok = h === chemin || (h !== "/" && h.length > 1 && chemin.indexOf(h) === 0);
+      if (ok && h.length > longueur) { meilleur = a; longueur = h.length; }
+    });
+    if (meilleur) meilleur.setAttribute("aria-current", "page");
+  })();
+
   toggle.addEventListener("click", function () {
     const isOpen = nav.classList.toggle("open");
     toggle.classList.toggle("open", isOpen);
