@@ -465,6 +465,10 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
 /* Idem pages Édition et Partage (le premier paquet y est lui-même un groupe dépliable). */
 .ie-groupe--edition > .edition-ligne--matiere { border-radius: 8px; }
 .ie-groupe--edition > .ie-groupe-liste > li:first-child > .ie-groupe > .edition-ligne { border-radius: 8px; }
+/* Édition / Partage : paquets décalés de 10 px sous leur matière, cartes décalées de 10 px
+   (au lieu de 20) sous leur paquet. */
+.ie-groupe--edition > .ie-groupe-liste { margin-left: 10px; }
+.ie-groupe--edition .ie-sous-liste { margin-left: 10px; }
 .ie-sous-liste { margin: 0 0 0 20px; }
 .ie-sous-ligne {
   background: #fff; border: none; border-top: 1px solid var(--rule);
