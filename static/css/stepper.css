@@ -174,7 +174,7 @@
   .stepper-feuille-caret { font-size: 1rem; transition: transform .15s ease; }
   .stepper-side.ouvert .stepper-feuille-caret { transform: rotate(180deg); }
   .stepper-side:not(.ouvert) .stepper-vars { display: none; }
-  .stepper-side.ouvert .stepper-vars { max-height: 40vh; overflow-y: auto; margin-bottom: 12px; }
+  .stepper-side.ouvert .stepper-vars { max-height: 30vh; overflow-y: auto; margin-bottom: 12px; }
 }
 
 /* Téléphone (dans le panneau du bas) : « ◀ Reculer », position sur deux lignes, « Avancer ▶ » sur une seule ligne
