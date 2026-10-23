@@ -74,6 +74,15 @@ document.getElementById('anki-nav-toggle')?.addEventListener('click', function (
   const ouvert = nav.classList.toggle('anki-nav-ouvert');
   this.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
 });
+// Menu superposé au contenu : un appui en dehors du menu le referme.
+document.addEventListener('click', function (e) {
+  const nav = document.getElementById('anki-nav');
+  const bouton = document.getElementById('anki-nav-toggle');
+  if (!nav || !nav.classList.contains('anki-nav-ouvert')) return;
+  if (nav.contains(e.target) || bouton.contains(e.target)) return;
+  nav.classList.remove('anki-nav-ouvert');
+  bouton.setAttribute('aria-expanded', 'false');
+});
 </script>
 {% block scripts %}{% endblock %}
 </body>

@@ -19,6 +19,8 @@
 header.anki-site {
   border-bottom: 1px solid var(--rule);
   background: var(--paper);
+  /* Barre collée en haut, comme sur Codexo ; elle sert aussi de repère au menu mobile superposé. */
+  position: sticky; top: 0; z-index: 60;
 }
 header.anki-site .bar {
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; row-gap: 8px;
@@ -505,9 +507,14 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
   header.anki-site .bar { flex-wrap: wrap; }
   header.anki-site nav {
     display: none; flex-direction: column; align-items: flex-start; gap: 12px;
-    width: 100%; padding-top: 14px;
+    /* Menu superposé au contenu (et non poussé vers le bas) : posé sous la barre du haut. */
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 30;
+    padding: 8px 16px 14px; background: var(--paper);
+    border-bottom: 1px solid var(--rule); box-shadow: 0 10px 18px rgba(28, 39, 71, .12);
+    max-height: calc(100vh - 70px); overflow-y: auto;
   }
   header.anki-site nav.anki-nav-ouvert { display: flex; }
+  header.anki-site nav a, header.anki-site nav .nav-link-btn { padding: 4px 0; }
 
   /* Titre et actions empilés plutôt que côte à côte — évite que le bouton
      ("Tout partager", l'œil d'aperçu...) chevauche le texte du paquet ou

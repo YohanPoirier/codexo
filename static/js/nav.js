@@ -23,6 +23,15 @@
     });
   });
 
+  // Menu mobile superposé au contenu : un appui en dehors du menu le referme.
+  document.addEventListener("click", function (event) {
+    if (!nav.classList.contains("open")) return;
+    if (nav.contains(event.target) || toggle.contains(event.target)) return;
+    nav.classList.remove("open");
+    toggle.classList.remove("open");
+    toggle.setAttribute("aria-expanded", "false");
+  });
+
   // Menu déroulant "Espace prof" (ajout du 06/09/2026, regroupe les liens réservés
   // aux profs qui étaient auparavant à plat dans la nav, voir base.html/style.css).
   // Le bouton ".nav-dropdown-toggle" n'est volontairement PAS un ".nav-link-btn" :
