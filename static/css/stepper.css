@@ -173,8 +173,8 @@
 /* Appel de fonction en cours dans une ligne : même éclaircissement, souligné en orange. */
 .stepper-call-range { background: rgba(255, 255, 255, .12); box-shadow: inset 0 -2px 0 #d98e2b; padding: 3px 0; }
 
-/* En-tête et onglets du panneau des variables : seulement sur téléphone (voir plus bas). */
-.stepper-feuille-entete, .stepper-onglets { display: none; }
+/* En-tête, onglets et message de chargement du panneau : seulement sur téléphone. */
+.stepper-feuille-entete, .stepper-onglets, .stepper-feuille-chargement { display: none; }
 
 @media (max-width: 760px) {
   .stepper-page { grid-template-columns: 1fr; }
@@ -234,8 +234,13 @@
   .stepper-side .stepper-table td.stepper-tag { font-size: .7rem; font-weight: 500; text-transform: lowercase; }
   .stepper-side:not(.ouvert) .stepper-vars { display: none; }
   .stepper-side.ouvert .stepper-resume-detail { display: none; }
-  /* Tant que Python se charge, pas de panneau (le message est dans « Output »). */
-  .stepper-side.chargement { display: none; }
+  /* Tant que Python se charge : seulement le message, centré. */
+  .stepper-side.chargement > :not(.stepper-feuille-chargement) { display: none; }
+  .stepper-side.chargement .stepper-feuille-chargement {
+    display: block; margin: 0; padding: 16px 0 6px; text-align: center;
+    font-style: italic; color: var(--ink-soft);
+  }
+  .stepper-feuille-chargement.erreur { color: var(--err); font-style: normal; font-weight: 600; }
   /* Déroulé : l'en-tête ne garde que la poignée et la flèche (au bord droit) ; les onglets
      Variables / Affichage prennent la place du titre. */
   .stepper-side.ouvert .stepper-feuille-entete { padding: 14px 0 0; min-height: 0; }

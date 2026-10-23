@@ -13,8 +13,9 @@
   // avant de tracer. Un menu permet de changer de test.
   //
   // Étapes enregistrées :
-  // - ENTRÉE dans une fonction : le « def » est surligné, ses paramètres apparaissent dans les
-  //   variables et, si l'appel vient d'une autre ligne du code, seul cet appel y est surligné ;
+  // - APPEL d'une fonction : d'abord une étape où seul l'appel est souligné dans la ligne
+  //   appelante, puis l'ENTRÉE dans la fonction : le « def » est surligné et ses paramètres
+  //   apparaissent dans les variables ;
   // - une ligne TERMINÉE : elle est surlignée en entier avec l'état qui la SUIT. Pour
   //   « b = carre(a) », on voit donc d'abord l'entrée dans carre et ses lignes, puis la ligne
   //   entière une fois carre terminée.
@@ -147,11 +148,18 @@ def __trace_student__(source, max_steps, trace_module):
             truncated = True
             raise _Stop()
         code = frame.f_code
-        step = {"line": code.co_firstlineno, "stack": snap_stack(frame), "out": out.size}
         pos = call_position(frame.f_back)
         if pos is not None:
-            step["call"] = pos
-        steps.append(step)
+            # Deux étapes : d'abord l'APPEL seul, souligné dans la ligne appelante (état de
+            # l'appelant juste avant l'appel), puis l'entrée dans la fonction (« def » surligné,
+            # paramètres créés).
+            caller = frame.f_back
+            stack_avant = snap_stack(caller) if caller is not None and caller.f_code.co_filename == FILENAME else []
+            steps.append({"line": None, "call": pos, "stack": stack_avant, "out": out.size})
+            if len(steps) >= max_steps:
+                truncated = True
+                raise _Stop()
+        steps.append({"line": code.co_firstlineno, "stack": snap_stack(frame), "out": out.size})
 
     def add_step(step, caller_key):
         # Fusion « return + ligne qui récupère la valeur » : si l'étape précédente est le
@@ -1027,6 +1035,11 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
       calls = await orderCalls(calls, data.solution_code || "");
     } catch (e) {
       showMessage("Erreur de chargement de Python.", true);
+      const chargement = document.getElementById("stepper-chargement");
+      if (chargement) {
+        chargement.textContent = "Erreur de chargement de Python.";
+        chargement.classList.add("erreur");
+      }
       return;
     }
     fillCases();
