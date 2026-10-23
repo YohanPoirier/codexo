@@ -22,21 +22,20 @@
 
 .stepper-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .stepper-controls button:disabled { cursor: not-allowed; }
-/* « Reculer » reprend le style des boutons « Réinitialiser » (reset-btn), dont le survol est
-   rouge (action destructrice) : ici, rien n'est effacé, donc survol indigo. Sur téléphone
-   (pas de souris), pas d'effet de survol, qui restait « collé » après un appui. */
-.stepper-controls #stepper-prev:hover:not(:disabled) { border-color: var(--indigo); color: var(--indigo); }
-/* « Avancer » : même style que « Reculer » (contour, pas de fond bleu). */
+/* « Reculer » et « Avancer » : même style, un simple contour. Le survol indigo n'existe
+   qu'avec une souris : sur téléphone, un appui laisse le bouton « survolé », et il gardait
+   une autre couleur (et « Reculer » le rouge de « Réinitialiser », dont il reprend le style). */
+.stepper-controls button#stepper-prev,
 .stepper-controls button#stepper-next {
   background: transparent; color: var(--ink-soft); border: 1px solid var(--rule);
   font-weight: 400; font-size: .85rem; padding-top: 11px; padding-bottom: 11px;
+  -webkit-tap-highlight-color: transparent;
 }
-.stepper-controls button#stepper-next:hover:not(:disabled) { border-color: var(--indigo); color: var(--indigo); }
-.stepper-controls button#stepper-next:disabled { background: transparent; opacity: .5; }
-.stepper-controls #stepper-prev:disabled { opacity: .5; }
-@media (hover: none) {
-  .stepper-controls #stepper-prev:hover,
-  .stepper-controls button#stepper-next:hover { border-color: var(--rule); color: var(--ink-soft); }
+.stepper-controls button#stepper-prev:disabled,
+.stepper-controls button#stepper-next:disabled { opacity: .5; }
+@media (hover: hover) {
+  .stepper-controls button#stepper-prev:hover:not(:disabled),
+  .stepper-controls button#stepper-next:hover:not(:disabled) { border-color: var(--indigo); color: var(--indigo); }
 }
 .stepper-pos { font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--ink-soft); }
 
