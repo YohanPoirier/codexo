@@ -2,7 +2,7 @@
 {% load exercise_extras %}
 {% block title %}{{ theme.name }} — Codexo{% endblock %}
 {% block content %}
-<span class="eyebrow"><a href="{% url 'theme_list' %}">← Thèmes</a></span>
+<a class="lien-retour" href="{% url 'theme_list' %}">← Thèmes</a>
 <h1>{{ theme.name }}</h1>
 <p>{{ theme.description }}</p>
 {% include "exercises/_schema_summary.html" %}

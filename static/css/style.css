@@ -177,6 +177,15 @@ main { padding: 48px 0 80px; }
   text-transform: uppercase; color: var(--amber); margin-bottom: 10px; display: block;
 }
 
+/* Lien de retour vers la page précédente (« ← Thèmes », « ← Retour à l'exercice »…) :
+   discret, gris, jamais souligné. */
+.lien-retour {
+  display: inline-block; margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: .78rem; letter-spacing: .04em;
+  color: var(--ink-soft); text-decoration: none;
+}
+.lien-retour:hover { color: var(--indigo); }
+
 .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-top: 28px; }
 
 .theme-card {

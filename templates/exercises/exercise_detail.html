@@ -2,7 +2,7 @@
 {% load static exercise_extras %}
 {% block title %}{{ exercise.title }} — Codexo{% endblock %}
 {% block content %}
-<span class="eyebrow"><a href="{% url 'exercise_list' theme.slug %}">← {{ theme.name }}</a></span>
+<a class="lien-retour" href="{% url 'exercise_list' theme.slug %}">← {{ theme.name }}</a>
 <h1>{{ exercise.title }}</h1>
 
 <span class="section-label">Énoncé</span>

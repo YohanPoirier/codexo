@@ -401,7 +401,8 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
 }
 .btn-ajouter:hover { background: var(--anki-accent-deep); }
 .edition-fil { font-size: .85rem; color: var(--ink-soft); margin-bottom: 4px; }
-.edition-fil a { color: var(--ink-soft); }
+.edition-fil a { color: var(--ink-soft); text-decoration: none; }
+.edition-fil a:hover { color: var(--anki-accent-deep); }
 
 .ie-filtre { margin: 10px 0 18px; font-size: .9rem; }
 .ie-filtre label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }

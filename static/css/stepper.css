@@ -1,5 +1,15 @@
 /* Page « Pas à pas » (accès : views.pas_a_pas_autorise) — voir static/js/stepper.js */
 
+/* En-tête : titre de l'exercice et cartouche « Mode pas à pas » à droite du titre (en
+   dessous si la place manque). Le lien de retour est .lien-retour (style.css). */
+.stepper-titre { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; }
+.stepper-titre h1 { margin: 0; }
+.stepper-cartouche {
+  flex: 0 0 auto; padding: 4px 10px; border-radius: 999px;
+  background: rgba(217, 142, 43, .15); color: #9a5a12;
+  font-family: 'JetBrains Mono', monospace; font-size: .75rem; font-weight: 700; letter-spacing: .03em;
+}
+
 .stepper-page {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);

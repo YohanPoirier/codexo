@@ -3,8 +3,11 @@
 {% block title %}Pas à pas — {{ exercise.title }} — Codexo{% endblock %}
 {% block content %}
 <!-- Mode pas à pas (accès : views.pas_a_pas_autorise) : voir static/js/stepper.js -->
-<span class="eyebrow"><a href="{% url 'exercise_detail' theme.slug exercise.slug %}">← Retour à l'exercice</a></span>
-<h1>Pas à pas — {{ exercise.title }}</h1>
+<a class="lien-retour" href="{% url 'exercise_detail' theme.slug exercise.slug %}">← Retour à l'exercice</a>
+<div class="stepper-titre">
+  <h1>{{ exercise.title }}</h1>
+  <span class="stepper-cartouche">Mode pas à pas</span>
+</div>
 
 <div class="stepper-page">
   <div class="stepper-main">

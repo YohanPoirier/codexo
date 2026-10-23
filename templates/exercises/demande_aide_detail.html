@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Demande d'aide — {{ demande.exercise.title }} — Codexo{% endblock %}
 {% block content %}
-<span class="eyebrow"><a href="{% url 'demandes_aide' %}">← Demandes d'aide</a></span>
+<a class="lien-retour" href="{% url 'demandes_aide' %}">← Demandes d'aide</a>
 <h1>{{ demande.exercise.title }}</h1>
 <p class="demande-aide-meta">
   Élève : <strong>{{ demande.eleve.display_name|default:demande.eleve.identifiant }}</strong>
