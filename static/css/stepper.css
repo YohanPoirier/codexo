@@ -22,6 +22,13 @@
 
 .stepper-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .stepper-controls button:disabled { cursor: not-allowed; }
+/* « Reculer » reprend le style des boutons « Réinitialiser » (reset-btn), dont le survol est
+   rouge (action destructrice) : ici, rien n'est effacé, donc survol indigo. Sur téléphone
+   (pas de souris), pas d'effet de survol, qui restait « collé » après un appui. */
+.stepper-controls #stepper-prev:hover:not(:disabled) { border-color: var(--indigo); color: var(--indigo); }
+@media (hover: none) {
+  .stepper-controls #stepper-prev:hover { border-color: var(--rule); color: var(--ink-soft); }
+}
 .stepper-pos { font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--ink-soft); }
 
 /* Appel du test, collé sous l'éditeur comme une ligne de console */
@@ -158,8 +165,8 @@
 /* Appel de fonction en cours dans une ligne : même éclaircissement, souligné en orange. */
 .stepper-call-range { background: rgba(255, 255, 255, .12); box-shadow: inset 0 -2px 0 #d98e2b; padding: 3px 0; }
 
-/* En-tête du panneau des variables : seulement sur téléphone (voir plus bas). */
-.stepper-feuille-entete { display: none; }
+/* En-tête du panneau des variables et message de chargement : seulement sur téléphone. */
+.stepper-feuille-entete, .stepper-feuille-chargement { display: none; }
 
 @media (max-width: 760px) {
   .stepper-page { grid-template-columns: 1fr; }
@@ -219,6 +226,15 @@
   .stepper-side .stepper-table td.stepper-tag { font-size: .7rem; font-weight: 500; text-transform: lowercase; }
   .stepper-side:not(.ouvert) .stepper-vars { display: none; }
   .stepper-side.ouvert .stepper-resume-detail { display: none; }
+  /* Tant que Python se charge : seulement le message, centré. */
+  .stepper-side.chargement > :not(.stepper-feuille-chargement) { display: none; }
+  .stepper-side.chargement .stepper-feuille-chargement {
+    display: block; margin: 0; padding: 18px 0 8px; text-align: center;
+    font-style: italic; color: var(--ink-soft);
+  }
+  /* Déroulé : « Variables » centré, la flèche reste au bord droit. */
+  .stepper-side.ouvert .stepper-feuille-entete { justify-content: center; }
+  .stepper-side.ouvert .stepper-feuille-caret { position: absolute; right: 0; }
   .stepper-side.ouvert .stepper-vars { max-height: 30vh; overflow-y: auto; margin-bottom: 12px; }
 }
 

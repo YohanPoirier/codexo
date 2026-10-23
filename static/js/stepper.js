@@ -920,10 +920,16 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
       calls = await orderCalls(calls, data.solution_code || "");
     } catch (e) {
       showMessage("Erreur de chargement de Python.", true);
+      const chargement = document.getElementById("stepper-chargement");
+      if (chargement) chargement.textContent = "Erreur de chargement de Python.";
       return;
     }
     fillCases();
     await trace();
+    // Python prêt : le panneau du bas (téléphone) retrouve variables et boutons.
+    if (side) side.classList.remove("chargement");
+    ajusterBoutons();
+    adjustPagePadding();
   }
 
   // Code modifié : la trace enregistrée ne correspond plus. On efface le surlignage AVANT la
