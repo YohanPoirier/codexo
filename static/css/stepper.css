@@ -58,7 +58,10 @@
 .stepper-case-row.single .stepper-call-caret { display: none; }
 .stepper-call { display: block; padding: 10px 40px 10px 16px; white-space: pre-wrap; word-break: break-word; }
 .stepper-call.active .stepper-call-expr { background: rgba(255, 255, 255, .12); box-shadow: inset 0 -2px 0 #d98e2b; }
-.stepper-call.full .stepper-call-stmt { background: rgba(255, 255, 255, .12); box-shadow: inset 0 -2px 0 #d98e2b; }
+/* Appel terminé (« res » reçu, fin du test) : c'est la ligne entière qui est en cours, même
+   style que la ligne en cours dans l'éditeur (éclaircie, trait orange à gauche). */
+.stepper-call.full { background: rgba(255, 255, 255, .10); box-shadow: inset 3px 0 0 #d98e2b; }
+.stepper-case-row:has(.stepper-call.full) .stepper-call-btn { border-radius: 0 0 var(--radius) var(--radius); overflow: hidden; }
 .stepper-case-row .f { color: #82aaff; }
 .stepper-case-row .n { color: #f78c6c; }
 .stepper-case-row .s { color: #c3e88d; }
