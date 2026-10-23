@@ -171,12 +171,14 @@ class HebdomadaireTests(Base):
         envoi.assert_not_called()
         self.assertEqual(r[0]["statut"], "rien à annoncer")
 
-    def test_prof_et_non_abonnes_ignores(self):
-        self.abonner(self.prof, 2)  # un prof abonné ne reçoit pas le message hebdomadaire
+    def test_prof_abonne_traite_comme_un_eleve_non_abonnes_ignores(self):
+        self.abonner(self.prof, 2)  # un prof abonné reçoit lui aussi le rappel hebdomadaire
         Card.objects.create(note=self.note_due, etudiant=self.autre)  # élève sans abonnement
         with mock.patch("anki_review.notifications.envoyer_push", return_value="ok"):
             r = notifications.envoyer_hebdomadaire()
-        self.assertEqual([x["etudiant"] for x in r], [self.eleve])
+        self.assertEqual({x["etudiant"] for x in r}, {self.eleve, self.prof})
+        ligne_prof = next(x for x in r if x["etudiant"] == self.prof)
+        self.assertEqual(ligne_prof["nouvelles"], 0)  # ses propres cartes partagées ne comptent pas
 
     def test_echec_total_ne_marque_pas_la_semaine_traitee(self):
         with mock.patch("anki_review.notifications.envoyer_push", return_value="erreur"):
@@ -313,14 +315,13 @@ class VuesTests(Base):
         self.assertContains(self.client.get(reverse("anki_review:liste_decks")), "notif-invitation")
         self.assertContains(self.client.get(reverse("anki_review:liste_decks")), PUBLIQUE)
 
-        # Prof : pas de bandeau, pas de réglages hebdomadaires, mais le test reste possible.
+        # Prof : mêmes bandeau et réglages que les élèves.
         self.client.force_login(self.prof)
-        self.assertNotContains(self.client.get(reverse("anki_review:liste_decks")), "notif-invitation")
+        self.assertContains(self.client.get(reverse("anki_review:liste_decks")), "notif-invitation")
         page = self.client.get(reverse("anki_review:notifications"))
-        self.assertContains(page, "qu'aux élèves")
-        # Seul réglage du professeur : les modifications proposées sur ses cartes.
-        self.assertNotContains(page, 'name="cartes_a_reviser"')
-        self.assertContains(page, 'name="propositions"')
+        for champ in ("cartes_a_reviser", "nouvelles_cartes", "propositions"):
+            self.assertContains(page, f'name="{champ}"')
+        self.assertContains(page, "les autres professeurs")
 
     def test_bouton_de_test(self):
         self.client.force_login(self.eleve)
@@ -524,9 +525,9 @@ class ExercicesTests(Base):
         self.client.post(reverse("notifications_codexo_preferences"), {"nouveaux_exercices": "on"})
         self.assertTrue(PreferencesNotification.pour(self.eleve_classe).nouveaux_exercices)
 
-        self.client.force_login(self.prof)
-        self.assertNotContains(self.client.get(reverse("theme_list")), "cx-notif-invitation")
-        self.assertContains(self.client.get(reverse("notifications_codexo")), "qu'aux élèves")
+        self.client.force_login(self.prof)  # mêmes bandeau et réglage que les élèves
+        self.assertContains(self.client.get(reverse("theme_list")), "cx-notif-invitation")
+        self.assertContains(self.client.get(reverse("notifications_codexo")), 'name="nouveaux_exercices"')
 
     def test_connexion_exigee(self):
         for nom in ("notifications_codexo", "notifications_codexo_preferences"):

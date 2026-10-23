@@ -73,7 +73,8 @@ def compter_a_reviser(etudiant, maintenant=None):
 
 
 def compter_nouvelles_cartes(etudiant, depuis):
-    """Cartes partagées par un professeur depuis `depuis`, que l'élève n'a pas encore."""
+    """Cartes partagées par un professeur depuis `depuis`, que l'utilisateur n'a pas encore
+    (hors les siennes)."""
     deja = Card.objects.filter(etudiant=etudiant).values("note_id")
     return (
         Note.objects.filter(
@@ -82,6 +83,7 @@ def compter_nouvelles_cartes(etudiant, depuis):
             partagee_le__gt=depuis,
         )
         .exclude(id__in=deja)
+        .exclude(cree_par=etudiant)  # un professeur n'est pas prévenu de ses propres cartes
         .count()
     )
 
@@ -258,7 +260,7 @@ def envoyer_hebdomadaire(simulation=False, force=False, identifiant=None, mainte
     maintenant = maintenant or timezone.now()
     User = get_user_model()
     eleves = (
-        User.objects.filter(is_active=True, is_staff=False, abonnements_push__isnull=False)
+        User.objects.filter(is_active=True, abonnements_push__isnull=False)
         .distinct()
         .order_by("pk")
     )

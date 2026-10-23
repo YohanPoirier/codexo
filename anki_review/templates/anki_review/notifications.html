@@ -25,23 +25,6 @@
   <p class="notif-aide" data-aide hidden></p>
 </section>
 
-{% if user.is_staff %}
-  <section class="notif-bloc">
-    <h2>Envois hebdomadaires</h2>
-    <p>Les rappels de la semaine ne sont envoyés qu'aux élèves.</p>
-  </section>
-  <section class="notif-bloc">
-    <h2>Ce que tu veux recevoir</h2>
-    <form method="post" action="{% url 'anki_review:notifications_preferences' %}">
-      {% csrf_token %}
-      <label class="notif-choix">
-        <input type="checkbox" name="propositions" {% if preferences.propositions %}checked{% endif %}>
-        <span>Modifications proposées sur mes cartes</span>
-      </label>
-      <button type="submit" class="notif-btn notif-btn--principal">Enregistrer</button>
-    </form>
-  </section>
-{% else %}
   <section class="notif-bloc">
     <h2>Ce que tu veux recevoir</h2>
     <p>Les rappels arrivent au plus une fois par semaine, le dimanche en fin d'après-midi, et
@@ -54,7 +37,7 @@
       </label>
       <label class="notif-choix">
         <input type="checkbox" name="nouvelles_cartes" {% if preferences.nouvelles_cartes %}checked{% endif %}>
-        <span>Nouvelles cartes partagées par ton professeur</span>
+        <span>Nouvelles cartes partagées par {% if user.is_staff %}les autres professeurs{% else %}ton professeur{% endif %}</span>
       </label>
       <label class="notif-choix">
         <input type="checkbox" name="propositions" {% if preferences.propositions %}checked{% endif %}>
@@ -63,7 +46,6 @@
       <button type="submit" class="notif-btn notif-btn--principal">Enregistrer</button>
     </form>
   </section>
-{% endif %}
 
 <section class="notif-bloc" data-test hidden>
   <h2>Tester</h2>

@@ -22,11 +22,11 @@ LONGUEUR_ENDPOINT_MAX = 2000
 
 
 def contexte_invitation(user):
-    """Contexte du bandeau d'invitation de l'accueil : seulement pour un élève, et seulement
+    """Contexte du bandeau d'invitation de l'accueil (élèves comme professeurs), seulement
     si les clés d'envoi sont configurées sur le serveur."""
     return {
         "invitation_notifications": (
-            user.is_authenticated and not user.is_staff and notifications.configuration_ok()
+            user.is_authenticated and notifications.configuration_ok()
         ),
         "vapid_public_key": settings.VAPID_PUBLIC_KEY,
     }
@@ -46,9 +46,7 @@ def page(request):
 @require_POST
 def enregistrer_preferences(request):
     preferences = PreferencesNotification.pour(request.user)
-    champs = ["propositions"]
-    if not request.user.is_staff:  # le professeur ne reçoit pas les rappels hebdomadaires
-        champs += ["nouvelles_cartes", "cartes_a_reviser"]
+    champs = ["nouvelles_cartes", "cartes_a_reviser", "propositions"]
     for champ in champs:
         setattr(preferences, champ, champ in request.POST)
     preferences.save(update_fields=champs)

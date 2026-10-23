@@ -26,13 +26,6 @@
   <p class="cx-notif-aide" data-aide hidden></p>
 </section>
 
-{% if user.is_staff %}
-  <section class="cx-notif-bloc">
-    <h2>Envois hebdomadaires</h2>
-    <p>Les rappels de la semaine ne sont envoyés qu'aux élèves. Ici, tu peux seulement
-      vérifier que les notifications arrivent bien sur tes appareils.</p>
-  </section>
-{% else %}
   <section class="cx-notif-bloc">
     <h2>Ce que tu veux recevoir</h2>
     <p>Au plus un message par semaine, le dimanche en fin d'après-midi, et seulement
@@ -41,13 +34,12 @@
       {% csrf_token %}
       <label class="cx-notif-choix">
         <input type="checkbox" name="nouveaux_exercices" {% if preferences.nouveaux_exercices %}checked{% endif %}>
-        <span>Nouveaux exercices disponibles pour ta classe</span>
+        <span>Nouveaux exercices disponibles{% if not user.is_staff %} pour ta classe{% endif %}</span>
       </label>
       <button type="submit" class="cx-notif-btn cx-notif-btn--principal">Enregistrer</button>
     </form>
     <p class="cx-notif-aide">Les rappels d'Anki (cartes à réviser, nouvelles cartes) se règlent depuis Anki.</p>
   </section>
-{% endif %}
 
 <section class="cx-notif-bloc" data-test hidden>
   <h2>Tester</h2>
