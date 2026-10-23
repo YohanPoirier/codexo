@@ -326,6 +326,30 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
   const codeArea = document.getElementById("stepper-code");
   if (!prevBtn || !nextBtn || !msgEl || !codeArea) return;
 
+  // « Étape » et « 3 / 12 » dans deux spans : sur téléphone, ils passent sur deux lignes
+  // entre les boutons Reculer et Avancer (cf. stepper.css).
+  function afficherPosition(numero, total) {
+    const mot = document.createElement("span");
+    mot.textContent = "Étape ";
+    const valeur = document.createElement("span");
+    valeur.textContent = numero + " / " + total;
+    posEl.replaceChildren(mot, valeur);
+    ajusterBoutons();
+  }
+
+  // Si « Reculer » / « Avancer » ne tiennent pas en entier (écran étroit), on ne garde
+  // que les flèches. Mesuré pour de vrai plutôt que deviné d'après la largeur d'écran.
+  const controles = prevBtn.parentElement;
+  function ajusterBoutons() {
+    controles.classList.remove("stepper-controls--compact");
+    const deborde = [prevBtn, nextBtn].some(
+      (b) => !b.hidden && b.offsetParent !== null && b.scrollWidth > b.clientWidth + 1
+    );
+    controles.classList.toggle("stepper-controls--compact", deborde);
+  }
+  window.addEventListener("resize", ajusterBoutons);
+  ajusterBoutons();
+
   let cm = null;
   let pyodide = null;
   let calls = [];
@@ -521,7 +545,7 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
 
     const changed = diffStacks(index > 0 ? steps[index - 1].stack : null, step.stack);
 
-    posEl.textContent = "Étape " + (index + 1) + " / " + steps.length;
+    afficherPosition(index + 1, steps.length);
     prevBtn.disabled = index === 0;
     nextBtn.disabled = isLast;
 

@@ -148,14 +148,26 @@
   .stepper-side { position: static; }
 }
 
-/* Téléphone : « Reculer » et « Avancer » côte à côte, à parts égales (au lieu de
-   l'empilement pleine largeur des boutons de style.css), la position en dessous. */
+/* Téléphone : « ◀ Reculer », position sur deux lignes, « Avancer ▶ » sur une seule ligne
+   (ordre visuel seulement : le HTML garde l'ordre des boutons). Si les libellés ne
+   tiennent pas, stepper.js ajoute --compact et seules les flèches restent. */
 @media (max-width: 480px) {
-  .stepper-controls { gap: 10px; }
+  .stepper-controls { gap: 8px; flex-wrap: nowrap; }
   .stepper-controls button.run-btn,
-  .stepper-controls button.reset-btn { flex: 1 1 0; width: auto; padding-left: 10px; padding-right: 10px; }
-  .stepper-pos { flex-basis: 100%; text-align: center; }
+  .stepper-controls button.reset-btn {
+    flex: 1 1 0; min-width: 0; width: auto; padding-left: 8px; padding-right: 8px;
+    white-space: nowrap; overflow: hidden;
+  }
+  #stepper-prev { order: 1; }
+  .stepper-pos {
+    order: 2; flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
+    line-height: 1.25; text-align: center;
+  }
+  #stepper-next, #stepper-rerun { order: 3; }
+  .stepper-pos:empty { display: none; }
 }
+.stepper-controls--compact .stepper-btn-texte { display: none; }
+
 
 /* Variable créée ou modifiée par l'étape qui vient d'être exécutée */
 .stepper-table tr.stepper-changed td { background: rgba(217, 142, 43, .18); }
