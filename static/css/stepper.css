@@ -26,8 +26,17 @@
    rouge (action destructrice) : ici, rien n'est effacé, donc survol indigo. Sur téléphone
    (pas de souris), pas d'effet de survol, qui restait « collé » après un appui. */
 .stepper-controls #stepper-prev:hover:not(:disabled) { border-color: var(--indigo); color: var(--indigo); }
+/* « Avancer » : même style que « Reculer » (contour, pas de fond bleu). */
+.stepper-controls button#stepper-next {
+  background: transparent; color: var(--ink-soft); border: 1px solid var(--rule);
+  font-weight: 400; font-size: .85rem; padding-top: 11px; padding-bottom: 11px;
+}
+.stepper-controls button#stepper-next:hover:not(:disabled) { border-color: var(--indigo); color: var(--indigo); }
+.stepper-controls button#stepper-next:disabled { background: transparent; opacity: .5; }
+.stepper-controls #stepper-prev:disabled { opacity: .5; }
 @media (hover: none) {
-  .stepper-controls #stepper-prev:hover { border-color: var(--rule); color: var(--ink-soft); }
+  .stepper-controls #stepper-prev:hover,
+  .stepper-controls button#stepper-next:hover { border-color: var(--rule); color: var(--ink-soft); }
 }
 .stepper-pos { font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--ink-soft); }
 
