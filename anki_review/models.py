@@ -335,7 +335,18 @@ class PreferencesNotification(models.Model):
     # Dernier passage de la tâche hebdomadaire sur cet étudiant (qu'il y ait eu un envoi
     # ou non) : évite un double envoi si la tâche est lancée deux fois, et délimite la
     # période des « nouvelles cartes ».
-    dernier_passage = models.DateTimeField(null=True, blank=True)
+    dernier_passage = models.DateTimeField(null=True, blank=True)  # ancien envoi hebdomadaire, plus utilisé
+
+    # Planification (tâche lancée toutes les heures, voir notifications.envoyer_planifie).
+    # Jour : 0 = lundi … 6 = dimanche, 7 = tous les jours.
+    JOURS = [(0, "lundi"), (1, "mardi"), (2, "mercredi"), (3, "jeudi"), (4, "vendredi"),
+             (5, "samedi"), (6, "dimanche"), (7, "tous les jours")]
+    TOUS_LES_JOURS = 7
+    HEURES = [(h, f"{h} h") for h in range(7, 23)]
+    jour_revisions = models.PositiveSmallIntegerField(choices=JOURS, default=6)
+    heure_revisions = models.PositiveSmallIntegerField(choices=HEURES, default=18)
+    dernier_rappel_revisions = models.DateTimeField(null=True, blank=True)
+    dernier_envoi_nouvelles = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Notifications de {self.etudiant}"

@@ -17,6 +17,11 @@
 .notif-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .notif-choix { display: flex; align-items: center; gap: 10px; margin: 8px 0; cursor: pointer; }
 .notif-choix input { width: 18px; height: 18px; }
+/* Jour / heure sous une case : en retrait, au niveau du texte de la case. */
+.notif-quand { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 14px 28px; font-size: .92rem; }
+.notif-quand select {
+  font: inherit; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 6px; background: #fff;
+}
 .notif-iphone summary { cursor: pointer; font-weight: 600; }
 
 .notif-btn {

@@ -82,17 +82,16 @@ class Base(TestCase):
 
 class ContenuTests(Base):
     def test_messages(self):
-        self.assertIsNone(notifications.construire_message(0, 0))
-        m = notifications.construire_message(1, 0)
-        self.assertEqual(m["corps"], "Tu as 1 carte à réviser.")
-        m = notifications.construire_message(12, 0)
+        self.assertIsNone(notifications.message_revisions(0))
+        self.assertIsNone(notifications.message_nouvelles(0))
+        self.assertEqual(notifications.message_revisions(1)["corps"], "Tu as 1 carte à réviser.")
+        m = notifications.message_revisions(12)
         self.assertEqual(m["corps"], "Tu as 12 cartes à réviser.")
         self.assertEqual(m["url"], reverse("anki_review:liste_decks"))
-        m = notifications.construire_message(0, 3)
+        m = notifications.message_nouvelles(3)
         self.assertIn("3 nouvelles cartes", m["corps"])
         self.assertEqual(m["url"], reverse("anki_review:partage_etudiants"))
-        m = notifications.construire_message(12, 1)
-        self.assertEqual(m["corps"], "12 cartes à réviser et 1 nouvelle carte à ajouter.")
+        self.assertNotEqual(m["tag"], notifications.message_revisions(1)["tag"])
 
     def test_cartes_a_reviser(self):
         n1, n2, n3 = self.note(), self.note(), self.note()
@@ -116,82 +115,112 @@ class ContenuTests(Base):
         self.assertTrue(recente.pk)
 
 
+def _heure_locale(jour, heure):
+    """Instant (aware) correspondant à `jour` (0 = lundi) à `heure` h, heure de Paris, en
+    semaine du 19 octobre 2026 (lundi)."""
+    from datetime import datetime
+    return timezone.make_aware(datetime(2026, 10, 19 + jour, heure, 0))
+
+
 @override_settings(**CONFIG)
-class HebdomadaireTests(Base):
+class PlanificationTests(Base):
+    """Passage horaire : révisions au jour/heure choisis, nouvelles cartes tous les jours à 20 h."""
+
     def setUp(self):
         self.abonnement = self.abonner(self.eleve)
         self.note_due = self.note(il_y_a=timedelta(days=30))
-        Card.objects.create(note=self.note_due, etudiant=self.eleve)
-        self.nouvelle = self.note(il_y_a=timedelta(days=2))
+        # Due bien avant la semaine fictive des tests (19-25 octobre 2026).
+        Card.objects.create(note=self.note_due, etudiant=self.eleve,
+                            prochaine_revision=_heure_locale(0, 0) - timedelta(days=30))
 
-    def test_message_combine_envoye_une_fois(self):
+    def passage(self, maintenant, **kw):
         with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
-            r = notifications.envoyer_hebdomadaire()
-        self.assertEqual(len(r), 1)
-        self.assertEqual((r[0]["a_reviser"], r[0]["nouvelles"], r[0]["envoyes"]), (1, 1, 1))
-        envoi.assert_called_once()
-        self.assertEqual(envoi.call_args.args[1]["titre"], "Anki")
-        self.assertIsNotNone(PreferencesNotification.pour(self.eleve).dernier_passage)
+            r = notifications.envoyer_planifie(maintenant=maintenant, **kw)
+        return r, [c.args[1]["titre"] for c in envoi.call_args_list]
 
-        # Deuxième lancement dans la foulée : ignoré.
-        with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
-            r = notifications.envoyer_hebdomadaire()
-        envoi.assert_not_called()
-        self.assertEqual(r[0]["statut"], "déjà traité cette semaine")
+    def test_revisions_au_jour_et_a_l_heure_choisis(self):
+        # Par défaut : dimanche 18 h.
+        self.assertEqual(self.passage(_heure_locale(6, 17))[1], [])
+        r, titres = self.passage(_heure_locale(6, 18))
+        self.assertEqual(titres, ["Cartes à réviser"])
+        self.assertIsNotNone(PreferencesNotification.pour(self.eleve).dernier_rappel_revisions)
+        # Relancé dans la même heure : rien de plus.
+        self.assertEqual(self.passage(_heure_locale(6, 18) + timedelta(minutes=20))[1], [])
+        # Autre jour à 18 h : rien.
+        self.assertEqual(self.passage(_heure_locale(2, 18))[1], [])
 
-        # Une semaine plus tard : les nouvelles cartes déjà annoncées ne reviennent pas.
-        dans_8_jours = timezone.now() + timedelta(days=8)
-        with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
-            r = notifications.envoyer_hebdomadaire(maintenant=dans_8_jours)
-        self.assertEqual(r[0]["nouvelles"], 0)
-        self.assertEqual(r[0]["a_reviser"], 1)
-        self.assertEqual(envoi.call_args.args[1]["titre"], "Cartes à réviser")
+    def test_tous_les_jours(self):
+        prefs = PreferencesNotification.pour(self.eleve)
+        prefs.jour_revisions, prefs.heure_revisions = PreferencesNotification.TOUS_LES_JOURS, 7
+        prefs.save()
+        for jour in (0, 3, 5):
+            self.assertEqual(self.passage(_heure_locale(jour, 7))[1], ["Cartes à réviser"])
+
+    def test_nouvelles_cartes_a_20h_une_seule_fois(self):
+        maintenant = _heure_locale(2, 20)   # tous les jours à 20 h
+        nouvelle = self.note()
+        nouvelle.partagee_le = maintenant - timedelta(hours=3)
+        nouvelle.save(update_fields=["partagee_le"])
+        self.assertEqual(self.passage(maintenant - timedelta(hours=1))[1], [])   # 19 h
+        r, titres = self.passage(maintenant)
+        self.assertEqual(titres, ["Nouvelles cartes"])
+        self.assertEqual(r[0]["nouvelles"], 1)
+        # Le lendemain à 20 h : déjà annoncée.
+        r, titres = self.passage(maintenant + timedelta(days=1))
+        self.assertEqual(titres, [])
 
     def test_simulation_n_envoie_ni_n_enregistre(self):
         with mock.patch("anki_review.notifications.envoyer_push") as envoi:
-            r = notifications.envoyer_hebdomadaire(simulation=True)
+            r = notifications.envoyer_planifie(simulation=True, maintenant=_heure_locale(6, 18))
         envoi.assert_not_called()
         self.assertEqual(r[0]["statut"], "simulation (rien envoyé)")
-        self.assertIsNone(PreferencesNotification.pour(self.eleve).dernier_passage)
+        self.assertIsNone(PreferencesNotification.pour(self.eleve).dernier_rappel_revisions)
 
     def test_preferences_respectees(self):
         prefs = PreferencesNotification.pour(self.eleve)
-        prefs.nouvelles_cartes = False
-        prefs.save()
-        with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
-            r = notifications.envoyer_hebdomadaire()
-        self.assertEqual((r[0]["a_reviser"], r[0]["nouvelles"]), (1, 0))
-        self.assertEqual(envoi.call_args.args[1]["titre"], "Cartes à réviser")
-
         prefs.cartes_a_reviser = False
-        prefs.dernier_passage = None
         prefs.save()
-        with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
-            r = notifications.envoyer_hebdomadaire()
-        envoi.assert_not_called()
-        self.assertEqual(r[0]["statut"], "rien à annoncer")
+        self.assertEqual(self.passage(_heure_locale(6, 18))[1], [])
+
+    def test_force_ignore_le_creneau(self):
+        r, titres = self.passage(_heure_locale(1, 9), force=True)
+        self.assertEqual(titres, ["Cartes à réviser"])
 
     def test_prof_abonne_traite_comme_un_eleve_non_abonnes_ignores(self):
-        self.abonner(self.prof, 2)  # un prof abonné reçoit lui aussi le rappel hebdomadaire
+        self.abonner(self.prof, 2)
         Card.objects.create(note=self.note_due, etudiant=self.autre)  # élève sans abonnement
         with mock.patch("anki_review.notifications.envoyer_push", return_value="ok"):
-            r = notifications.envoyer_hebdomadaire()
+            r = notifications.envoyer_planifie(maintenant=_heure_locale(6, 20), force=True)
         self.assertEqual({x["etudiant"] for x in r}, {self.eleve, self.prof})
         ligne_prof = next(x for x in r if x["etudiant"] == self.prof)
         self.assertEqual(ligne_prof["nouvelles"], 0)  # ses propres cartes partagées ne comptent pas
 
-    def test_echec_total_ne_marque_pas_la_semaine_traitee(self):
+    def test_echec_total_ne_marque_pas_le_creneau(self):
         with mock.patch("anki_review.notifications.envoyer_push", return_value="erreur"):
-            r = notifications.envoyer_hebdomadaire()
-        self.assertEqual(r[0]["statut"], "échec de l'envoi")
-        self.assertIsNone(PreferencesNotification.pour(self.eleve).dernier_passage)
+            r = notifications.envoyer_planifie(maintenant=_heure_locale(6, 18))
+        self.assertIn("échec de l'envoi", r[0]["statut"])
+        self.assertIsNone(PreferencesNotification.pour(self.eleve).dernier_rappel_revisions)
+
+    def test_reglages_jour_heure_enregistres(self):
+        self.client.force_login(self.eleve)
+        self.client.post(reverse("anki_review:notifications_preferences"), {
+            "cartes_a_reviser": "on", "jour_revisions": "7", "heure_revisions": "21",
+            "nouvelles_cartes": "on",
+        })
+        p = PreferencesNotification.pour(self.eleve)
+        self.assertEqual((p.jour_revisions, p.heure_revisions), (7, 21))
+        # Valeurs hors liste : ignorées.
+        self.client.post(reverse("anki_review:notifications_preferences"),
+                         {"jour_revisions": "9", "heure_revisions": "3"})
+        p.refresh_from_db()
+        self.assertEqual((p.jour_revisions, p.heure_revisions), (7, 21))
 
     def test_commande(self):
         sortie = StringIO()
-        call_command("envoyer_notifications", "--simulation", stdout=sortie)
+        call_command("envoyer_notifications", "--simulation", "--force", stdout=sortie)
         texte = sortie.getvalue()
         self.assertIn("eleve-notif", texte)
-        self.assertIn("1 à réviser, 1 nouvelles", texte)
+        self.assertIn("1 à réviser, 0 nouvelles", texte)
 
     @override_settings(VAPID_PRIVATE_KEY="")
     def test_commande_sans_cles(self):
@@ -403,8 +432,9 @@ class ExercicesTests(Base):
         return ex
 
     def passage(self, **kw):
+        kw.setdefault("maintenant", _heure_locale(2, 10))   # mercredi 10 h : aucun créneau Anki
         with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
-            r = notifications.envoyer_hebdomadaire(**kw)
+            r = notifications.envoyer_planifie(**kw)
         return r, envoi
 
     def test_visibilite_par_classe(self):
@@ -443,7 +473,8 @@ class ExercicesTests(Base):
         # Un exercice ajouté + des cartes à réviser : deux messages distincts.
         nouveau = self.exercice("Nouveau")
         note = self.note(il_y_a=timedelta(days=30))
-        Card.objects.create(note=note, etudiant=self.eleve_classe)
+        Card.objects.create(note=note, etudiant=self.eleve_classe,
+                            prochaine_revision=_heure_locale(0, 0) - timedelta(days=30))
         r, envoi = self.passage(force=True)
         messages_envoyes = [c.args[1] for c in envoi.call_args_list]
         self.assertEqual(len(messages_envoyes), 2)
@@ -453,10 +484,10 @@ class ExercicesTests(Base):
         self.assertEqual(codexo["corps"], "Nouvel exercice : « Nouveau ».")
         self.assertTrue(nouveau.pk)
         self.assertEqual(r[0]["exercices"], 1)
-        self.assertIn("Anki : ", r[0]["statut"])
-        self.assertIn("Codexo : ", r[0]["statut"])
+        self.assertIn("Révisions : ", r[0]["statut"])
+        self.assertIn("Exercices : ", r[0]["statut"])
         # Annoncé une fois : le passage suivant ne le répète pas.
-        r, envoi = self.passage(force=True)
+        r, envoi = self.passage(force=True, maintenant=_heure_locale(2, 12))
         self.assertEqual(r[0]["exercices"], 0)
         self.assertEqual(envoi.call_count, 1)  # seulement les cartes à réviser (Anki)
 
@@ -488,8 +519,8 @@ class ExercicesTests(Base):
         self.passage()
         self.exercice("Nouveau")
         with mock.patch("anki_review.notifications.envoyer_push", return_value="erreur"):
-            r = notifications.envoyer_hebdomadaire(force=True)
-        self.assertEqual(r[0]["statut"], "échec de l'envoi")
+            r = notifications.envoyer_planifie(force=True, maintenant=_heure_locale(2, 11))
+        self.assertIn("échec de l'envoi", r[0]["statut"])
         r, envoi = self.passage(force=True)
         self.assertEqual(r[0]["exercices"], 1)
 
@@ -574,13 +605,13 @@ class CodexoDesactiveTests(Base):
 
     def test_pas_de_message_codexo_mais_l_etat_avance(self):
         with mock.patch("anki_review.notifications.envoyer_push", return_value="ok"):
-            notifications.envoyer_hebdomadaire()  # état de départ
+            notifications.envoyer_planifie(maintenant=_heure_locale(2, 10))  # état de départ
         ex = self.Exercise.objects.create(
             theme=self.theme, title="Nouveau", slug="nouveau", statement="x",
             function_name="f", solution_code="def f():\n    return 1\n")
         ex.enabled_for_classes.add(self.classe)
         with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
-            r = notifications.envoyer_hebdomadaire(force=True)
+            r = notifications.envoyer_planifie(force=True, maintenant=_heure_locale(2, 11))
         envoi.assert_not_called()
         self.assertEqual(r[0]["exercices"], 0)
         self.assertIn(ex.id, PreferencesNotification.pour(self.eleve_classe).exercices_connus)

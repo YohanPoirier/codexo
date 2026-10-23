@@ -30,14 +30,22 @@
 
   <section class="notif-bloc">
     <h2>Ce que tu veux recevoir</h2>
-    <p>Les rappels arrivent au plus une fois par semaine, le dimanche en fin d'après-midi, et
-      seulement s'il y a quelque chose à te dire.</p>
+    <p>Une notification seulement s'il y a quelque chose à te dire.</p>
     <form method="post" action="{% url 'anki_review:notifications_preferences' %}">
       {% csrf_token %}
       <label class="notif-choix">
         <input type="checkbox" name="cartes_a_reviser" {% if preferences.cartes_a_reviser %}checked{% endif %}>
         <span>Cartes à réviser</span>
       </label>
+      <div class="notif-quand">
+        <select name="jour_revisions" aria-label="Jour du rappel de révision">
+          {% for valeur, libelle in jours %}<option value="{{ valeur }}" {% if valeur == preferences.jour_revisions %}selected{% endif %}>{{ libelle|capfirst }}</option>{% endfor %}
+        </select>
+        <span>à</span>
+        <select name="heure_revisions" aria-label="Heure du rappel de révision">
+          {% for valeur, libelle in heures %}<option value="{{ valeur }}" {% if valeur == preferences.heure_revisions %}selected{% endif %}>{{ libelle }}</option>{% endfor %}
+        </select>
+      </div>
       <label class="notif-choix">
         <input type="checkbox" name="nouvelles_cartes" {% if preferences.nouvelles_cartes %}checked{% endif %}>
         <span>Nouvelles cartes partagées par {% if user.is_staff %}les autres professeurs{% else %}ton professeur{% endif %}</span>

@@ -39,7 +39,18 @@ def page(request):
         "configure": notifications.configuration_ok(),
         "vapid_public_key": settings.VAPID_PUBLIC_KEY,
         "preferences": preferences,
+        "jours": PreferencesNotification.JOURS,
+        "heures": PreferencesNotification.HEURES,
     })
+
+
+def _choix(valeur, choix, defaut):
+    """Entier parmi les valeurs de `choix`, sinon `defaut` (formulaire trafiqué)."""
+    try:
+        valeur = int(valeur)
+    except (TypeError, ValueError):
+        return defaut
+    return valeur if valeur in dict(choix) else defaut
 
 
 @login_required
@@ -49,6 +60,10 @@ def enregistrer_preferences(request):
     champs = ["nouvelles_cartes", "cartes_a_reviser", "propositions"]
     for champ in champs:
         setattr(preferences, champ, champ in request.POST)
+    P = PreferencesNotification
+    preferences.jour_revisions = _choix(request.POST.get("jour_revisions"), P.JOURS, preferences.jour_revisions)
+    preferences.heure_revisions = _choix(request.POST.get("heure_revisions"), P.HEURES, preferences.heure_revisions)
+    champs += ["jour_revisions", "heure_revisions"]
     preferences.save(update_fields=champs)
     messages.success(request, "Réglages enregistrés.")
     return redirect("anki_review:notifications")

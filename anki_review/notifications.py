@@ -1,17 +1,16 @@
 """Notifications push (Anki et Codexo) : calcul du contenu et envoi.
 
-Chaque élève reçoit, au plus une fois par semaine, jusqu'à DEUX notifications distinctes,
-chacune avec l'icône de son appli et ouvrant son appli :
-  - Anki : les cartes à réviser (échéance dépassée, hors cartes suspendues) et les
-    nouvelles cartes partagées par un professeur depuis le dernier passage, que l'élève
-    n'a pas encore ajoutées — regroupées en UN seul message ;
-  - Codexo : les nouveaux exercices, c'est-à-dire ceux qui sont devenus visibles pour la
-    classe de l'élève depuis le dernier passage (créés, ou rendus visibles ensuite).
-Aucun message n'est envoyé s'il n'y a rien à dire.
-
-L'envoi hebdomadaire est lancé par la commande `envoyer_notifications` (tâche
-planifiée du serveur). Les vues de la page « Notifications » réutilisent
-envoyer_message() pour le bouton de test.
+Envois planifiés (commande `envoyer_notifications`, lancée TOUTES LES HEURES par le serveur),
+chacun en notification séparée, avec l'icône et le lien de son appli :
+  - Anki, cartes à réviser (échéance dépassée, hors cartes suspendues) : au jour et à l'heure
+    choisis par chacun (tous les jours possible ; dimanche 18 h par défaut) ;
+  - Anki, nouvelles cartes partagées par un professeur depuis l'annonce précédente, pas encore
+    ajoutées : tous les jours à 20 h, s'il y en a ;
+  - Codexo, nouveaux exercices devenus visibles pour la classe : au passage qui suit.
+Envois immédiats (dans un fil à part) : modification proposée sur une carte, réponse à une
+demande d'aide, nouvelle demande d'aide ou de mot de passe (professeurs).
+Aucun message n'est envoyé s'il n'y a rien à dire. Les vues de la page « Notifications »
+réutilisent envoyer_message() pour le bouton de test.
 """
 import json
 import logging
@@ -29,11 +28,14 @@ from .models import AbonnementPush, Card, Note, PreferencesNotification
 
 logger = logging.getLogger(__name__)
 
-# Si le dernier passage date de plus de 14 jours (élève qui avait coupé les notifications,
+# Si le dernier envoi date de plus de 14 jours (élève qui avait coupé les notifications,
 # par exemple), on ne remonte pas plus loin pour les « nouvelles cartes ».
 FENETRE_MAX_JOURS = 14
-# Délai minimal entre deux passages sur un même élève (protège d'un double lancement).
-INTERVALLE_MIN_JOURS = 6
+# Heure (locale) de l'annonce quotidienne des nouvelles cartes.
+HEURE_NOUVELLES = 20
+# Deux passages à moins de 50 minutes d'écart sur un même créneau : le second ne renvoie rien
+# (protège d'un double lancement de la tâche horaire).
+ECART_MIN_MINUTES = 50
 # Durée pendant laquelle le service de notifications garde le message si le téléphone
 # est éteint ou hors ligne.
 TTL_SECONDES = 3 * 24 * 3600
@@ -95,36 +97,29 @@ def _cartes(n):
     return f"{n} carte{'s' if n > 1 else ''}"
 
 
-def construire_message(nb_a_reviser, nb_nouvelles):
-    """Message Anki : dictionnaire {titre, corps, url} ou None s'il n'y a rien à annoncer."""
-    url_accueil = reverse("anki_review:liste_decks")
-    url_partage = reverse("anki_review:partage_etudiants")
-    if nb_a_reviser and nb_nouvelles:
-        return {
-            "titre": "Anki",
-            "corps": (
-                f"{_cartes(nb_a_reviser)} à réviser et "
-                f"{nb_nouvelles} nouvelle{'s' if nb_nouvelles > 1 else ''} "
-                f"carte{'s' if nb_nouvelles > 1 else ''} à ajouter."
-            ),
-            "url": url_accueil,
-        }
-    if nb_a_reviser:
-        return {
-            "titre": "Cartes à réviser",
-            "corps": f"Tu as {_cartes(nb_a_reviser)} à réviser.",
-            "url": url_accueil,
-        }
-    if nb_nouvelles:
-        return {
-            "titre": "Nouvelles cartes",
-            "corps": (
-                f"Ton professeur a partagé {nb_nouvelles} nouvelle{'s' if nb_nouvelles > 1 else ''} "
-                f"carte{'s' if nb_nouvelles > 1 else ''} : ajoute-les à tes révisions."
-            ),
-            "url": url_partage,
-        }
-    return None
+def message_revisions(nb_a_reviser):
+    """Rappel « cartes à réviser » (Anki), ou None s'il n'y en a pas."""
+    if not nb_a_reviser:
+        return None
+    return {
+        "titre": "Cartes à réviser",
+        "corps": f"Tu as {_cartes(nb_a_reviser)} à réviser.",
+        "url": reverse("anki_review:liste_decks"),
+        "tag": "anki-rappel",
+    }
+
+
+def message_nouvelles(nb_nouvelles):
+    """Annonce des nouvelles cartes partagées par un professeur (Anki), ou None."""
+    if not nb_nouvelles:
+        return None
+    s = "s" if nb_nouvelles > 1 else ""
+    return {
+        "titre": "Nouvelles cartes",
+        "corps": f"Ton professeur a partagé {nb_nouvelles} nouvelle{s} carte{s} : ajoute-les à tes révisions.",
+        "url": reverse("anki_review:partage_etudiants"),
+        "tag": "anki-nouvelles",   # ne remplace pas un rappel de révision encore affiché
+    }
 
 
 # ---------------------------------------------------------------- contenu : Codexo
@@ -242,7 +237,7 @@ def envoyer_message(etudiant, message):
     return envoyes
 
 
-# ---------------------------------------------------------------- tâche hebdomadaire
+# ---------------------------------------------------------------- tâche planifiée (toutes les heures)
 
 
 def _texte_envoi(envoyes):
@@ -251,97 +246,114 @@ def _texte_envoi(envoyes):
     return f"envoyé sur {envoyes} appareil{'s' if envoyes > 1 else ''}"
 
 
-def envoyer_hebdomadaire(simulation=False, force=False, identifiant=None, maintenant=None):
-    """Passe sur les élèves abonnés et envoie les notifications de la semaine.
+def _jour_ok(jour_choisi, local):
+    return jour_choisi == PreferencesNotification.TOUS_LES_JOURS or jour_choisi == local.weekday()
+
+
+def _deja_fait(dernier, maintenant):
+    return dernier is not None and maintenant - dernier < timedelta(minutes=ECART_MIN_MINUTES)
+
+
+def envoyer_planifie(simulation=False, force=False, identifiant=None, maintenant=None):
+    """Passage horaire sur les utilisateurs abonnés (tâche cron « 0 * * * * »).
+
+    - Cartes à réviser (Anki) : au jour et à l'heure choisis par chacun (tous les jours possible).
+    - Nouvelles cartes (Anki) : tous les jours à 20 h, s'il y en a depuis l'annonce précédente.
+    - Nouveaux exercices (Codexo) : à chaque passage, donc au plus une heure après leur
+      publication (un seul message si plusieurs exercices sont publiés en même temps).
+    Chaque annonce est une notification séparée, et rien n'est envoyé s'il n'y a rien à dire.
 
     simulation : calcule tout et retourne le détail, sans rien envoyer ni enregistrer.
-    force      : ignore le délai minimal entre deux passages.
-    identifiant: ne traite que cet élève.
+    force      : ignore le jour et l'heure choisis (et le délai anti-doublon) : tout est
+                 calculé maintenant.
+    identifiant: ne traite que cet utilisateur.
 
-    Retourne une liste de dictionnaires {etudiant, a_reviser, nouvelles, exercices, message,
-    message_exercices, statut, envoyes} utilisée par la commande pour afficher le détail.
+    Retourne une liste de dictionnaires {etudiant, a_reviser, nouvelles, exercices, statut,
+    envoyes} — seulement pour les utilisateurs concernés à ce passage.
     """
     maintenant = maintenant or timezone.now()
+    local = timezone.localtime(maintenant)
     User = get_user_model()
-    eleves = (
+    utilisateurs = (
         User.objects.filter(is_active=True, abonnements_push__isnull=False)
         .distinct()
         .order_by("pk")
     )
     if identifiant:
-        eleves = eleves.filter(**{User.USERNAME_FIELD: identifiant})
+        utilisateurs = utilisateurs.filter(**{User.USERNAME_FIELD: identifiant})
 
     resultats = []
-    for eleve in eleves:
-        preferences = PreferencesNotification.pour(eleve)
-        ligne = {"etudiant": eleve, "a_reviser": 0, "nouvelles": 0, "exercices": 0,
-                 "message": None, "message_exercices": None, "statut": "", "envoyes": 0}
+    for utilisateur in utilisateurs:
+        prefs = PreferencesNotification.pour(utilisateur)
+        ligne = {"etudiant": utilisateur, "a_reviser": 0, "nouvelles": 0, "exercices": 0,
+                 "statut": "", "envoyes": 0}
+        envois = []      # (nom, message, champ de date à poser si l'envoi part)
+        a_marquer = []   # créneaux traités sans rien à envoyer
+
+        # Cartes à réviser
+        if prefs.cartes_a_reviser and (force or (
+            _jour_ok(prefs.jour_revisions, local) and local.hour == prefs.heure_revisions
+            and not _deja_fait(prefs.dernier_rappel_revisions, maintenant)
+        )):
+            ligne["a_reviser"] = compter_a_reviser(utilisateur, maintenant)
+            m = message_revisions(ligne["a_reviser"])
+            (envois.append(("Révisions", m, "dernier_rappel_revisions")) if m
+             else a_marquer.append("dernier_rappel_revisions"))
+
+        # Nouvelles cartes
+        if prefs.nouvelles_cartes and (force or (
+            local.hour == HEURE_NOUVELLES and not _deja_fait(prefs.dernier_envoi_nouvelles, maintenant)
+        )):
+            depuis = max(prefs.dernier_envoi_nouvelles or (maintenant - timedelta(days=1)),
+                         maintenant - timedelta(days=FENETRE_MAX_JOURS))
+            ligne["nouvelles"] = compter_nouvelles_cartes(utilisateur, depuis)
+            m = message_nouvelles(ligne["nouvelles"])
+            (envois.append(("Nouvelles cartes", m, "dernier_envoi_nouvelles")) if m
+             else a_marquer.append("dernier_envoi_nouvelles"))
+
+        # Nouveaux exercices (Codexo) : le premier passage (exercices_connus vide) sert d'état
+        # de départ. L'état avance même si les notifications Codexo sont coupées, pour ne pas
+        # annoncer de retard à la réactivation.
+        etat_exercices = sorted(exercices_visibles_ids(utilisateur))
+        message_exos = None
+        if (settings.NOTIFICATIONS_CODEXO and prefs.exercices_connus is not None
+                and prefs.nouveaux_exercices):
+            exercices = nouveaux_exercices(utilisateur, prefs.exercices_connus)
+            ligne["exercices"] = len(exercices)
+            message_exos = construire_message_exercices(exercices)
+            if message_exos:
+                envois.append(("Exercices", message_exos, "exercices_connus"))
+
+        if not envois and not a_marquer and etat_exercices == prefs.exercices_connus:
+            continue   # rien à faire pour cet utilisateur à cette heure
         resultats.append(ligne)
 
-        if (
-            not force
-            and preferences.dernier_passage
-            and maintenant - preferences.dernier_passage < timedelta(days=INTERVALLE_MIN_JOURS)
-        ):
-            ligne["statut"] = "déjà traité cette semaine"
-            continue
-
-        depuis = max(
-            preferences.dernier_passage or (maintenant - timedelta(days=7)),
-            maintenant - timedelta(days=FENETRE_MAX_JOURS),
-        )
-        if preferences.cartes_a_reviser:
-            ligne["a_reviser"] = compter_a_reviser(eleve, maintenant)
-        if preferences.nouvelles_cartes:
-            ligne["nouvelles"] = compter_nouvelles_cartes(eleve, depuis)
-        ligne["message"] = construire_message(ligne["a_reviser"], ligne["nouvelles"])
-
-        # Exercices : le premier passage (exercices_connus vide) sert d'état de départ. L'état
-        # continue d'avancer même si les notifications Codexo sont désactivées (réglage
-        # settings.NOTIFICATIONS_CODEXO), pour ne pas annoncer de retard à la réactivation.
-        etat_exercices = sorted(exercices_visibles_ids(eleve))
-        if (
-            settings.NOTIFICATIONS_CODEXO
-            and preferences.exercices_connus is not None
-            and preferences.nouveaux_exercices
-        ):
-            exercices = nouveaux_exercices(eleve, preferences.exercices_connus)
-            ligne["exercices"] = len(exercices)
-            ligne["message_exercices"] = construire_message_exercices(exercices)
-
-        a_envoyer = [
-            (nom, m) for nom, m in (("Anki", ligne["message"]), ("Codexo", ligne["message_exercices"]))
-            if m is not None
-        ]
         envoyes = {}
-        if not a_envoyer:
+        if not envois:
             ligne["statut"] = "rien à annoncer"
         elif simulation:
             ligne["statut"] = "simulation (rien envoyé)"
         else:
-            for nom, m in a_envoyer:
-                envoyes[nom] = envoyer_message(eleve, m)
+            for nom, m, _ in envois:
+                envoyes[nom] = envoyer_message(utilisateur, m)
             ligne["envoyes"] = max(envoyes.values())
-            if len(a_envoyer) == 1:
-                ligne["statut"] = _texte_envoi(ligne["envoyes"])
-            else:
-                ligne["statut"] = " ; ".join(f"{nom} : {_texte_envoi(n)}" for nom, n in envoyes.items())
+            ligne["statut"] = " ; ".join(f"{nom} : {_texte_envoi(n)}" for nom, n in envoyes.items())
 
         if simulation:
             continue
-        # On marque le passage sauf si l'envoi a échoué partout (pour qu'un nouvel essai ne
-        # considère pas la semaine comme traitée).
-        champs = []
-        if not a_envoyer or ligne["envoyes"]:
-            preferences.dernier_passage = maintenant
-            champs.append("dernier_passage")
-        # L'état des exercices n'avance que si leur annonce est partie (ou s'il n'y en avait
-        # pas) : sinon ils seraient annoncés la semaine suivante.
-        if ligne["message_exercices"] is None or envoyes.get("Codexo"):
-            preferences.exercices_connus = etat_exercices
+        # Une date n'avance que si l'annonce correspondante est partie (sinon elle sera
+        # reprise au créneau suivant) ; idem pour l'état des exercices.
+        champs = list(a_marquer)
+        for nom, _, champ in envois:
+            if envoyes.get(nom) and champ != "exercices_connus":
+                champs.append(champ)
+        for champ in champs:
+            setattr(prefs, champ, maintenant)
+        if message_exos is None or envoyes.get("Exercices"):
+            prefs.exercices_connus = etat_exercices
             champs.append("exercices_connus")
         if champs:
-            preferences.save(update_fields=champs)
+            prefs.save(update_fields=champs)
     return resultats
 
 
