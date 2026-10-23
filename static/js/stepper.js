@@ -1003,6 +1003,9 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
       return;
     }
     render();
+    // Première étape (appel du test) : on l'amène à l'écran. Au tout premier chargement, c'est
+    // fait par init(), une fois le panneau du bas affiché (sa hauteur compte).
+    if (!side || !side.classList.contains("chargement")) defilerVersEtape();
   }
 
   async function init() {
@@ -1048,6 +1051,7 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
     if (side) side.classList.remove("chargement");
     ajusterBoutons();
     adjustPagePadding();
+    if (steps.length) defilerVersEtape();
   }
 
   // Code modifié : la trace enregistrée ne correspond plus. On efface le surlignage AVANT la
