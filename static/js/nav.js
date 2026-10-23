@@ -26,7 +26,8 @@
   // Menu mobile superposé au contenu : un appui en dehors du menu le referme.
   document.addEventListener("click", function (event) {
     if (!nav.classList.contains("open")) return;
-    if (nav.contains(event.target) || toggle.contains(event.target)) return;
+    var surVoile = event.target === nav && event.clientY > nav.getBoundingClientRect().bottom;
+    if ((nav.contains(event.target) && !surVoile) || toggle.contains(event.target)) return;
     nav.classList.remove("open");
     toggle.classList.remove("open");
     toggle.setAttribute("aria-expanded", "false");

@@ -79,7 +79,8 @@ document.addEventListener('click', function (e) {
   const nav = document.getElementById('anki-nav');
   const bouton = document.getElementById('anki-nav-toggle');
   if (!nav || !nav.classList.contains('anki-nav-ouvert')) return;
-  if (nav.contains(e.target) || bouton.contains(e.target)) return;
+  const surVoile = e.target === nav && e.clientY > nav.getBoundingClientRect().bottom;
+  if ((nav.contains(e.target) && !surVoile) || bouton.contains(e.target)) return;
   nav.classList.remove('anki-nav-ouvert');
   bouton.setAttribute('aria-expanded', 'false');
 });
