@@ -350,6 +350,92 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
   window.addEventListener("resize", ajusterBoutons);
   ajusterBoutons();
 
+  // --- Téléphone : panneau des variables fixé en bas, repliable ---------------------------
+  // Les boutons Reculer / Avancer passent dans le panneau (sous le pouce) ; sur grand écran
+  // ils reviennent sous l'éditeur. L'état ouvert / replié est mémorisé sur l'appareil.
+  const side = document.getElementById("stepper-side");
+  const sheetHeader = document.getElementById("stepper-feuille-entete");
+  const summaryEl = document.getElementById("stepper-resume");
+  const mobileSlot = document.getElementById("stepper-controls-mobile");
+  const pageEl = document.querySelector(".stepper-page");
+  const controlsAnchor = controles.nextElementSibling; // bloc « Output », juste après les boutons
+  const mobileQuery = window.matchMedia("(max-width: 760px)");
+  const SHEET_KEY = "codexo-pas-a-pas-variables-ouvert";
+
+  function readSheetState() {
+    try { return window.localStorage.getItem(SHEET_KEY) === "1"; } catch (e) { return false; }
+  }
+  function setSheetOpen(open) {
+    side.classList.toggle("ouvert", open);
+    sheetHeader.setAttribute("aria-expanded", open ? "true" : "false");
+    try { window.localStorage.setItem(SHEET_KEY, open ? "1" : "0"); } catch (e) { /* navigation privée */ }
+  }
+  function placeControls() {
+    if (mobileQuery.matches) {
+      if (controles.parentElement !== mobileSlot) mobileSlot.appendChild(controles);
+    } else if (controles.parentElement === mobileSlot) {
+      controlsAnchor.parentElement.insertBefore(controles, controlsAnchor);
+    }
+    ajusterBoutons();
+    adjustPagePadding();
+  }
+  // Le panneau replié recouvre le bas de la page : on réserve sa hauteur pour pouvoir faire
+  // défiler tout le contenu au-dessus.
+  function adjustPagePadding() {
+    if (!pageEl || !side) return;
+    pageEl.style.paddingBottom = mobileQuery.matches && !side.classList.contains("ouvert")
+      ? side.offsetHeight + 12 + "px"
+      : mobileQuery.matches ? "45vh" : "";
+  }
+  if (side && sheetHeader && mobileSlot) {
+    sheetHeader.addEventListener("click", function () {
+      setSheetOpen(!side.classList.contains("ouvert"));
+      adjustPagePadding();
+    });
+    setSheetOpen(readSheetState());
+    if (mobileQuery.addEventListener) mobileQuery.addEventListener("change", placeControls);
+    else if (mobileQuery.addListener) mobileQuery.addListener(placeControls);
+    placeControls();
+  }
+
+  // Résumé de l'en-tête du panneau : nombre de variables de la fonction en cours et
+  // variables créées / modifiées par l'étape qui vient de s'exécuter.
+  function updateSummary(stack, marks) {
+    if (!summaryEl) return;
+    summaryEl.textContent = "";
+    const label = document.createElement("strong");
+    label.textContent = "Variables";
+    summaryEl.appendChild(label);
+    if (!stack || stack.length === 0) {
+      summaryEl.appendChild(document.createTextNode(" · aucune pour l'instant"));
+      return;
+    }
+    const ordered = stack.slice().reverse();
+    let current = ordered.length - 1;
+    while (current > 0 && ordered[current].done) current--;
+    const vars = ordered[current].vars || [];
+    const count = document.createElement("small");
+    count.textContent = " (" + vars.length + ")";
+    summaryEl.appendChild(count);
+    const currentMarks = (marks && marks[current]) || {};
+    const names = Object.keys(currentMarks);
+    if (names.length === 0) return;
+    summaryEl.appendChild(document.createTextNode(" · "));
+    names.slice(0, 2).forEach(function (name, i) {
+      if (i > 0) summaryEl.appendChild(document.createTextNode(", "));
+      const code = document.createElement("code");
+      code.className = "stepper-resume-nom";
+      code.textContent = name;
+      summaryEl.appendChild(code);
+    });
+    const allNew = names.every(function (n) { return currentMarks[n] === "nouvelle"; });
+    const plural = names.length > 1;
+    const word = document.createElement("small");
+    word.textContent = (names.length > 2 ? "…" : "") + " " +
+      (allNew ? "créée" : "modifiée") + (plural ? "s" : "");
+    summaryEl.appendChild(word);
+  }
+
   let cm = null;
   let pyodide = null;
   let calls = [];
@@ -565,6 +651,8 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
       showMessage(parts.join("\n"), isLast && truncated);
     }
     renderVars(step.stack, changed);
+    updateSummary(step.stack, changed);
+    adjustPagePadding();
   }
 
   // Réordonne les appels (voir PY_MESURE). Exercice non récursif, ou mesure impossible : ordre
@@ -752,6 +840,7 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
     output = Array.from(result.output || "");
     index = 0;
     varsBox.textContent = "";
+    updateSummary(null);
     if (printEl) printEl.textContent = "";
 
     if (steps.length === 0) {
@@ -807,6 +896,7 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
     clearHighlight();
     steps = [];
     varsBox.textContent = "";
+    updateSummary(null);
     posEl.textContent = "";
     if (printEl) printEl.textContent = "";
     prevBtn.hidden = true;

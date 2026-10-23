@@ -143,15 +143,44 @@
 .stepper-current-line { background: rgba(217, 142, 43, .35); }
 .stepper-call-range { background: rgba(217, 142, 43, .35); padding: 3px 0; } /* même couleur que la ligne en cours, sans arrondi : surlignage continu */
 
+/* En-tête du panneau des variables : seulement sur téléphone (voir plus bas). */
+.stepper-feuille-entete { display: none; }
+
 @media (max-width: 760px) {
   .stepper-page { grid-template-columns: 1fr; }
-  .stepper-side { position: static; }
+
+  /* Panneau fixé en bas de l'écran (sous la barre du site et son menu : z-index < 10),
+     repliable ; il porte aussi les boutons Reculer / Avancer (déplacés par stepper.js). */
+  .stepper-side {
+    position: fixed; top: auto; left: 0; right: 0; bottom: 0; z-index: 9;
+    background: #fff; border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 24px rgba(28, 39, 71, .18);
+    padding: 0 14px calc(12px + env(safe-area-inset-bottom));
+  }
+  .stepper-feuille-entete {
+    position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    width: 100%; margin: 0; padding: 16px 0 10px; border: 0; background: none;
+    font: 600 .9rem system-ui, sans-serif; color: var(--indigo-deep); text-align: left; cursor: pointer;
+  }
+  .stepper-feuille-poignee {
+    position: absolute; top: 6px; left: 50%; width: 40px; height: 4px; margin-left: -20px;
+    border-radius: 2px; background: #ccc;
+  }
+  .stepper-resume small { font-weight: 400; color: var(--ink-soft); }
+  .stepper-resume-nom {
+    font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+    background: rgba(217, 142, 43, .25); padding: 1px 5px; border-radius: 4px;
+  }
+  .stepper-feuille-caret { font-size: 1rem; transition: transform .15s ease; }
+  .stepper-side.ouvert .stepper-feuille-caret { transform: rotate(180deg); }
+  .stepper-side:not(.ouvert) .stepper-vars { display: none; }
+  .stepper-side.ouvert .stepper-vars { max-height: 40vh; overflow-y: auto; margin-bottom: 12px; }
 }
 
-/* Téléphone : « ◀ Reculer », position sur deux lignes, « Avancer ▶ » sur une seule ligne
+/* Téléphone (dans le panneau du bas) : « ◀ Reculer », position sur deux lignes, « Avancer ▶ » sur une seule ligne
    (ordre visuel seulement : le HTML garde l'ordre des boutons). Si les libellés ne
    tiennent pas, stepper.js ajoute --compact et seules les flèches restent. */
-@media (max-width: 480px) {
+@media (max-width: 760px) {
   .stepper-controls { gap: 8px; flex-wrap: nowrap; }
   .stepper-controls button.run-btn,
   .stepper-controls button.reset-btn {

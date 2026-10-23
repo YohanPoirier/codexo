@@ -25,7 +25,7 @@
       </div>
     </div>
 
-    <div class="stepper-controls">
+    <div class="stepper-controls" id="stepper-controls">
       <button id="stepper-prev" type="button" class="reset-btn" aria-label="Reculer" disabled><span aria-hidden="true">◀</span><span class="stepper-btn-texte" aria-hidden="true"> Reculer</span></button>
       <button id="stepper-next" type="button" class="run-btn" aria-label="Avancer" disabled><span class="stepper-btn-texte" aria-hidden="true">Avancer </span><span aria-hidden="true">▶</span></button>
       <button id="stepper-rerun" type="button" class="run-btn" hidden>Relancer</button>
@@ -39,8 +39,17 @@
     </div>
   </div>
 
-  <div class="stepper-side">
+  <!-- Sur téléphone : panneau fixé en bas de l'écran, repliable (en-tête = résumé), qui
+       accueille aussi les boutons Reculer / Avancer (déplacés par stepper.js). -->
+  <div class="stepper-side" id="stepper-side">
+    <button type="button" id="stepper-feuille-entete" class="stepper-feuille-entete"
+            aria-expanded="false" aria-controls="stepper-vars">
+      <span class="stepper-feuille-poignee" aria-hidden="true"></span>
+      <span id="stepper-resume" class="stepper-resume">Variables</span>
+      <span class="stepper-feuille-caret" aria-hidden="true">▴</span>
+    </button>
     <div id="stepper-vars" class="stepper-vars"></div>
+    <div id="stepper-controls-mobile"></div>
   </div>
 </div>
 
