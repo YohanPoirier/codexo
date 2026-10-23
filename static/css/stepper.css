@@ -22,12 +22,12 @@
 
 .stepper-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .stepper-controls button:disabled { cursor: not-allowed; }
-/* « Reculer » et « Avancer » : même style, un simple contour. Le survol indigo n'existe
+/* « Reculer » et « Avancer » : même style, texte et contour bleutés (indigo). Le survol n'existe
    qu'avec une souris : sur téléphone, un appui laisse le bouton « survolé », et il gardait
    une autre couleur (et « Reculer » le rouge de « Réinitialiser », dont il reprend le style). */
 .stepper-controls button#stepper-prev,
 .stepper-controls button#stepper-next {
-  background: transparent; color: var(--ink-soft); border: 1px solid var(--rule);
+  background: transparent; color: var(--indigo); border: 1px solid rgba(43, 58, 103, .35);
   font-weight: 400; font-size: .85rem; padding-top: 11px; padding-bottom: 11px;
   -webkit-tap-highlight-color: transparent;
 }
@@ -35,7 +35,7 @@
 .stepper-controls button#stepper-next:disabled { opacity: .5; }
 @media (hover: hover) {
   .stepper-controls button#stepper-prev:hover:not(:disabled),
-  .stepper-controls button#stepper-next:hover:not(:disabled) { border-color: var(--indigo); color: var(--indigo); }
+  .stepper-controls button#stepper-next:hover:not(:disabled) { border-color: var(--indigo); background: rgba(43, 58, 103, .06); }
 }
 .stepper-pos { font-family: 'JetBrains Mono', monospace; font-size: .85rem; color: var(--ink-soft); }
 
