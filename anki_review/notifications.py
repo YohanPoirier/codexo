@@ -229,10 +229,11 @@ def envoyer_push(abonnement, message):
 
 
 def envoyer_message(etudiant, message):
-    """Envoie `message` à tous les appareils de l'élève. Retourne le nombre d'appareils
-    atteints."""
+    """Envoie `message` à tous les appareils de l'utilisateur abonnés pour l'appli du message
+    (message["appli"], Anki par défaut). Retourne le nombre d'appareils atteints."""
     envoyes = 0
-    for abonnement in list(AbonnementPush.objects.filter(etudiant=etudiant)):
+    appli = message.get("appli", AbonnementPush.Appli.ANKI)
+    for abonnement in list(AbonnementPush.objects.filter(etudiant=etudiant, appli=appli)):
         if envoyer_push(abonnement, message) == "ok":
             envoyes += 1
     return envoyes

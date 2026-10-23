@@ -81,11 +81,16 @@ def abonner(request):
     ):
         return JsonResponse({"erreur": "Abonnement invalide."}, status=400)
 
+    appli = donnees.get("appli")
+    if appli not in AbonnementPush.Appli.values:
+        appli = AbonnementPush.Appli.ANKI
+
     # Un téléphone prêté à un autre élève : l'appareil passe au dernier compte connecté.
     AbonnementPush.objects.update_or_create(
         endpoint=endpoint,
         defaults={
             "etudiant": request.user,
+            "appli": appli,
             "p256dh": cles["p256dh"],
             "auth": cles["auth"],
             "user_agent": request.headers.get("User-Agent", "")[:200],
@@ -98,11 +103,18 @@ def abonner(request):
 @login_required
 @require_POST
 def desabonner(request):
-    donnees = _json_du_corps(request)
-    endpoint = (donnees or {}).get("endpoint")
+    """Supprime l'abonnement d'un appareil. Avec « appli », seulement s'il appartient à
+    cette appli (sert à retirer l'ancien abonnement Anki de la racine sans toucher à un
+    abonnement Codexo). Renvoie le nombre de lignes supprimées."""
+    donnees = _json_du_corps(request) or {}
+    endpoint = donnees.get("endpoint")
+    supprimes = 0
     if isinstance(endpoint, str):
-        AbonnementPush.objects.filter(etudiant=request.user, endpoint=endpoint).delete()
-    return JsonResponse({"ok": True})
+        abonnements = AbonnementPush.objects.filter(etudiant=request.user, endpoint=endpoint)
+        if donnees.get("appli") in AbonnementPush.Appli.values:
+            abonnements = abonnements.filter(appli=donnees["appli"])
+        supprimes, _ = abonnements.delete()
+    return JsonResponse({"ok": True, "supprimes": supprimes})
 
 
 @login_required

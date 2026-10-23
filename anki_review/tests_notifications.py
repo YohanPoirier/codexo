@@ -73,10 +73,10 @@ class Base(TestCase):
             n.save(update_fields=["partagee_le"])
         return n
 
-    def abonner(self, utilisateur, i=1):
+    def abonner(self, utilisateur, i=1, appli="anki"):
         s = _abonnement_navigateur(i)
         return AbonnementPush.objects.create(
-            etudiant=utilisateur, endpoint=s["endpoint"],
+            etudiant=utilisateur, endpoint=s["endpoint"], appli=appli,
             p256dh=s["keys"]["p256dh"], auth=s["keys"]["auth"])
 
 
@@ -393,6 +393,7 @@ class ExercicesTests(Base):
         self.eleve_classe = User.objects.create_user(
             "eleve-classe", "mdp-test-123", role=User.ELEVE, classe=self.classe)
         self.abonner(self.eleve_classe, 9)
+        self.abonner(self.eleve_classe, 10, appli="codexo")  # abonnement pris depuis Codexo
 
     def exercice(self, titre, ouvert_a=None, theme=None):
         ex = self.Exercise.objects.create(
@@ -583,3 +584,65 @@ class CodexoDesactiveTests(Base):
         envoi.assert_not_called()
         self.assertEqual(r[0]["exercices"], 0)
         self.assertIn(ex.id, PreferencesNotification.pour(self.eleve_classe).exercices_connus)
+
+
+@override_settings(**CONFIG)
+class ServiceWorkerAnkiTests(Base):
+    """Service worker propre à Anki (étape 1 : comptes professeurs seulement)."""
+
+    def test_script_servi_sans_connexion(self):
+        for url in ("/sw.js", "/anki/sw.js"):
+            r = self.client.get(url)
+            self.assertEqual(r.status_code, 200, url)
+            self.assertIn("javascript", r["Content-Type"])
+            self.assertIn("notificationclick", r.content.decode())
+
+    def test_service_worker_anki_reserve_aux_professeurs(self):
+        self.client.force_login(self.prof)
+        page = self.client.get(reverse("anki_review:notifications")).content.decode()
+        self.assertIn("data-sw-anki", page)
+        self.assertIn('data-sw="/anki/sw.js"', page)
+        self.assertIn('data-scope="/anki/"', page)
+        self.client.force_login(self.eleve)
+        page = self.client.get(reverse("anki_review:notifications")).content.decode()
+        self.assertNotIn("data-sw-anki", page)
+        self.assertIn('data-sw="/sw.js"', page)
+
+    def _abonner_par_la_vue(self, i, **extra):
+        s = _abonnement_navigateur(i)
+        s.update(extra)
+        return self.client.post(
+            reverse("anki_review:notifications_abonner"), json.dumps(s), content_type="application/json"
+        )
+
+    def test_abonnement_note_son_appli(self):
+        self.client.force_login(self.eleve)
+        self._abonner_par_la_vue(1, appli="codexo")
+        self._abonner_par_la_vue(2)                 # sans appli : Anki
+        self._abonner_par_la_vue(3, appli="pirate")  # valeur inconnue : Anki
+        self.assertEqual(
+            sorted(AbonnementPush.objects.values_list("appli", flat=True)), ["anki", "anki", "codexo"]
+        )
+
+    def test_envoi_limite_aux_abonnements_de_l_appli(self):
+        self.abonner(self.eleve, 1, appli="anki")
+        self.abonner(self.eleve, 2, appli="codexo")
+        with mock.patch("anki_review.notifications.envoyer_push", return_value="ok") as envoi:
+            self.assertEqual(notifications.envoyer_message(self.eleve, {"titre": "t", "corps": "c", "url": "/anki/"}), 1)
+            self.assertEqual(envoi.call_args.args[0].appli, "anki")
+            self.assertEqual(notifications.envoyer_message(
+                self.eleve, {"titre": "t", "corps": "c", "url": "/", "appli": "codexo"}), 1)
+            self.assertEqual(envoi.call_args.args[0].appli, "codexo")
+
+    def test_retrait_de_l_ancien_abonnement_seulement_s_il_est_anki(self):
+        anki = self.abonner(self.eleve, 1, appli="anki")
+        codexo = self.abonner(self.eleve, 2, appli="codexo")
+        self.client.force_login(self.eleve)
+        url = reverse("anki_review:notifications_desabonner")
+        r = self.client.post(url, json.dumps({"endpoint": codexo.endpoint, "appli": "anki"}),
+                             content_type="application/json")
+        self.assertEqual(r.json()["supprimes"], 0)
+        r = self.client.post(url, json.dumps({"endpoint": anki.endpoint, "appli": "anki"}),
+                             content_type="application/json")
+        self.assertEqual(r.json()["supprimes"], 1)
+        self.assertEqual(list(AbonnementPush.objects.values_list("appli", flat=True)), ["codexo"])

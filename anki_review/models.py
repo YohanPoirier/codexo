@@ -287,7 +287,17 @@ class AbonnementPush(models.Model):
     etudiant = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="abonnements_push"
     )
+    class Appli(models.TextChoices):
+        ANKI = "anki", "Anki"
+        CODEXO = "codexo", "Codexo"
+
     endpoint = models.TextField(unique=True)
+    # Appli (et donc service worker) qui a créé l'abonnement : un message Anki ne part que
+    # vers les abonnements Anki, un message Codexo vers les abonnements Codexo. db_default :
+    # l'ancien code continue de fonctionner si on revient en arrière sans défaire la migration.
+    appli = models.CharField(
+        max_length=10, choices=Appli.choices, default=Appli.ANKI, db_default=Appli.ANKI
+    )
     p256dh = models.CharField(max_length=200)
     auth = models.CharField(max_length=100)
     user_agent = models.CharField(max_length=200, blank=True)

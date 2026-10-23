@@ -17,7 +17,7 @@ from django.templatetags.static import static
 from django.views.decorators.http import require_GET
 
 # Adresses à ne jamais rediriger (cf. accounts/middleware.py et exercises/middleware.py).
-PWA_PATHS = frozenset({"/sw.js", "/manifest.webmanifest", "/anki.webmanifest"})
+PWA_PATHS = frozenset({"/sw.js", "/anki/sw.js", "/manifest.webmanifest", "/anki.webmanifest"})
 
 COULEUR_FOND = "#f6f2e9"  # --paper de style.css
 
@@ -72,7 +72,13 @@ def manifeste_anki(request):
 @require_GET
 def service_worker(request):
     """Sert le service worker à la racine (/sw.js) : servi depuis /static/, il ne
-    pourrait contrôler que les pages de /static/."""
+    pourrait contrôler que les pages de /static/.
+
+    Le même script est aussi servi en /anki/sw.js, enregistré avec le périmètre /anki/ :
+    Android attribue une notification à l'appli installée dont le périmètre couvre celui
+    du service worker qui l'affiche. Avec le seul service worker de la racine, l'appli Anki
+    (périmètre /anki/) ne le couvre pas : la notification était attribuée à Chrome (ou à
+    Codexo s'il est installé)."""
     reponse = render(
         request,
         "pwa/sw.js",

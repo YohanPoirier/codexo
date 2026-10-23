@@ -14,6 +14,7 @@
 
 <section class="cx-notif-bloc" data-notifications data-mode="page"
          data-cle="{{ vapid_public_key }}"
+         data-appli="codexo" data-sw="/sw.js" data-scope="/"
          data-url-abonner="{% url 'anki_review:notifications_abonner' %}"
          data-url-desabonner="{% url 'anki_review:notifications_desabonner' %}"
          data-csrf="{{ csrf_token }}">

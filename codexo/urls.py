@@ -33,6 +33,7 @@ urlpatterns = [
     path('apple-touch-icon.png', _redirect_static('apple-touch-icon.png')),
     path('apple-touch-icon-precomposed.png', _redirect_static('apple-touch-icon.png')),
     path('sw.js', pwa.service_worker, name='pwa_sw'),
+    path('anki/sw.js', pwa.service_worker, name='pwa_sw_anki'),
     path('manifest.webmanifest', pwa.manifeste_codexo, name='pwa_manifest'),
     path('anki.webmanifest', pwa.manifeste_anki, name='pwa_manifest_anki'),
     path('admin/', admin.site.urls),

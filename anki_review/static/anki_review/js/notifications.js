@@ -12,6 +12,10 @@
   var urlAbonner = racine.dataset.urlAbonner;
   var urlDesabonner = racine.dataset.urlDesabonner;
   var csrf = racine.dataset.csrf;
+  // Appli et service worker auxquels rattacher l'abonnement (cf. static/js/pwa.js).
+  var appli = racine.dataset.appli || 'anki';
+  var urlSw = racine.dataset.sw || '/sw.js';
+  var perimetre = racine.dataset.scope || '/';
 
   var CLE_PLUS_TARD = 'anki-notifications-plus-tard';
   var DELAI_PLUS_TARD_MS = 7 * 24 * 3600 * 1000;
@@ -44,16 +48,45 @@
     try { window.localStorage.setItem(cleStockage, valeur); } catch (e) { /* navigation privée */ }
   }
 
+  // Enregistrement du service worker de cette appli, une fois actif (s'il est déjà
+  // enregistré, register() renvoie simplement l'existant).
+  async function registrationAppli() {
+    var reg = await navigator.serviceWorker.register(urlSw, { scope: perimetre });
+    if (reg.active) return reg;
+    var travailleur = reg.installing || reg.waiting;
+    if (!travailleur) return navigator.serviceWorker.ready;
+    await new Promise(function (ok) {
+      travailleur.addEventListener('statechange', function () {
+        if (travailleur.state === 'activated') ok();
+      });
+    });
+    return reg;
+  }
+
   async function abonnementActuel() {
-    var reg = await navigator.serviceWorker.ready;
+    var reg = await registrationAppli();
     return reg.pushManager.getSubscription();
+  }
+
+  // Service worker propre à Anki : l'ancien abonnement Anki pris via le service worker de la
+  // racine ferait doublon. Le serveur ne le supprime que s'il est bien marqué Anki (jamais un
+  // abonnement Codexo) ; l'appareil ne s'en désinscrit qu'ensuite.
+  async function retirerAncienAbonnementRacine() {
+    if (perimetre === '/') return;
+    var racineReg = await navigator.serviceWorker.getRegistration('/');
+    if (!racineReg || racineReg.scope !== location.origin + '/') return;
+    var ancien = await racineReg.pushManager.getSubscription();
+    if (!ancien) return;
+    var reponse = await post(urlDesabonner, { endpoint: ancien.endpoint, appli: 'anki' });
+    var donnees = reponse.ok ? await reponse.json() : {};
+    if (donnees.supprimes) await ancien.unsubscribe();
   }
 
   // Demande l'autorisation puis enregistre l'appareil. Retourne "ok" ou "refuse".
   async function activer() {
     var permission = await Notification.requestPermission();
     if (permission !== 'granted') return 'refuse';
-    var reg = await navigator.serviceWorker.ready;
+    var reg = await registrationAppli();
     var abonnement = await reg.pushManager.getSubscription();
     if (!abonnement) {
       var options = { userVisibleOnly: true, applicationServerKey: base64VersUint8(cle) };
@@ -66,8 +99,11 @@
         abonnement = await reg.pushManager.subscribe(options);
       }
     }
-    var reponse = await post(urlAbonner, abonnement.toJSON());
+    var corps = abonnement.toJSON();
+    corps.appli = appli;
+    var reponse = await post(urlAbonner, corps);
     if (!reponse.ok) throw new Error('Enregistrement refusé par le serveur');
+    try { await retirerAncienAbonnementRacine(); } catch (e) { /* sans gravité : doublon possible */ }
     return 'ok';
   }
 
