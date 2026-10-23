@@ -35,7 +35,7 @@
       <span id="stepper-pos" class="stepper-pos"></span>
     </div>
 
-    <div class="stepper-output" aria-live="polite">
+    <div class="stepper-output" id="stepper-output" aria-live="polite">
       <div class="stepper-output-label">Output</div>
       <pre id="stepper-print" class="stepper-print"></pre>
       <div id="stepper-msg" class="stepper-msg">Chargement de Python…</div>
@@ -50,9 +50,17 @@
             aria-expanded="false" aria-controls="stepper-vars">
       <span class="stepper-feuille-poignee" aria-hidden="true"></span>
       <span id="stepper-resume" class="stepper-resume">Variables</span>
+      <span class="stepper-feuille-point" id="stepper-feuille-point" aria-hidden="true" hidden></span>
       <span class="stepper-feuille-caret" aria-hidden="true">▴</span>
     </button>
+    <!-- Onglets (téléphone, panneau déroulé) : variables, ou ce que le programme affiche
+         (le bloc « Output », déplacé ici par stepper.js). -->
+    <div class="stepper-onglets" role="tablist">
+      <button type="button" role="tab" class="stepper-onglet actif" data-onglet="variables" aria-selected="true">Variables</button>
+      <button type="button" role="tab" class="stepper-onglet" data-onglet="affichage" aria-selected="false">Affichage<span class="stepper-onglet-point" hidden></span></button>
+    </div>
     <div id="stepper-vars" class="stepper-vars"></div>
+    <div id="stepper-affichage-mobile"></div>
     <div id="stepper-controls-mobile"></div>
   </div>
 </div>

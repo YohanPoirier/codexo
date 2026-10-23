@@ -390,7 +390,13 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
   const summaryEl = document.getElementById("stepper-resume");
   const mobileSlot = document.getElementById("stepper-controls-mobile");
   const pageEl = document.querySelector(".stepper-page");
-  const controlsAnchor = controles.nextElementSibling; // bloc « Output », juste après les boutons
+  const mainEl = controles.parentElement;                 // colonne principale (grand écran)
+  const outputEl = document.getElementById("stepper-output");
+  const affichageSlot = document.getElementById("stepper-affichage-mobile");
+  const sheetDot = document.getElementById("stepper-feuille-point");
+  const ongletBoutons = side ? side.querySelectorAll(".stepper-onglet") : [];
+  let ongletActif = "variables";
+  let affichageVu = "";   // texte de « Output » au dernier passage sur l'onglet Affichage
   const mobileQuery = window.matchMedia("(max-width: 760px)");
   const SHEET_KEY = "codexo-pas-a-pas-variables-ouvert";
 
@@ -405,8 +411,11 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
   function placeControls() {
     if (mobileQuery.matches) {
       if (controles.parentElement !== mobileSlot) mobileSlot.appendChild(controles);
+      if (outputEl && affichageSlot && outputEl.parentElement !== affichageSlot) affichageSlot.appendChild(outputEl);
     } else if (controles.parentElement === mobileSlot) {
-      controlsAnchor.parentElement.insertBefore(controles, controlsAnchor);
+      // Retour sous l'éditeur, dans l'ordre d'origine : boutons puis « Output ».
+      mainEl.appendChild(controles);
+      if (outputEl) mainEl.appendChild(outputEl);
     }
     ajusterBoutons();
     adjustPagePadding();
@@ -419,9 +428,37 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
       ? side.offsetHeight + 12 + "px"
       : mobileQuery.matches ? "45vh" : "";
   }
+  // Onglets du panneau (téléphone) : Variables / Affichage. Un point orange signale un
+  // affichage nouveau (print, message, erreur) pas encore vu.
+  function contenuAffichage() {
+    return (printEl ? printEl.textContent : "") + "\n" + msgEl.textContent;
+  }
+  function choisirOnglet(nom) {
+    ongletActif = nom;
+    if (side) side.classList.toggle("onglet-affichage", nom === "affichage");
+    ongletBoutons.forEach(function (b) {
+      const actif = b.dataset.onglet === nom;
+      b.classList.toggle("actif", actif);
+      b.setAttribute("aria-selected", actif ? "true" : "false");
+    });
+    if (nom === "affichage") affichageVu = contenuAffichage();
+    majPointAffichage();
+  }
+  function majPointAffichage() {
+    const nouveau = contenuAffichage() !== affichageVu && contenuAffichage().trim() !== "";
+    const montrer = nouveau && !(ongletActif === "affichage" && side && side.classList.contains("ouvert"));
+    side && side.querySelectorAll(".stepper-onglet-point").forEach(function (p) { p.hidden = !montrer; });
+    if (sheetDot) sheetDot.hidden = !montrer;
+  }
+  ongletBoutons.forEach(function (b) {
+    b.addEventListener("click", function () { choisirOnglet(b.dataset.onglet); adjustPagePadding(); });
+  });
+
   if (side && sheetHeader && mobileSlot) {
     sheetHeader.addEventListener("click", function () {
       setSheetOpen(!side.classList.contains("ouvert"));
+      if (ongletActif === "affichage" && side.classList.contains("ouvert")) affichageVu = contenuAffichage();
+      majPointAffichage();
       adjustPagePadding();
     });
     setSheetOpen(readSheetState());
@@ -753,6 +790,13 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
     }
     renderVars(step.stack, changed);
     updateSummary(step.stack, changed);
+    if (step.error && mobileQuery.matches && side) {
+      setSheetOpen(true);
+      choisirOnglet("affichage");
+    } else if (ongletActif === "affichage" && side && side.classList.contains("ouvert")) {
+      affichageVu = contenuAffichage();
+    }
+    majPointAffichage();
     adjustPagePadding();
   }
 
