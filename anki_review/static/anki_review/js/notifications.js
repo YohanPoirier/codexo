@@ -145,6 +145,16 @@
     await post(urlDesabonner, { endpoint: endpoint });
   }
 
+  // Autorisation refusée ou jamais demandée à l'écran : Chrome masque parfois la fenêtre
+  // « Autoriser les notifications ? » (site déjà signalé, demandes jugées trop fréquentes) et
+  // répond « pas de décision » sans rien montrer. On l'explique au lieu de ne rien faire.
+  function texteRefus() {
+    if (Notification.permission === 'denied') {
+      return "Notifications bloquées pour ce site. Pour les autoriser : touche l'icône à gauche de l'adresse (le cadenas), puis Autorisations, Notifications, Autoriser, et réessaie.";
+    }
+    return "Ton navigateur n'a pas affiché la demande d'autorisation. Touche l'icône à gauche de l'adresse (cadenas ou cloche barrée), autorise les notifications pour ce site, puis réessaie.";
+  }
+
   // ------------------------------------------------------------ bandeau (accueil)
   async function initBandeau() {
     if (!supporte || !cle) return;
@@ -167,8 +177,11 @@
           racine.innerHTML = '<p class="notif-invitation-retour">Notifications activées sur cet appareil. Tu peux régler ce que tu reçois dans « Notifications ».</p>';
           setTimeout(function () { racine.hidden = true; }, 6000);
         } else {
-          ecrire(CLE_PLUS_TARD, String(Date.now()));
-          racine.hidden = true;
+          // Pas d'autorisation : on reste affiché avec l'explication (plutôt que de disparaître
+          // comme si tout s'était bien passé).
+          bouton.disabled = false;
+          retour.textContent = texteRefus();
+          retour.hidden = false;
         }
       } catch (e) {
         bouton.disabled = false;
@@ -223,14 +236,16 @@
     // une appli installée peut ouvrir cette appli au lieu de rester dans le navigateur.
     boutonActiver.addEventListener('click', async function () {
       boutonActiver.disabled = true;
-      var reussi = false;
+      var etat = null;
       try {
-        reussi = (await activer()) === 'ok';
+        etat = await activer();
       } catch (e) {
-        montrerAide("L'activation a échoué. Réessaie dans un instant.");
+        etat = 'erreur';
       }
       boutonActiver.disabled = false;
       await rafraichir();
+      if (etat === 'refuse') montrerAide(texteRefus());
+      else if (etat === 'erreur') montrerAide("L'activation a échoué. Réessaie dans un instant.");
     });
     boutonDesactiver.addEventListener('click', async function () {
       boutonDesactiver.disabled = true;
