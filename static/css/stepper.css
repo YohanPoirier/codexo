@@ -173,7 +173,31 @@
   }
   .stepper-feuille-caret { font-size: 1rem; transition: transform .15s ease; }
   .stepper-side.ouvert .stepper-feuille-caret { transform: rotate(180deg); }
+
+  /* Variables dans le panneau : version allégée (pas de cadres sombres), mais l'empilement
+     des appels reste lisible — chaque fonction appelée est décalée et reliée par un trait
+     à gauche ; la fonction en cours a son nom et son trait en indigo. */
+  .stepper-side .stepper-vars { gap: 4px; }
+  .stepper-side .stepper-call-arrow { display: none; }
+  .stepper-side .stepper-scope {
+    border: 0; border-left: 2px solid var(--rule); border-radius: 0; background: none;
+    padding-left: 10px; overflow: visible;
+    margin-left: calc(var(--profondeur, 0) * 12px);
+  }
+  .stepper-side .stepper-scope.current { border-left-color: var(--indigo); }
+  .stepper-side .stepper-scope-title {
+    padding: 2px 0; background: none; color: var(--ink-soft); font-weight: 500; font-size: .8rem;
+  }
+  .stepper-side .stepper-scope.current .stepper-scope-title { background: none; color: var(--indigo); font-weight: 700; }
+  .stepper-side .stepper-scope > .stepper-table { margin: 2px 0 4px; width: 100%; }
+  .stepper-side .stepper-table td { padding: 3px 6px; border-bottom: 0; }
+  .stepper-side .stepper-table tr:last-child td { border-bottom: 0; }
+  .stepper-side .stepper-table td:first-child { border-right: 0; padding-left: 0; }
+  .stepper-side .stepper-table tr.stepper-changed td { background: none; }
+  .stepper-side .stepper-table tr.stepper-changed td:nth-child(2) { color: #9a5a12; font-weight: 700; }
+  .stepper-side .stepper-table td.stepper-tag { font-size: .7rem; font-weight: 500; text-transform: lowercase; }
   .stepper-side:not(.ouvert) .stepper-vars { display: none; }
+  .stepper-side.ouvert .stepper-resume-detail { display: none; }
   .stepper-side.ouvert .stepper-vars { max-height: 30vh; overflow-y: auto; margin-bottom: 12px; }
 }
 

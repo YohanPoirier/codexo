@@ -406,8 +406,12 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
     const label = document.createElement("strong");
     label.textContent = "Variables";
     summaryEl.appendChild(label);
+    // Détail (nombre, variables modifiées) : masqué quand le panneau est ouvert (stepper.css).
+    const detail = document.createElement("span");
+    detail.className = "stepper-resume-detail";
+    summaryEl.appendChild(detail);
     if (!stack || stack.length === 0) {
-      summaryEl.appendChild(document.createTextNode(" · aucune pour l'instant"));
+      detail.appendChild(document.createTextNode(" · aucune pour l'instant"));
       return;
     }
     const ordered = stack.slice().reverse();
@@ -416,24 +420,24 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
     const vars = ordered[current].vars || [];
     const count = document.createElement("small");
     count.textContent = " (" + vars.length + ")";
-    summaryEl.appendChild(count);
+    detail.appendChild(count);
     const currentMarks = (marks && marks[current]) || {};
     const names = Object.keys(currentMarks);
     if (names.length === 0) return;
-    summaryEl.appendChild(document.createTextNode(" · "));
+    detail.appendChild(document.createTextNode(" · "));
     names.slice(0, 2).forEach(function (name, i) {
-      if (i > 0) summaryEl.appendChild(document.createTextNode(", "));
+      if (i > 0) detail.appendChild(document.createTextNode(", "));
       const code = document.createElement("code");
       code.className = "stepper-resume-nom";
       code.textContent = name;
-      summaryEl.appendChild(code);
+      detail.appendChild(code);
     });
     const allNew = names.every(function (n) { return currentMarks[n] === "nouvelle"; });
     const plural = names.length > 1;
     const word = document.createElement("small");
     word.textContent = (names.length > 2 ? "…" : "") + " " +
       (allNew ? "créée" : "modifiée") + (plural ? "s" : "");
-    summaryEl.appendChild(word);
+    detail.appendChild(word);
   }
 
   let cm = null;
@@ -545,6 +549,7 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
       }
       const section = document.createElement("div");
       section.className = "stepper-scope" + (scope.done ? " done" : i === currentIndex ? " current" : "");
+      section.style.setProperty("--profondeur", i - firstVisible); // décalage sur téléphone
       const title = document.createElement("div");
       title.className = "stepper-scope-title";
       // Le grand titre « État des variables » est au-dessus ; chaque cadre porte le nom de sa fonction.
