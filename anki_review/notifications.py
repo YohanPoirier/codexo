@@ -43,7 +43,9 @@ TTL_SECONDES = 3 * 24 * 3600
 # notifications de tags différents ne se remplacent pas l'une l'autre.
 APPLIS = {
     "anki": {
-        "icone": "anki_review/icons/favicon-192.png",
+        # Pas de grande icône : la notification est attribuée à l'appli Anki installée (service
+        # worker /anki/sw.js), dont l'icône s'affiche déjà ; elle ferait doublon.
+        "icone": None,
         "badge": "anki_review/icons/badge-96.png",
         "tag": "anki-rappel",
     },
@@ -196,7 +198,7 @@ def envoyer_push(abonnement, message):
 
     charge = dict(message)
     appli = APPLIS[charge.pop("appli", "anki")]
-    icone = _url_statique(appli["icone"])
+    icone = _url_statique(appli["icone"]) if appli["icone"] else None
     badge = _url_statique(appli["badge"])
     if icone:
         charge["icone"] = icone

@@ -68,6 +68,35 @@
     return reg.pushManager.getSubscription();
   }
 
+  // Bascule automatique (sans geste de l'utilisateur) : notifications déjà autorisées, pas
+  // encore d'abonnement sur le service worker d'Anki, mais un ancien abonnement Anki sur celui
+  // de la racine (pris avant /anki/sw.js). On en crée un nouveau, puis on retire l'ancien —
+  // seulement s'il était bien marqué Anki ; sinon (abonnement Codexo) on annule tout.
+  async function basculerAncienAbonnement() {
+    if (perimetre === '/' || Notification.permission !== 'granted' || !cle) return;
+    var reg = await registrationAppli();
+    if (await reg.pushManager.getSubscription()) return;
+    var racineReg = await navigator.serviceWorker.getRegistration('/');
+    if (!racineReg || racineReg.scope !== location.origin + '/') return;
+    var ancien = await racineReg.pushManager.getSubscription();
+    if (!ancien) return;
+    var nouveau = await reg.pushManager.subscribe({
+      userVisibleOnly: true, applicationServerKey: base64VersUint8(cle),
+    });
+    var corps = nouveau.toJSON();
+    corps.appli = appli;
+    var reponse = await post(urlAbonner, corps);
+    if (!reponse.ok) { await nouveau.unsubscribe(); return; }
+    var retrait = await post(urlDesabonner, { endpoint: ancien.endpoint, appli: 'anki' });
+    var donnees = retrait.ok ? await retrait.json() : {};
+    if (donnees.supprimes) {
+      await ancien.unsubscribe();
+    } else {
+      await post(urlDesabonner, { endpoint: nouveau.endpoint });
+      await nouveau.unsubscribe();
+    }
+  }
+
   // Service worker propre à Anki : l'ancien abonnement Anki pris via le service worker de la
   // racine ferait doublon. Le serveur ne le supprime que s'il est bien marqué Anki (jamais un
   // abonnement Codexo) ; l'appareil ne s'en désinscrit qu'ensuite.
@@ -218,6 +247,11 @@
     await rafraichir();
   }
 
-  if (mode === 'invitation') initBandeau().catch(function () {});
-  else if (mode === 'page') initPage().catch(function () {});
+  // La bascule passe avant l'affichage : sinon le bandeau inviterait à réactiver des
+  // notifications déjà actives.
+  var bascule = supporte ? basculerAncienAbonnement().catch(function () {}) : Promise.resolve();
+  bascule.then(function () {
+    if (mode === 'invitation') initBandeau().catch(function () {});
+    else if (mode === 'page') initPage().catch(function () {});
+  });
 })();

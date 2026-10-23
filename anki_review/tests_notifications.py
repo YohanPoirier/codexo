@@ -217,12 +217,12 @@ class EnvoiPushTests(Base):
         self.assertEqual(entetes["ttl"], str(notifications.TTL_SECONDES))
         self.assertTrue(post.call_args.kwargs["data"])  # charge utile chiffrée
 
-    def test_charge_contient_les_icones_d_anki(self):
+    def test_charge_anki_badge_sans_grande_icone(self):
         abonnement = self.abonner(self.eleve)
         with mock.patch("pywebpush.webpush", return_value=mock.Mock(status_code=201)) as envoi:
             notifications.envoyer_push(abonnement, {"titre": "T", "corps": "C", "url": "/anki/"})
         charge = json.loads(envoi.call_args.kwargs["data"])
-        self.assertIn("anki_review/icons/favicon-192", charge["icone"])
+        self.assertNotIn("icone", charge)  # l'icône de l'appli Anki s'affiche déjà
         self.assertIn("anki_review/icons/badge-96", charge["badge"])
 
     def _erreur(self, statut):
@@ -588,7 +588,7 @@ class CodexoDesactiveTests(Base):
 
 @override_settings(**CONFIG)
 class ServiceWorkerAnkiTests(Base):
-    """Service worker propre à Anki (étape 1 : comptes professeurs seulement)."""
+    """Service worker propre à Anki (/anki/sw.js), pour tous les comptes."""
 
     def test_script_servi_sans_connexion(self):
         for url in ("/sw.js", "/anki/sw.js"):
@@ -597,16 +597,16 @@ class ServiceWorkerAnkiTests(Base):
             self.assertIn("javascript", r["Content-Type"])
             self.assertIn("notificationclick", r.content.decode())
 
-    def test_service_worker_anki_reserve_aux_professeurs(self):
-        self.client.force_login(self.prof)
-        page = self.client.get(reverse("anki_review:notifications")).content.decode()
-        self.assertIn("data-sw-anki", page)
-        self.assertIn('data-sw="/anki/sw.js"', page)
-        self.assertIn('data-scope="/anki/"', page)
-        self.client.force_login(self.eleve)
-        page = self.client.get(reverse("anki_review:notifications")).content.decode()
+    def test_service_worker_anki_pour_tous(self):
+        for utilisateur in (self.prof, self.eleve):
+            self.client.force_login(utilisateur)
+            page = self.client.get(reverse("anki_review:notifications")).content.decode()
+            self.assertIn("data-sw-anki", page)
+            self.assertIn('data-sw="/anki/sw.js"', page)
+            self.assertIn('data-scope="/anki/"', page)
+        # Codexo garde le service worker de la racine.
+        page = self.client.get(reverse("theme_list")).content.decode()
         self.assertNotIn("data-sw-anki", page)
-        self.assertIn('data-sw="/sw.js"', page)
 
     def _abonner_par_la_vue(self, i, **extra):
         s = _abonnement_navigateur(i)

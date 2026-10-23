@@ -6,8 +6,8 @@
      data-notifications data-mode="invitation"
      data-cle="{{ vapid_public_key }}"
      data-appli="anki"
-     data-sw="{% if user.is_staff %}/anki/sw.js{% else %}/sw.js{% endif %}"
-     data-scope="{% if user.is_staff %}/anki/{% else %}/{% endif %}"
+     data-sw="/anki/sw.js"
+     data-scope="/anki/"
      data-url-abonner="{% url 'anki_review:notifications_abonner' %}"
      data-url-desabonner="{% url 'anki_review:notifications_desabonner' %}"
      data-csrf="{{ csrf_token }}">
