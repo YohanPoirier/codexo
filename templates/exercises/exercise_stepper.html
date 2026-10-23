@@ -44,9 +44,8 @@
 
   <!-- Sur téléphone : panneau fixé en bas de l'écran, repliable (en-tête = résumé), qui
        accueille aussi les boutons Reculer / Avancer (déplacés par stepper.js). -->
+  <!-- Sur téléphone, le panneau n'apparaît qu'une fois Python chargé (classe « chargement »). -->
   <div class="stepper-side chargement" id="stepper-side">
-    <!-- Sur téléphone, tant que Python se charge, le panneau n'affiche que ce message. -->
-    <p class="stepper-feuille-chargement" id="stepper-chargement">Chargement de Python…</p>
     <button type="button" id="stepper-feuille-entete" class="stepper-feuille-entete"
             aria-expanded="false" aria-controls="stepper-vars">
       <span class="stepper-feuille-poignee" aria-hidden="true"></span>
