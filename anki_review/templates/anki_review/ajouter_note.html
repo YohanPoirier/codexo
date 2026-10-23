@@ -77,7 +77,8 @@
         <p class="champ-aide-texte" id="aide-latex" hidden>
           Formules LaTeX : clique sur le bouton "∑ Formule" (ou tape <code>\( ... \)</code> toi-même pour une
           formule dans le texte, <code>\[ ... \]</code> pour une formule seule sur sa ligne) — même syntaxe que
-          dans Anki. Une formule apparaît grisée ; clique dessus pour la modifier.
+          dans Anki. Une formule apparaît grisée ; clique dessus pour la modifier. Un texte collé avec
+          <code>$ ... $</code>, <code>$$ ... $$</code> ou <code>\begin{align}</code> est converti automatiquement.
         </p>
         <div class="editeur-barre-outils" data-cible="riche_question">
           <button type="button" class="outil-btn" data-action="bold" title="Gras">
@@ -420,6 +421,59 @@ rerendreChipsQuandKatexPret();
   editable.addEventListener('input', () => {
     convertirLatexEnChips(editable);
     synchroniserTextarea(editable);
+  });
+});
+
+// --- Copier-coller de LaTeX "à la .tex" : $…$, $$…$$ et les environnements equation,
+// align, gather (étoilés ou non) sont convertis en \( … \) / \[ … \] au moment du
+// collage — le seul format que l'éditeur et la révision connaissent. Seulement au collage :
+// en tapant, le premier $ arrive bien avant le second. Un \$ reste un dollar, un $ isolé
+// (un prix) n'est pas touché. Les retours à la ligne d'une formule deviennent des espaces
+// (sans effet en LaTeX ; « \\ » est conservé) pour qu'elle reste d'un seul tenant. ---
+const ENVIRONNEMENTS_LATEX = { equation: null, align: 'aligned', gather: 'gathered', multline: 'gathered' };
+const RE_ENVIRONNEMENT = /\\begin\{(equation|align|gather|multline)\*?\}([\s\S]*?)\\end\{\1\*?\}/g;
+const DOLLAR_ECHAPPE = '\u0000';
+
+function formuleSurUneLigne(expression) {
+  return expression
+    .replace(/\\(label|tag)\{[^}]*\}|\\(nonumber|notag)\b/g, '')
+    .replace(/\s*\n\s*/g, ' ')
+    .trim()
+    .split(DOLLAR_ECHAPPE).join('\\$');
+}
+
+function convertirLatexColle(texte) {
+  let t = texte.replace(/\\\$/g, DOLLAR_ECHAPPE);
+  t = t.replace(RE_ENVIRONNEMENT, (tout, nom, contenu) => {
+    const interne = ENVIRONNEMENTS_LATEX[nom];
+    const corps = interne ? `\\begin{${interne}}${contenu}\\end{${interne}}` : contenu;
+    return `\\[ ${formuleSurUneLigne(corps)} \\]`;
+  });
+  t = t.replace(/\$\$([\s\S]+?)\$\$/g, (tout, f) => `\\[ ${formuleSurUneLigne(f)} \\]`);
+  t = t.replace(/\\\[([\s\S]+?)\\\]/g, (tout, f) => `\\[ ${formuleSurUneLigne(f)} \\]`);
+  // $ ouvrant collé à son contenu, $ fermant aussi (règle de Pandoc) : « 5 $ et 10 $ » reste du texte.
+  t = t.replace(/\$(?=\S)([^$\n]*?\S)\$(?!\d)/g, (tout, f) => `\\( ${formuleSurUneLigne(f)} \\)`);
+  return t.split(DOLLAR_ECHAPPE).join('$');
+}
+
+[richeQuestion, richeReponse].forEach(editable => {
+  editable.addEventListener('paste', (e) => {
+    const texte = e.clipboardData && e.clipboardData.getData('text/plain');
+    if (!texte) return;
+    const converti = convertirLatexColle(texte);
+    if (converti === texte) return; // rien à convertir : collage normal du navigateur
+    e.preventDefault();
+    // insertText garde l'annulation (Ctrl+Z) et déclenche "input" : les formules deviennent
+    // aussitôt des puces (convertirLatexEnChips ci-dessus).
+    if (!document.execCommand('insertText', false, converti)) {
+      const sel = window.getSelection();
+      if (!sel.rangeCount) return;
+      const r = sel.getRangeAt(0);
+      r.deleteContents();
+      r.insertNode(document.createTextNode(converti));
+      r.collapse(false);
+      editable.dispatchEvent(new Event('input'));
+    }
   });
 });
 
