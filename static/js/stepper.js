@@ -55,6 +55,8 @@ def __trace_student__(source, max_steps, trace_module):
     events = 0
     truncated = False
     lines = source.split("\\n")
+    # Avec un test, le code de l'élève s'arrête avant la ligne d'appel ajoutée à la fin.
+    code_end = len(source.rstrip("\\n").split("\\n")) - 1 if not trace_module else len(lines)
 
     rep = reprlib.Repr()
     rep.maxlist = rep.maxtuple = rep.maxset = rep.maxfrozenset = rep.maxdeque = rep.maxarray = 20
@@ -164,6 +166,8 @@ def __trace_student__(source, max_steps, trace_module):
             ghost = dict(previous["stack"][0])
             ghost["done"] = True
             step["ret"] = previous["line"]
+            if previous.get("fin"):
+                step["fin"] = True   # fin de fonction sans return : le message reste affiché
             step["stack"] = [ghost] + step["stack"]
             steps[-1] = step
             return True
@@ -176,6 +180,30 @@ def __trace_student__(source, max_steps, trace_module):
         if line is None:
             return None   # rien à enregistrer
         return add_step({"line": line, "stack": snap_stack(frame), "out": out.size}, id(frame))
+
+    def is_return_line(line_no):
+        # La ligne contient-elle une instruction return (aussi « if x: return y ») ?
+        text = lines[line_no - 1].split("#")[0].replace(":", " ").replace(";", " ")
+        return "return" in text.split()
+
+    def end_step(frame, last_line):
+        # Fonction terminée SANS return (oubli fréquent) : étape de plus sur la ligne vide qui
+        # suit la fonction, pour montrer qu'on en sort (elle renvoie alors None). Seulement si
+        # cette ligne existe dans le code de l'élève et qu'elle est vide.
+        nonlocal truncated
+        if last_line is None or is_return_line(last_line):
+            return False
+        numbers = [l for _, _, l in frame.f_code.co_lines() if l is not None]
+        if not numbers:
+            return False
+        target = max(numbers) + 1
+        if target > code_end or lines[target - 1].strip() != "":
+            return False
+        if len(steps) >= max_steps:
+            truncated = True
+            raise _Stop()
+        steps.append({"line": target, "stack": snap_stack(frame), "out": out.size, "fin": True})
+        return True
 
     def tracer(frame, event, arg):
         nonlocal truncated, events
@@ -212,7 +240,11 @@ def __trace_student__(source, max_steps, trace_module):
                 unwinding.discard(key)
                 pending.pop(key, None)
             else:
+                last_line = pending.get(key)
                 appended = finish(frame) is False   # nouvelle étape (ni fusionnée, ni absente)
+                if (arg is None and not is_module and not (code.co_flags & CO_GENERATORS)
+                        and end_step(frame, last_line)):
+                    appended = True
                 caller = frame.f_back
                 if (appended and not is_module and not (code.co_flags & CO_GENERATORS)
                         and caller is not None and caller.f_code.co_filename == FILENAME):
@@ -646,6 +678,7 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
       showMessage(step.error, true);
     } else {
       const parts = [];
+      if (step.fin) parts.push("Fin de la fonction sans return : elle renvoie None.");
       if (isLast) {
         parts.push(
           truncated
