@@ -458,6 +458,10 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
    espace juste sous l'en-tête de la matière et garde donc le haut plat. */
 .ie-groupe-liste > li:first-child .ie-groupe > .edition-ligne { border-radius: 0 0 8px 8px; }
 .ie-groupe-liste > li:first-child > .edition-ligne { border-radius: 0 0 8px 8px; }
+/* Page Révision : l'en-tête de matière et le premier paquet dessous sont arrondis sur leurs
+   4 coins (bas de la matière, haut du premier paquet), comme les autres paquets. */
+.ie-groupe--revision > .edition-ligne--matiere { border-radius: 8px; }
+.ie-groupe--revision > .ie-groupe-liste > li:first-child > .edition-ligne { border-radius: 8px; }
 .ie-sous-liste { margin: 0 0 0 20px; }
 .ie-sous-ligne {
   background: #fff; border: none; border-top: 1px solid var(--rule);
