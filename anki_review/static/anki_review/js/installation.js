@@ -7,6 +7,11 @@
 // vrai bouton « Installer ». iPhone / iPad : pas d'équivalent, on affiche le geste à faire.
 // Jamais affiché si l'appli est déjà ouverte comme une appli, ni sur ordinateur.
 // Le choix est mémorisé sur l'appareil (localStorage), pas sur le compte.
+//
+// « Déjà installée » n'est retenu que sur iPhone, où Safari ne permet pas de le savoir.
+// Sur Android, Chrome n'envoie beforeinstallprompt que si l'appli n'est PAS installée :
+// c'est lui qui fait foi. Retenir « installée » empêchait le bandeau de revenir après une
+// désinstallation (la mémoire du site, elle, n'est pas effacée).
 (function () {
   'use strict';
 
@@ -36,13 +41,16 @@
       || (/Macintosh/.test(ua) && window.navigator.maxTouchPoints > 1);
   }
 
-  function masque() {
-    if (lire(CLE_FAIT) === '1') return true;
+  function masque(ios) {
+    if (ios && lire(CLE_FAIT) === '1') return true;
     var plusTard = parseInt(lire(CLE_PLUS_TARD) || '0', 10);
     return !!plusTard && Date.now() - plusTard < DELAI_PLUS_TARD_MS;
   }
 
-  if (dejaInstallee()) { ecrire(CLE_FAIT, '1'); return; }
+  if (dejaInstallee()) {
+    if (estIos()) ecrire(CLE_FAIT, '1');
+    return;
+  }
 
   var evenementInstall = null;
   window.addEventListener('beforeinstallprompt', function (evt) {
@@ -51,7 +59,6 @@
     quandPret(afficher);
   });
   window.addEventListener('appinstalled', function () {
-    ecrire(CLE_FAIT, '1');
     evenementInstall = null;
     fermer();
   });
@@ -65,8 +72,8 @@
 
   function afficher() {
     var el = bandeau();
-    if (!el || masque()) return;
     var ios = estIos() && !evenementInstall;
+    if (!el || masque(ios)) return;
     if (!ios && !evenementInstall) return; // ni Android installable ni iPhone : rien à proposer
     el.querySelector('[data-install-ios]').hidden = !ios;
     el.querySelector('[data-install-android]').hidden = ios;
@@ -97,8 +104,7 @@
       try {
         evt.prompt();
         var choix = await evt.userChoice;
-        if (choix && choix.outcome === 'accepted') ecrire(CLE_FAIT, '1');
-        else ecrire(CLE_PLUS_TARD, String(Date.now()));
+        if (!choix || choix.outcome !== 'accepted') ecrire(CLE_PLUS_TARD, String(Date.now()));
       } catch (e) {
         ecrire(CLE_PLUS_TARD, String(Date.now()));
       }
