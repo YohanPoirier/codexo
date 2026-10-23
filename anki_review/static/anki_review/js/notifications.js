@@ -23,6 +23,22 @@
 
   var supporte = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 
+  // Juste après une installation de l'appli (bandeau d'installation), Android met une vingtaine
+  // de secondes à la finaliser ; pendant ce temps, demander les notifications depuis Chrome
+  // donne des résultats aléatoires (demande avalée, abonnement perdu). On attend donc un peu :
+  // pas de bandeau pendant ce délai, et le bouton de la page de réglages patiente.
+  var CLE_INSTALLEE_LE = (appli === 'codexo' ? 'codexo' : 'anki') + '-installee-le';
+  var DELAI_APRES_INSTALLATION_MS = 60 * 1000;
+  function attenteApresInstallation() {
+    var t = parseInt(lire(CLE_INSTALLEE_LE) || '0', 10);
+    var reste = t ? DELAI_APRES_INSTALLATION_MS - (Date.now() - t) : 0;
+    return reste > 0 ? reste : 0;
+  }
+  window.addEventListener('appinstalled', function () {
+    ecrire(CLE_INSTALLEE_LE, String(Date.now()));
+    if (mode === 'invitation') racine.hidden = true;
+  });
+
   function el(selecteur) { return racine.querySelector(selecteur); }
 
   function base64VersUint8(b64) {
@@ -161,6 +177,7 @@
     if (Notification.permission === 'denied') return;
     var plusTard = parseInt(lire(CLE_PLUS_TARD) || '0', 10);
     if (plusTard && Date.now() - plusTard < DELAI_PLUS_TARD_MS) return;
+    if (attenteApresInstallation()) return;   // reproposé à une visite suivante
     var abonnement = await abonnementActuel();
     // Déjà abonné sur cet appareil : rien à proposer. Autorisation accordée mais sans abonnement
     // (abonnement perdu) : on repropose.
@@ -229,6 +246,12 @@
       } else {
         statut.textContent = "Notifications désactivées sur cet appareil.";
         boutonActiver.hidden = false;
+        var reste = attenteApresInstallation();
+        if (reste) {
+          boutonActiver.disabled = true;
+          montrerAide("L'appli vient d'être installée : son installation se termine. Le bouton sera disponible dans quelques secondes.");
+          setTimeout(function () { boutonActiver.disabled = false; montrerAide(''); }, reste);
+        }
       }
     }
 
