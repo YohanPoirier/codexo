@@ -43,9 +43,10 @@ TTL_SECONDES = 3 * 24 * 3600
 # notifications de tags différents ne se remplacent pas l'une l'autre.
 APPLIS = {
     "anki": {
-        # Pas de grande icône : la notification est attribuée à l'appli Anki installée (service
-        # worker /anki/sw.js), dont l'icône s'affiche déjà ; elle ferait doublon.
-        "icone": None,
+        # Grande icône transparente : la notification est attribuée à l'appli Anki installée
+        # (service worker /anki/sw.js), dont l'icône s'affiche déjà à gauche. Sans icône du tout,
+        # Chrome en génère une avec la première lettre du site (un « C »).
+        "icone": "anki_review/icons/transparent-192.png",
         "badge": "anki_review/icons/badge-96.png",
         "tag": "anki-rappel",
     },

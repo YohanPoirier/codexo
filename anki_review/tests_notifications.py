@@ -222,7 +222,7 @@ class EnvoiPushTests(Base):
         with mock.patch("pywebpush.webpush", return_value=mock.Mock(status_code=201)) as envoi:
             notifications.envoyer_push(abonnement, {"titre": "T", "corps": "C", "url": "/anki/"})
         charge = json.loads(envoi.call_args.kwargs["data"])
-        self.assertNotIn("icone", charge)  # l'icône de l'appli Anki s'affiche déjà
+        self.assertIn("transparent-192", charge["icone"])  # l'icône de l'appli Anki s'affiche déjà
         self.assertIn("anki_review/icons/badge-96", charge["badge"])
 
     def _erreur(self, statut):
