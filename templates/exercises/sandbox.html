@@ -3,20 +3,36 @@
 {% block title %}Bac à sable — Codexo{% endblock %}
 {% block content %}
 <span class="eyebrow">Pour expérimenter</span>
-<h1>Bac à sable</h1>
+<div class="titre-aide">
+  <h1>Bac à sable</h1>
+  <button type="button" class="aide-bouton" aria-expanded="false" aria-controls="aide-bac-a-sable"
+          title="Qu'est-ce que le bac à sable ?" aria-label="Qu'est-ce que le bac à sable ?">?</button>
+</div>
 
-<h2>Qu'est-ce que le bac à sable ?</h2>
-<p>
-  Le bac à sable est un espace libre pour essayer du code Python, sans exercice ni test
-  associé. Écrivez ce que vous voulez, cliquez sur <strong>Exécuter</strong>, et observez le
-  résultat.
-</p>
-<p>
-  La fenêtre de résultat affiche uniquement ce qui a été écrit avec <code>print()</code>,
-  ainsi que les éventuelles erreurs. Pensez donc à utiliser <code>print()</code> pour voir
-  une valeur. Si le programme ne s'arrête pas (boucle infinie, par exemple), le bouton
-  <strong>Arrêter</strong> permet de l'interrompre.
-</p>
+<div class="aide-panneau" id="aide-bac-a-sable" hidden>
+  <p>
+    Le bac à sable est un espace libre pour essayer du code Python, sans exercice ni test
+    associé. Écrivez ce que vous voulez, cliquez sur <strong>Exécuter</strong>, et observez le
+    résultat.
+  </p>
+  <p>
+    La fenêtre de résultat affiche uniquement ce qui a été écrit avec <code>print()</code>,
+    ainsi que les éventuelles erreurs. Pensez donc à utiliser <code>print()</code> pour voir
+    une valeur. Si le programme ne s'arrête pas (boucle infinie, par exemple), le bouton
+    <strong>Arrêter</strong> permet de l'interrompre.
+  </p>
+</div>
+<script>
+// Explication repliée par défaut : le bouton « ? » à côté du titre l'affiche ou la masque.
+document.querySelectorAll('.aide-bouton').forEach(function (bouton) {
+  bouton.addEventListener('click', function () {
+    var panneau = document.getElementById(bouton.getAttribute('aria-controls'));
+    var ouvert = panneau.hidden;
+    panneau.hidden = !ouvert;
+    bouton.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+  });
+});
+</script>
 
 <span class="section-label">Code</span>
 <div class="code-block">

@@ -177,6 +177,21 @@ main { padding: 48px 0 80px; }
   text-transform: uppercase; color: var(--amber); margin-bottom: 10px; display: block;
 }
 
+/* Titre suivi d'un bouton « ? » qui affiche une explication repliée (ex. bac à sable). */
+.titre-aide { display: flex; align-items: center; gap: 12px; }
+.titre-aide h1 { margin: 0; }
+.aide-bouton {
+  flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%;
+  border: 1.5px solid var(--indigo); background: transparent; color: var(--indigo);
+  font: 700 .95rem 'JetBrains Mono', monospace; line-height: 1; cursor: pointer; padding: 0;
+}
+.aide-bouton:hover, .aide-bouton[aria-expanded="true"] { background: var(--indigo); color: #fff; }
+.aide-panneau {
+  margin: 14px 0 0; padding: 4px 16px; border-left: 3px solid var(--indigo);
+  background: var(--paper-alt); border-radius: 0 var(--radius) var(--radius) 0;
+}
+.aide-panneau[hidden] { display: none; }
+
 /* Lien de retour vers la page précédente (« ← Thèmes », « ← Retour à l'exercice »…) :
    discret, gris, jamais souligné. */
 .lien-retour {
