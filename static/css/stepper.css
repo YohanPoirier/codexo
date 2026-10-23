@@ -235,7 +235,8 @@
   .stepper-side:not(.ouvert) .stepper-vars { display: none; }
   .stepper-side.ouvert .stepper-resume-detail { display: none; }
   /* Tant que Python se charge : seulement le message, centré. */
-  .stepper-side.chargement > :not(.stepper-feuille-chargement) { display: none; }
+  /* !important : sinon les règles du panneau déroulé (onglets, variables) l'emportent. */
+  .stepper-side.chargement > :not(.stepper-feuille-chargement) { display: none !important; }
   .stepper-side.chargement .stepper-feuille-chargement {
     display: block; margin: 0; padding: 16px 0 6px; text-align: center;
     font-style: italic; color: var(--ink-soft);
