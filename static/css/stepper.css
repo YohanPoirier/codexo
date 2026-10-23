@@ -148,6 +148,15 @@
   .stepper-side { position: static; }
 }
 
+/* Téléphone : « Reculer » et « Avancer » côte à côte, à parts égales (au lieu de
+   l'empilement pleine largeur des boutons de style.css), la position en dessous. */
+@media (max-width: 480px) {
+  .stepper-controls { gap: 10px; }
+  .stepper-controls button.run-btn,
+  .stepper-controls button.reset-btn { flex: 1 1 0; width: auto; padding-left: 10px; padding-right: 10px; }
+  .stepper-pos { flex-basis: 100%; text-align: center; }
+}
+
 /* Variable créée ou modifiée par l'étape qui vient d'être exécutée */
 .stepper-table tr.stepper-changed td { background: rgba(217, 142, 43, .18); }
 .stepper-table tr.stepper-changed td:first-child { font-weight: 700; }
