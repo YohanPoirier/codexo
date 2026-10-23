@@ -189,6 +189,12 @@
     padding: 2px 0; background: none; color: var(--ink-soft); font-weight: 500; font-size: .8rem;
   }
   .stepper-side .stepper-scope.current .stepper-scope-title { background: none; color: var(--indigo); font-weight: 700; }
+  /* Nom de la fonction sur une bande pâle partant de la ligne de gauche (crème ; bleu clair
+     pour la fonction en cours) : il se distingue ainsi de ses variables. */
+  .stepper-side .stepper-scope > .stepper-scope-title {
+    margin-left: -10px; padding: 3px 8px; border-radius: 0 6px 6px 0; background: #f1ece0;
+  }
+  .stepper-side .stepper-scope.current > .stepper-scope-title { background: #e3e7f4; }
   .stepper-side .stepper-scope > .stepper-table { margin: 2px 0 4px; width: 100%; }
   .stepper-side .stepper-table td { padding: 3px 6px; border-bottom: 0; }
   .stepper-side .stepper-table tr:last-child td { border-bottom: 0; }
