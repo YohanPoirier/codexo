@@ -506,7 +506,7 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
   .anki-nav-toggle { display: flex; }
   header.anki-site .bar { flex-wrap: wrap; }
   header.anki-site nav {
-    display: none; flex-direction: column; align-items: flex-start; gap: 12px;
+    display: none; flex-direction: column; align-items: flex-start; gap: 0;
     /* Menu superposé au contenu (et non poussé vers le bas) : posé sous la barre du haut. */
     position: absolute; top: 100%; left: 0; right: 0; z-index: 30;
     padding: 8px 20px 16px; background: #fff;
@@ -523,7 +523,7 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
   /* Entrées du menu : lignes séparées, grandes zones d'appui, page en cours mise en avant. */
   header.anki-site nav a, header.anki-site nav .nav-link-btn {
     display: flex; align-items: center; justify-content: space-between; width: 100%;
-    padding: 13px 10px; font-size: 1rem; color: var(--ink);
+    padding: 10px 10px; line-height: 1.3; font-size: 1rem; color: var(--ink);
     border-top: 1px solid var(--rule); border-left: 3px solid transparent; border-radius: 0;
     box-sizing: border-box; text-align: left;
   }
