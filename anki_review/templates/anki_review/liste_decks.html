@@ -4,6 +4,13 @@
 
 {% block content %}
 {% if invitation_notifications %}{% include "anki_review/_invitation_notifications.html" %}{% endif %}
+{% if nb_propositions %}
+  <a class="propositions-alerte" href="{% url 'anki_review:edition' %}">
+    <span><strong>{{ nb_propositions }} modification{{ nb_propositions|pluralize }} proposée{{ nb_propositions|pluralize }}</strong>
+      sur {% if nb_propositions > 1 %}tes cartes{% else %}une de tes cartes{% endif %}, en attente de ta validation.</span>
+    <span class="propositions-alerte-lien">Voir →</span>
+  </a>
+{% endif %}
 <h1>Tes paquets</h1>
 
 {% for m in matieres %}

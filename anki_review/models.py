@@ -298,7 +298,7 @@ class AbonnementPush(models.Model):
 
 
 class PreferencesNotification(models.Model):
-    """Réglages de notification d'un étudiant (communs à tous ses appareils)."""
+    """Réglages de notification d'un utilisateur (communs à tous ses appareils)."""
 
     etudiant = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="preferences_notification"
@@ -308,6 +308,8 @@ class PreferencesNotification(models.Model):
     )
     cartes_a_reviser = models.BooleanField("cartes à réviser", default=True)
     nouveaux_exercices = models.BooleanField("nouveaux exercices Codexo", default=True)
+    # Envoyée tout de suite (pas avec le rappel hebdomadaire), au propriétaire de la carte.
+    propositions = models.BooleanField("modifications proposées sur mes cartes", default=True)
     # Identifiants des exercices visibles pour l'élève au dernier passage de la tâche
     # hebdomadaire : ceux qui n'y figurent pas sont « nouveaux » (créés, ou rendus visibles
     # pour sa classe depuis). None = pas encore de passage : le premier sert d'état de

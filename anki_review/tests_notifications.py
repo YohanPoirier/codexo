@@ -318,7 +318,9 @@ class VuesTests(Base):
         self.assertNotContains(self.client.get(reverse("anki_review:liste_decks")), "notif-invitation")
         page = self.client.get(reverse("anki_review:notifications"))
         self.assertContains(page, "qu'aux élèves")
-        self.assertNotContains(page, "Ce que tu veux recevoir")
+        # Seul réglage du professeur : les modifications proposées sur ses cartes.
+        self.assertNotContains(page, 'name="cartes_a_reviser"')
+        self.assertContains(page, 'name="propositions"')
 
     def test_bouton_de_test(self):
         self.client.force_login(self.eleve)

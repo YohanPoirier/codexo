@@ -46,9 +46,12 @@ def page(request):
 @require_POST
 def enregistrer_preferences(request):
     preferences = PreferencesNotification.pour(request.user)
-    preferences.nouvelles_cartes = "nouvelles_cartes" in request.POST
-    preferences.cartes_a_reviser = "cartes_a_reviser" in request.POST
-    preferences.save(update_fields=["nouvelles_cartes", "cartes_a_reviser"])
+    champs = ["propositions"]
+    if not request.user.is_staff:  # le professeur ne reçoit pas les rappels hebdomadaires
+        champs += ["nouvelles_cartes", "cartes_a_reviser"]
+    for champ in champs:
+        setattr(preferences, champ, champ in request.POST)
+    preferences.save(update_fields=champs)
     messages.success(request, "Réglages enregistrés.")
     return redirect("anki_review:notifications")
 

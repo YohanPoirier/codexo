@@ -15,10 +15,12 @@ envoyer_message() pour le bouton de test.
 """
 import json
 import logging
+import threading
 from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db import connection
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import timezone
@@ -198,7 +200,7 @@ def envoyer_push(abonnement, message):
         charge["icone"] = icone
     if badge:
         charge["badge"] = badge
-    charge["tag"] = appli["tag"]
+    charge["tag"] = charge.get("tag") or appli["tag"]
     try:
         webpush(
             subscription_info={
@@ -335,3 +337,49 @@ def envoyer_hebdomadaire(simulation=False, force=False, identifiant=None, mainte
         if champs:
             preferences.save(update_fields=champs)
     return resultats
+
+
+# ---------------------------------------------------------------- propositions de modification
+
+
+def destinataires_proposition(note):
+    """Qui prévenir d'une proposition sur `note` : son propriétaire ; à défaut (carte sans
+    propriétaire), les professeurs."""
+    if note.cree_par_id:
+        return [note.cree_par]
+    return list(get_user_model().objects.filter(is_staff=True, is_active=True))
+
+
+def message_proposition(proposition):
+    titre_carte = proposition.note.titre_affichage().strip()
+    if len(titre_carte) > 60:
+        titre_carte = titre_carte[:57] + "…"
+    return {
+        "titre": "Modification proposée",
+        "corps": f"{proposition.auteur} propose une modification de ta carte « {titre_carte} ».",
+        "url": reverse("anki_review:voir_proposition", args=[proposition.id]),
+        "tag": f"anki-proposition-{proposition.id}",
+    }
+
+
+def prevenir_proposition(proposition):
+    """Notification immédiate au propriétaire de la carte. Envoyée dans un fil à part pour
+    ne pas faire attendre l'étudiant qui propose (l'envoi peut prendre quelques secondes)."""
+    if not configuration_ok():
+        return
+    destinataires = [
+        u for u in destinataires_proposition(proposition.note)
+        if u.id != proposition.auteur_id and PreferencesNotification.pour(u).propositions
+    ]
+    if not destinataires:
+        return
+    message = message_proposition(proposition)
+
+    def envoyer():
+        try:
+            for utilisateur in destinataires:
+                envoyer_message(utilisateur, message)
+        finally:
+            connection.close()
+
+    threading.Thread(target=envoyer, daemon=True).start()

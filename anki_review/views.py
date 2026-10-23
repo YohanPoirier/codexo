@@ -19,7 +19,7 @@ from .models import Activite, Card, Deck, Note, PropositionModification
 from .sm2 import Reponse, appliquer, calculer_prochaine_etape
 from .apkg_import import importer_apkg, analyser_apkg, ErreurImportApkg
 from .apkg_export import exporter_notes_apkg
-from . import views_notifications
+from . import notifications, views_notifications
 
 EXTENSIONS_IMAGE_AUTORISEES = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
 
@@ -112,8 +112,15 @@ def liste_decks(request):
             "total": sum(p["total"] for p in paquets_sans_matiere),
         })
 
+    # Bandeau « modifications proposées » : sur les cartes dont il est propriétaire (toutes
+    # pour le professeur, comme dans Édition où il les valide).
+    propositions = PropositionModification.objects.filter(statut=PropositionModification.Statut.EN_ATTENTE)
+    if not request.user.is_staff:
+        propositions = propositions.filter(note__cree_par=request.user)
+
     return render(request, "anki_review/liste_decks.html", {
         "matieres": matieres,
+        "nb_propositions": propositions.count(),
         **views_notifications.contexte_invitation(request.user),
     })
 
@@ -621,12 +628,13 @@ def modifier_note(request, note_id):
             # retenu — le paquet et le type de carte restent ceux du
             # propriétaire, une proposition ne porte que sur le contenu.
             if form.is_valid():
-                PropositionModification.objects.create(
+                proposition = PropositionModification.objects.create(
                     note=note, auteur=request.user,
                     question=form.cleaned_data["question"],
                     reponse=form.cleaned_data["reponse"],
                     tags=form.cleaned_data.get("tags", ""),
                 )
+                notifications.prevenir_proposition(proposition)
                 messages.success(request, "Ta proposition de modification a été envoyée au propriétaire de la carte.")
                 return redirect("anki_review:edition")
     else:

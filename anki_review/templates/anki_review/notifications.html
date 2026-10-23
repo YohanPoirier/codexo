@@ -28,14 +28,24 @@
 {% if user.is_staff %}
   <section class="notif-bloc">
     <h2>Envois hebdomadaires</h2>
-    <p>Les rappels de la semaine ne sont envoyés qu'aux élèves. Ici, tu peux seulement
-      vérifier que les notifications arrivent bien sur tes appareils.</p>
+    <p>Les rappels de la semaine ne sont envoyés qu'aux élèves.</p>
+  </section>
+  <section class="notif-bloc">
+    <h2>Ce que tu veux recevoir</h2>
+    <form method="post" action="{% url 'anki_review:notifications_preferences' %}">
+      {% csrf_token %}
+      <label class="notif-choix">
+        <input type="checkbox" name="propositions" {% if preferences.propositions %}checked{% endif %}>
+        <span>Modifications proposées sur mes cartes</span>
+      </label>
+      <button type="submit" class="notif-btn notif-btn--principal">Enregistrer</button>
+    </form>
   </section>
 {% else %}
   <section class="notif-bloc">
     <h2>Ce que tu veux recevoir</h2>
-    <p>Au plus un message par semaine, le dimanche en fin d'après-midi, et seulement
-      s'il y a quelque chose à te dire.</p>
+    <p>Les rappels arrivent au plus une fois par semaine, le dimanche en fin d'après-midi, et
+      seulement s'il y a quelque chose à te dire.</p>
     <form method="post" action="{% url 'anki_review:notifications_preferences' %}">
       {% csrf_token %}
       <label class="notif-choix">
@@ -45,6 +55,10 @@
       <label class="notif-choix">
         <input type="checkbox" name="nouvelles_cartes" {% if preferences.nouvelles_cartes %}checked{% endif %}>
         <span>Nouvelles cartes partagées par ton professeur</span>
+      </label>
+      <label class="notif-choix">
+        <input type="checkbox" name="propositions" {% if preferences.propositions %}checked{% endif %}>
+        <span>Modifications proposées sur mes cartes</span>
       </label>
       <button type="submit" class="notif-btn notif-btn--principal">Enregistrer</button>
     </form>
