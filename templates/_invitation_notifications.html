@@ -1,5 +1,4 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
 {# Bandeau d'invitation de Codexo : masqué par défaut, affiché par notifications.js seulement #}
 {# si l'appareil sait recevoir des notifications et que l'élève n'a encore rien décidé. #}
 <div class="cx-notif-invitation" hidden
@@ -10,8 +9,8 @@
      data-url-desabonner="{% url 'anki_review:notifications_desabonner' %}"
      data-csrf="{{ csrf_token }}">
   <div class="cx-notif-texte">
-    <strong>Un rappel quand de nouveaux exercices arrivent ?</strong>
-    <span>Au plus une notification par semaine, seulement s'il y a du nouveau.
+    <strong>Être prévenu sur ton téléphone ?</strong>
+    <span>{% if user.is_staff %}Quand un élève demande de l'aide ou un nouveau mot de passe, et quand de nouveaux exercices arrivent.{% else %}Quand un professeur répond à ta demande d'aide, et quand de nouveaux exercices arrivent.{% endif %}
       <a href="{% url 'notifications_codexo' %}">Réglages</a></span>
   </div>
   <div class="cx-notif-actions">

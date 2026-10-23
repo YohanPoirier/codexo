@@ -17,7 +17,8 @@
   var urlSw = racine.dataset.sw || '/sw.js';
   var perimetre = racine.dataset.scope || '/';
 
-  var CLE_PLUS_TARD = 'anki-notifications-plus-tard';
+  // Une clé par appli : « Plus tard » sur Codexo ne doit pas masquer le bandeau d'Anki.
+  var CLE_PLUS_TARD = appli === 'codexo' ? 'codexo-notifications-plus-tard' : 'anki-notifications-plus-tard';
   var DELAI_PLUS_TARD_MS = 7 * 24 * 3600 * 1000;
 
   var supporte = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;

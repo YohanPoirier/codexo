@@ -389,3 +389,74 @@ def prevenir_proposition(proposition):
             connection.close()
 
     threading.Thread(target=envoyer, daemon=True).start()
+
+
+# ---------------------------------------------------------------- demandes d'aide (Codexo)
+
+
+def _envoyer_en_fond(destinataires, message):
+    """Envoi dans un fil à part : la personne qui agit (demande, réponse) n'attend pas."""
+    if not destinataires:
+        return
+
+    def envoyer():
+        try:
+            for utilisateur in destinataires:
+                envoyer_message(utilisateur, message)
+        finally:
+            connection.close()
+
+    threading.Thread(target=envoyer, daemon=True).start()
+
+
+def _codexo_actif():
+    return settings.NOTIFICATIONS_CODEXO and configuration_ok()
+
+
+def prevenir_demande_aide(demande):
+    """Nouvelle demande d'aide (ou demande mise à jour) : les professeurs qui le souhaitent."""
+    if not _codexo_actif():
+        return
+    profs = [
+        u for u in get_user_model().objects.filter(is_staff=True, is_active=True).exclude(pk=demande.eleve_id)
+        if PreferencesNotification.pour(u).demandes_aide
+    ]
+    _envoyer_en_fond(profs, {
+        "titre": "Demande d'aide",
+        "corps": f"{demande.eleve} demande de l'aide sur « {demande.exercise.title} ».",
+        "url": reverse("demande_aide_detail", args=[demande.id]),
+        "appli": "codexo",
+        "tag": f"codexo-demande-{demande.id}",   # une demande renvoyée remplace la précédente
+    })
+
+
+def prevenir_reponse_aide(demande):
+    """Réponse d'un professeur : l'élève qui avait demandé de l'aide."""
+    if not _codexo_actif() or not PreferencesNotification.pour(demande.eleve).reponses_aide:
+        return
+    _envoyer_en_fond([demande.eleve], {
+        "titre": "Réponse à ta demande d'aide",
+        "corps": f"Un professeur t'a répondu sur « {demande.exercise.title} ».",
+        "url": reverse("mes_demandes_aide"),
+        "appli": "codexo",
+        "tag": f"codexo-reponse-{demande.id}",
+    })
+
+
+def prevenir_demande_mdp(demande):
+    """Demande de réinitialisation de mot de passe (formulaire public) : les professeurs qui le
+    souhaitent. Même étiquette pour toutes : plusieurs demandes ne s'empilent pas, la dernière
+    remplace la précédente sur le téléphone."""
+    if not _codexo_actif():
+        return
+    profs = [
+        u for u in get_user_model().objects.filter(is_staff=True, is_active=True)
+        if PreferencesNotification.pour(u).demandes_mdp
+    ]
+    _envoyer_en_fond(profs, {
+        "titre": "Mot de passe oublié",
+        "corps": f"Demande de réinitialisation pour « {demande.identifiant_saisi} ».",
+        "url": reverse("demandes_reinitialisation"),
+        "appli": "codexo",
+        "tag": "codexo-mdp",
+    })

@@ -396,9 +396,11 @@ def demander_aide(request, exercise_id):
     payload = json.loads(request.body.decode("utf-8"))
     code_soumis = payload.get("code", "")
     commentaire = (payload.get("commentaire") or "").strip()
-    DemandeAide.envoyer(
+    demande = DemandeAide.envoyer(
         eleve=request.user, exercise=exercise, code_soumis=code_soumis, commentaire=commentaire,
     )
+    from anki_review.notifications import prevenir_demande_aide
+    prevenir_demande_aide(demande)
     return JsonResponse({"ok": True})
 
 
@@ -444,6 +446,8 @@ def demande_aide_detail(request, demande_id):
         reponse = request.POST.get("reponse", "").strip()
         if reponse:
             demande.repondre(reponse, request.user)
+            from anki_review.notifications import prevenir_reponse_aide
+            prevenir_reponse_aide(demande)
             messages.success(request, "Réponse envoyée à l'élève.")
             return redirect("demandes_aide")
         messages.error(request, "La réponse ne peut pas être vide.")

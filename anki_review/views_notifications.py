@@ -180,7 +180,11 @@ def page_codexo(request):
 def enregistrer_preferences_codexo(request):
     _exiger_codexo_actif()
     preferences = PreferencesNotification.pour(request.user)
-    preferences.nouveaux_exercices = "nouveaux_exercices" in request.POST
-    preferences.save(update_fields=["nouveaux_exercices"])
+    champs = ["nouveaux_exercices", "reponses_aide"]
+    if request.user.is_staff:  # seuls les professeurs reçoivent les nouvelles demandes d'aide
+        champs += ["demandes_aide", "demandes_mdp"]
+    for champ in champs:
+        setattr(preferences, champ, champ in request.POST)
+    preferences.save(update_fields=champs)
     messages.success(request, "Réglages enregistrés.")
     return redirect("notifications_codexo")

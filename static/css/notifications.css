@@ -29,3 +29,19 @@
 .cx-notif-btn--principal:hover { background: var(--indigo-deep); border-color: var(--indigo-deep); }
 .cx-notif-btn[hidden] { display: none; }
 .cx-notif-btn:disabled { opacity: .6; cursor: wait; }
+
+/* Bandeau « Installer Codexo » (templates/_installation.html, script partagé avec Anki :
+   anki_review/static/anki_review/js/installation.js). Même gabarit que le bandeau des
+   notifications. */
+.install-invitation {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px;
+  padding: 14px 18px; margin: 0 0 24px;
+  background: var(--paper-alt); border: 1px solid var(--indigo); border-radius: var(--radius);
+}
+.install-invitation[hidden] { display: none; }
+.install-invitation-texte { flex: 1 1 260px; display: flex; flex-direction: column; gap: 2px; font-size: .92rem; }
+.install-invitation-texte [hidden] { display: none; }
+.install-invitation-actions { display: flex; gap: 8px; }
+/* Un seul bandeau à la fois : celui des notifications attend que l'installation soit faite
+   ou repoussée. */
+.codexo-install-visible .cx-notif-invitation { display: none; }

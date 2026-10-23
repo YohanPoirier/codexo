@@ -1,4 +1,5 @@
-// Bandeau « Installer Anki ». Chargé SANS defer et tout en haut : l'événement
+// Bandeau « Installer l'appli » (Anki, ou Codexo avec data-appli="codexo" sur la balise
+// <script>). Chargé SANS defer et tout en haut : l'événement
 // beforeinstallprompt peut partir avant la fin du chargement de la page, il faut que
 // l'écouteur existe déjà. Le bandeau lui-même est affiché une fois la page prête.
 //
@@ -9,8 +10,11 @@
 (function () {
   'use strict';
 
-  var CLE_PLUS_TARD = 'anki-installation-plus-tard';
-  var CLE_FAIT = 'anki-installation-faite';
+  var script = document.currentScript;
+  var APPLI = (script && script.dataset.appli) || 'anki';
+  var CLE_PLUS_TARD = APPLI + '-installation-plus-tard';
+  var CLE_FAIT = APPLI + '-installation-faite';
+  var CLASSE_VISIBLE = APPLI + '-install-visible';
   var DELAI_PLUS_TARD_MS = 7 * 24 * 3600 * 1000;
 
   function lire(cle) {
@@ -70,13 +74,13 @@
     el.querySelector('[data-install-action="plus-tard"]').textContent = ios ? 'Compris' : 'Plus tard';
     el.hidden = false;
     // Tant que ce bandeau est visible, celui des notifications reste caché (voir installation.css).
-    document.body.classList.add('anki-install-visible');
+    document.body.classList.add(CLASSE_VISIBLE);
   }
 
   function fermer() {
     var el = bandeau();
     if (el) el.hidden = true;
-    document.body.classList.remove('anki-install-visible');
+    document.body.classList.remove(CLASSE_VISIBLE);
   }
 
   quandPret(function () {

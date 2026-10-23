@@ -29,14 +29,28 @@
 
   <section class="cx-notif-bloc">
     <h2>Ce que tu veux recevoir</h2>
-    <p>Au plus un message par semaine, le dimanche en fin d'après-midi, et seulement
-      s'il y a quelque chose à te dire.</p>
+    <p>Les nouveaux exercices arrivent au plus une fois par semaine, le dimanche en fin
+      d'après-midi ; les demandes d'aide, tout de suite.</p>
     <form method="post" action="{% url 'notifications_codexo_preferences' %}">
       {% csrf_token %}
       <label class="cx-notif-choix">
         <input type="checkbox" name="nouveaux_exercices" {% if preferences.nouveaux_exercices %}checked{% endif %}>
         <span>Nouveaux exercices disponibles{% if not user.is_staff %} pour ta classe{% endif %}</span>
       </label>
+      <label class="cx-notif-choix">
+        <input type="checkbox" name="reponses_aide" {% if preferences.reponses_aide %}checked{% endif %}>
+        <span>Réponse d'un professeur à mes demandes d'aide</span>
+      </label>
+      {% if user.is_staff %}
+        <label class="cx-notif-choix">
+          <input type="checkbox" name="demandes_aide" {% if preferences.demandes_aide %}checked{% endif %}>
+          <span>Nouvelle demande d'aide d'un élève</span>
+        </label>
+        <label class="cx-notif-choix">
+          <input type="checkbox" name="demandes_mdp" {% if preferences.demandes_mdp %}checked{% endif %}>
+          <span>Nouvelle demande de réinitialisation de mot de passe</span>
+        </label>
+      {% endif %}
       <button type="submit" class="cx-notif-btn cx-notif-btn--principal">Enregistrer</button>
     </form>
     <p class="cx-notif-aide">Les rappels d'Anki (cartes à réviser, nouvelles cartes) se règlent depuis Anki.</p>

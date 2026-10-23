@@ -320,6 +320,13 @@ class PreferencesNotification(models.Model):
     nouveaux_exercices = models.BooleanField("nouveaux exercices Codexo", default=True)
     # Envoyée tout de suite (pas avec le rappel hebdomadaire), au propriétaire de la carte.
     propositions = models.BooleanField("modifications proposées sur mes cartes", default=True)
+    # Codexo, envoyées tout de suite : réponse d'un professeur à une demande d'aide de l'élève,
+    # et (professeurs) nouvelle demande d'aide d'un élève.
+    reponses_aide = models.BooleanField("réponses à mes demandes d'aide", default=True)
+    demandes_aide = models.BooleanField("nouvelles demandes d'aide (professeurs)", default=True)
+    demandes_mdp = models.BooleanField(
+        "demandes de réinitialisation de mot de passe (professeurs)", default=True
+    )
     # Identifiants des exercices visibles pour l'élève au dernier passage de la tâche
     # hebdomadaire : ceux qui n'y figurent pas sont « nouveaux » (créés, ou rendus visibles
     # pour sa classe depuis). None = pas encore de passage : le premier sert d'état de

@@ -58,7 +58,9 @@ def demande_mot_de_passe_oublie(request):
     if request.method == "POST":
         form = DemandeReinitialisationForm(request.POST)
         if form.is_valid():
-            form.save()
+            demande = form.save()
+            from anki_review.notifications import prevenir_demande_mdp
+            prevenir_demande_mdp(demande)
             return redirect("mot_de_passe_oublie_envoye")
     else:
         form = DemandeReinitialisationForm()

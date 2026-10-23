@@ -1,0 +1,13 @@
+{# Bandeau « Installer Codexo » : masqué par défaut, affiché par installation.js seulement #}
+{# si l'appareil peut installer l'appli et que l'utilisateur n'a encore rien décidé. #}
+<div class="install-invitation" id="install-invitation" hidden>
+  <div class="install-invitation-texte">
+    <strong>Installe Codexo sur ton téléphone</strong>
+    <span data-install-android hidden>Une icône sur ton écran d'accueil, et Codexo s'ouvre en plein écran.</span>
+    <span data-install-ios hidden>Touche <b>Partager</b> (le carré avec une flèche), puis <b>« Sur l'écran d'accueil »</b>. Ouvre ensuite Codexo depuis cette icône.</span>
+  </div>
+  <div class="install-invitation-actions">
+    <button type="button" class="cx-notif-btn cx-notif-btn--principal" data-install-action="installer" hidden>Installer</button>
+    <button type="button" class="cx-notif-btn" data-install-action="plus-tard">Plus tard</button>
+  </div>
+</div>

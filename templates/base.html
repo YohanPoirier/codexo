@@ -19,7 +19,10 @@
 <meta name="theme-color" content="#1c2747">
 <meta name="apple-mobile-web-app-title" content="Codexo">
 <script defer src="{% static 'js/pwa.js' %}"></script>
+{# Bandeau « Installer Codexo » : script sans defer (voir installation.js). #}
+<script src="{% static 'anki_review/js/installation.js' %}" data-appli="codexo"></script>
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}">
 </head>
 <body>
 <header class="site">
@@ -75,6 +78,7 @@
         {% endfor %}
       </ul>
     {% endif %}
+    {% if user.is_authenticated %}{% include "_installation.html" %}{% endif %}
     {% block content %}{% endblock %}
   </div>
 </main>

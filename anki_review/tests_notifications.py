@@ -544,7 +544,7 @@ class ExercicesTests(Base):
         self.assertEqual(message["url"], reverse("theme_list"))
 
 
-@override_settings(**CONFIG)  # NOTIFICATIONS_CODEXO est False par défaut
+@override_settings(**CONFIG, NOTIFICATIONS_CODEXO=False)
 class CodexoDesactiveTests(Base):
     """Tant que NOTIFICATIONS_CODEXO est faux : ni bandeau, ni page, ni lien, ni envoi."""
 

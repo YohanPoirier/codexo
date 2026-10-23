@@ -246,6 +246,7 @@ VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_CONTACT = os.environ.get('VAPID_CONTACT', '')  # ex. mailto:prof@exemple.fr
 
 # Notifications côté CODEXO (nouveaux exercices) : bandeau, page, lien du menu et envoi
-# hebdomadaire. Désactivées pour le moment (22/10/2026) ; passer à True pour les réactiver.
-# Les notifications d'ANKI ne dépendent pas de ce réglage.
-NOTIFICATIONS_CODEXO = False
+# hebdomadaire, et notifications immédiates des demandes d'aide (réponse pour l'élève, nouvelle
+# demande pour les professeurs). Réactivées le 23/10/2026 ; passer à False pour tout couper
+# (bandeau, page de réglages et envois). Les notifications d'ANKI ne dépendent pas de ce réglage.
+NOTIFICATIONS_CODEXO = True
