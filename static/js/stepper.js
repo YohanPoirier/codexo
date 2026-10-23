@@ -547,7 +547,35 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
 
   const TITLE_PREFIX = "État des variables dans ";
 
+  // Panneau des variables à hauteur limitée (téléphone) : on garde la position de défilement
+  // d'une étape à l'autre, et on fait défiler jusqu'à la variable créée ou modifiée si elle est
+  // hors de vue. Sur ordinateur, la zone ne défile pas : rien ne bouge.
+  function montrerVariableModifiee(ancienDefilement) {
+    varsBox.scrollTop = ancienDefilement;
+    if (varsBox.scrollHeight <= varsBox.clientHeight) return;
+    // Toutes les variables modifiées de la fonction en cours, de la première à la dernière :
+    // si le bloc tient dans le panneau, il est entièrement visible ; sinon la première
+    // variable modifiée est placée en haut, les suivantes en dessous.
+    const lignes = varsBox.querySelectorAll(".stepper-scope.current tr.stepper-changed");
+    if (!lignes.length) return;
+    const zone = varsBox.getBoundingClientRect();
+    // Première variable du cadre (entrée dans une fonction) : on montre aussi son nom.
+    const premiere = lignes[0];
+    const titre = premiere === premiere.parentElement.firstElementChild
+      ? premiere.closest(".stepper-scope").querySelector(".stepper-scope-title") : null;
+    const haut = (titre || premiere).getBoundingClientRect().top - 8;
+    const bas = lignes[lignes.length - 1].getBoundingClientRect().bottom + 8;
+    if (bas - haut > zone.height || haut < zone.top) varsBox.scrollTop += haut - zone.top;
+    else if (bas > zone.bottom) varsBox.scrollTop += bas - zone.bottom;
+  }
+
   function renderVars(stack, marks) {
+    const ancienDefilement = varsBox.scrollTop;
+    renderVarsContenu(stack, marks);
+    montrerVariableModifiee(ancienDefilement);
+  }
+
+  function renderVarsContenu(stack, marks) {
     varsBox.textContent = "";
     if (!stack || stack.length === 0) return; // niveau global uniquement : rien à montrer
     // L'appelant en haut, la fonction appelée en dessous (la plus récente = la dernière).
@@ -619,6 +647,39 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
     });
   }
 
+  // Lignes surlignées à l'étape affichée (base 0), pour defilerVersEtape().
+  let lignesSurlignees = [];
+
+  // Après « Avancer » / « Reculer » : si ce qui est surligné (lignes du code, ou appel du test
+  // sous l'éditeur) n'est pas entièrement visible entre la barre du haut et le panneau des
+  // variables (téléphone), la PAGE défile en douceur juste ce qu'il faut. Déjà visible : rien
+  // ne bouge.
+  function defilerVersEtape() {
+    const boites = lignesSurlignees.map(function (l) {
+      const c = cm.charCoords({ line: l, ch: 0 }, "window");
+      const fin = cm.charCoords({ line: l, ch: cm.getLine(l) ? cm.getLine(l).length : 0 }, "window");
+      return { top: c.top, bottom: Math.max(c.bottom, fin.bottom) };
+    });
+    if (callEl && (callEl.classList.contains("active") || callEl.classList.contains("full"))) {
+      boites.push(callEl.getBoundingClientRect());
+    }
+    if (!boites.length) return;
+    const haut = Math.min.apply(null, boites.map(function (b) { return b.top; }));
+    const bas = Math.max.apply(null, boites.map(function (b) { return b.bottom; }));
+
+    const marge = 16;
+    const entete = document.querySelector("header.site");
+    let zoneHaut = (entete ? entete.getBoundingClientRect().bottom : 0) + marge;
+    let zoneBas = window.innerHeight - marge;
+    if (side && mobileQuery.matches && !side.classList.contains("chargement")) {
+      zoneBas = Math.min(zoneBas, side.getBoundingClientRect().top - marge);
+    }
+    let decalage = 0;
+    if (bas - haut > zoneBas - zoneHaut || haut < zoneHaut) decalage = haut - zoneHaut;
+    else if (bas > zoneBas) decalage = bas - zoneBas;
+    if (decalage) window.scrollBy({ top: decalage, behavior: "smooth" });
+  }
+
   function render() {
     clearHighlight();
 
@@ -638,6 +699,7 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
       callEl.classList.toggle("active", !!step.call && step.call.line === callLine);
       callEl.classList.toggle("full", step.line === callLine);
     }
+    lignesSurlignees = [];
     if (cm) {
       if (showLine) {
         currentLine = step.line - 1;
@@ -659,6 +721,7 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
         if (showLine) where.push(step.line - 1);
         if (showRet) where.push(step.ret - 1);
         if (showCall) where.push(step.call.line - 1);
+        lignesSurlignees = where;
         cm.scrollIntoView(
           { from: { line: Math.min.apply(null, where), ch: 0 }, to: { line: Math.max.apply(null, where), ch: 0 } },
           60
@@ -959,10 +1022,10 @@ __mesure_tests__(__MESURE_SOLUTION__, __MESURE_CALLS__, 20000)
   caseSel.addEventListener("change", function () { renderCallLine(); trace(); }); // autre test : on retrace depuis le début
   rerunBtn.addEventListener("click", trace);
   nextBtn.addEventListener("click", function () {
-    if (index < steps.length - 1) { index++; unsentClicks++; render(); }
+    if (index < steps.length - 1) { index++; unsentClicks++; render(); defilerVersEtape(); }
   });
   prevBtn.addEventListener("click", function () {
-    if (index > 0) { index--; unsentClicks++; render(); }
+    if (index > 0) { index--; unsentClicks++; render(); defilerVersEtape(); }
   });
 
   // Envoi du nombre de clics au serveur quand on quitte la page ou qu'elle passe en
