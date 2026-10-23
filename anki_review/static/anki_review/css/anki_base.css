@@ -462,7 +462,7 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
    4 coins (bas de la matière, haut du premier paquet), comme les autres paquets. */
 .ie-groupe--revision > .edition-ligne--matiere { border-radius: 8px; }
 .ie-groupe--revision > .ie-groupe-liste > li:first-child > .edition-ligne { border-radius: 8px; }
-/* Idem page Édition (le premier paquet y est lui-même un groupe dépliable). */
+/* Idem pages Édition et Partage (le premier paquet y est lui-même un groupe dépliable). */
 .ie-groupe--edition > .edition-ligne--matiere { border-radius: 8px; }
 .ie-groupe--edition > .ie-groupe-liste > li:first-child > .ie-groupe > .edition-ligne { border-radius: 8px; }
 .ie-sous-liste { margin: 0 0 0 20px; }
