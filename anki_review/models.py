@@ -250,8 +250,10 @@ class Activite(models.Model):
 
     class Type(models.TextChoices):
         REVISION = "revision", "Révision"      # une réponse (Again/Hard/Good/Easy) = un événement
-        AJOUT = "ajout", "Ajout"               # carte créée par l'étudiant (formulaire, miroir, import .apkg)
+        AJOUT = "ajout", "Ajout"               # carte créée par l'étudiant dans l'éditeur (formulaire, miroir)
         RECUPERATION = "recuperation", "Récupération"  # carte partagée par un autre, ajoutée à sa révision
+        IMPORT = "import", "Import"            # carte créée par import d'un fichier .apkg (une par carte)
+        EXPORT = "export", "Export"            # carte exportée dans un fichier .apkg (une par carte)
 
     etudiant = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="activites_anki"

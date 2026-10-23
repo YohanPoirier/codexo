@@ -23,8 +23,10 @@
       </div>
       <div class="trafic-totaux">
         <span><strong>{{ jour.totaux.revision }}</strong> révision{{ jour.totaux.revision|pluralize }}</span>
-        <span><strong>{{ jour.totaux.ajout }}</strong> ajout{{ jour.totaux.ajout|pluralize }}</span>
+        <span><strong>{{ jour.totaux.ajout }}</strong> ajout{{ jour.totaux.ajout|pluralize }} (éditeur)</span>
         <span><strong>{{ jour.totaux.recuperation }}</strong> récupération{{ jour.totaux.recuperation|pluralize }}</span>
+        <span><strong>{{ jour.totaux.import }}</strong> import{{ jour.totaux.import|pluralize }}</span>
+        <span><strong>{{ jour.totaux.export }}</strong> export{{ jour.totaux.export|pluralize }}</span>
       </div>
     </summary>
     <div class="trafic-tableau-conteneur">
@@ -33,8 +35,10 @@
           <tr>
             <th scope="col">Étudiant</th>
             <th scope="col" class="trafic-nb">Révisions</th>
-            <th scope="col" class="trafic-nb">Ajouts</th>
+            <th scope="col" class="trafic-nb">Éditeur</th>
             <th scope="col" class="trafic-nb">Récup.</th>
+            <th scope="col" class="trafic-nb">Imports</th>
+            <th scope="col" class="trafic-nb">Exports</th>
           </tr>
         </thead>
         <tbody>
@@ -47,6 +51,8 @@
               <td class="trafic-nb{% if not d.revision %} trafic-zero{% endif %}">{{ d.revision }}</td>
               <td class="trafic-nb{% if not d.ajout %} trafic-zero{% endif %}">{{ d.ajout }}</td>
               <td class="trafic-nb{% if not d.recuperation %} trafic-zero{% endif %}">{{ d.recuperation }}</td>
+              <td class="trafic-nb{% if not d.import %} trafic-zero{% endif %}">{{ d.import }}</td>
+              <td class="trafic-nb{% if not d.export %} trafic-zero{% endif %}">{{ d.export }}</td>
             </tr>
           {% endfor %}
         </tbody>

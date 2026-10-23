@@ -17,6 +17,12 @@
       <li>{{ resultat.decks }} paquet{{ resultat.decks|pluralize }} concerné{{ resultat.decks|pluralize }}</li>
       <li>{{ resultat.notes_creees }} carte{{ resultat.notes_creees|pluralize }} créée{{ resultat.notes_creees|pluralize }}</li>
       <li>{{ resultat.notes_mises_a_jour }} carte{{ resultat.notes_mises_a_jour|pluralize }} déjà connue{{ resultat.notes_mises_a_jour|pluralize }}, mise{{ resultat.notes_mises_a_jour|pluralize }} à jour</li>
+      {% if resultat.notes_recuperees %}
+        <li>{{ resultat.notes_recuperees }} carte{{ resultat.notes_recuperees|pluralize }} existai{{ resultat.notes_recuperees|pluralize:"t,ent" }} déjà sur le site (professeur ou classe) : ajoutée{{ resultat.notes_recuperees|pluralize }} à ta révision sans doublon</li>
+      {% endif %}
+      {% if resultat.notes_deja_a_soi %}
+        <li>{{ resultat.notes_deja_a_soi }} carte{{ resultat.notes_deja_a_soi|pluralize }} déjà dans ta révision, inchangée{{ resultat.notes_deja_a_soi|pluralize }}</li>
+      {% endif %}
       {% if resultat.cartes_ignorees_cloze %}
         <li>{{ resultat.cartes_ignorees_cloze }} carte{{ resultat.cartes_ignorees_cloze|pluralize }} de type "texte à trous" ignorée{{ resultat.cartes_ignorees_cloze|pluralize }} (pas encore géré)</li>
       {% endif %}

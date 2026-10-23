@@ -857,6 +857,9 @@ def exporter_apkg_selection(request):
         return redirect("anki_review:import_export_fichier")
 
     contenu = exporter_notes_apkg(notes)
+    Activite.objects.bulk_create(
+        [Activite(etudiant=request.user, type=Activite.Type.EXPORT) for _ in notes]
+    )
     reponse = HttpResponse(contenu, content_type="application/octet-stream")
     reponse["Content-Disposition"] = 'attachment; filename="export.apkg"'
     return reponse
@@ -1097,8 +1100,8 @@ PERIODES_TRAFIC = [30, 7, 90]
 def trafic(request):
     """
     Page réservée aux profs : pour chaque jour de la période, le nombre de
-    révisions (chaque réponse compte, cf. Activite), d'ajouts et de
-    récupérations de cartes, avec le détail par étudiant dans une liste
+    révisions (chaque réponse compte, cf. Activite), d'ajouts (éditeur), de
+    récupérations, d'imports et d'exports de cartes, avec le détail par étudiant dans une liste
     déroulante. Seuls apparaissent les jours et les étudiants ayant eu au
     moins une activité ; l'activité des profs (is_staff) n'est pas comptée.
     Les jours sont découpés à l'heure de Paris (TruncDate suit TIME_ZONE).

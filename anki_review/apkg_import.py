@@ -45,13 +45,14 @@ import uuid
 import zipfile
 from pathlib import Path
 
+from django.db.models import Q
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.html import strip_tags
 from django.utils.text import slugify
 
-from .models import Card, Deck, Note
+from .models import Activite, Card, Deck, Note
 
 SEPARATEUR_CHAMPS = "\x1f"
 
@@ -362,6 +363,8 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
     (privé par défaut, à partager explicitement ensuite si besoin).
 
     Renvoie un résumé : {"decks", "notes_creees", "notes_mises_a_jour",
+    "notes_recuperees" (déjà sur le site chez le professeur/la classe : ajoutées à la
+    révision sans copie), "notes_deja_a_soi",
     "cartes_ignorees_cloze"}. Lève ErreurImportApkg pour toute erreur
     destinée à être montrée telle quelle à l'utilisateur.
     """
@@ -404,6 +407,8 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
     medias_deja_sauves = {}
     nb_notes_creees = 0
     nb_notes_maj = 0
+    nb_notes_recuperees = 0
+    nb_notes_deja_a_soi = 0
     nb_cloze_ignorees = 0
     decks_touches = set()
 
@@ -422,14 +427,47 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
         question = _sauver_medias_references(champs[0], medias, medias_deja_sauves)
         reponse = _sauver_medias_references(champs[1], medias, medias_deja_sauves)
 
+        guid = ligne["guid"]
+        tags = ligne["tags"].strip()
+
+        # Carte déjà présente sur le site chez le professeur (ou partagée par un autre
+        # étudiant) : on ne la recopie pas, on l'ajoute simplement à la révision de l'étudiant
+        # (comme le bouton « récupérer »). Sinon, importer un export des cartes du professeur
+        # créerait des doublons privés de toutes ses cartes.
+        note_commune = None
+        if not utilisateur.is_staff and not Note.objects.filter(guid=guid, cree_par=utilisateur).exists():
+            note_commune = (
+                Note.objects.filter(guid=guid)
+                .filter(
+                    Q(cree_par__isnull=True) | Q(cree_par__is_staff=True) | Q(partagee_avec_classe=True)
+                )
+                .order_by("cree_par__is_staff", "id")  # le professeur d'abord
+                .last()
+            )
+        if note_commune is not None:
+            carte, creee = Card.objects.get_or_create(note=note_commune, etudiant=utilisateur)
+            if creee:
+                planning = planning_par_note.get(ligne["id"])
+                if planning:
+                    ivl = planning["ivl"] or 0
+                    carte.intervalle_jours = abs(ivl) if ivl >= 0 else abs(ivl) / 86400
+                    carte.facteur_facilite = (planning["factor"] or 2500) / 1000
+                    carte.repetitions = planning["reps"] or 0
+                    carte.echecs = planning["lapses"] or 0
+                carte.prochaine_revision = timezone.now()
+                carte.save()
+                Activite.journaliser(utilisateur, Activite.Type.RECUPERATION, carte)
+                nb_notes_recuperees += 1
+            else:
+                nb_notes_deja_a_soi += 1
+            continue
+
         did_anki = deck_par_note.get(ligne["id"])
         nom_deck_anki = decks_anki.get(str(did_anki), {}).get("name", "Importé") if did_anki else "Importé"
         deck = _obtenir_deck(nom_deck_anki)
         decks_touches.add(deck.id)
 
-        guid = ligne["guid"]
-        tags = ligne["tags"].strip()
-
+        nouvelle_note = False
         note_existante = Note.objects.filter(guid=guid, cree_par=utilisateur).first()
         if note_existante:
             note_existante.question = question
@@ -445,6 +483,7 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
                 tags=tags, cree_par=utilisateur, partagee_avec_classe=False,
             )
             nb_notes_creees += 1
+            nouvelle_note = True
 
         planning = planning_par_note.get(ligne["id"])
         carte, _ = Card.objects.get_or_create(note=note, etudiant=utilisateur)
@@ -456,10 +495,14 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
             carte.echecs = planning["lapses"] or 0
         carte.prochaine_revision = timezone.now()
         carte.save()
+        if nouvelle_note:
+            Activite.journaliser(utilisateur, Activite.Type.IMPORT, carte)
 
     return {
         "decks": len(decks_touches),
         "notes_creees": nb_notes_creees,
         "notes_mises_a_jour": nb_notes_maj,
+        "notes_recuperees": nb_notes_recuperees,
+        "notes_deja_a_soi": nb_notes_deja_a_soi,
         "cartes_ignorees_cloze": nb_cloze_ignorees,
     }
