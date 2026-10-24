@@ -15,13 +15,13 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .forms import DeckForm, NoteForm
+from .html_propre import EXTENSIONS_IMAGE_AUTORISEES
 from .models import Activite, Card, Deck, Note, PropositionModification
 from .sm2 import Reponse, appliquer, calculer_prochaine_etape
 from .apkg_import import importer_apkg, analyser_apkg, ErreurImportApkg
 from .apkg_export import exporter_notes_apkg
 from . import notifications, views_notifications
 
-EXTENSIONS_IMAGE_AUTORISEES = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
 
 # Pseudo-matière pour les paquets sans matière assignée — affichés avec la
 # même bande que les vraies matières plutôt qu'à part, pour la cohérence

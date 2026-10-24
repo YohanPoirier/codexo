@@ -51,6 +51,7 @@ from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.html import strip_tags
 
+from .html_propre import EXTENSIONS_IMAGE_AUTORISEES, nettoyer_html
 from .models import Activite, Card, Deck, Note
 from .slugs import slug_unique
 
@@ -208,6 +209,10 @@ def _sauver_medias_references(html_texte: str, medias: dict, medias_deja_sauves:
             nouveau_nom = medias_deja_sauves[nom_original]
         elif nom_original in medias:
             extension = "." + nom_original.rsplit(".", 1)[-1].lower() if "." in nom_original else ""
+            if extension not in EXTENSIONS_IMAGE_AUTORISEES:
+                # Pas une image acceptée (.svg, .html… peuvent contenir du code) : le fichier
+                # n'est pas importé, la balise garde seulement un texte de remplacement.
+                return m.group(0).replace(f'src="{nom_original}"', 'alt="image non importée"')
             nouveau_nom = f"{uuid.uuid4().hex}{extension}"
             default_storage.save(f"anki_review/notes/{nouveau_nom}", ContentFile(medias[nom_original]))
             medias_deja_sauves[nom_original] = nouveau_nom
@@ -420,8 +425,8 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
         champs = ligne["flds"].split(SEPARATEUR_CHAMPS)
         if len(champs) < 2:
             continue
-        question = _sauver_medias_references(champs[0], medias, medias_deja_sauves)
-        reponse = _sauver_medias_references(champs[1], medias, medias_deja_sauves)
+        question = nettoyer_html(_sauver_medias_references(champs[0], medias, medias_deja_sauves))
+        reponse = nettoyer_html(_sauver_medias_references(champs[1], medias, medias_deja_sauves))
 
         guid = ligne["guid"]
         tags = ligne["tags"].strip()

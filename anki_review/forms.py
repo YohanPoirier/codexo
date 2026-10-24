@@ -1,5 +1,6 @@
 from django import forms
 
+from .html_propre import nettoyer_html
 from .models import Deck, Note
 from .slugs import slug_unique
 
@@ -44,3 +45,11 @@ class NoteForm(forms.ModelForm):
             "reponse": forms.Textarea(attrs={"rows": 5, "class": "editeur-champ"}),
             "tags": forms.TextInput(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # L'éditeur place le contenu des champs dans la page en HTML brut (innerHTML) : on lui
+        # donne la version nettoyée, même pour une carte enregistrée avant le nettoyage.
+        if self.instance.pk:
+            self.initial["question"] = nettoyer_html(self.instance.question)
+            self.initial["reponse"] = nettoyer_html(self.instance.reponse)

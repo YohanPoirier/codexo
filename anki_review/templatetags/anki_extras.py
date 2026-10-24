@@ -16,6 +16,8 @@ from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
+from ..html_propre import nettoyer_html
+
 register = template.Library()
 
 PREFIXE_IMAGES_NOTES = f"{settings.MEDIA_URL}anki_review/notes/"
@@ -68,12 +70,15 @@ def peut_editer_deck(deck, user):
 @register.filter(name="resoudre_images")
 def resoudre_images(html):
     """Reconstitue les URLs d'images à partir des noms de fichiers nus.
-    Le résultat est marqué safe : ce filtre s'applique à du contenu déjà
-    considéré comme HTML de confiance (saisi par un enseignant), au même
-    titre que l'usage de |safe déjà fait sur ces champs ailleurs."""
+
+    Le HTML est d'abord NETTOYÉ (voir html_propre.py) : les cartes sont saisies par n'importe
+    quel utilisateur connecté, élèves compris, et affichées à d'autres (dont les professeurs).
+    Ce nettoyage à l'affichage protège aussi les cartes enregistrées avant que Note.save() ne
+    nettoie. Seul le résultat nettoyé est marqué sûr."""
     if not html:
         return html
+    propre = nettoyer_html(html)
     resultat = _RE_IMG_SRC_NU.sub(
-        lambda m: f'src="{PREFIXE_IMAGES_NOTES}{m.group(1)}"', html
+        lambda m: f'src="{PREFIXE_IMAGES_NOTES}{m.group(1)}"', propre
     )
     return mark_safe(resultat)

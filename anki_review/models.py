@@ -26,6 +26,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.html import strip_tags
 
+from .html_propre import nettoyer_html
+
 
 class Deck(models.Model):
     class Matiere(models.TextChoices):
@@ -142,6 +144,10 @@ class Note(models.Model):
         return "R", "V"
 
     def save(self, *args, **kwargs):
+        # HTML nettoyé à CHAQUE enregistrement, quelle que soit l'origine (éditeur, import
+        # .apkg, proposition acceptée, admin) : voir html_propre.py.
+        self.question = nettoyer_html(self.question)
+        self.reponse = nettoyer_html(self.reponse)
         super().save(*args, **kwargs)
         # Carte réversible : répercute automatiquement sur l'autre moitié
         # (question/réponse inversées, le reste identique) — via un simple
@@ -228,6 +234,11 @@ class PropositionModification(models.Model):
 
     def __str__(self):
         return f"Proposition de {self.auteur} sur note {self.note_id} ({self.get_statut_display()})"
+
+    def save(self, *args, **kwargs):
+        self.question = nettoyer_html(self.question)
+        self.reponse = nettoyer_html(self.reponse)
+        super().save(*args, **kwargs)
 
 
 class Activite(models.Model):
