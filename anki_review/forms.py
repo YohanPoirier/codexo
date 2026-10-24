@@ -1,7 +1,7 @@
 from django import forms
-from django.utils.text import slugify
 
 from .models import Deck, Note
+from .slugs import slug_unique
 
 
 class DeckForm(forms.ModelForm):
@@ -17,13 +17,7 @@ class DeckForm(forms.ModelForm):
     def save(self, commit=True):
         deck = super().save(commit=False)
         if not deck.slug:
-            base = slugify(deck.nom)
-            slug = base
-            i = 2
-            while Deck.objects.filter(slug=slug).exclude(pk=deck.pk).exists():
-                slug = f"{base}-{i}"
-                i += 1
-            deck.slug = slug
+            deck.slug = slug_unique(deck.nom, exclure_pk=deck.pk)
         if commit:
             deck.save()
         return deck

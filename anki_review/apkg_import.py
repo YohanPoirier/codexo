@@ -50,9 +50,9 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.html import strip_tags
-from django.utils.text import slugify
 
 from .models import Activite, Card, Deck, Note
+from .slugs import slug_unique
 
 SEPARATEUR_CHAMPS = "\x1f"
 
@@ -394,13 +394,9 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
         nom_propre = nom_sans_matiere.replace("::", " — ")  # sous-paquets Anki restants -> nom plat
         deck = Deck.objects.filter(nom=nom_propre, cree_par=utilisateur).first()
         if deck is None:
-            slug_base = slugify(nom_propre) or "paquet"
-            slug = slug_base
-            i = 2
-            while Deck.objects.filter(slug=slug).exists():
-                slug = f"{slug_base}-{i}"
-                i += 1
-            deck = Deck.objects.create(nom=nom_propre, slug=slug, cree_par=utilisateur, matiere=matiere)
+            deck = Deck.objects.create(
+                nom=nom_propre, slug=slug_unique(nom_propre), cree_par=utilisateur, matiere=matiere,
+            )
         cache_decks[nom_anki] = deck
         return deck
 
