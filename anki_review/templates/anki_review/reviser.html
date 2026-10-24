@@ -31,6 +31,7 @@
     <form method="post" class="reponse-boutons" id="form-reponse" hidden>
       {% csrf_token %}
       <input type="hidden" name="carte_id" value="{{ carte.id }}">
+      <input type="hidden" name="version" value="{{ carte.prochaine_revision.isoformat }}">
       <button class="btn-reponse btn-again" name="reponse" value="again">
         <span class="label">À revoir</span><span class="intervalle">{{ intervalles.again }}</span>
       </button>

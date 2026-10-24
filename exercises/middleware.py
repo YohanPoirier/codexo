@@ -18,7 +18,7 @@ class IntroPasAPasMiddleware:
     pas redirigés : ils peuvent voir la page à son adresse.
     """
 
-    PREFIXES_EXEMPTES = ("/api/", "/admin/", "/static/", "/media/")
+    PREFIXES_EXEMPTES = ("/api/", "/admin/", "/static/", "/media/", "/anki/")
 
     def __init__(self, get_response):
         self.get_response = get_response

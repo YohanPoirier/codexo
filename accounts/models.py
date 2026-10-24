@@ -139,6 +139,13 @@ class User(AbstractUser):
         # sans lui retirer ses droits à chaque sauvegarde.
         if self.role == self.PROF:
             self.is_staff = True
+        elif self.pk and self.role == self.ELEVE and not self.is_superuser:
+            # Un professeur repassé « élève » (changement de rôle dans l'admin) perd l'accès
+            # aux pages réservées. Seul ce changement est détecté : un compte technique
+            # jamais professeur garde son is_staff.
+            ancien_role = User.objects.filter(pk=self.pk).values_list("role", flat=True).first()
+            if ancien_role == self.PROF:
+                self.is_staff = False
         super().save(*args, **kwargs)
 
 

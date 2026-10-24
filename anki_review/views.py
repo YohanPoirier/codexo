@@ -167,6 +167,14 @@ def _retirer_de_la_file_apprentissage(request, carte_id):
     _ecrire_file_apprentissage(request, file)
 
 
+def _faire_avancer_file_apprentissage(request, sauf_carte_id):
+    file = _lire_file_apprentissage(request)
+    for entree in file:
+        if entree["id"] != sauf_carte_id:
+            entree["n"] += 1
+    _ecrire_file_apprentissage(request, file)
+
+
 def _prochaine_carte(request, decks_qs, etudiant):
     """
     Détermine la prochaine carte à afficher, en combinant :
@@ -199,8 +207,6 @@ def _prochaine_carte(request, decks_qs, etudiant):
 
     carte_due = _prochaine_carte_due(decks_qs, etudiant)
     if carte_due:
-        for entree in file:
-            entree["n"] += 1
         return carte_due, file
 
     # Rien de dû dans ce scope, mais une carte en apprentissage de CE
@@ -252,12 +258,25 @@ def _traiter_revision(request, decks_qs, titre, nom_url_action, args_url_action)
     if request.method == "POST":
         carte = get_object_or_404(Card, id=request.POST["carte_id"], etudiant=request.user)
         reponse = request.POST.get("reponse")
-        if reponse in (Reponse.AGAIN, Reponse.HARD, Reponse.GOOD, Reponse.EASY):
+        # « Version » de la carte telle qu'elle était affichée : si elle a déjà été répondue
+        # entre-temps (double appui, requête rejouée par le réseau mobile, deuxième onglet),
+        # la date de prochaine révision a changé et cette réponse est ignorée au lieu de
+        # faire avancer SM-2 une seconde fois. Absent (page ouverte avant la mise à jour) :
+        # la réponse est acceptée comme avant.
+        version_affichee = request.POST.get("version")
+        deja_repondue = bool(version_affichee) and version_affichee != carte.prochaine_revision.isoformat()
+        if not deja_repondue and reponse in (Reponse.AGAIN, Reponse.HARD, Reponse.GOOD, Reponse.EASY):
+            etait_en_apprentissage = any(e["id"] == carte.id for e in _lire_file_apprentissage(request))
             appliquer(carte, reponse)
             carte.save()
             # Une réponse = une révision dans le journal (page Trafic), y
             # compris quand la même carte ratée revient dans la session.
             Activite.journaliser(request.user, Activite.Type.REVISION, carte)
+            if not etait_en_apprentissage:
+                # Une carte ordinaire vient d'être traitée : les cartes ratées en attente
+                # se rapprochent d'un cran de leur réapparition. (Compté ici, à la réponse,
+                # et non à l'affichage : recharger la page ne doit pas les faire avancer.)
+                _faire_avancer_file_apprentissage(request, sauf_carte_id=carte.id)
             if reponse == Reponse.AGAIN:
                 _ajouter_a_la_file_apprentissage(request, carte.id)
             else:
@@ -273,7 +292,13 @@ def _traiter_revision(request, decks_qs, titre, nom_url_action, args_url_action)
         return render(request, "anki_review/session_terminee.html", {"titre_paquet": titre})
 
     ids_apprentissage = [e["id"] for e in file]
-    nb_apprentissage_scope = Card.objects.filter(id__in=ids_apprentissage, note__deck__in=decks_qs).count()
+    # Une carte ratée qui est AUSSI échue est déjà dans le décompte ci-dessous : on ne la
+    # compte pas une seconde fois.
+    nb_apprentissage_scope = (
+        Card.objects.filter(id__in=ids_apprentissage, note__deck__in=decks_qs)
+        .exclude(suspendue=False, prochaine_revision__lte=timezone.now())
+        .count()
+    )
     restantes = Card.objects.filter(
         note__deck__in=decks_qs, etudiant=request.user, suspendue=False,
         prochaine_revision__lte=timezone.now(),
@@ -1103,6 +1128,9 @@ def accepter_proposition(request, proposition_id):
     proposition = get_object_or_404(PropositionModification.objects.select_related("note"), id=proposition_id)
     if not (request.user.is_staff or proposition.note.cree_par_id == request.user.id):
         return HttpResponseForbidden("Seul le propriétaire de la carte (ou le prof) peut traiter cette proposition.")
+    if proposition.statut != PropositionModification.Statut.EN_ATTENTE:
+        messages.info(request, "Cette proposition a déjà été traitée.")
+        return redirect("anki_review:edition")
     if request.method == "POST":
         note = proposition.note
         note.question = proposition.question
@@ -1121,6 +1149,9 @@ def refuser_proposition(request, proposition_id):
     proposition = get_object_or_404(PropositionModification.objects.select_related("note"), id=proposition_id)
     if not (request.user.is_staff or proposition.note.cree_par_id == request.user.id):
         return HttpResponseForbidden("Seul le propriétaire de la carte (ou le prof) peut traiter cette proposition.")
+    if proposition.statut != PropositionModification.Statut.EN_ATTENTE:
+        messages.info(request, "Cette proposition a déjà été traitée.")
+        return redirect("anki_review:edition")
     if request.method == "POST":
         proposition.statut = PropositionModification.Statut.REFUSEE
         proposition.traitee_le = timezone.now()

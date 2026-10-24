@@ -51,7 +51,7 @@ def _abonnement_navigateur(i=1):
     cle = ec.generate_private_key(ec.SECP256R1())
     p256dh = _b64url(cle.public_key().public_bytes(
         serialization.Encoding.X962, serialization.PublicFormat.UncompressedPoint))
-    return {"endpoint": f"https://push.example.com/send/appareil-{i}",
+    return {"endpoint": f"https://fcm.googleapis.com/fcm/send/appareil-{i}",
             "keys": {"p256dh": p256dh, "auth": _b64url(os.urandom(16))}}
 
 
@@ -301,8 +301,12 @@ class VuesTests(Base):
     def test_abonnement_invalide_refuse(self):
         self.client.force_login(self.eleve)
         for corps in ({}, {"endpoint": "http://x", "keys": {"p256dh": "a", "auth": "b"}},
-                      {"endpoint": "https://x.example/1", "keys": {"p256dh": "", "auth": "b"}},
-                      {"endpoint": "https://x.example/" + "a" * 2100, "keys": {"p256dh": "a", "auth": "b"}}):
+                      {"endpoint": "https://127.0.0.1/x", "keys": {"p256dh": "a", "auth": "b"}},
+                      {"endpoint": "https://fcm.googleapis.com.evil.fr/x", "keys": {"p256dh": "a", "auth": "b"}},
+                      {"endpoint": "https://fcm.googleapis.com@evil.fr/x", "keys": {"p256dh": "a", "auth": "b"}},
+                      {"endpoint": "https://fcm.googleapis.com:8443/x", "keys": {"p256dh": "a", "auth": "b"}},
+                      {"endpoint": "https://fcm.googleapis.com/1", "keys": {"p256dh": "", "auth": "b"}},
+                      {"endpoint": "https://fcm.googleapis.com/" + "a" * 2100, "keys": {"p256dh": "a", "auth": "b"}}):
             self.assertEqual(self.post_json("anki_review:notifications_abonner", corps).status_code, 400, corps)
         r = self.client.post(reverse("anki_review:notifications_abonner"), data="pas du json",
                              content_type="application/json")

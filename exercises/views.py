@@ -8,7 +8,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Sum, Count, Min
 from django.db.models.functions import TruncDate
-from django.http import JsonResponse, HttpResponseNotAllowed
+from django.http import Http404, HttpResponseBadRequest, JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -304,6 +304,8 @@ def exercise_tests(request, exercise_id):
     rien niveau sécurité : comme déjà noté dans le README, un étudiant curieux pouvait de toute
     façon inspecter cette réponse réseau et y trouver le corrigé, même avant ce changement."""
     exercise = get_object_or_404(Exercise, id=exercise_id)
+    if not exercise.is_visible_for(request.user):
+        raise Http404  # exercice non ouvert à sa classe : ni tests ni corrigé
     solution = exercise.sql_solution if exercise.kind == exercise.SQL else exercise.solution_code
     payload = {
         "starter_code": exercise.starter_code,
@@ -342,13 +344,25 @@ def submit_result(request, exercise_id):
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
     exercise = get_object_or_404(Exercise, id=exercise_id)
+    if not exercise.is_visible_for(request.user):
+        raise Http404
 
     if request.content_type == "application/json":
-        payload = json.loads(request.body.decode("utf-8"))
+        try:
+            payload = json.loads(request.body.decode("utf-8"))
+        except (ValueError, UnicodeDecodeError):
+            return HttpResponseBadRequest("JSON invalide")
+        if not isinstance(payload, dict):
+            return HttpResponseBadRequest("Objet JSON attendu")
         submitted_code = payload.get("code", "")
+        if not isinstance(submitted_code, str):
+            return HttpResponseBadRequest("code invalide")
         success = bool(payload.get("success", False))
         is_attempt = bool(payload.get("is_attempt", False))
-        time_seconds = min(int(payload.get("time_seconds") or 0), TEMPS_MAX_PAR_ENVOI_SECONDES)
+        try:
+            time_seconds = max(0, min(int(payload.get("time_seconds") or 0), TEMPS_MAX_PAR_ENVOI_SECONDES))
+        except (TypeError, ValueError):
+            return HttpResponseBadRequest("time_seconds invalide")
     else:
         # navigator.sendBeacon() envoie les données au format formulaire classique
         # (application/x-www-form-urlencoded), pas en JSON — utilisé pour la sauvegarde
@@ -358,7 +372,10 @@ def submit_result(request, exercise_id):
         submitted_code = request.POST.get("code", "")
         success = request.POST.get("success") in ("true", "1", "True")
         is_attempt = request.POST.get("is_attempt") in ("true", "1", "True")
-        time_seconds = min(int(request.POST.get("time_seconds") or 0), TEMPS_MAX_PAR_ENVOI_SECONDES)
+        try:
+            time_seconds = max(0, min(int(request.POST.get("time_seconds") or 0), TEMPS_MAX_PAR_ENVOI_SECONDES))
+        except ValueError:
+            return HttpResponseBadRequest("time_seconds invalide")
 
     Result.objects.create(
         user=request.user,

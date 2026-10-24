@@ -6,6 +6,7 @@ d'envoyer quoi que ce soit à un appareil qui ne s'est pas abonné lui-même : l
 appuyer sur « Activer » (bandeau de l'accueil ou cette page).
 """
 import json
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib import messages
@@ -19,6 +20,31 @@ from . import notifications
 from .models import AbonnementPush, PreferencesNotification
 
 LONGUEUR_ENDPOINT_MAX = 2000
+
+# Le serveur enverra les notifications à l'adresse fournie par le navigateur : on n'accepte
+# que les services de notification des navigateurs (sinon un élève pourrait faire envoyer
+# des requêtes du serveur vers n'importe quelle adresse).
+HOTES_PUSH_EXACTS = {
+    "fcm.googleapis.com",                 # Chrome, Edge, Brave, Samsung Internet, Opera…
+    "updates.push.services.mozilla.com",  # Firefox
+}
+SUFFIXES_HOTES_PUSH = (
+    ".notify.windows.com",   # Edge / Windows
+    ".push.apple.com",       # Safari (web.push.apple.com)
+)
+
+
+def endpoint_push_autorise(endpoint):
+    try:
+        url = urlparse(endpoint)
+        port = url.port
+    except ValueError:
+        return False
+    hote = (url.hostname or "").lower()
+    return (
+        url.scheme == "https" and url.username is None and port in (None, 443)
+        and (hote in HOTES_PUSH_EXACTS or hote.endswith(SUFFIXES_HOTES_PUSH))
+    )
 
 
 def contexte_invitation(user):
@@ -87,7 +113,7 @@ def abonner(request):
     cles = (donnees or {}).get("keys")
     endpoint = (donnees or {}).get("endpoint")
     if (
-        not isinstance(endpoint, str) or not endpoint.startswith("https://")
+        not isinstance(endpoint, str) or not endpoint_push_autorise(endpoint)
         or len(endpoint) > LONGUEUR_ENDPOINT_MAX
         or not isinstance(cles, dict)
         or not isinstance(cles.get("p256dh"), str) or not isinstance(cles.get("auth"), str)
