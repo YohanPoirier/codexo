@@ -132,6 +132,15 @@ body.fullscreen-app {
   padding: 16px 20px;
   padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
+/* Appli installée (PWA) sur Android : la page s'étend sous la barre de
+   navigation du système (3 boutons ou geste) et env(safe-area-inset-bottom)
+   vaut souvent 0, ce qui cache « Voir la réponse » derrière cette barre.
+   On garde donc une marge fixe confortable en mode standalone. */
+@media (display-mode: standalone) {
+  .reviser-actions {
+    padding-bottom: max(72px, calc(16px + env(safe-area-inset-bottom)));
+  }
+}
 
 .btn-voir-reponse {
   display: block;
