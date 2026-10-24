@@ -44,7 +44,7 @@ PREFIXE_IMAGES_NOTES = f"{settings.MEDIA_URL}anki_review/notes/"
 SEUIL_REAPPARITION_SESSION = 3
 
 
-def _decks_visibles(user):
+def _decks_visibles(user, avec_mes_cartes=True):
     """Paquets visibles par cet utilisateur : ceux du prof (officiels, sans
     créateur ou créé par un membre du staff) + les siens propres + tout
     paquet contenant au moins une note partagée (même appartenant à un
@@ -52,13 +52,23 @@ def _decks_visibles(user):
     copiée dans un paquet à soi : elle reste dans son paquet d'origine, qui
     doit donc devenir visible pour qu'on puisse la retrouver dans Édition.
     Un paquet privé sans aucune note partagée reste invisible aux autres,
-    comme avant."""
+    comme avant.
+
+    + tout paquet où il a au moins une carte (avec_mes_cartes) : une carte
+    récupérée est GARDÉE même si son propriétaire cesse de la partager, et
+    son paquet doit donc rester visible, sinon la carte serait conservée
+    en base mais introuvable (ni dans l'accueil, ni en révision).
+    avec_mes_cartes=False sert aux formulaires d'ajout de carte : on n'y
+    propose pas, pour y écrire, le paquet d'un autre qui a cessé de partager."""
     if user.is_staff:
         return Deck.objects.all()
-    return Deck.objects.filter(
+    visibilite = (
         Q(cree_par__isnull=True) | Q(cree_par__is_staff=True) | Q(cree_par=user)
         | Q(notes__partagee_avec_classe=True)
-    ).distinct()
+    )
+    if avec_mes_cartes:
+        visibilite |= Q(notes__cards__etudiant=user)
+    return Deck.objects.filter(visibilite).distinct()
 
 
 def _decks_pour_selecteur(decks_visibles):
@@ -579,7 +589,7 @@ def ajouter_note(request):
     choisi, une ou deux notes sont créées (cf. _creer_notes_depuis_formulaire).
     """
     deck_prerempli = request.GET.get("deck")
-    decks_visibles = _decks_visibles(request.user)
+    decks_visibles = _decks_visibles(request.user, avec_mes_cartes=False)
 
     if request.method == "POST":
         form = NoteForm(request.POST)

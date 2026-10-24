@@ -187,3 +187,38 @@ class IntroNeBloquePasAnkiTests(TestCase):
         reponse = self.client.get(reverse("anki_review:liste_decks"))
         self.assertEqual(reponse.status_code, 200)
         self.assertEqual(self.client.get(reverse("theme_list")).status_code, 302)  # le site, si
+
+
+@override_settings(**CONFIG)
+class CarteRecupereeGardeeTests(TestCase):
+    """Un étudiant qui a récupéré une carte la garde, même si son propriétaire cesse de la partager."""
+
+    def setUp(self):
+        self.a, self.b = eleve("A-gardee"), eleve("B-gardee")
+        self.deck = Deck.objects.create(nom="Paquet 1", slug="paquet-1", cree_par=self.a)
+        self.note = Note.objects.create(
+            deck=self.deck, question="Q", reponse="R", cree_par=self.a, partagee_avec_classe=True)
+        Card.objects.create(note=self.note, etudiant=self.a)
+        self.client.force_login(self.b)
+        self.client.post(reverse("anki_review:ajouter_carte_partagee", args=[self.note.id]))
+        Note.objects.filter(pk=self.note.pk).update(partagee_avec_classe=False)  # A arrête de partager
+
+    def test_paquet_et_carte_restent_accessibles_a_celui_qui_l_a_recuperee(self):
+        html = self.client.get(reverse("anki_review:liste_decks")).content.decode()
+        self.assertIn("Paquet 1", html)
+        self.assertEqual(self.client.get(reverse("anki_review:reviser", args=["paquet-1"])).status_code, 200)
+        self.assertEqual(self.client.get(reverse("anki_review:edition_deck", args=["paquet-1"])).status_code, 200)
+
+    def test_il_peut_encore_proposer_une_correction(self):
+        r = self.client.post(reverse("anki_review:modifier_note", args=[self.note.id]), {
+            "deck": self.deck.id, "question": "Q corrigée", "reponse": "R", "tags": ""})
+        self.assertEqual(r.status_code, 302)
+        self.assertEqual(PropositionModification.objects.filter(note=self.note).count(), 1)
+
+    def test_un_autre_etudiant_ne_voit_pas_le_paquet(self):
+        self.client.force_login(eleve("C-gardee"))
+        self.assertEqual(self.client.get(reverse("anki_review:reviser", args=["paquet-1"])).status_code, 404)
+
+    def test_son_paquet_n_est_pas_propose_pour_y_ajouter_ses_cartes(self):
+        reponse = self.client.get(reverse("anki_review:ajouter_note"))
+        self.assertNotIn(self.deck, list(reponse.context["decks"]))
