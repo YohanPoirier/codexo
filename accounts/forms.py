@@ -104,8 +104,9 @@ class ImporterElevesForm(forms.Form):
         help_text=(
             "Colonnes attendues, avec en-tête : id, nom_complet, classe, "
             "mot_de_passe (mot de passe provisoire du compte, ex: 15/03/2007 si "
-            "vous utilisez la date de naissance comme convention). Les classes "
-            "doivent déjà exister dans l'admin (recherche par nom exact)."
+            "vous utilisez la date de naissance comme convention ; utilisé seulement "
+            "pour les nouveaux comptes). Les classes doivent déjà exister dans l'admin "
+            "(recherche par nom exact)."
         ),
     )
     delimiter = forms.ChoiceField(

@@ -6,8 +6,10 @@
 <p>Le mot de passe provisoire de chaque compte créé est la valeur indiquée dans la
 colonne "mot_de_passe" du CSV (par exemple une date de naissance au format
 JJ/MM/AAAA, si c'est la convention choisie) ; l'élève sera invité à le changer dès
-sa première connexion. Peut être relancé sans dupliquer : un identifiant déjà
-présent est simplement mis à jour.</p>
+sa première connexion. Peut être relancé sans dupliquer : pour un élève déjà inscrit,
+seuls le nom et la classe sont mis à jour (changement de classe à la rentrée, par
+exemple), son mot de passe n'est pas modifié et son historique est conservé. Un compte
+professeur ou administrateur n'est jamais modifié par l'import.</p>
 
 <div class="auth-card">
   <form method="post" enctype="multipart/form-data">

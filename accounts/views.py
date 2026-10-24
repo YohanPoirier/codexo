@@ -1,3 +1,4 @@
+import csv
 import io
 
 from django.contrib import messages
@@ -7,7 +8,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
 from .forms import ConnexionThrottleeForm, DemandeReinitialisationForm, ImporterElevesForm
-from .importation import ColonnesManquantes, importer_eleves_depuis_lignes
+from .importation import (
+    ColonnesManquantes, ErreurEncodage, importer_eleves_depuis_lignes, lire_csv_texte,
+)
 from .models import DemandeReinitialisation, User
 
 
@@ -119,20 +122,21 @@ def importer_eleves_view(request):
         if form.is_valid():
             fichier = form.cleaned_data["fichier"]
             delimiter = form.cleaned_data["delimiter"]
-            # encoding="utf-8-sig" : tolère le BOM ajouté par Excel en tête de
-            # fichier (même remarque que dans la commande en ligne de commande).
-            contenu = fichier.read().decode("utf-8-sig")
             try:
+                # UTF-8 (avec ou sans BOM) puis Windows-1252 : voir lire_csv_texte.
+                contenu = lire_csv_texte(fichier.read())
                 crees, mis_a_jour, erreurs = importer_eleves_depuis_lignes(
-                    io.StringIO(contenu), delimiter=delimiter
+                    io.StringIO(contenu, newline=""), delimiter=delimiter
                 )
                 resultat = {"crees": crees, "mis_a_jour": mis_a_jour, "erreurs": erreurs}
                 messages.success(
                     request,
                     f"Import terminé : {crees} compte(s) créé(s), {mis_a_jour} mis à jour.",
                 )
-            except ColonnesManquantes as exc:
+            except (ColonnesManquantes, ErreurEncodage) as exc:
                 form.add_error("fichier", str(exc))
+            except csv.Error as exc:
+                form.add_error("fichier", f"Fichier CSV illisible : {exc}")
     else:
         form = ImporterElevesForm()
     return render(request, "accounts/importer_eleves.html", {"form": form, "resultat": resultat})
