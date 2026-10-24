@@ -768,6 +768,32 @@ def import_export_accueil(request):
     return render(request, "anki_review/import_export_accueil.html")
 
 
+CLE_SESSION_APKG = "import_apkg_temp"
+PREFIXE_APKG_TEMP = "anki_review/import_temp/"
+
+
+def _chemin_apkg_temporaire(request):
+    """Chemin du .apkg en attente de confirmation pour CET utilisateur (lu dans sa session,
+    jamais dans le formulaire), ou None s'il n'y en a pas ou s'il a disparu."""
+    chemin = request.session.get(CLE_SESSION_APKG)
+    if (
+        not isinstance(chemin, str)
+        or not chemin.startswith(PREFIXE_APKG_TEMP)
+        or not chemin.endswith(".apkg")
+        or ".." in chemin
+        or not default_storage.exists(chemin)
+    ):
+        return None
+    return chemin
+
+
+def _oublier_apkg_temporaire(request):
+    chemin = _chemin_apkg_temporaire(request)
+    if chemin:
+        default_storage.delete(chemin)
+    request.session.pop(CLE_SESSION_APKG, None)
+
+
 @login_required
 def import_export_fichier(request):
     """Import/export via fichier .apkg (Anki) — page d'accueil : formulaire
@@ -776,6 +802,7 @@ def import_export_fichier(request):
     erreur = None
     if request.method == "POST" and "fichier" in request.FILES:
         fichier = request.FILES["fichier"]
+        _oublier_apkg_temporaire(request)  # un éventuel import précédent jamais confirmé
         chemin_temp = default_storage.save(f"anki_review/import_temp/{uuid.uuid4().hex}.apkg", fichier)
         try:
             paquets, nb_cloze = analyser_apkg(default_storage.open(chemin_temp))
@@ -783,8 +810,11 @@ def import_export_fichier(request):
             default_storage.delete(chemin_temp)
             erreur = str(e)
         else:
+            # Le chemin reste côté serveur (session) : il n'est PAS renvoyé au navigateur,
+            # sinon l'utilisateur pourrait le remplacer par un autre fichier à supprimer.
+            request.session[CLE_SESSION_APKG] = chemin_temp
             return render(request, "anki_review/import_apkg_selection.html", {
-                "paquets": paquets, "nb_cloze": nb_cloze, "chemin_temp": chemin_temp,
+                "paquets": paquets, "nb_cloze": nb_cloze,
             })
 
     decks_pour_export = {}
@@ -810,12 +840,12 @@ def import_apkg_confirmer(request):
     if request.method != "POST":
         return redirect("anki_review:import_export_fichier")
 
-    chemin_temp = request.POST.get("chemin_temp")
+    chemin_temp = _chemin_apkg_temporaire(request)
     guids = set(request.POST.getlist("notes"))
     resultat = None
     erreur = None
 
-    if not chemin_temp or not default_storage.exists(chemin_temp):
+    if not chemin_temp:
         erreur = "Le fichier temporaire a expiré, réimporte-le."
     elif not guids:
         erreur = "Aucune carte cochée — rien à importer."
@@ -825,7 +855,7 @@ def import_apkg_confirmer(request):
         except ErreurImportApkg as e:
             erreur = str(e)
         finally:
-            default_storage.delete(chemin_temp)
+            _oublier_apkg_temporaire(request)
 
     decks_pour_export = {}
     for deck in _decks_visibles(request.user).order_by("nom"):

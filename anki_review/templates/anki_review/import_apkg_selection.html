@@ -12,7 +12,6 @@
 
 <form method="post" action="{% url 'anki_review:import_apkg_confirmer' %}">
   {% csrf_token %}
-  <input type="hidden" name="chemin_temp" value="{{ chemin_temp }}">
 
   {% for paquet in paquets %}
     <details class="ie-groupe" open>
