@@ -25,23 +25,39 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         appliquer = options["appliquer"]
         for modele, libelle in ((Note, "carte(s)"), (PropositionModification, "proposition(s)")):
-            concernes = 0
+            concernes = cosmetiques = 0
             for obj in modele.objects.all().iterator():
                 q, r = nettoyer_html(obj.question), nettoyer_html(obj.reponse)
                 if (q, r) == (obj.question, obj.reponse):
                     continue
                 concernes += 1
-                self.stdout.write(f"  {modele.__name__} #{obj.pk} modifiée par le nettoyage")
+                if appliquer:
+                    # update() : évite les effets de bord de save() (carte réversible, etc.)
+                    modele.objects.filter(pk=obj.pk).update(question=q, reponse=r)
+                if self._normaliser(obj.question) == self._normaliser(q) and \
+                        self._normaliser(obj.reponse) == self._normaliser(r):
+                    cosmetiques += 1  # même affichage : fins de ligne, < écrit &lt;, « ; » final
+                    continue
+                self.stdout.write(f"  {modele.__name__} #{obj.pk} : CHANGEMENT DE CONTENU")
                 if options["detail"]:
                     for champ, avant, apres in (("question", obj.question, q), ("réponse", obj.reponse, r)):
                         if avant != apres:
                             self.stdout.write(f"      {champ} : {self._difference(avant, apres)}")
-                if appliquer:
-                    # update() : évite les effets de bord de save() (carte réversible, etc.)
-                    modele.objects.filter(pk=obj.pk).update(question=q, reponse=r)
-            self.stdout.write(f"{concernes} {libelle} concernée(s).")
+            self.stdout.write(
+                f"{concernes} {libelle} concernée(s), dont {cosmetiques} sans aucun effet visible "
+                f"(fins de ligne, « < » écrit « &lt; », « ; » final) et {concernes - cosmetiques} "
+                f"avec un vrai changement de contenu."
+            )
         if not appliquer:
             self.stdout.write("Rapport seulement : relancer avec --appliquer pour écrire.")
+
+    @staticmethod
+    def _normaliser(html):
+        """Forme de comparaison qui ignore les différences sans effet à l'affichage."""
+        return (
+            html.replace("\r\n", "\n").replace("&lt;", "<").replace("&gt;", ">")
+            .replace(";\"", "\"")
+        )
 
     @staticmethod
     def _difference(avant, apres):

@@ -76,3 +76,25 @@ class BrancheMentTests(TestCase):
         rendu = resoudre_images('<img src="a.png" onerror="alert(1)">')
         self.assertNotIn("onerror", rendu)
         self.assertIn("/media/anki_review/notes/a.png", rendu)
+
+
+class CommandeNettoyerCartesTests(TestCase):
+    def test_rapport_distingue_cosmetique_et_vrai_changement(self):
+        from io import StringIO
+
+        from django.core.management import call_command
+
+        deck = Deck.objects.create(nom="D", slug="d")
+        a = Note.objects.create(deck=deck, question="Q", reponse="R")
+        b = Note.objects.create(deck=deck, question="Q2", reponse="R2")
+        # On écrit directement en base (sans passer par save, qui nettoierait déjà).
+        Note.objects.filter(pk=a.pk).update(reponse="x\r\n\\(a < b\\)")
+        Note.objects.filter(pk=b.pk).update(reponse="<h2>titre</h2><script>x</script>")
+        sortie = StringIO()
+        call_command("nettoyer_cartes", "--detail", stdout=sortie)
+        texte = sortie.getvalue()
+        self.assertIn("2 carte(s) concernée(s), dont 1 sans aucun effet visible", texte)
+        self.assertIn(f"Note #{b.pk} : CHANGEMENT DE CONTENU", texte)
+        self.assertNotIn(f"Note #{a.pk} :", texte)
+        b.refresh_from_db()
+        self.assertIn("<h2>", b.reponse)  # rapport seul : rien d'écrit
