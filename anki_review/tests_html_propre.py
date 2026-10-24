@@ -36,6 +36,13 @@ class NettoyerHtmlTests(TestCase):
             self.assertIn(attendu, propre)
         self.assertEqual(nettoyer_html(propre), propre)
 
+    def test_centrage_ancien_style_anki_conserve(self):
+        self.assertEqual(nettoyer_html('<div align="center">x</div>'), '<div align="center">x</div>')
+
+    def test_fins_de_ligne_windows_normalisees(self):
+        # Les notes #105… du rapport ne changent que par \r\n -> \n (sans effet visible).
+        self.assertEqual(nettoyer_html("a\r\nb"), "a\nb")
+
     def test_latex_echappe_conserve_et_idempotent(self):
         html = r"\(a &lt; b\) et \[x &gt; 0\]"
         self.assertEqual(nettoyer_html(html), html)

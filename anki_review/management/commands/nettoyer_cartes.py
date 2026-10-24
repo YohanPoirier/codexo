@@ -51,6 +51,6 @@ class Command(BaseCommand):
         sortie = []
         for ligne in difflib.ndiff(a, b):
             if ligne[:2] in ("- ", "+ "):
-                texte = ligne[2:].replace("\n", " ")
+                texte = ligne[2:].replace("\r", "\\r").replace("\n", "\\n")
                 sortie.append(f"{ligne[0]}{texte[:80]}")
         return " | ".join(sortie) or "(différence de mise en forme)"

@@ -29,8 +29,13 @@ ATTRIBUTS_AUTORISES = {
     "img": ["src", "alt", "width", "height"],
     "a": ["href"],
     "font": ["color", "size"],
-    "td": ["colspan", "rowspan"],
-    "th": ["colspan", "rowspan"],
+    # Centrage « à l'ancienne » d'Anki : <div align="center"> (valeur sans danger).
+    "div": ["align"],
+    "p": ["align"],
+    "table": ["align"],
+    "hr": ["align"],
+    "td": ["colspan", "rowspan", "align"],
+    "th": ["colspan", "rowspan", "align"],
 }
 
 PROTOCOLES_AUTORISES = ["http", "https", "mailto"]
