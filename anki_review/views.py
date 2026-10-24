@@ -494,15 +494,37 @@ def modifier_deck(request, deck_id):
 @login_required
 def supprimer_deck(request, deck_id):
     """Suppression d'un paquet — POST uniquement (déclenché par un petit
-    formulaire avec confirmation JS, cf. edition_accueil.html). Supprime en
-    cascade ses notes et les cartes de progression associées."""
+    formulaire avec confirmation JS, cf. _edition_paquet.html).
+
+    Le professeur supprime réellement le paquet et tout son contenu (modération).
+    Un étudiant, lui, ne peut priver personne d'une carte qu'il utilise : ses propres
+    cartes sont retirées (la propriété de chacune passe au plus ancien détenteur restant,
+    ou la carte est supprimée si plus personne ne l'a) ; si d'autres étudiants gardent des
+    cartes dans ce paquet, le paquet est CONSERVÉ et sa propriété leur est transmise."""
     deck = get_object_or_404(Deck, id=deck_id)
     if not _peut_editer_deck(request.user, deck):
         return HttpResponseForbidden("Tu ne peux supprimer que les paquets que tu as créés.")
     if request.method == "POST":
         nom = deck.nom
-        deck.delete()
-        messages.success(request, f"Paquet « {nom} » supprimé.")
+        if request.user.is_staff:
+            deck.delete()
+            messages.success(request, f"Paquet « {nom} » supprimé.")
+            return redirect("anki_review:edition")
+
+        for carte in list(Card.objects.filter(note__deck=deck, etudiant=request.user).select_related("note")):
+            _retirer_de_ma_revision(carte, request.user)
+        carte_restante = Card.objects.filter(note__deck=deck).order_by("cree_le", "id").first()
+        if carte_restante is None:
+            deck.delete()  # plus aucune carte utilisée : seules des notes orphelines, sans détenteur
+            messages.success(request, f"Paquet « {nom} » supprimé.")
+        else:
+            deck.cree_par = carte_restante.etudiant
+            deck.save(update_fields=["cree_par"])
+            messages.success(
+                request,
+                f"Tes cartes du paquet « {nom} » ont été retirées. Le paquet est conservé : "
+                f"d'autres étudiants utilisent encore des cartes qui s'y trouvent, et il leur est transmis.",
+            )
     return redirect("anki_review:edition")
 
 
@@ -719,26 +741,18 @@ def supprimer_note(request, note_id):
             messages.success(request, "Carte supprimée pour tout le monde.")
         else:
             etait_proprietaire = note.cree_par_id == request.user.id
-            if carte_utilisateur:
-                carte_utilisateur.delete()
-            if etait_proprietaire:
-                carte_suivante = Card.objects.filter(note=note).order_by("cree_le", "id").first()
-                if carte_suivante:
-                    note.cree_par = carte_suivante.etudiant
-                    note.save(update_fields=["cree_par"])
-                    messages.success(
-                        request,
-                        f"Carte retirée de ta révision. Comme tu en étais propriétaire, "
-                        f"{carte_suivante.etudiant} en devient propriétaire.",
-                    )
-                else:
-                    miroir_id = note.note_miroir_id
-                    note.delete()
-                    if miroir_id:
-                        Note.objects.filter(pk=miroir_id).delete()
-                    messages.success(request, "Carte retirée — plus personne ne l'avait, elle a été supprimée.")
-            else:
+            note_supprimee = _retirer_de_ma_revision(carte_utilisateur, request.user)
+            if not etait_proprietaire:
                 messages.success(request, "Carte retirée de ta révision.")
+            elif note_supprimee:
+                messages.success(request, "Carte retirée — plus personne ne l'avait, elle a été supprimée.")
+            else:
+                nouveau = Note.objects.get(pk=note.pk).cree_par
+                messages.success(
+                    request,
+                    f"Carte retirée de ta révision. Comme tu en étais propriétaire, "
+                    f"{nouveau} en devient propriétaire.",
+                )
     return redirect("anki_review:edition")
 
 
@@ -1023,6 +1037,28 @@ def partager_paquet_toggle(request, deck_id):
     return redirect("anki_review:partage_etudiants")
 
 
+def _retirer_de_ma_revision(carte, utilisateur):
+    """Retire UNE carte de la révision de `utilisateur`, sans priver personne d'une carte
+    qu'il utilise : si `utilisateur` en était propriétaire, la propriété passe au plus
+    ancien détenteur restant ; la note n'est supprimée que si plus personne ne l'a.
+    Renvoie True si la note a été supprimée."""
+    note = carte.note
+    etait_proprietaire = note.cree_par_id == utilisateur.id
+    carte.delete()
+    if not etait_proprietaire:
+        return False
+    carte_suivante = Card.objects.filter(note=note).order_by("cree_le", "id").first()
+    if carte_suivante:
+        note.cree_par = carte_suivante.etudiant
+        note.save(update_fields=["cree_par"])
+        return False
+    miroir_id = note.note_miroir_id
+    note.delete()
+    if miroir_id:
+        Note.objects.filter(pk=miroir_id).delete()
+    return True
+
+
 @login_required
 def supprimer_mes_cartes_paquet(request, deck_id):
     """Retire en bloc toutes MES cartes de ce paquet (celles que j'ai dans
@@ -1035,19 +1071,7 @@ def supprimer_mes_cartes_paquet(request, deck_id):
         mes_cartes = list(Card.objects.filter(note__deck_id=deck_id, etudiant=request.user).select_related("note"))
         nb = len(mes_cartes)
         for carte in mes_cartes:
-            note = carte.note
-            etait_proprietaire = note.cree_par_id == request.user.id
-            carte.delete()
-            if etait_proprietaire:
-                carte_suivante = Card.objects.filter(note=note).order_by("cree_le", "id").first()
-                if carte_suivante:
-                    note.cree_par = carte_suivante.etudiant
-                    note.save(update_fields=["cree_par"])
-                else:
-                    miroir_id = note.note_miroir_id
-                    note.delete()
-                    if miroir_id:
-                        Note.objects.filter(pk=miroir_id).delete()
+            _retirer_de_ma_revision(carte, request.user)
         messages.success(request, f"{nb} carte{'s' if nb > 1 else ''} retirée{'s' if nb > 1 else ''} de ta révision.")
     return redirect("anki_review:partage_etudiants")
 

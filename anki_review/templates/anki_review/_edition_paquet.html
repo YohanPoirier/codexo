@@ -12,7 +12,7 @@
       {% if groupe.deck|peut_editer_deck:user %}
         <a class="edition-icone-btn" href="{% url 'anki_review:modifier_deck' groupe.deck.id %}" title="Modifier">✏️</a>
         <form method="post" action="{% url 'anki_review:supprimer_deck' groupe.deck.id %}"
-              onsubmit="return confirm('Supprimer le paquet « {{ groupe.deck.nom }} » et toutes ses cartes ?');" style="display:contents;">
+              onsubmit="return confirm('{% if user.is_staff %}Supprimer le paquet « {{ groupe.deck.nom }} » et toutes ses cartes ?{% else %}Supprimer le paquet « {{ groupe.deck.nom }} » ? Tes cartes seront retirées. Celles que d\'autres étudiants utilisent leur sont conservées, avec le paquet.{% endif %}');" style="display:contents;">
           {% csrf_token %}
           <button type="submit" class="edition-icone-btn supprimer" title="Supprimer">🗑️</button>
         </form>

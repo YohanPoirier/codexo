@@ -222,3 +222,69 @@ class CarteRecupereeGardeeTests(TestCase):
     def test_son_paquet_n_est_pas_propose_pour_y_ajouter_ses_cartes(self):
         reponse = self.client.get(reverse("anki_review:ajouter_note"))
         self.assertNotIn(self.deck, list(reponse.context["decks"]))
+
+
+@override_settings(**CONFIG)
+class SuppressionPaquetTests(TestCase):
+    """Personne ne peut priver les autres d'une carte qu'ils utilisent."""
+
+    def setUp(self):
+        self.a, self.b = eleve("A-suppr"), eleve("B-suppr")
+        self.deck = Deck.objects.create(nom="Paquet 1", slug="paquet-1", cree_par=self.a)
+        self.partagee = Note.objects.create(
+            deck=self.deck, question="partagée", reponse="R", cree_par=self.a, partagee_avec_classe=True)
+        self.privee = Note.objects.create(deck=self.deck, question="privée", reponse="R", cree_par=self.a)
+        for note in (self.partagee, self.privee):
+            Card.objects.create(note=note, etudiant=self.a)
+        Card.objects.create(note=self.partagee, etudiant=self.b)  # B l'a récupérée
+        self.url = reverse("anki_review:supprimer_deck", args=[self.deck.id])
+
+    def test_le_paquet_et_la_carte_utilisee_sont_conserves(self):
+        self.client.force_login(self.a)
+        self.client.post(self.url)
+        self.assertTrue(Deck.objects.filter(pk=self.deck.pk).exists())
+        self.partagee.refresh_from_db()
+        self.assertEqual(self.partagee.cree_par, self.b)  # B en devient propriétaire
+        self.assertTrue(Card.objects.filter(note=self.partagee, etudiant=self.b).exists())
+        self.deck.refresh_from_db()
+        self.assertEqual(self.deck.cree_par, self.b)  # et du paquet
+
+    def test_les_cartes_que_personne_d_autre_n_utilise_sont_supprimees(self):
+        self.client.force_login(self.a)
+        self.client.post(self.url)
+        self.assertFalse(Note.objects.filter(pk=self.privee.pk).exists())
+        self.assertFalse(Card.objects.filter(etudiant=self.a).exists())
+
+    def test_b_garde_acces_a_son_paquet_et_peut_le_reviser(self):
+        self.client.force_login(self.a)
+        self.client.post(self.url)
+        self.client.force_login(self.b)
+        self.assertEqual(self.client.get(reverse("anki_review:reviser", args=["paquet-1"])).status_code, 200)
+
+    def test_cartes_ajoutees_par_b_dans_le_paquet_de_a_conservees(self):
+        perso = Note.objects.create(deck=self.deck, question="de B", reponse="R", cree_par=self.b)
+        Card.objects.create(note=perso, etudiant=self.b)
+        self.client.force_login(self.a)
+        self.client.post(self.url)
+        self.assertTrue(Note.objects.filter(pk=perso.pk).exists())
+
+    def test_paquet_que_personne_d_autre_n_utilise_est_vraiment_supprime(self):
+        Card.objects.filter(etudiant=self.b).delete()
+        self.client.force_login(self.a)
+        self.client.post(self.url)
+        self.assertFalse(Deck.objects.filter(pk=self.deck.pk).exists())
+
+    def test_le_professeur_supprime_tout(self):
+        prof = User.objects.create_user("prof-suppr", "mdp-test-solide-1", role=User.PROF)
+        prof.a_vu_intro_pas_a_pas = True
+        prof.save()
+        self.client.force_login(prof)
+        self.client.post(self.url)
+        self.assertFalse(Deck.objects.filter(pk=self.deck.pk).exists())
+        self.assertFalse(Note.objects.filter(pk=self.partagee.pk).exists())
+
+    def test_retrait_d_une_carte_garde_le_transfert_de_propriete(self):
+        self.client.force_login(self.a)
+        self.client.post(reverse("anki_review:supprimer_note", args=[self.partagee.id]))
+        self.partagee.refresh_from_db()
+        self.assertEqual(self.partagee.cree_par, self.b)
