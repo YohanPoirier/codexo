@@ -3,6 +3,9 @@
 Par défaut : RAPPORT seulement (rien n'est modifié). Avec --appliquer : réécrit les cartes
 (et propositions) dont le HTML change une fois nettoyé.
 """
+import difflib
+import re
+
 from django.core.management.base import BaseCommand
 
 from anki_review.html_propre import nettoyer_html
@@ -14,6 +17,10 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--appliquer", action="store_true", help="Enregistre les changements.")
+        parser.add_argument(
+            "--detail", action="store_true",
+            help="Affiche, pour chaque carte, ce que le nettoyage retire ou ajoute.",
+        )
 
     def handle(self, *args, **options):
         appliquer = options["appliquer"]
@@ -25,9 +32,25 @@ class Command(BaseCommand):
                     continue
                 concernes += 1
                 self.stdout.write(f"  {modele.__name__} #{obj.pk} modifiée par le nettoyage")
+                if options["detail"]:
+                    for champ, avant, apres in (("question", obj.question, q), ("réponse", obj.reponse, r)):
+                        if avant != apres:
+                            self.stdout.write(f"      {champ} : {self._difference(avant, apres)}")
                 if appliquer:
                     # update() : évite les effets de bord de save() (carte réversible, etc.)
                     modele.objects.filter(pk=obj.pk).update(question=q, reponse=r)
             self.stdout.write(f"{concernes} {libelle} concernée(s).")
         if not appliquer:
             self.stdout.write("Rapport seulement : relancer avec --appliquer pour écrire.")
+
+    @staticmethod
+    def _difference(avant, apres):
+        """Résumé lisible : fragments retirés (-) et ajoutés (+), balise par balise."""
+        morceaux = lambda t: re.findall(r"<[^>]*>|[^<]+", t)
+        a, b = morceaux(avant), morceaux(apres)
+        sortie = []
+        for ligne in difflib.ndiff(a, b):
+            if ligne[:2] in ("- ", "+ "):
+                texte = ligne[2:].replace("\n", " ")
+                sortie.append(f"{ligne[0]}{texte[:80]}")
+        return " | ".join(sortie) or "(différence de mise en forme)"
