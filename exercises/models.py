@@ -308,7 +308,7 @@ class Exercise(models.Model):
             extra_test_code += "\n"
 
         template = '''__RESULTS__ = []
-import json as _json, io as _io, contextlib as _contextlib, ast
+import json as _json, io as _io, contextlib as _contextlib, ast, copy as _copy
 def _decrire_erreur(e):
     # « IndexError: list index out of range (ligne 6) » : type, message, et ligne du code
     # de l'étudiant où l'erreur s'est produite. Les cadres du code de l'étudiant partagent
@@ -336,14 +336,16 @@ for _case in _cases:
     _args = _case.get('args', [])
     _args_repr = ', '.join(repr(a) for a in _args)
     try:
-        _attendu = _solution_ns['__FN__'](*_args)
+        # Chacun reçoit sa PROPRE copie des arguments : un corrigé (ou une fonction d'élève)
+        # qui modifie sa liste « en place » ne doit pas fausser l'autre appel ni le message.
+        _attendu = _solution_ns['__FN__'](*_copy.deepcopy(_args))
     except Exception as e:
         __RESULTS__.append((False, f"Erreur dans le code de correction pour __FN__({_args_repr}) : {e}", ""))
         continue
     _out = _io.StringIO()
     try:
         with _contextlib.redirect_stdout(_out):
-            _obtenu = __FN__(*_args)
+            _obtenu = __FN__(*_copy.deepcopy(_args))
         try:
             _ok = bool(_obtenu == _attendu)
         except (ValueError, TypeError):
