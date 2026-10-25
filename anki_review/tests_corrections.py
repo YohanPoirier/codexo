@@ -288,3 +288,19 @@ class SuppressionPaquetTests(TestCase):
         self.client.post(reverse("anki_review:supprimer_note", args=[self.partagee.id]))
         self.partagee.refresh_from_db()
         self.assertEqual(self.partagee.cree_par, self.b)
+
+
+@override_settings(PAS_A_PAS_ELEVES=True, **{k: v for k, v in CONFIG.items() if k != "PAS_A_PAS_ELEVES"})
+class DeconnexionDepuisAnkiTests(TestCase):
+    def test_se_deconnecter_puis_se_reconnecter_depuis_anki_reste_dans_anki(self):
+        u = User.objects.create_user("e-logout", "mdp-test-solide-1", role=User.ELEVE)  # n'a pas vu la présentation
+        self.client.force_login(u)
+        html = self.client.get(reverse("anki_review:liste_decks")).content.decode()
+        self.assertIn('name="next"', html)
+        reponse = self.client.post(reverse("logout"), {"next": f"{reverse('login')}?next=/anki/"})
+        self.assertEqual(reponse.status_code, 302)
+        self.assertEqual(reponse.url, "/login/?next=/anki/")
+        reponse = self.client.post("/login/?next=/anki/", {"username": "e-logout", "password": "mdp-test-solide-1"})
+        self.assertEqual(reponse.status_code, 302)
+        self.assertEqual(reponse.url, "/anki/")
+        self.assertEqual(self.client.get("/anki/").status_code, 200)  # pas de redirection vers la présentation

@@ -46,6 +46,8 @@
       {% endif %}
       {% if user.is_authenticated %}
         <form method="post" action="{% url 'logout' %}" class="logout-form">
+          {# Déconnecté depuis Anki : la page de connexion ramène dans Anki (et non sur Codexo). #}
+          <input type="hidden" name="next" value="{% url 'login' %}?next={% url 'anki_review:liste_decks' %}">
           {% csrf_token %}
           <button type="submit" class="nav-link-btn">Déconnexion</button>
         </form>
