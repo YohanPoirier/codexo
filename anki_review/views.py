@@ -1091,24 +1091,30 @@ def _lien_changer(notes):
 
 
 def _recuperer(request, notes):
-    """Récupère `notes` dans la révision de l'utilisateur. Si une règle de rangement désigne
-    déjà le paquet, c'est fait aussitôt ; sinon il faut lui demander où les ranger.
-    Renvoie (destination, creees) — destination None : il faut demander (rien n'est fait)."""
-    destination = gestion_paquets.regle_destination(request.user, notes)
-    if destination is None:
-        return None, []
-    creees, _ = gestion_paquets.ranger(request.user, notes, destination)
+    """Récupère `notes` dans la révision de l'utilisateur, sans rien lui demander : dans le
+    paquet que sa règle de rangement désigne, sinon dans un paquet à lui de même nom que
+    l'original (créé si besoin). S'il n'est pas d'accord, le lien « Changer » rouvre l'écran de
+    choix. Renvoie (destination, creees)."""
+    par_destination = {}
+    for note in notes:
+        destination = gestion_paquets.paquet_par_defaut(request.user, note)
+        par_destination.setdefault(destination.id, (destination, []))[1].append(note)
+    creees = []
+    for destination, lot in par_destination.values():
+        nouvelles, _ = gestion_paquets.ranger(request.user, lot, destination)
+        creees += nouvelles
     for carte in creees:
         Activite.journaliser(request.user, Activite.Type.RECUPERATION, carte)
-    return destination, creees
+    premiere = next(iter(par_destination.values()))[0]
+    return premiere, creees
 
 
 @login_required
 def ajouter_carte_partagee(request, note_id):
     """
     "Ajouter" une carte partagée : ça ne fait que créer une Card pour soi sur la note EXISTANTE
-    (pas de copie). Elle est rangée dans un paquet À SOI : celui que la règle de rangement
-    désigne, sinon on demande où (ranger_cartes).
+    (pas de copie). Elle est rangée aussitôt dans un paquet À SOI : celui que la règle de
+    rangement désigne, sinon un paquet de même nom que l'original (« Changer » pour choisir autrement).
     """
     if request.method != "POST":
         return redirect("anki_review:partage_etudiants")
@@ -1123,10 +1129,6 @@ def ajouter_carte_partagee(request, note_id):
         return redirect("anki_review:partage_etudiants")
 
     destination, creees = _recuperer(request, [note])
-    if destination is None:
-        if _est_ajax(request):
-            return JsonResponse({"choix": _lien_changer([note])})
-        return redirect(_lien_changer([note]))
     if _est_ajax(request):
         return JsonResponse({"cree": True, "deck": destination.nom, "changer": _lien_changer([note])})
     messages.success(request, format_html(
@@ -1138,7 +1140,7 @@ def ajouter_carte_partagee(request, note_id):
 def ajouter_paquet_partage(request, deck_id, cree_par_id):
     """Ajoute EN BLOC toutes les cartes qu'un même étudiant a partagées
     depuis un paquet donné — une Card par note, sans rien dupliquer, rangées dans un paquet à
-    soi (règle de rangement, sinon on demande où)."""
+    soi (règle de rangement, sinon un paquet de même nom que l'original)."""
     if request.method != "POST":
         return redirect("anki_review:partage_etudiants")
     if request.user.is_staff:
@@ -1156,10 +1158,6 @@ def ajouter_paquet_partage(request, deck_id, cree_par_id):
         return redirect("anki_review:partage_etudiants")
 
     destination, creees = _recuperer(request, notes)
-    if destination is None:
-        if _est_ajax(request):
-            return JsonResponse({"choix": _lien_changer(notes)})
-        return redirect(_lien_changer(notes))
     nb = len(creees)
     if _est_ajax(request):
         return JsonResponse({"nouvelles": nb, "deck": destination.nom, "changer": _lien_changer(notes)})

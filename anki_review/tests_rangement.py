@@ -57,17 +57,25 @@ class RecuperationTests(TestCase):
         return self.client.post(
             reverse("anki_review:ranger_cartes"), {"notes": ",".join(str(n.id) for n in notes), **donnees})
 
-    # ---- sans règle : on demande où ranger
-    def test_sans_regle_ajouter_ne_cree_rien_et_renvoie_vers_le_choix(self):
+    # ---- sans règle : rangée aussitôt dans un paquet de même nom, « Changer » pour choisir autrement
+    def test_sans_regle_la_carte_est_rangee_dans_un_paquet_de_meme_nom(self):
         r = self.client.post(reverse("anki_review:ajouter_carte_partagee", args=[self.n1.id]))
         self.assertEqual(r.status_code, 302)
-        self.assertIn(reverse("anki_review:ranger_cartes"), r["Location"])
-        self.assertFalse(Card.objects.filter(etudiant=self.b).exists())
+        deck_b = Deck.objects.get(cree_par=self.b)
+        self.assertEqual((deck_b.nom, deck_b.matiere), ("Vocabulaire", "anglais"))
+        self.assertEqual(Card.objects.get(etudiant=self.b).deck, deck_b)
+        self.assertFalse(RegleRangement.objects.exists())  # le même nom se retrouve sans règle
 
-    def test_sans_regle_en_ajax_on_recoit_l_adresse_du_choix(self):
+    def test_sans_regle_en_ajax_on_recoit_le_paquet_et_le_lien_changer(self):
         r = self.client.post(reverse("anki_review:ajouter_carte_partagee", args=[self.n1.id]), **AJAX)
-        self.assertIn("choix", r.json())
-        self.assertFalse(Card.objects.filter(etudiant=self.b).exists())
+        self.assertEqual(r.json()["deck"], "Vocabulaire")
+        self.assertIn(reverse("anki_review:ranger_cartes"), r.json()["changer"])
+
+    def test_la_deuxieme_carte_retrouve_le_meme_paquet(self):
+        self.client.post(reverse("anki_review:ajouter_carte_partagee", args=[self.n1.id]))
+        self.client.post(reverse("anki_review:ajouter_carte_partagee", args=[self.n2.id]))
+        self.assertEqual(Deck.objects.filter(cree_par=self.b).count(), 1)
+        self.assertEqual(Card.objects.filter(etudiant=self.b).count(), 2)
 
     def test_la_page_de_choix_propose_le_paquet_de_meme_nom(self):
         r = self.client.get(reverse("anki_review:ranger_cartes") + f"?notes={self.n1.id},{self.n2.id}")
@@ -137,11 +145,11 @@ class RecuperationTests(TestCase):
         self.assertEqual(r.json()["nouvelles"], 2)  # cat et bird : dog était déjà là
         self.assertEqual(Card.objects.get(etudiant=self.b, note=nouvelle).deck.nom, "Anglais B")
 
-    def test_tout_ajouter_sans_regle_demande_ou_ranger(self):
+    def test_tout_ajouter_sans_regle_range_dans_un_paquet_de_meme_nom(self):
         r = self.client.post(
             reverse("anki_review:ajouter_paquet_partage", args=[self.deck_a.id, self.a.id]), **AJAX)
-        self.assertIn("choix", r.json())
-        self.assertFalse(Card.objects.filter(etudiant=self.b).exists())
+        self.assertEqual((r.json()["nouvelles"], r.json()["deck"]), (2, "Vocabulaire"))
+        self.assertEqual(Card.objects.filter(etudiant=self.b, deck__nom="Vocabulaire").count(), 2)
 
     def test_une_regle_ne_deplace_pas_ce_qui_est_deja_range(self):
         self._ranger([self.n1], choix="meme_nom")  # dog -> « Vocabulaire » (à B)

@@ -203,7 +203,6 @@ async function envoyerAjout(form) {
     });
     if (!reponse.ok) throw new Error('HTTP ' + reponse.status);
     const data = await reponse.json();
-    if (data.choix) { window.location = data.choix; return; }  // pas de règle : on demande où ranger
     const details = form.closest('details.ie-groupe');
     if (form.classList.contains('js-ajout-paquet')) {
       details.querySelectorAll('.js-ajout-note').forEach(marquerNoteAjoutee);
