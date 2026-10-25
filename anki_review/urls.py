@@ -1,11 +1,13 @@
 from django.urls import path
 
 from . import views, views_notifications
+from .acces import ConnexionAnkiView
 
 app_name = "anki_review"
 
 urlpatterns = [
     path("", views.liste_decks, name="liste_decks"),
+    path("connexion/", ConnexionAnkiView.as_view(), name="connexion"),
 
     # Espace prof — routes fixes, doivent être déclarées AVANT le
     # "<slug:deck_slug>/" générique ci-dessous, sans quoi Django

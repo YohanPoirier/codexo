@@ -1,7 +1,6 @@
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from datetime import datetime, time, timedelta
@@ -15,6 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
+from .acces import login_required
 from .forms import DeckForm, NoteForm
 from . import decks as gestion_paquets
 from .html_propre import EXTENSIONS_IMAGE_AUTORISEES

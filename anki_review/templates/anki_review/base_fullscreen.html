@@ -43,7 +43,7 @@
           <button type="submit" class="nav-link-btn">Déconnexion</button>
         </form>
       {% else %}
-        <a href="{% url 'login' %}?next={{ request.path }}">Connexion</a>
+        {% url 'anki_review:connexion' as url_connexion %}<a href="{{ url_connexion }}{% if request.path != url_connexion %}?next={{ request.path }}{% endif %}">Connexion</a>
       {% endif %}
     </nav>
   </div>

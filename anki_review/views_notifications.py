@@ -10,13 +10,13 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from . import notifications
+from .acces import login_required
 from .models import AbonnementPush, PreferencesNotification
 
 LONGUEUR_ENDPOINT_MAX = 2000

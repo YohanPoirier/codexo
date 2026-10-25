@@ -1,4 +1,5 @@
 """Paquets personnels et rangement automatique."""
+import re
 from importlib import import_module
 
 from django.apps import apps as registre_apps
@@ -463,3 +464,38 @@ class PagesTests(TestCase):
         r = self.client.post(reverse("anki_review:exporter_apkg_selection"), {"notes": [self.mienne.id, self.off.id]})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r["Content-Disposition"], 'attachment; filename="export.apkg"')
+
+
+@override_settings(**CONFIG)
+class ConnexionAnkiTests(TestCase):
+    def setUp(self):
+        self.a = eleve("A-conn")
+
+    def test_un_visiteur_est_renvoye_vers_la_connexion_d_anki(self):
+        r = self.client.get(reverse("anki_review:liste_decks"))
+        self.assertRedirects(
+            r, reverse("anki_review:connexion") + "?next=" + reverse("anki_review:liste_decks"),
+            fetch_redirect_response=False)
+
+    def test_la_page_est_celle_d_anki_sans_codexo(self):
+        r = self.client.get(reverse("anki_review:connexion"))
+        self.assertContains(r, "Se connecter")
+        self.assertContains(r, 'class="brand"')
+        visible = re.sub(r"<!--.*?-->", "", r.content.decode(), flags=re.S)
+        self.assertNotIn("Codexo", visible)
+
+    def test_la_connexion_ramene_dans_anki(self):
+        r = self.client.post(reverse("anki_review:connexion"),
+                             {"username": self.a.identifiant, "password": "mdp-test-solide-1"})
+        self.assertRedirects(r, reverse("anki_review:liste_decks"), fetch_redirect_response=False)
+
+    def test_la_connexion_respecte_next(self):
+        url = reverse("anki_review:edition")
+        r = self.client.post(reverse("anki_review:connexion") + "?next=" + url,
+                             {"username": self.a.identifiant, "password": "mdp-test-solide-1", "next": url})
+        self.assertRedirects(r, url, fetch_redirect_response=False)
+
+    def test_mauvais_mot_de_passe(self):
+        r = self.client.post(reverse("anki_review:connexion"),
+                             {"username": self.a.identifiant, "password": "faux"})
+        self.assertEqual(r.status_code, 200)

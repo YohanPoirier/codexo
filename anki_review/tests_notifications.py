@@ -318,7 +318,7 @@ class VuesTests(Base):
                     "notifications_preferences", "notifications_test"):
             r = self.client.post(reverse(f"anki_review:{nom}"))
             self.assertEqual(r.status_code, 302, nom)
-            self.assertIn("/login/", r["Location"])
+            self.assertIn("/anki/connexion/", r["Location"])
         self.client.force_login(self.eleve)
         self.assertEqual(self.client.get(reverse("anki_review:notifications_abonner")).status_code, 405)
 
