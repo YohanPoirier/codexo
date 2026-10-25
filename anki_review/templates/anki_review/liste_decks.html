@@ -44,8 +44,13 @@
     </ul>
   </details>
 {% empty %}
-  <p>Tu n'as encore aucun paquet. Récupère des cartes partagées (menu Import/Export, « Entre étudiants »)
-     ou crée tes propres cartes dans <a href="{% url 'anki_review:edition' %}">Édition</a> : elles seront rangées dans tes paquets.</p>
+  <p>Tu n'as encore aucun paquet. Il y a trois façons d'ajouter des cartes :</p>
+  <ul>
+    <li>les <a href="{% url 'anki_review:ajouter_note' %}">créer toi-même</a> (ou les gérer dans <a href="{% url 'anki_review:edition' %}">Édition</a>) ;</li>
+    <li><a href="{% url 'anki_review:partage_etudiants' %}">récupérer les cartes partagées</a> par le professeur ou d'autres étudiants ;</li>
+    <li><a href="{% url 'anki_review:import_export_fichier' %}">importer un fichier</a> Anki (.apkg).</li>
+  </ul>
+  <p>Elles seront rangées dans tes paquets, que personne d'autre ne voit.</p>
 {% endfor %}
 {% endblock %}
 
