@@ -403,6 +403,29 @@ def prevenir_proposition(proposition):
     threading.Thread(target=envoyer, daemon=True).start()
 
 
+def message_deplacement(suggestion):
+    auteur = suggestion.auteur or "Quelqu'un"
+    return {
+        "titre": "Déplacement proposé",
+        "corps": (
+            f"{auteur} a déplacé ses cartes de « {suggestion.ancien_deck.nom} » vers "
+            f"« {suggestion.nouveau_deck.nom} ». Déplacer aussi les tiennes ?"
+        ),
+        "url": reverse("anki_review:liste_decks"),
+        "tag": f"anki-deplacement-{suggestion.id}",
+    }
+
+
+def prevenir_deplacements(suggestions):
+    """Notification immédiate à chaque destinataire d'une suggestion de déplacement (même
+    réglage que les modifications proposées : « propositions sur mes cartes »)."""
+    if not suggestions or not configuration_ok():
+        return
+    for suggestion in suggestions:
+        if PreferencesNotification.pour(suggestion.destinataire).propositions:
+            _envoyer_en_fond([suggestion.destinataire], message_deplacement(suggestion))
+
+
 # ---------------------------------------------------------------- demandes d'aide (Codexo)
 
 

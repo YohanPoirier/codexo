@@ -12,7 +12,7 @@ from django.utils.text import slugify
 # porter un comme slug. Un test compare cette liste aux routes réelles pour ne rien oublier.
 SLUGS_RESERVES = frozenset({
     "trafic", "edition", "paquets", "ajouter", "cartes", "uploader-image",
-    "matiere", "import-export", "propositions", "notifications",
+    "matiere", "import-export", "propositions", "notifications", "deplacements",
 })
 
 SLUG_PAR_DEFAUT = "paquet"

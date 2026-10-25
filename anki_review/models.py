@@ -241,6 +241,42 @@ class PropositionModification(models.Model):
         super().save(*args, **kwargs)
 
 
+class SuggestionDeplacement(models.Model):
+    """Proposition faite à quelqu'un de déplacer lui aussi ses cartes d'un paquet vers un autre.
+
+    Créée quand `auteur` déplace ses cartes de `ancien_deck` vers `nouveau_deck` (voir
+    decks.proposer_aux_autres) : les autres personnes qui ont encore des cartes À ELLES dans
+    l'ancien paquet se voient proposer la même chose, pour finir de rassembler les cartes
+    (ex. deux paquets « Vocabulaire » écrits chacun de leur côté). C'est une suggestion, jamais
+    une action automatique : le destinataire accepte ou refuse."""
+
+    class Statut(models.TextChoices):
+        EN_ATTENTE = "en_attente", "En attente"
+        ACCEPTEE = "acceptee", "Acceptée"
+        REFUSEE = "refusee", "Refusée"
+
+    destinataire = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="suggestions_deplacement"
+    )
+    auteur = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+",
+    )
+    ancien_deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="+")
+    nouveau_deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="+")
+    statut = models.CharField(max_length=12, choices=Statut.choices, default=Statut.EN_ATTENTE)
+    cree_le = models.DateTimeField(auto_now_add=True)
+    traitee_le = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-cree_le"]
+        # Une seule suggestion par (personne, ancien paquet, nouveau paquet) : un refus n'est
+        # pas redemandé, et deux personnes qui déplacent vers le même paquet n'en créent qu'une.
+        unique_together = [("destinataire", "ancien_deck", "nouveau_deck")]
+
+    def __str__(self):
+        return f"Déplacement proposé à {self.destinataire} : {self.ancien_deck} → {self.nouveau_deck}"
+
+
 class Activite(models.Model):
     """
     Journal des événements d'un étudiant dans la partie Anki, pour la page

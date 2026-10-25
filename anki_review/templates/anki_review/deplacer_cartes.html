@@ -1,0 +1,44 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}Déplacer mes cartes — Anki{% endblock %}
+
+{% block content %}
+<p class="edition-fil"><a href="{% url 'anki_review:edition' %}">← Édition</a></p>
+<h1>Déplacer mes cartes</h1>
+
+<p class="editeur-champ-aide">
+  Paquet de départ : <strong>« {{ deck.nom }} »</strong>.<br>
+  {{ nb_a_moi }} carte{{ nb_a_moi|pluralize }} {% if nb_a_moi > 1 %}t'appartiennent{% else %}t'appartient{% endif %}
+  dans ce paquet : {% if nb_a_moi > 1 %}elles seront déplacées{% else %}elle sera déplacée{% endif %}
+  avec leur progression et leur partage, sans rien copier ni supprimer.
+  {% if nb_recuperees %}
+    Les {{ nb_recuperees }} carte{{ nb_recuperees|pluralize }} que tu as récupérée{{ nb_recuperees|pluralize }}
+    chez d'autres ne t'appartiennent pas : {% if nb_recuperees > 1 %}elles restent{% else %}elle reste{% endif %} dans ce paquet.
+  {% endif %}
+  {% if avertit_les_autres %}
+    Les autres personnes qui ont encore des cartes à elles dans ce paquet recevront la même proposition, qu'elles
+    pourront accepter ou refuser.
+  {% endif %}
+</p>
+
+{% if not decks %}
+  <p>Il n'y a aucun autre paquet où tu puisses déplacer tes cartes.</p>
+{% else %}
+  <form method="post" class="editeur-note" style="max-width:480px;">
+    {% csrf_token %}
+    <div class="editeur-champ-groupe">
+      <label for="id_destination">Déplacer vers</label>
+      <select name="destination" id="id_destination" class="select-stylise" required>
+        <option value="">— Choisir un paquet —</option>
+        {% regroup decks by libelle_matiere as groupes %}
+        {% for groupe in groupes %}
+          <optgroup label="{{ groupe.grouper }}">
+            {% for d in groupe.list %}<option value="{{ d.id }}">{{ d.nom }}</option>{% endfor %}
+          </optgroup>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn-ajouter">Déplacer mes cartes</button>
+  </form>
+{% endif %}
+{% endblock %}

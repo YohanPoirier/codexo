@@ -9,6 +9,9 @@
       </span>
     </div>
     <div class="edition-actions" onclick="event.stopPropagation()">
+      {% if groupe.notes|compte_notes_de:user %}
+        <a class="edition-icone-btn" href="{% url 'anki_review:deplacer_cartes' groupe.deck.id %}" title="Déplacer mes cartes vers un autre paquet">📦</a>
+      {% endif %}
       {% if groupe.deck|peut_editer_deck:user %}
         <a class="edition-icone-btn" href="{% url 'anki_review:modifier_deck' groupe.deck.id %}" title="Modifier">✏️</a>
         <form method="post" action="{% url 'anki_review:supprimer_deck' groupe.deck.id %}"

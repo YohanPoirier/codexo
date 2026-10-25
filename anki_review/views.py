@@ -15,8 +15,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .forms import DeckForm, NoteForm
+from . import decks as gestion_paquets
 from .html_propre import EXTENSIONS_IMAGE_AUTORISEES
-from .models import Activite, Card, Deck, Note, PropositionModification
+from .models import Activite, Card, Deck, Note, PropositionModification, SuggestionDeplacement
 from .sm2 import Reponse, appliquer, calculer_prochaine_etape
 from .apkg_import import importer_apkg, analyser_apkg, ErreurImportApkg
 from .apkg_export import exporter_notes_apkg
@@ -44,31 +45,7 @@ PREFIXE_IMAGES_NOTES = f"{settings.MEDIA_URL}anki_review/notes/"
 SEUIL_REAPPARITION_SESSION = 3
 
 
-def _decks_visibles(user, avec_mes_cartes=True):
-    """Paquets visibles par cet utilisateur : ceux du prof (officiels, sans
-    créateur ou créé par un membre du staff) + les siens propres + tout
-    paquet contenant au moins une note partagée (même appartenant à un
-    autre étudiant) — nécessaire depuis qu'une note "récupérée" n'est plus
-    copiée dans un paquet à soi : elle reste dans son paquet d'origine, qui
-    doit donc devenir visible pour qu'on puisse la retrouver dans Édition.
-    Un paquet privé sans aucune note partagée reste invisible aux autres,
-    comme avant.
-
-    + tout paquet où il a au moins une carte (avec_mes_cartes) : une carte
-    récupérée est GARDÉE même si son propriétaire cesse de la partager, et
-    son paquet doit donc rester visible, sinon la carte serait conservée
-    en base mais introuvable (ni dans l'accueil, ni en révision).
-    avec_mes_cartes=False sert aux formulaires d'ajout de carte : on n'y
-    propose pas, pour y écrire, le paquet d'un autre qui a cessé de partager."""
-    if user.is_staff:
-        return Deck.objects.all()
-    visibilite = (
-        Q(cree_par__isnull=True) | Q(cree_par__is_staff=True) | Q(cree_par=user)
-        | Q(notes__partagee_avec_classe=True)
-    )
-    if avec_mes_cartes:
-        visibilite |= Q(notes__cards__etudiant=user)
-    return Deck.objects.filter(visibilite).distinct()
+_decks_visibles = gestion_paquets.decks_visibles
 
 
 def _decks_pour_selecteur(decks_visibles):
@@ -131,6 +108,7 @@ def liste_decks(request):
     return render(request, "anki_review/liste_decks.html", {
         "matieres": matieres,
         "nb_propositions": propositions.count(),
+        "suggestions": gestion_paquets.suggestions_en_attente(request.user),
         **views_notifications.contexte_invitation(request.user),
     })
 
@@ -1139,6 +1117,85 @@ def ajouter_paquet_partage(request, deck_id, cree_par_id):
         f"carte{'s' if nb_ajoutees > 1 else ''}).",
     )
     return redirect("anki_review:partage_etudiants")
+
+
+@login_required
+def deplacer_cartes(request, deck_id):
+    """Déplace d'un coup toutes MES cartes (celles dont je suis propriétaire) d'un paquet vers
+    un autre — pour rassembler des cartes écrites chacun de son côté. Les cartes que j'ai
+    seulement récupérées chez d'autres restent en place. Les autres personnes qui ont encore des
+    cartes à elles dans ce paquet reçoivent la même proposition (gestion_paquets.proposer_aux_autres)."""
+    source = get_object_or_404(_decks_visibles(request.user), pk=deck_id)
+    nb_a_moi = gestion_paquets.mes_notes(request.user, source).count()
+    if not nb_a_moi:
+        messages.info(request, "Tu n'as aucune carte à toi dans ce paquet : rien à déplacer.")
+        return redirect("anki_review:edition")
+
+    destinations = _decks_visibles(request.user, avec_mes_cartes=False).exclude(pk=source.pk)
+    if request.method == "POST":
+        destination = destinations.filter(pk=request.POST.get("destination") or 0).first()
+        if destination is None:
+            messages.error(request, "Choisis le paquet de destination.")
+            return redirect("anki_review:deplacer_cartes", deck_id=source.id)
+        source_id = source.id
+        try:
+            nb = gestion_paquets.deplacer_mes_cartes(request.user, source, destination)
+        except gestion_paquets.DeplacementImpossible as e:
+            messages.error(request, str(e))
+            return redirect("anki_review:edition")
+        # L'ancien paquet a pu être supprimé (vidé, et c'était le sien) : alors personne d'autre
+        # n'y avait de carte, et il n'y a rien à proposer.
+        source = Deck.objects.filter(pk=source_id).select_related("cree_par").first()
+        suggestions = (
+            gestion_paquets.proposer_aux_autres(request.user, source, destination) if source else []
+        )
+        notifications.prevenir_deplacements(suggestions)
+        texte = f"{nb} carte{'s' if nb > 1 else ''} déplacée{'s' if nb > 1 else ''} vers « {destination.nom} »."
+        if suggestions:
+            texte += " Les autres personnes qui ont des cartes à elles dans l'ancien paquet peuvent faire de même."
+        messages.success(request, texte)
+        return redirect("anki_review:edition")
+
+    nb_recuperees = Card.objects.filter(note__deck=source, etudiant=request.user).exclude(
+        note__cree_par=request.user).count()
+    return render(request, "anki_review/deplacer_cartes.html", {
+        "deck": source, "nb_a_moi": nb_a_moi, "nb_recuperees": nb_recuperees,
+        "decks": _decks_pour_selecteur(destinations),
+        "avertit_les_autres": source.cree_par_id is not None and not source.cree_par.is_staff,
+    })
+
+
+@login_required
+def accepter_deplacement(request, suggestion_id):
+    suggestion = get_object_or_404(
+        SuggestionDeplacement.objects.select_related("ancien_deck", "nouveau_deck"),
+        id=suggestion_id, destinataire=request.user, statut=SuggestionDeplacement.Statut.EN_ATTENTE,
+    )
+    if request.method == "POST":
+        try:
+            nb = gestion_paquets.accepter_suggestion(suggestion)
+        except gestion_paquets.DeplacementImpossible as e:
+            messages.error(request, f"Ce déplacement n'est plus possible : {e}")
+        else:
+            messages.success(
+                request,
+                f"{nb} carte{'s' if nb > 1 else ''} déplacée{'s' if nb > 1 else ''} vers « {suggestion.nouveau_deck.nom} ».",
+            )
+    return redirect("anki_review:liste_decks")
+
+
+@login_required
+def refuser_deplacement(request, suggestion_id):
+    suggestion = get_object_or_404(
+        SuggestionDeplacement, id=suggestion_id, destinataire=request.user,
+        statut=SuggestionDeplacement.Statut.EN_ATTENTE,
+    )
+    if request.method == "POST":
+        suggestion.statut = SuggestionDeplacement.Statut.REFUSEE
+        suggestion.traitee_le = timezone.now()
+        suggestion.save(update_fields=["statut", "traitee_le"])
+        messages.success(request, "Tes cartes restent où elles sont.")
+    return redirect("anki_review:liste_decks")
 
 
 @login_required

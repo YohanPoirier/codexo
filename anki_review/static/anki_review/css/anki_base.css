@@ -357,6 +357,14 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
   color: var(--ink); text-decoration: none;
 }
 .propositions-alerte:hover { background: rgba(217, 142, 43, .16); }
+.suggestion-deplacement {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px;
+  padding: 12px 18px; margin-bottom: 14px; font-size: .92rem;
+  background: rgba(217, 142, 43, .1); border: 1.5px solid var(--amber); border-radius: 10px;
+}
+.suggestion-deplacement p { margin: 0; }
+.suggestion-deplacement-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.suggestion-deplacement-actions form { margin: 0; }
 .propositions-alerte-lien { font-weight: 600; color: var(--amber); white-space: nowrap; }
 .ie-propositions-bandeau {
   background: rgba(217, 142, 43, .1); border: 1.5px solid var(--amber); border-radius: 10px;

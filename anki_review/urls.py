@@ -17,6 +17,9 @@ urlpatterns = [
     path("paquets/ajouter/", views.ajouter_deck, name="ajouter_deck"),
     path("paquets/<int:deck_id>/modifier/", views.modifier_deck, name="modifier_deck"),
     path("paquets/<int:deck_id>/supprimer/", views.supprimer_deck, name="supprimer_deck"),
+    path("paquets/<int:deck_id>/deplacer-mes-cartes/", views.deplacer_cartes, name="deplacer_cartes"),
+    path("deplacements/<int:suggestion_id>/accepter/", views.accepter_deplacement, name="accepter_deplacement"),
+    path("deplacements/<int:suggestion_id>/refuser/", views.refuser_deplacement, name="refuser_deplacement"),
 
     path("ajouter/", views.ajouter_note, name="ajouter_note"),
     path("cartes/<int:note_id>/modifier/", views.modifier_note, name="modifier_note"),
