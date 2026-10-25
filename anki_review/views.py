@@ -1234,39 +1234,6 @@ def ranger_cartes(request):
 
 
 @login_required
-def rangement_automatique(request):
-    """Les règles « cartes de tel paquet → tel de mes paquets » : les consulter, changer la
-    destination ou les oublier. Elles ne valent que pour les cartes à venir."""
-    regles = RegleRangement.objects.filter(etudiant=request.user).select_related(
-        "origine", "origine__cree_par", "destination").order_by("origine__nom")
-    return render(request, "anki_review/rangement_automatique.html", {
-        "regles": regles, "decks": _decks_pour_selecteur(gestion_paquets.mes_paquets(request.user)),
-    })
-
-
-@login_required
-def modifier_regle(request, regle_id):
-    regle = get_object_or_404(RegleRangement, id=regle_id, etudiant=request.user)
-    if request.method == "POST":
-        destination = gestion_paquets.mes_paquets(request.user).filter(pk=request.POST.get("destination") or 0).first()
-        if destination is None:
-            messages.error(request, "Choisis un de tes paquets.")
-        else:
-            regle.destination = destination
-            regle.save(update_fields=["destination"])
-            messages.success(request, "Règle mise à jour : les prochaines cartes iront dans « %s »." % destination.nom)
-    return redirect("anki_review:rangement_automatique")
-
-
-@login_required
-def oublier_regle(request, regle_id):
-    if request.method == "POST":
-        gestion_paquets.oublier_regle(request.user, regle_id)
-        messages.success(request, "Règle oubliée : les prochaines cartes de ce paquet te seront redemandées.")
-    return redirect("anki_review:rangement_automatique")
-
-
-@login_required
 def deplacer_cartes(request, deck_id):
     """Déplace d'un coup toutes les cartes d'un de MES paquets vers un autre de mes paquets."""
     source = get_object_or_404(gestion_paquets.mes_paquets(request.user), pk=deck_id)

@@ -176,44 +176,6 @@ class RecuperationTests(TestCase):
 
 
 @override_settings(**CONFIG)
-class PageRangementAutomatiqueTests(TestCase):
-    def setUp(self):
-        self.a, self.b, self.c = eleve("A-reg"), eleve("B-reg"), eleve("C-reg")
-        self.deck_a = Deck.objects.create(nom="Optique", slug="optique", cree_par=self.a)
-        self.dest_b = Deck.objects.create(nom="Optique B", slug="optique-b", cree_par=self.b)
-        self.autre_b = Deck.objects.create(nom="Autre B", slug="autre-b", cree_par=self.b)
-        self.regle = RegleRangement.objects.create(etudiant=self.b, origine=self.deck_a, destination=self.dest_b)
-        self.client.force_login(self.b)
-
-    def test_la_page_liste_les_regles(self):
-        r = self.client.get(reverse("anki_review:rangement_automatique"))
-        self.assertContains(r, "Optique B")
-
-    def test_changer_la_destination(self):
-        self.client.post(reverse("anki_review:modifier_regle", args=[self.regle.id]), {"destination": self.autre_b.id})
-        self.regle.refresh_from_db()
-        self.assertEqual(self.regle.destination, self.autre_b)
-
-    def test_destination_d_un_autre_refusee(self):
-        self.client.post(reverse("anki_review:modifier_regle", args=[self.regle.id]), {"destination": self.deck_a.id})
-        self.regle.refresh_from_db()
-        self.assertEqual(self.regle.destination, self.dest_b)
-
-    def test_oublier_la_regle(self):
-        self.client.post(reverse("anki_review:oublier_regle", args=[self.regle.id]))
-        self.assertFalse(RegleRangement.objects.exists())
-
-    def test_la_regle_d_un_autre_est_intouchable(self):
-        self.client.force_login(self.c)
-        self.assertEqual(
-            self.client.post(reverse("anki_review:oublier_regle", args=[self.regle.id])).status_code, 302)
-        self.assertTrue(RegleRangement.objects.filter(pk=self.regle.pk).exists())
-        self.assertEqual(
-            self.client.post(reverse("anki_review:modifier_regle", args=[self.regle.id]), {"destination": 1}).status_code,
-            404)
-
-
-@override_settings(**CONFIG)
 class PaquetsPrivesTests(TestCase):
     def setUp(self):
         self.a, self.b = eleve("A-priv"), eleve("B-priv")
@@ -463,7 +425,7 @@ class PagesTests(TestCase):
         for nom, args in [
             ("liste_decks", []), ("edition", []), ("ajouter_note", []), ("ajouter_deck", []),
             ("import_export_accueil", []), ("import_export_fichier", []), ("partage_etudiants", []),
-            ("rangement_automatique", []), ("notifications", []),
+            ("notifications", []),
             ("edition_deck", [self.deck_a.slug]), ("edition_deck", [self.deck_a_thermo.slug]),
             ("reviser", [self.deck_a.slug]), ("reviser_matiere", ["sans-matiere"]),
             ("modifier_note", [self.mienne.id]), ("modifier_note", [self.off.id]),

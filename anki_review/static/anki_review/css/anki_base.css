@@ -595,4 +595,3 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
 .choix-paquet-souvenir { display: flex; gap: 10px; align-items: flex-start; margin-top: 10px; cursor: pointer; }
 .choix-paquet-souvenir input { margin-top: 4px; }
 .choix-paquet-souvenir .editeur-champ-aide { display: block; }
-.regle-rangement { flex-wrap: wrap; gap: 10px; }

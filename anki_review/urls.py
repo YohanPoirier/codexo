@@ -34,9 +34,6 @@ urlpatterns = [
     path("import-export/fichier/exporter/", views.exporter_apkg_selection, name="exporter_apkg_selection"),
     path("import-export/etudiants/", views.partage_etudiants, name="partage_etudiants"),
     path("import-export/ranger/", views.ranger_cartes, name="ranger_cartes"),
-    path("import-export/rangement-automatique/", views.rangement_automatique, name="rangement_automatique"),
-    path("import-export/rangement-automatique/<int:regle_id>/modifier/", views.modifier_regle, name="modifier_regle"),
-    path("import-export/rangement-automatique/<int:regle_id>/oublier/", views.oublier_regle, name="oublier_regle"),
     path("import-export/<int:note_id>/partager/", views.partager_note_toggle, name="partager_note_toggle"),
     path("import-export/<int:note_id>/ajouter-copie/", views.ajouter_carte_partagee, name="ajouter_carte_partagee"),
 

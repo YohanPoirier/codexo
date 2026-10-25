@@ -109,10 +109,6 @@ def retenir_choix(user, notes, destination):
         )
 
 
-def oublier_regle(user, regle_id):
-    RegleRangement.objects.filter(etudiant=user, pk=regle_id).delete()
-
-
 # ----------------------------------------------------------------------------- rangement
 
 
