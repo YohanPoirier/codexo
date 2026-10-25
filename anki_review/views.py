@@ -18,7 +18,7 @@ from django.utils.html import format_html
 from .forms import DeckForm, NoteForm
 from . import decks as gestion_paquets
 from .html_propre import EXTENSIONS_IMAGE_AUTORISEES
-from .models import Activite, Card, Deck, Note, PropositionModification, RegleRangement
+from .models import Activite, Card, Deck, Note, PropositionModification
 from .sm2 import Reponse, appliquer, calculer_prochaine_etape
 from .apkg_import import importer_apkg, analyser_apkg, ErreurImportApkg
 from .apkg_export import exporter_notes_apkg
