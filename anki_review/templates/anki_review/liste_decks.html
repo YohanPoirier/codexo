@@ -11,25 +11,6 @@
     <span class="propositions-alerte-lien">Voir →</span>
   </a>
 {% endif %}
-{% for s in suggestions %}
-  <div class="suggestion-deplacement">
-    <p>
-      <strong>{{ s.auteur|default:"Quelqu'un" }}</strong> a déplacé ses cartes de
-      « {{ s.ancien_deck.nom }} » vers « {{ s.nouveau_deck.nom }} ».
-      Déplacer aussi {% if s.nb_cartes > 1 %}tes {{ s.nb_cartes }} cartes{% else %}ta carte{% endif %} ?
-    </p>
-    <div class="suggestion-deplacement-actions">
-      <form method="post" action="{% url 'anki_review:accepter_deplacement' s.id %}">
-        {% csrf_token %}
-        <button type="submit" class="btn-ajouter">Déplacer mes cartes</button>
-      </form>
-      <form method="post" action="{% url 'anki_review:refuser_deplacement' s.id %}">
-        {% csrf_token %}
-        <button type="submit" class="ie-btn-refuser">Non merci</button>
-      </form>
-    </div>
-  </div>
-{% endfor %}
 <h1>Tes paquets</h1>
 
 {% for m in matieres %}
@@ -63,7 +44,8 @@
     </ul>
   </details>
 {% empty %}
-  <p>Aucun paquet disponible pour l'instant.</p>
+  <p>Tu n'as encore aucun paquet. Récupère des cartes partagées (menu Import/Export, « Entre étudiants »)
+     ou crée tes propres cartes dans <a href="{% url 'anki_review:edition' %}">Édition</a> : elles seront rangées dans tes paquets.</p>
 {% endfor %}
 {% endblock %}
 

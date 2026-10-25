@@ -20,7 +20,7 @@ import genanki
 
 from django.conf import settings
 
-from .models import Deck
+from .models import Card, Deck
 
 # Id de modèle FIXE et arbitraire (ne jamais changer une fois des fichiers
 # exportés en circulation : Anki s'en sert pour reconnaître le type de note
@@ -62,22 +62,33 @@ def _nom_paquet_anki(deck) -> str:
     return deck.nom
 
 
-def exporter_notes_apkg(notes) -> bytes:
+def exporter_notes_apkg(notes, utilisateur=None) -> bytes:
     """
     Construit le contenu binaire d'un .apkg à partir de `notes` (déjà
     filtrées par l'appelant selon ce que l'utilisateur a le droit de voir
     — cf. la vue). Les notes de paquets différents deviennent chacune leur
     propre paquet Anki à l'intérieur du même fichier.
 
+    Chaque carte est exportée dans le paquet où `utilisateur` l'a rangée (son paquet à lui) ;
+    à défaut, dans le paquet de son auteur.
+
     Renvoie les octets du fichier .apkg prêt à être proposé en
     téléchargement.
     """
+    paquets_chez_moi = {}
+    if utilisateur is not None:
+        paquets_chez_moi = {
+            c.note_id: c.deck
+            for c in Card.objects.filter(etudiant=utilisateur, note__in=notes).select_related("deck")
+        }
     paquets_anki = {}  # deck_id -> genanki.Deck
     chemins_media = []
     medias_deja_ajoutes = set()
 
     for note in notes:
-        deck = note.deck
+        deck = paquets_chez_moi.get(note.id) or note.deck
+        if deck is None:
+            continue
         if deck.id not in paquets_anki:
             paquets_anki[deck.id] = genanki.Deck(_id_stable(deck.slug), _nom_paquet_anki(deck))
 

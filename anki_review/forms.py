@@ -37,9 +37,14 @@ class NoteForm(forms.ModelForm):
     # sans effet à la modification au-delà du choix Normal/Double lui-même.
     type_carte = forms.ChoiceField(choices=CHOIX_TYPE_CARTE, initial=TYPE_NORMAL, required=False)
 
+    # Le paquet n'est pas un champ de la Note : c'est le paquet À MOI dans lequel je range cette
+    # carte (la vue le restreint à mes paquets et décide quoi mettre à jour).
+    deck = forms.ModelChoiceField(queryset=Deck.objects.none(), empty_label="— Choisir —")
+    field_order = ["deck", "type_carte", "question", "reponse", "tags"]
+
     class Meta:
         model = Note
-        fields = ["deck", "question", "reponse", "tags"]
+        fields = ["question", "reponse", "tags"]
         widgets = {
             "question": forms.Textarea(attrs={"rows": 5, "class": "editeur-champ"}),
             "reponse": forms.Textarea(attrs={"rows": 5, "class": "editeur-champ"}),

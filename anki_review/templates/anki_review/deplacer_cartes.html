@@ -1,28 +1,19 @@
 {% extends "anki_review/base.html" %}
 
-{% block title %}Déplacer mes cartes — Anki{% endblock %}
+{% block title %}Déplacer les cartes d'un paquet — Anki{% endblock %}
 
 {% block content %}
 <p class="edition-fil"><a href="{% url 'anki_review:edition' %}">← Édition</a></p>
-<h1>Déplacer mes cartes</h1>
+<h1>Déplacer les cartes d'un paquet</h1>
 
 <p class="editeur-champ-aide">
   Paquet de départ : <strong>« {{ deck.nom }} »</strong>.<br>
-  {{ nb_a_moi }} carte{{ nb_a_moi|pluralize }} {% if nb_a_moi > 1 %}t'appartiennent{% else %}t'appartient{% endif %}
-  dans ce paquet : {% if nb_a_moi > 1 %}elles seront déplacées{% else %}elle sera déplacée{% endif %}
-  avec leur progression et leur partage, sans rien copier ni supprimer.
-  {% if nb_recuperees %}
-    Les {{ nb_recuperees }} carte{{ nb_recuperees|pluralize }} que tu as récupérée{{ nb_recuperees|pluralize }}
-    chez d'autres ne t'appartiennent pas : {% if nb_recuperees > 1 %}elles restent{% else %}elle reste{% endif %} dans ce paquet.
-  {% endif %}
-  {% if avertit_les_autres %}
-    Les autres personnes qui ont encore des cartes à elles dans ce paquet recevront la même proposition, qu'elles
-    pourront accepter ou refuser.
-  {% endif %}
+  Les {{ nb }} carte{{ nb|pluralize }} de ce paquet seront déplacée{{ nb|pluralize }} vers un autre de tes paquets,
+  avec leur progression. Le paquet de départ est conservé (vide).
 </p>
 
 {% if not decks %}
-  <p>Il n'y a aucun autre paquet où tu puisses déplacer tes cartes.</p>
+  <p>Tu n'as aucun autre paquet. Crée-en un dans <a href="{% url 'anki_review:edition' %}">Édition</a>.</p>
 {% else %}
   <form method="post" class="editeur-note" style="max-width:480px;">
     {% csrf_token %}
@@ -38,7 +29,7 @@
         {% endfor %}
       </select>
     </div>
-    <button type="submit" class="btn-ajouter">Déplacer mes cartes</button>
+    <button type="submit" class="btn-ajouter">Déplacer</button>
   </form>
 {% endif %}
 {% endblock %}

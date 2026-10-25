@@ -19,7 +19,25 @@
     <div class="erreur-bandeau">{{ form.non_field_errors }}</div>
   {% endif %}
 
+  {% if mode_proposition and choix_paquet %}
+  <div class="editeur-champ-groupe">
+    <label for="id_deck">Mon paquet pour cette carte</label>
+    <select name="deck" id="id_deck" class="select-stylise">
+      {% regroup decks by libelle_matiere as groupes_matiere %}
+      {% for groupe in groupes_matiere %}
+        <optgroup label="{{ groupe.grouper }}">
+          {% for deck in groupe.list %}
+            <option value="{{ deck.pk }}" {% if form.deck.value|stringformat:"s" == deck.pk|stringformat:"s" %}selected{% endif %}>{{ deck.nom }}</option>
+          {% endfor %}
+        </optgroup>
+      {% endfor %}
+    </select>
+    <p class="editeur-champ-aide">Ne change que le rangement de ta carte : le propriétaire garde la sienne.</p>
+  </div>
+  {% endif %}
+
   {% if not mode_proposition %}
+  {% if choix_paquet or not note %}
   <div class="editeur-champ-groupe">
     <label for="id_deck">Paquet</label>
     <select name="deck" id="id_deck" class="select-stylise">
@@ -35,6 +53,7 @@
     </select>
     {% for erreur in form.deck.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
   </div>
+  {% endif %}
 
   <div class="editeur-champ-groupe">
     <label for="id_type_carte">Type de carte</label>
@@ -55,11 +74,6 @@
        proposition (cf. views.modifier_note) : seuls question/réponse/tags
        comptent. #}
     <div hidden>
-      <select name="deck" id="id_deck">
-        {% for deck in decks %}
-          <option value="{{ deck.pk }}" {% if form.deck.value|stringformat:"s" == deck.pk|stringformat:"s" %}selected{% endif %}>{{ deck.nom }}</option>
-        {% endfor %}
-      </select>
       <select name="type_carte" id="id_type_carte">
         {% for valeur, libelle in form.fields.type_carte.choices %}
           <option value="{{ valeur }}" {% if form.type_carte.value == valeur %}selected{% endif %}>{{ libelle }}</option>

@@ -18,8 +18,6 @@ urlpatterns = [
     path("paquets/<int:deck_id>/modifier/", views.modifier_deck, name="modifier_deck"),
     path("paquets/<int:deck_id>/supprimer/", views.supprimer_deck, name="supprimer_deck"),
     path("paquets/<int:deck_id>/deplacer-mes-cartes/", views.deplacer_cartes, name="deplacer_cartes"),
-    path("deplacements/<int:suggestion_id>/accepter/", views.accepter_deplacement, name="accepter_deplacement"),
-    path("deplacements/<int:suggestion_id>/refuser/", views.refuser_deplacement, name="refuser_deplacement"),
 
     path("ajouter/", views.ajouter_note, name="ajouter_note"),
     path("cartes/<int:note_id>/modifier/", views.modifier_note, name="modifier_note"),
@@ -35,6 +33,10 @@ urlpatterns = [
     path("import-export/fichier/importer-confirmer/", views.import_apkg_confirmer, name="import_apkg_confirmer"),
     path("import-export/fichier/exporter/", views.exporter_apkg_selection, name="exporter_apkg_selection"),
     path("import-export/etudiants/", views.partage_etudiants, name="partage_etudiants"),
+    path("import-export/ranger/", views.ranger_cartes, name="ranger_cartes"),
+    path("import-export/rangement-automatique/", views.rangement_automatique, name="rangement_automatique"),
+    path("import-export/rangement-automatique/<int:regle_id>/modifier/", views.modifier_regle, name="modifier_regle"),
+    path("import-export/rangement-automatique/<int:regle_id>/oublier/", views.oublier_regle, name="oublier_regle"),
     path("import-export/<int:note_id>/partager/", views.partager_note_toggle, name="partager_note_toggle"),
     path("import-export/<int:note_id>/ajouter-copie/", views.ajouter_carte_partagee, name="ajouter_carte_partagee"),
 

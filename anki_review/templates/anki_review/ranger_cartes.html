@@ -1,0 +1,66 @@
+{% extends "anki_review/base.html" %}
+
+{% block title %}Ranger des cartes — Anki{% endblock %}
+
+{% block content %}
+<p class="edition-fil"><a href="{% url 'anki_review:partage_etudiants' %}">← Entre étudiants</a></p>
+<h1>Où ranger {% if notes|length > 1 %}ces {{ notes|length }} cartes{% else %}cette carte{% endif %} ?</h1>
+
+<p class="editeur-champ-aide">
+  Les paquets sont personnels : tu ranges ces cartes dans un de <strong>tes</strong> paquets, que personne d'autre ne voit.
+  {% if nb_deja %}{{ nb_deja }} carte{{ nb_deja|pluralize }} déjà dans ta révision {% if nb_deja > 1 %}seront déplacées{% else %}sera déplacée{% endif %}.{% endif %}
+</p>
+
+<form method="post" class="editeur-note choix-paquet">
+  {% csrf_token %}
+  <input type="hidden" name="notes" value="{{ ids }}">
+
+  {% if origine %}
+    <label class="choix-paquet-option">
+      <input type="radio" name="choix" value="meme_nom" checked>
+      <div>
+        <span class="choix-paquet-titre">
+          {% if meme_nom %}Ranger dans ton paquet « {{ origine.nom }} »{% else %}Créer le paquet « {{ origine.nom }} »{% endif %}
+        </span>
+        <span class="editeur-champ-aide">Même nom que le paquet d'origine.</span>
+      </div>
+    </label>
+  {% endif %}
+
+  <label class="choix-paquet-option">
+    <input type="radio" name="choix" value="existant" {% if not origine and decks %}checked{% endif %}>
+    <div>
+      <span class="choix-paquet-titre">Ranger dans un de mes paquets</span>
+      <select name="deck_existant" class="select-stylise" onfocus="this.closest('label').querySelector('input').checked = true">
+        {% regroup decks by libelle_matiere as groupes %}
+        {% for groupe in groupes %}
+          <optgroup label="{{ groupe.grouper }}">
+            {% for d in groupe.list %}<option value="{{ d.id }}">{{ d.nom }}</option>{% endfor %}
+          </optgroup>
+        {% endfor %}
+      </select>
+    </div>
+  </label>
+
+  <label class="choix-paquet-option">
+    <input type="radio" name="choix" value="nouveau" {% if not origine and not decks %}checked{% endif %}>
+    <div>
+      <span class="choix-paquet-titre">Créer un nouveau paquet</span>
+      <input type="text" name="nouveau_nom" maxlength="200" placeholder="Nom du paquet"
+             value="{% if not origine %}Cartes récupérées{% endif %}"
+             onfocus="this.closest('label').querySelector('input').checked = true">
+    </div>
+  </label>
+
+  {% if peut_souvenir %}
+    <label class="choix-paquet-souvenir">
+      <input type="checkbox" name="souvenir" value="1" checked>
+      Se souvenir de ce choix pour les cartes provenant du même paquet
+      <span class="editeur-champ-aide">Les prochaines cartes de ce paquet seront rangées là sans rien te demander.
+        Tu pourras changer ou oublier ce choix dans « Rangement automatique » (Import/Export).</span>
+    </label>
+  {% endif %}
+
+  <button type="submit" class="btn-ajouter" style="margin-top:8px;">Ranger</button>
+</form>
+{% endblock %}

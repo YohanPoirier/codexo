@@ -5,33 +5,20 @@
       <span>{{ groupe.deck.nom }}</span>
       <span class="edition-ligne-meta">
         {{ groupe.notes|length }} carte{{ groupe.notes|length|pluralize }}
-        {% if user.is_staff and groupe.deck.cree_par and not groupe.deck.cree_par.is_staff %}· créé par {{ groupe.deck.cree_par }}{% endif %}
+        {% if user.is_staff and groupe.deck.cree_par and groupe.deck.cree_par_id != user.id %}· paquet de {{ groupe.deck.cree_par }}{% endif %}
       </span>
     </div>
     <div class="edition-actions" onclick="event.stopPropagation()">
-      {% if groupe.notes|compte_notes_de:user %}
-        <a class="edition-icone-btn" href="{% url 'anki_review:deplacer_cartes' groupe.deck.id %}" title="Déplacer mes cartes vers un autre paquet">➡️</a>
+      {% if groupe.deck.cree_par_id == user.id and groupe.notes %}
+        <a class="edition-icone-btn" href="{% url 'anki_review:deplacer_cartes' groupe.deck.id %}" title="Déplacer les cartes de ce paquet vers un autre de mes paquets">➡️</a>
       {% endif %}
       {% if groupe.deck|peut_editer_deck:user %}
         <a class="edition-icone-btn" href="{% url 'anki_review:modifier_deck' groupe.deck.id %}" title="Modifier">✏️</a>
         <form method="post" action="{% url 'anki_review:supprimer_deck' groupe.deck.id %}"
-              onsubmit="return confirm('{% if user.is_staff %}Supprimer le paquet « {{ groupe.deck.nom }} » et toutes ses cartes ?{% else %}Supprimer le paquet « {{ groupe.deck.nom }} » ? Tes cartes seront retirées. Celles que d\'autres étudiants utilisent leur sont conservées, avec le paquet.{% endif %}');" style="display:contents;">
+              onsubmit="return confirm('{% if user.is_staff %}Supprimer le paquet « {{ groupe.deck.nom }} » et les cartes que leurs auteurs y ont rangées, pour tout le monde ?{% else %}Supprimer le paquet « {{ groupe.deck.nom }} » ? Ses cartes seront retirées de ta révision (celles que d\'autres étudiants utilisent leur sont conservées).{% endif %}');" style="display:contents;">
           {% csrf_token %}
           <button type="submit" class="edition-icone-btn supprimer" title="Supprimer">🗑️</button>
         </form>
-      {% else %}
-        <div class="ie-bulle-conteneur">
-          <button type="button" class="edition-icone-btn edition-icone-btn--desactive"
-                  onclick="this.nextElementSibling.classList.add('ie-bulle--visible'); setTimeout(() => this.nextElementSibling.classList.remove('ie-bulle--visible'), 2500)">✏️</button>
-          <span class="ie-bulle">Tu n'es pas propriétaire de ce paquet.</span>
-        </div>
-        {% if groupe.notes|compte_notes_de:user %}
-          <form method="post" action="{% url 'anki_review:supprimer_mes_cartes_paquet' groupe.deck.id %}"
-                onsubmit="return confirm('Retirer tes {{ groupe.notes|compte_notes_de:user }} carte(s) de « {{ groupe.deck.nom }} » de ta révision ?');" style="display:contents;">
-            {% csrf_token %}
-            <button type="submit" class="edition-icone-btn supprimer" title="Retirer mes cartes de ce paquet">🗑️</button>
-          </form>
-        {% endif %}
       {% endif %}
     </div>
   </summary>

@@ -168,6 +168,19 @@ function marquerNoteAjoutee(form) {
   form.remove();
 }
 
+// Rangement automatique : indique où la carte a été rangée, avec un lien pour changer.
+function annoncerRangement(conteneur, data) {
+  if (!data.deck) return;
+  const info = document.createElement('span');
+  info.className = 'ie-sens';
+  info.append(' → rangée dans « ' + data.deck + ' » · ');
+  const lien = document.createElement('a');
+  lien.href = data.changer;
+  lien.textContent = 'Changer';
+  info.append(lien);
+  conteneur.append(info);
+}
+
 function majGroupeAjout(details) {
   if (details.querySelector('.js-ajout-note')) return; // il reste des cartes à ajouter
   const voyant = details.querySelector('.js-voyant-groupe');
@@ -189,12 +202,16 @@ async function envoyerAjout(form) {
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
     });
     if (!reponse.ok) throw new Error('HTTP ' + reponse.status);
-    await reponse.json();
+    const data = await reponse.json();
+    if (data.choix) { window.location = data.choix; return; }  // pas de règle : on demande où ranger
     const details = form.closest('details.ie-groupe');
     if (form.classList.contains('js-ajout-paquet')) {
       details.querySelectorAll('.js-ajout-note').forEach(marquerNoteAjoutee);
+      annoncerRangement(details.querySelector('.edition-ligne-titre'), data);
     } else {
+      const ligneTitre = form.closest('li').querySelector('.ie-ligne-gauche');
       marquerNoteAjoutee(form);
+      annoncerRangement(ligneTitre, data);
     }
     majGroupeAjout(details);
   } catch (err) {

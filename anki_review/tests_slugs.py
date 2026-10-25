@@ -18,12 +18,15 @@ CONFIG = dict(
 )
 
 
-def creer_via_formulaire(nom):
+def creer_via_formulaire(nom, proprietaire=None):
     formulaire = DeckForm({"nom": nom, "description": "", "matiere": ""})
     assert formulaire.is_valid(), formulaire.errors
     deck = formulaire.save(commit=False)
     deck.slug = ""  # comme à la création : le slug est généré par save()
     deck = formulaire.save()
+    if proprietaire:
+        deck.cree_par = proprietaire
+        deck.save(update_fields=["cree_par"])
     return deck
 
 
@@ -73,8 +76,8 @@ class SlugsTests(TestCase):
 class AccueilAvecPaquetsDifficilesTests(TestCase):
     def test_accueil_ne_plante_pas(self):
         prof = User.objects.create_user("prof-s", "mdp-test-123", role=User.PROF)
-        creer_via_formulaire("???")
-        creer_via_formulaire("Trafic")
+        creer_via_formulaire("???", prof)
+        creer_via_formulaire("Trafic", prof)
         self.client.force_login(prof)
         self.assertEqual(self.client.get("/anki/").status_code, 200)
         self.assertEqual(self.client.get("/anki/paquet/").status_code, 200)

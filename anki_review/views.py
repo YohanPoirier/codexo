@@ -13,11 +13,12 @@ from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import format_html
 
 from .forms import DeckForm, NoteForm
 from . import decks as gestion_paquets
 from .html_propre import EXTENSIONS_IMAGE_AUTORISEES
-from .models import Activite, Card, Deck, Note, PropositionModification, SuggestionDeplacement
+from .models import Activite, Card, Deck, Note, PropositionModification, RegleRangement
 from .sm2 import Reponse, appliquer, calculer_prochaine_etape
 from .apkg_import import importer_apkg, analyser_apkg, ErreurImportApkg
 from .apkg_export import exporter_notes_apkg
@@ -45,16 +46,13 @@ PREFIXE_IMAGES_NOTES = f"{settings.MEDIA_URL}anki_review/notes/"
 SEUIL_REAPPARITION_SESSION = 3
 
 
-_decks_visibles = gestion_paquets.decks_visibles
-
-
-def _decks_pour_selecteur(decks_visibles):
+def _decks_pour_selecteur(decks):
     """Paquets triés par matière puis nom, avec un libellé de matière
     précalculé sur chaque instance (attribut non stocké en base, juste
     pour le regroupement du <select> du formulaire de carte, cf. template
     ajouter_note.html) — "Sans matière" pour ceux qui n'en ont pas, même
     convention que le reste du site (VALEUR_SANS_MATIERE/LIBELLE_SANS_MATIERE)."""
-    decks = list(decks_visibles.order_by("matiere", "nom"))
+    decks = list(decks.order_by("matiere", "nom"))
     libelles = dict(Deck.Matiere.choices)
     for deck in decks:
         deck.libelle_matiere = libelles.get(deck.matiere, "") or LIBELLE_SANS_MATIERE
@@ -68,14 +66,14 @@ def liste_decks(request):
     d'un coup) ; les paquets sans matière restent à plat."""
     par_matiere = {}
     paquets_sans_matiere = []
-    for deck in _decks_visibles(request.user):
+    for deck in gestion_paquets.mes_paquets(request.user).order_by("nom"):
         dues = Card.objects.filter(
-            note__deck=deck,
+            deck=deck,
             etudiant=request.user,
             suspendue=False,
             prochaine_revision__lte=timezone.now(),
         ).count()
-        total = Card.objects.filter(note__deck=deck, etudiant=request.user).count()
+        total = Card.objects.filter(deck=deck, etudiant=request.user).count()
         item = {"deck": deck, "dues": dues, "total": total}
         if deck.matiere:
             groupe = par_matiere.setdefault(deck.matiere, {"paquets": [], "dues": 0, "total": 0})
@@ -108,7 +106,6 @@ def liste_decks(request):
     return render(request, "anki_review/liste_decks.html", {
         "matieres": matieres,
         "nb_propositions": propositions.count(),
-        "suggestions": gestion_paquets.suggestions_en_attente(request.user),
         **views_notifications.contexte_invitation(request.user),
     })
 
@@ -116,7 +113,7 @@ def liste_decks(request):
 def _prochaine_carte_due(decks_qs, etudiant):
     return (
         Card.objects.filter(
-            note__deck__in=decks_qs,
+            deck__in=decks_qs,
             etudiant=etudiant,
             suspendue=False,
             prochaine_revision__lte=timezone.now(),
@@ -187,7 +184,7 @@ def _prochaine_carte(request, decks_qs, etudiant):
         if carte is None:
             continue  # supprimée entretemps : oubliée définitivement
         file.append(entree)
-        if carte_apprentissage is None and entree["n"] >= SEUIL_REAPPARITION_SESSION and carte.note.deck_id in deck_ids:
+        if carte_apprentissage is None and entree["n"] >= SEUIL_REAPPARITION_SESSION and carte.deck_id in deck_ids:
             carte_apprentissage = carte
 
     if carte_apprentissage:
@@ -201,7 +198,7 @@ def _prochaine_carte(request, decks_qs, etudiant):
     # scope attend peut-être encore sous le seuil : autant la montrer.
     for entree in file:
         carte = Card.objects.filter(
-            id=entree["id"], etudiant=etudiant, note__deck_id__in=deck_ids
+            id=entree["id"], etudiant=etudiant, deck_id__in=deck_ids
         ).select_related("note").first()
         if carte:
             return carte, file
@@ -283,12 +280,12 @@ def _traiter_revision(request, decks_qs, titre, nom_url_action, args_url_action)
     # Une carte ratée qui est AUSSI échue est déjà dans le décompte ci-dessous : on ne la
     # compte pas une seconde fois.
     nb_apprentissage_scope = (
-        Card.objects.filter(id__in=ids_apprentissage, note__deck__in=decks_qs)
+        Card.objects.filter(id__in=ids_apprentissage, deck__in=decks_qs)
         .exclude(suspendue=False, prochaine_revision__lte=timezone.now())
         .count()
     )
     restantes = Card.objects.filter(
-        note__deck__in=decks_qs, etudiant=request.user, suspendue=False,
+        deck__in=decks_qs, etudiant=request.user, suspendue=False,
         prochaine_revision__lte=timezone.now(),
     ).count() + nb_apprentissage_scope
 
@@ -316,7 +313,7 @@ def _traiter_revision(request, decks_qs, titre, nom_url_action, args_url_action)
 @login_required
 def reviser(request, deck_slug):
     """Écran de révision plein écran pour UN paquet précis."""
-    deck = get_object_or_404(_decks_visibles(request.user), slug=deck_slug)
+    deck = get_object_or_404(gestion_paquets.mes_paquets(request.user), slug=deck_slug)
     return _traiter_revision(
         request, Deck.objects.filter(pk=deck.pk), deck.nom,
         "anki_review:reviser", [deck_slug],
@@ -331,10 +328,10 @@ def reviser_matiere(request, matiere):
     `matiere` peut aussi être la pseudo-matière "sans-matiere" (paquets
     sans matière assignée, regroupés pour la cohérence visuelle)."""
     if matiere == VALEUR_SANS_MATIERE:
-        decks = _decks_visibles(request.user).filter(matiere="")
+        decks = gestion_paquets.mes_paquets(request.user).filter(matiere="")
         libelle = LIBELLE_SANS_MATIERE
     else:
-        decks = _decks_visibles(request.user).filter(matiere=matiere)
+        decks = gestion_paquets.mes_paquets(request.user).filter(matiere=matiere)
         libelle = dict(Deck.Matiere.choices).get(matiere, matiere)
     if not decks.exists():
         messages.error(request, "Aucun paquet pour cette matière.")
@@ -374,16 +371,21 @@ def edition_accueil(request):
             statut=PropositionModification.Statut.EN_ATTENTE, note__cree_par=request.user,
         ).select_related("note", "auteur")
 
-    decks = _decks_visibles(request.user).order_by("nom")
+    # Chacun voit SES paquets et les cartes qu'il y a rangées. Le professeur, qui modère, voit en
+    # plus (sauf avec « mes cartes ») les paquets de ses élèves, avec les cartes de leurs auteurs.
+    if request.user.is_staff and not filtre_mes:
+        decks = gestion_paquets.paquets_a_moderer().order_by("nom")
+    else:
+        decks = gestion_paquets.mes_paquets(request.user).order_by("nom")
     par_matiere = {}
     paquets_sans_matiere = []
     for deck in decks:
-        if filtre_mes:
-            notes = list(
-                deck.notes.select_related("cree_par").filter(cards__etudiant=request.user).distinct().order_by("id")
-            )
+        if request.user.is_staff and not filtre_mes:
+            notes = list(deck.notes.select_related("cree_par", "deck").order_by("id"))
         else:
-            notes = list(deck.notes.select_related("cree_par").order_by("id"))
+            notes = list(
+                gestion_paquets.notes_du_paquet(request.user, deck).select_related("cree_par", "deck").order_by("id")
+            )
         item = {"deck": deck, "notes": notes}
         if deck.matiere:
             par_matiere.setdefault(deck.matiere, []).append(item)
@@ -407,16 +409,16 @@ def edition_accueil(request):
 @login_required
 def edition_deck(request, deck_slug):
     """
-    Liste des cartes d'un paquet précis. La visibilité du PAQUET lui-même
-    suit _decks_visibles (404 si ce paquet privé appartient à un autre
-    étudiant) ; les NOTES à l'intérieur suivent la même règle que
-    edition_accueil (les siennes pour un étudiant, tout pour le prof).
+    Liste des cartes d'un paquet précis. Un paquet est
+    PERSONNEL : 404 s'il appartient à quelqu'un d'autre (sauf pour le professeur, qui modère) ;
+    les NOTES à l'intérieur sont celles que l'on y a rangées (celles de leurs auteurs, pour le prof).
     """
-    deck = get_object_or_404(_decks_visibles(request.user), slug=deck_slug)
     if request.user.is_staff:
+        deck = get_object_or_404(gestion_paquets.paquets_a_moderer(), slug=deck_slug)
         notes = list(deck.notes.select_related("cree_par").order_by("id"))
     else:
-        notes = deck.notes.select_related("cree_par").filter(cards__etudiant=request.user).distinct().order_by("id")
+        deck = get_object_or_404(gestion_paquets.mes_paquets(request.user), slug=deck_slug)
+        notes = list(gestion_paquets.notes_du_paquet(request.user, deck).select_related("cree_par").order_by("id"))
     return render(request, "anki_review/edition_deck.html", {"deck": deck, "notes": notes})
 
 
@@ -433,9 +435,7 @@ def ajouter_deck(request):
     à partir du nom à la création (cf. DeckForm.save), inchangé en
     modification.
 
-    Un paquet créé par un étudiant reste visible par toute la classe (pas
-    de notion de paquet privé pour l'instant) — seule sa modification est
-    restreinte à son créateur (ou au prof).
+    Un paquet est personnel : lui seul (et le professeur, qui modère) le voit.
     """
     if request.method == "POST":
         form = DeckForm(request.POST)
@@ -474,35 +474,29 @@ def supprimer_deck(request, deck_id):
     """Suppression d'un paquet — POST uniquement (déclenché par un petit
     formulaire avec confirmation JS, cf. _edition_paquet.html).
 
-    Le professeur supprime réellement le paquet et tout son contenu (modération).
-    Un étudiant, lui, ne peut priver personne d'une carte qu'il utilise : ses propres
-    cartes sont retirées (la propriété de chacune passe au plus ancien détenteur restant,
-    ou la carte est supprimée si plus personne ne l'a) ; si d'autres étudiants gardent des
-    cartes dans ce paquet, le paquet est CONSERVÉ et sa propriété leur est transmise."""
+    Un paquet est personnel : le supprimer retire MES cartes de ma révision, sans priver personne
+    d'une carte qu'il utilise (la propriété de chacune passe au plus ancien détenteur restant, ou
+    la carte est supprimée si plus personne ne l'a). Le professeur, lui, modère : il supprime le
+    paquet avec les cartes que leur auteur y a rangées, pour tout le monde."""
     deck = get_object_or_404(Deck, id=deck_id)
     if not _peut_editer_deck(request.user, deck):
-        return HttpResponseForbidden("Tu ne peux supprimer que les paquets que tu as créés.")
+        return HttpResponseForbidden("Tu ne peux supprimer que tes propres paquets.")
     if request.method == "POST":
         nom = deck.nom
         if request.user.is_staff:
+            for note in list(Note.objects.filter(deck=deck)):
+                miroir_id = note.note_miroir_id
+                note.delete()
+                if miroir_id:
+                    Note.objects.filter(pk=miroir_id).delete()
             deck.delete()
             messages.success(request, f"Paquet « {nom} » supprimé.")
             return redirect("anki_review:edition")
 
-        for carte in list(Card.objects.filter(note__deck=deck, etudiant=request.user).select_related("note")):
-            _retirer_de_ma_revision(carte, request.user)
-        carte_restante = Card.objects.filter(note__deck=deck).order_by("cree_le", "id").first()
-        if carte_restante is None:
-            deck.delete()  # plus aucune carte utilisée : seules des notes orphelines, sans détenteur
-            messages.success(request, f"Paquet « {nom} » supprimé.")
-        else:
-            deck.cree_par = carte_restante.etudiant
-            deck.save(update_fields=["cree_par"])
-            messages.success(
-                request,
-                f"Tes cartes du paquet « {nom} » ont été retirées. Le paquet est conservé : "
-                f"d'autres étudiants utilisent encore des cartes qui s'y trouvent, et il leur est transmis.",
-            )
+        for carte in list(Card.objects.filter(deck=deck, etudiant=deck.cree_par_id).select_related("note")):
+            _retirer_de_ma_revision(carte, deck.cree_par)
+        deck.delete()
+        messages.success(request, f"Paquet « {nom} » supprimé. Ses cartes ont été retirées de ta révision.")
     return redirect("anki_review:edition")
 
 
@@ -542,7 +536,7 @@ def _creer_notes_depuis_formulaire(form, utilisateur):
     return notes
 
 
-def _creer_miroir_pour_note_existante(form, note):
+def _creer_miroir_pour_note_existante(form, note, deck):
     """
     Bascule Normal -> Double pendant la MODIFICATION d'une note déjà
     existante : enregistre la note avec le contenu tel que soumis dans le
@@ -553,7 +547,6 @@ def _creer_miroir_pour_note_existante(form, note):
     forcément la personne qui modifie — le prof peut éditer la carte d'un
     étudiant) et reçoit sa propre Card pour ce même propriétaire.
     """
-    deck = form.cleaned_data["deck"]
     question = form.cleaned_data["question"]
     reponse = form.cleaned_data["reponse"]
     tags = form.cleaned_data.get("tags", "")
@@ -569,7 +562,9 @@ def _creer_miroir_pour_note_existante(form, note):
         partagee_le=note.partagee_le,
     )
     if note.cree_par_id:
-        carte_miroir, cree = Card.objects.get_or_create(note=miroir, etudiant=note.cree_par)
+        carte_miroir, cree = Card.objects.get_or_create(
+            note=miroir, etudiant=note.cree_par,
+            defaults={"deck": gestion_paquets.paquet_par_defaut(note.cree_par, miroir)})
         if cree:
             Activite.journaliser(note.cree_par, Activite.Type.AJOUT, carte_miroir)
 
@@ -589,7 +584,7 @@ def ajouter_note(request):
     choisi, une ou deux notes sont créées (cf. _creer_notes_depuis_formulaire).
     """
     deck_prerempli = request.GET.get("deck")
-    decks_visibles = _decks_visibles(request.user, avec_mes_cartes=False)
+    decks_visibles = gestion_paquets.mes_paquets(request.user)
 
     if request.method == "POST":
         form = NoteForm(request.POST)
@@ -597,7 +592,8 @@ def ajouter_note(request):
         if form.is_valid():
             notes = _creer_notes_depuis_formulaire(form, request.user)
             for note in notes:
-                carte, cree = Card.objects.get_or_create(note=note, etudiant=request.user)
+                carte, cree = Card.objects.get_or_create(
+                    note=note, etudiant=request.user, defaults={"deck": note.deck})
                 if cree:
                     Activite.journaliser(request.user, Activite.Type.AJOUT, carte)
             messages.success(request, f"{len(notes)} carte{'s' if len(notes) > 1 else ''} ajoutée{'s' if len(notes) > 1 else ''}.")
@@ -629,39 +625,58 @@ def modifier_note(request, note_id):
       soumet devient une PropositionModification en attente, jamais
       appliqué à la note elle-même — c'est au propriétaire de l'accepter
       ou non (cf. voir_proposition).
+    Dans tous les cas, le « Paquet » choisi est MON paquet pour cette carte : changer de paquet
+    ne touche que mon rangement (et celui de l'auteur, pour l'auteur lui-même).
     """
     note = get_object_or_404(Note, id=note_id)
     peut_direct = _peut_editer_directement(request.user, note)
     peut_proposer = _peut_proposer_modification(request.user, note)
     if not peut_direct and not peut_proposer:
         return HttpResponseForbidden("Tu n'as pas cette carte dans ta révision.")
-    decks_visibles = _decks_visibles(request.user)
+    mes_decks = gestion_paquets.mes_paquets(request.user)
+    ma_carte = Card.objects.filter(note=note, etudiant=request.user).first()
+    est_auteur = note.cree_par_id == request.user.id
+
+    def preparer(form):
+        form.fields["deck"].queryset = mes_decks
+        if ma_carte is None:
+            # Le professeur qui modère la carte d'un élève ne la range pas chez lui.
+            del form.fields["deck"]
+        return form
+
+    def appliquer_paquet(form):
+        deck = form.cleaned_data.get("deck")
+        if deck is not None:
+            cibles = [note] + ([note.note_miroir] if note.note_miroir_id else [])
+            gestion_paquets.changer_de_paquet(request.user, cibles, deck)
 
     if request.method == "POST":
-        form = NoteForm(request.POST, instance=note)
-        form.fields["deck"].queryset = decks_visibles
+        form = preparer(NoteForm(request.POST, instance=note))
         if peut_direct:
             if form.is_valid():
                 ancien_miroir_id = note.note_miroir_id
                 nouveau_type = form.cleaned_data.get("type_carte") or NoteForm.TYPE_NORMAL
+                deck_auteur = form.cleaned_data.get("deck") if est_auteur else note.deck
 
                 if nouveau_type == NoteForm.TYPE_NORMAL and ancien_miroir_id:
                     # Double -> Normal : supprime la carte liée (et sa
                     # progression de révision, cf. Card.note en CASCADE).
                     form.save()
                     Note.objects.filter(pk=ancien_miroir_id).delete()
+                    note.refresh_from_db()
                 elif nouveau_type != NoteForm.TYPE_NORMAL and not ancien_miroir_id:
                     # Normal -> Double : crée la carte miroir à la volée.
-                    _creer_miroir_pour_note_existante(form, note)
+                    _creer_miroir_pour_note_existante(form, note, deck_auteur)
                 else:
                     form.save()
 
+                appliquer_paquet(form)
                 messages.success(request, "Carte mise à jour.")
                 return redirect("anki_review:edition")
         else:
             # Pas propriétaire : seul le CONTENU (question/réponse/tags) est
-            # retenu — le paquet et le type de carte restent ceux du
-            # propriétaire, une proposition ne porte que sur le contenu.
+            # retenu — le type de carte reste celui du propriétaire, une
+            # proposition ne porte que sur le contenu. Le paquet choisi, lui, est le mien.
             if form.is_valid():
                 proposition = PropositionModification.objects.create(
                     note=note, auteur=request.user,
@@ -669,22 +684,21 @@ def modifier_note(request, note_id):
                     reponse=form.cleaned_data["reponse"],
                     tags=form.cleaned_data.get("tags", ""),
                 )
+                appliquer_paquet(form)
                 notifications.prevenir_proposition(proposition)
                 messages.success(request, "Ta proposition de modification a été envoyée au propriétaire de la carte.")
                 return redirect("anki_review:edition")
     else:
+        initial = {"deck": ma_carte.deck_id} if ma_carte else {}
         if peut_direct:
-            form = NoteForm(instance=note, initial={
-                "type_carte": NoteForm.TYPE_DOUBLE if note.note_miroir_id else NoteForm.TYPE_NORMAL,
-            })
-        else:
-            form = NoteForm(instance=note)
-        form.fields["deck"].queryset = decks_visibles
+            initial["type_carte"] = NoteForm.TYPE_DOUBLE if note.note_miroir_id else NoteForm.TYPE_NORMAL
+        form = preparer(NoteForm(instance=note, initial=initial))
 
     return render(
         request, "anki_review/ajouter_note.html",
-        {"form": form, "decks": _decks_pour_selecteur(decks_visibles), "note": note, "media_notes_prefix": PREFIXE_IMAGES_NOTES,
-         "retour_url": reverse("anki_review:edition"), "mode_proposition": not peut_direct},
+        {"form": form, "decks": _decks_pour_selecteur(mes_decks), "note": note, "media_notes_prefix": PREFIXE_IMAGES_NOTES,
+         "retour_url": reverse("anki_review:edition"), "mode_proposition": not peut_direct,
+         "choix_paquet": ma_carte is not None}
     )
 
 
@@ -821,6 +835,20 @@ def _oublier_apkg_temporaire(request):
     request.session.pop(CLE_SESSION_APKG, None)
 
 
+def _decks_pour_export(utilisateur):
+    """Mes paquets avec, pour chacun, les cartes que j'ai le droit d'exporter : les miennes et
+    celles du professeur (pas celles que d'autres élèves m'ont partagées)."""
+    decks_pour_export = {}
+    for deck in gestion_paquets.mes_paquets(utilisateur).order_by("nom"):
+        notes = gestion_paquets.notes_du_paquet(utilisateur, deck)
+        if not utilisateur.is_staff:
+            notes = notes.filter(Q(cree_par__isnull=True) | Q(cree_par__is_staff=True) | Q(cree_par=utilisateur))
+        notes = list(notes.order_by("id"))
+        if notes:
+            decks_pour_export[deck] = notes
+    return decks_pour_export
+
+
 @login_required
 def import_export_fichier(request):
     """Import/export via fichier .apkg (Anki) — page d'accueil : formulaire
@@ -844,16 +872,7 @@ def import_export_fichier(request):
                 "paquets": paquets, "nb_cloze": nb_cloze,
             })
 
-    decks_pour_export = {}
-    for deck in _decks_visibles(request.user).order_by("nom"):
-        if request.user.is_staff:
-            notes = list(deck.notes.all())
-        else:
-            notes = list(deck.notes.filter(
-                Q(cree_par__isnull=True) | Q(cree_par__is_staff=True) | Q(cree_par=request.user)
-            ))
-        if notes:
-            decks_pour_export[deck] = notes
+    decks_pour_export = _decks_pour_export(request.user)
 
     return render(request, "anki_review/import_export_fichier.html", {
         "erreur": erreur, "decks_pour_export": decks_pour_export,
@@ -884,16 +903,7 @@ def import_apkg_confirmer(request):
         finally:
             _oublier_apkg_temporaire(request)
 
-    decks_pour_export = {}
-    for deck in _decks_visibles(request.user).order_by("nom"):
-        if request.user.is_staff:
-            notes = list(deck.notes.all())
-        else:
-            notes = list(deck.notes.filter(
-                Q(cree_par__isnull=True) | Q(cree_par__is_staff=True) | Q(cree_par=request.user)
-            ))
-        if notes:
-            decks_pour_export[deck] = notes
+    decks_pour_export = _decks_pour_export(request.user)
 
     return render(request, "anki_review/import_export_fichier.html", {
         "resultat": resultat, "erreur": erreur, "decks_pour_export": decks_pour_export,
@@ -921,7 +931,7 @@ def exporter_apkg_selection(request):
         messages.error(request, "Aucune des cartes sélectionnées n'est accessible.")
         return redirect("anki_review:import_export_fichier")
 
-    contenu = exporter_notes_apkg(notes)
+    contenu = exporter_notes_apkg(notes, request.user)
     Activite.objects.bulk_create(
         [Activite(etudiant=request.user, type=Activite.Type.EXPORT) for _ in notes]
     )
@@ -945,6 +955,8 @@ def partage_etudiants(request):
 
     mes_paquets = {}
     for note in mes_notes:
+        if note.deck_id is None:
+            continue
         groupe = mes_paquets.setdefault(note.deck_id, {"deck": note.deck, "notes": [], "toutes_partagees": True})
         groupe["notes"].append(note)
         if not note.partagee_avec_classe:
@@ -977,6 +989,8 @@ def partage_etudiants(request):
 
     groupes_partages = {}
     for note in notes_partagees:
+        if note.deck_id is None:
+            continue
         statut = "deja" if note.id in mes_cartes_ids else "absente"
         cle = (note.deck_id, note.cree_par_id)
         groupe = groupes_partages.setdefault(cle, {"deck": note.deck, "cree_par": note.cree_par, "notes": []})
@@ -1027,8 +1041,10 @@ def _retirer_de_ma_revision(carte, utilisateur):
         return False
     carte_suivante = Card.objects.filter(note=note).order_by("cree_le", "id").first()
     if carte_suivante:
+        # Le nouveau propriétaire devient l'auteur : le paquet de la note est alors le sien.
         note.cree_par = carte_suivante.etudiant
-        note.save(update_fields=["cree_par"])
+        note.deck = carte_suivante.deck
+        note.save(update_fields=["cree_par", "deck"])
         return False
     miroir_id = note.note_miroir_id
     note.delete()
@@ -1046,7 +1062,7 @@ def supprimer_mes_cartes_paquet(request, deck_id):
     (ou la note est supprimée si plus personne ne l'a) ; pour les autres,
     ça ne retire que ma Card, sans toucher à la note."""
     if request.method == "POST":
-        mes_cartes = list(Card.objects.filter(note__deck_id=deck_id, etudiant=request.user).select_related("note"))
+        mes_cartes = list(Card.objects.filter(deck_id=deck_id, etudiant=request.user).select_related("note"))
         nb = len(mes_cartes)
         for carte in mes_cartes:
             _retirer_de_ma_revision(carte, request.user)
@@ -1070,13 +1086,29 @@ def partager_note_toggle(request, note_id):
     return redirect("anki_review:partage_etudiants")
 
 
+def _lien_changer(notes):
+    return reverse("anki_review:ranger_cartes") + "?notes=" + ",".join(str(n.id) for n in notes)
+
+
+def _recuperer(request, notes):
+    """Récupère `notes` dans la révision de l'utilisateur. Si une règle de rangement désigne
+    déjà le paquet, c'est fait aussitôt ; sinon il faut lui demander où les ranger.
+    Renvoie (destination, creees) — destination None : il faut demander (rien n'est fait)."""
+    destination = gestion_paquets.regle_destination(request.user, notes)
+    if destination is None:
+        return None, []
+    creees, _ = gestion_paquets.ranger(request.user, notes, destination)
+    for carte in creees:
+        Activite.journaliser(request.user, Activite.Type.RECUPERATION, carte)
+    return destination, creees
+
+
 @login_required
 def ajouter_carte_partagee(request, note_id):
     """
-    "Ajouter" une carte partagée : depuis qu'une note n'est plus dupliquée,
-    ça ne fait plus que créer une Card pour soi sur la note EXISTANTE — pas
-    de copie, pas de paquet à choisir (elle reste dans son paquet
-    d'origine, devenu visible via _decks_visibles dès qu'elle est partagée).
+    "Ajouter" une carte partagée : ça ne fait que créer une Card pour soi sur la note EXISTANTE
+    (pas de copie). Elle est rangée dans un paquet À SOI : celui que la règle de rangement
+    désigne, sinon on demande où (ranger_cartes).
     """
     if request.method != "POST":
         return redirect("anki_review:partage_etudiants")
@@ -1084,118 +1116,185 @@ def ajouter_carte_partagee(request, note_id):
         return HttpResponseForbidden("Réservé aux étudiants — le prof ne récupère pas de cartes ici.")
 
     note = get_object_or_404(Note, id=note_id, partagee_avec_classe=True)
-    carte, cree = Card.objects.get_or_create(note=note, etudiant=request.user)
-    if cree:
-        Activite.journaliser(request.user, Activite.Type.RECUPERATION, carte)
+    if Card.objects.filter(note=note, etudiant=request.user).exists():
+        if _est_ajax(request):
+            return JsonResponse({"cree": False})
+        messages.success(request, "Tu avais déjà cette carte.")
+        return redirect("anki_review:partage_etudiants")
+
+    destination, creees = _recuperer(request, [note])
+    if destination is None:
+        if _est_ajax(request):
+            return JsonResponse({"choix": _lien_changer([note])})
+        return redirect(_lien_changer([note]))
     if _est_ajax(request):
-        return JsonResponse({"cree": cree})
-    messages.success(request, "Carte ajoutée à ta révision." if cree else "Tu avais déjà cette carte.")
+        return JsonResponse({"cree": True, "deck": destination.nom, "changer": _lien_changer([note])})
+    messages.success(request, format_html(
+        "Carte rangée dans « {} ». <a href=\"{}\">Changer</a>", destination.nom, _lien_changer([note])))
     return redirect("anki_review:partage_etudiants")
 
 
 @login_required
 def ajouter_paquet_partage(request, deck_id, cree_par_id):
     """Ajoute EN BLOC toutes les cartes qu'un même étudiant a partagées
-    depuis un paquet donné — une Card par note, sans rien dupliquer."""
+    depuis un paquet donné — une Card par note, sans rien dupliquer, rangées dans un paquet à
+    soi (règle de rangement, sinon on demande où)."""
     if request.method != "POST":
         return redirect("anki_review:partage_etudiants")
     if request.user.is_staff:
         return HttpResponseForbidden("Réservé aux étudiants — le prof ne récupère pas de cartes ici.")
-    notes = Note.objects.filter(deck_id=deck_id, cree_par_id=cree_par_id, partagee_avec_classe=True)
     deck_source = get_object_or_404(Deck, id=deck_id)
-    nb_ajoutees = 0
-    for note in notes:
-        carte, cree = Card.objects.get_or_create(note=note, etudiant=request.user)
-        if cree:
-            Activite.journaliser(request.user, Activite.Type.RECUPERATION, carte)
-            nb_ajoutees += 1
-    if _est_ajax(request):
-        return JsonResponse({"nouvelles": nb_ajoutees})
-    messages.success(
-        request,
-        f"Paquet « {deck_source.nom} » ajouté ({nb_ajoutees} nouvelle{'s' if nb_ajoutees > 1 else ''} "
-        f"carte{'s' if nb_ajoutees > 1 else ''}).",
+    deja = Card.objects.filter(etudiant=request.user).values("note_id")
+    notes = list(
+        Note.objects.filter(deck_id=deck_id, cree_par_id=cree_par_id, partagee_avec_classe=True)
+        .exclude(id__in=deja).order_by("id")
     )
+    if not notes:
+        if _est_ajax(request):
+            return JsonResponse({"nouvelles": 0})
+        messages.success(request, "Tu avais déjà toutes ces cartes.")
+        return redirect("anki_review:partage_etudiants")
+
+    destination, creees = _recuperer(request, notes)
+    if destination is None:
+        if _est_ajax(request):
+            return JsonResponse({"choix": _lien_changer(notes)})
+        return redirect(_lien_changer(notes))
+    nb = len(creees)
+    if _est_ajax(request):
+        return JsonResponse({"nouvelles": nb, "deck": destination.nom, "changer": _lien_changer(notes)})
+    messages.success(request, format_html(
+        "Paquet « {} » ajouté : {} nouvelle{} carte{}, rangée{} dans « {} ». <a href=\"{}\">Changer</a>",
+        deck_source.nom, nb, "s" if nb > 1 else "", "s" if nb > 1 else "", "s" if nb > 1 else "",
+        destination.nom, _lien_changer(notes)))
     return redirect("anki_review:partage_etudiants")
+
+
+def _notes_a_ranger(utilisateur, ids):
+    """Les notes demandées sur l'écran « ranger » : celles que j'ai déjà (à déplacer) ou que la
+    classe partage (à récupérer) — rien d'autre."""
+    return list(
+        Note.objects.filter(id__in=ids)
+        .filter(Q(cards__etudiant=utilisateur) | Q(partagee_avec_classe=True))
+        .select_related("deck").distinct().order_by("id")
+    )
+
+
+@login_required
+def ranger_cartes(request):
+    """Choisir dans quel paquet à soi ranger des cartes qu'on récupère (ou qu'on a déjà : « Changer »).
+    Proposition par défaut : un paquet de même nom que l'original (créé si besoin) ; ou un de mes
+    paquets existants. Case « se souvenir » : les prochaines cartes venant du même paquet seront
+    rangées là sans rien demander (règle modifiable dans « Rangement automatique »)."""
+    if request.user.is_staff:
+        return HttpResponseForbidden("Réservé aux étudiants — le prof ne récupère pas de cartes ici.")
+    source = request.POST if request.method == "POST" else request.GET
+    ids = [int(i) for i in (source.get("notes") or "").split(",") if i.strip().isdigit()]
+    notes = _notes_a_ranger(request.user, ids)
+    if not notes:
+        messages.error(request, "Aucune carte à ranger.")
+        return redirect("anki_review:partage_etudiants")
+
+    origines = {n.deck_id: n.deck for n in notes if n.deck_id and n.deck.cree_par_id != request.user.id}
+    origine = next(iter(origines.values())) if len(origines) == 1 else None
+    mes_decks = gestion_paquets.mes_paquets(request.user)
+    meme_nom = gestion_paquets.paquet_de_meme_nom(request.user, origine, creer=False) if origine else None
+
+    if request.method == "POST":
+        choix = request.POST.get("choix")
+        destination = None
+        if choix == "meme_nom" and origine:
+            destination = meme_nom or gestion_paquets.paquet_de_meme_nom(request.user, origine)
+        elif choix == "nouveau":
+            nom = (request.POST.get("nouveau_nom") or "").strip()[:200]
+            if nom:
+                destination = gestion_paquets.creer_paquet(
+                    request.user, nom, matiere=origine.matiere if origine else "")
+        elif choix == "existant":
+            destination = mes_decks.filter(pk=request.POST.get("deck_existant") or 0).first()
+        if destination is None:
+            messages.error(request, "Choisis le paquet où ranger ces cartes.")
+            return redirect(_lien_changer(notes))
+        creees, deplacees = gestion_paquets.ranger(
+            request.user, notes, destination, souvenir=bool(request.POST.get("souvenir")))
+        for carte in creees:
+            Activite.journaliser(request.user, Activite.Type.RECUPERATION, carte)
+        nb = len(creees) + deplacees
+        texte = f"{nb} carte{'s' if nb > 1 else ''} rangée{'s' if nb > 1 else ''} dans « {destination.nom} »."
+        if request.POST.get("souvenir") and origines:
+            texte += " Les prochaines cartes de ce paquet iront aussi là."
+        messages.success(request, texte)
+        return redirect("anki_review:partage_etudiants")
+
+    deja = set(Card.objects.filter(etudiant=request.user, note__in=notes).values_list("note_id", flat=True))
+    return render(request, "anki_review/ranger_cartes.html", {
+        "notes": notes, "ids": ",".join(str(n.id) for n in notes),
+        "nb_nouvelles": len([n for n in notes if n.id not in deja]), "nb_deja": len(deja),
+        "origine": origine, "meme_nom": meme_nom, "decks": _decks_pour_selecteur(mes_decks),
+        "peut_souvenir": bool(origines),
+    })
+
+
+@login_required
+def rangement_automatique(request):
+    """Les règles « cartes de tel paquet → tel de mes paquets » : les consulter, changer la
+    destination ou les oublier. Elles ne valent que pour les cartes à venir."""
+    regles = RegleRangement.objects.filter(etudiant=request.user).select_related(
+        "origine", "origine__cree_par", "destination").order_by("origine__nom")
+    return render(request, "anki_review/rangement_automatique.html", {
+        "regles": regles, "decks": _decks_pour_selecteur(gestion_paquets.mes_paquets(request.user)),
+    })
+
+
+@login_required
+def modifier_regle(request, regle_id):
+    regle = get_object_or_404(RegleRangement, id=regle_id, etudiant=request.user)
+    if request.method == "POST":
+        destination = gestion_paquets.mes_paquets(request.user).filter(pk=request.POST.get("destination") or 0).first()
+        if destination is None:
+            messages.error(request, "Choisis un de tes paquets.")
+        else:
+            regle.destination = destination
+            regle.save(update_fields=["destination"])
+            messages.success(request, "Règle mise à jour : les prochaines cartes iront dans « %s »." % destination.nom)
+    return redirect("anki_review:rangement_automatique")
+
+
+@login_required
+def oublier_regle(request, regle_id):
+    if request.method == "POST":
+        gestion_paquets.oublier_regle(request.user, regle_id)
+        messages.success(request, "Règle oubliée : les prochaines cartes de ce paquet te seront redemandées.")
+    return redirect("anki_review:rangement_automatique")
 
 
 @login_required
 def deplacer_cartes(request, deck_id):
-    """Déplace d'un coup toutes MES cartes (celles dont je suis propriétaire) d'un paquet vers
-    un autre — pour rassembler des cartes écrites chacun de son côté. Les cartes que j'ai
-    seulement récupérées chez d'autres restent en place. Les autres personnes qui ont encore des
-    cartes à elles dans ce paquet reçoivent la même proposition (gestion_paquets.proposer_aux_autres)."""
-    source = get_object_or_404(_decks_visibles(request.user), pk=deck_id)
-    nb_a_moi = gestion_paquets.mes_notes(request.user, source).count()
-    if not nb_a_moi:
-        messages.info(request, "Tu n'as aucune carte à toi dans ce paquet : rien à déplacer.")
+    """Déplace d'un coup toutes les cartes d'un de MES paquets vers un autre de mes paquets."""
+    source = get_object_or_404(gestion_paquets.mes_paquets(request.user), pk=deck_id)
+    nb = Card.objects.filter(deck=source, etudiant=request.user).count()
+    if not nb:
+        messages.info(request, "Ce paquet ne contient aucune carte : rien à déplacer.")
         return redirect("anki_review:edition")
 
-    destinations = _decks_visibles(request.user, avec_mes_cartes=False).exclude(pk=source.pk)
+    destinations = gestion_paquets.mes_paquets(request.user).exclude(pk=source.pk)
     if request.method == "POST":
         destination = destinations.filter(pk=request.POST.get("destination") or 0).first()
         if destination is None:
             messages.error(request, "Choisis le paquet de destination.")
             return redirect("anki_review:deplacer_cartes", deck_id=source.id)
-        source_id = source.id
         try:
             nb = gestion_paquets.deplacer_mes_cartes(request.user, source, destination)
         except gestion_paquets.DeplacementImpossible as e:
             messages.error(request, str(e))
             return redirect("anki_review:edition")
-        # L'ancien paquet a pu être supprimé (vidé, et c'était le sien) : alors personne d'autre
-        # n'y avait de carte, et il n'y a rien à proposer.
-        source = Deck.objects.filter(pk=source_id).select_related("cree_par").first()
-        suggestions = (
-            gestion_paquets.proposer_aux_autres(request.user, source, destination) if source else []
-        )
-        notifications.prevenir_deplacements(suggestions)
-        texte = f"{nb} carte{'s' if nb > 1 else ''} déplacée{'s' if nb > 1 else ''} vers « {destination.nom} »."
-        if suggestions:
-            texte += " Les autres personnes qui ont des cartes à elles dans l'ancien paquet peuvent faire de même."
-        messages.success(request, texte)
+        messages.success(
+            request, f"{nb} carte{'s' if nb > 1 else ''} déplacée{'s' if nb > 1 else ''} vers « {destination.nom} ».")
         return redirect("anki_review:edition")
 
-    nb_recuperees = Card.objects.filter(note__deck=source, etudiant=request.user).exclude(
-        note__cree_par=request.user).count()
     return render(request, "anki_review/deplacer_cartes.html", {
-        "deck": source, "nb_a_moi": nb_a_moi, "nb_recuperees": nb_recuperees,
-        "decks": _decks_pour_selecteur(destinations),
-        "avertit_les_autres": source.cree_par_id is not None and not source.cree_par.is_staff,
+        "deck": source, "nb": nb, "decks": _decks_pour_selecteur(destinations),
     })
-
-
-@login_required
-def accepter_deplacement(request, suggestion_id):
-    suggestion = get_object_or_404(
-        SuggestionDeplacement.objects.select_related("ancien_deck", "nouveau_deck"),
-        id=suggestion_id, destinataire=request.user, statut=SuggestionDeplacement.Statut.EN_ATTENTE,
-    )
-    if request.method == "POST":
-        try:
-            nb = gestion_paquets.accepter_suggestion(suggestion)
-        except gestion_paquets.DeplacementImpossible as e:
-            messages.error(request, f"Ce déplacement n'est plus possible : {e}")
-        else:
-            messages.success(
-                request,
-                f"{nb} carte{'s' if nb > 1 else ''} déplacée{'s' if nb > 1 else ''} vers « {suggestion.nouveau_deck.nom} ».",
-            )
-    return redirect("anki_review:liste_decks")
-
-
-@login_required
-def refuser_deplacement(request, suggestion_id):
-    suggestion = get_object_or_404(
-        SuggestionDeplacement, id=suggestion_id, destinataire=request.user,
-        statut=SuggestionDeplacement.Statut.EN_ATTENTE,
-    )
-    if request.method == "POST":
-        suggestion.statut = SuggestionDeplacement.Statut.REFUSEE
-        suggestion.traitee_le = timezone.now()
-        suggestion.save(update_fields=["statut", "traitee_le"])
-        messages.success(request, "Tes cartes restent où elles sont.")
-    return redirect("anki_review:liste_decks")
 
 
 @login_required

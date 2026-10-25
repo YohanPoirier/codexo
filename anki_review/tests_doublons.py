@@ -45,9 +45,10 @@ class DoublonsTests(TestCase):
     def test_fusion_reporte_la_progression_et_nettoie(self):
         self._lancer("--appliquer")
         self.assertFalse(Note.objects.filter(pk=self.copie.pk).exists())
-        self.assertFalse(Deck.objects.filter(pk=self.deck_eleve.pk).exists())
         carte = Card.objects.get(note=self.officielle, etudiant=self.eleve)
         self.assertEqual((carte.repetitions, carte.intervalle_jours), (5, 12))
+        # Son paquet n'est pas supprimé : la carte y reste rangée.
+        self.assertEqual(carte.deck, self.deck_eleve)
         self.assertTrue(Deck.objects.filter(pk=self.deck_prof.pk).exists())
 
     def test_fusion_garde_la_carte_la_plus_avancee(self):
@@ -75,4 +76,6 @@ class DoublonsTests(TestCase):
         self.assertEqual(Note.objects.filter(guid=self.officielle.guid).count(), 1)
         self.assertTrue(Card.objects.filter(note=self.officielle, etudiant=self.eleve).exists())
         self.assertEqual(Activite.objects.filter(type="recuperation", etudiant=self.eleve).count(), 1)
-        self.assertFalse(Deck.objects.filter(cree_par=self.eleve).exists())
+        # Rangée dans un paquet à lui, de même nom que celui du professeur.
+        carte = Card.objects.get(note=self.officielle, etudiant=self.eleve)
+        self.assertEqual((carte.deck.nom, carte.deck.cree_par), ("Thermo", self.eleve))

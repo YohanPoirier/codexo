@@ -94,7 +94,7 @@ class Command(BaseCommand):
             par_etudiant[copie.cree_par].append((copie, officielle, raison))
 
         for etudiant, lignes in par_etudiant.items():
-            decks = sorted({c.deck.nom for c, _, _ in lignes})
+            decks = sorted({c.deck.nom for c, _, _ in lignes if c.deck})
             self.stdout.write(
                 f"{etudiant} : {len(lignes)} copie(s) dans {len(decks)} paquet(s) ({', '.join(decks[:5])}"
                 f"{'…' if len(decks) > 5 else ''})"
@@ -105,11 +105,11 @@ class Command(BaseCommand):
             self.stdout.write("Rapport seul — rien n'a été modifié. Relancer avec --appliquer pour fusionner.")
             return
 
-        decks_touches = {copie.deck_id for copie, _, _ in doublons}
+        decks_touches = {copie.deck_id for copie, _, _ in doublons if copie.deck_id}
         with transaction.atomic():
             for copie, officielle, _ in doublons:
                 fusionner(copie, officielle)
-            vides = Deck.objects.filter(id__in=decks_touches, notes__isnull=True).exclude(
+            vides = Deck.objects.filter(id__in=decks_touches, notes__isnull=True, cartes__isnull=True).exclude(
                 Q(cree_par__isnull=True) | Q(cree_par__is_staff=True)
             )
             nb_vides = vides.count()

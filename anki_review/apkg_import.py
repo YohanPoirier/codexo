@@ -51,6 +51,7 @@ from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.utils.html import strip_tags
 
+from .decks import paquet_par_defaut
 from .html_propre import EXTENSIONS_IMAGE_AUTORISEES, nettoyer_html
 from .models import Activite, Card, Deck, Note
 from .slugs import slug_unique
@@ -446,7 +447,10 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
                 .last()
             )
         if note_commune is not None:
-            carte, creee = Card.objects.get_or_create(note=note_commune, etudiant=utilisateur)
+            carte, creee = Card.objects.get_or_create(
+                note=note_commune, etudiant=utilisateur,
+                defaults={"deck": paquet_par_defaut(utilisateur, note_commune)},
+            )
             if creee:
                 planning = planning_par_note.get(ligne["id"])
                 if planning:
@@ -487,7 +491,8 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
             nouvelle_note = True
 
         planning = planning_par_note.get(ligne["id"])
-        carte, _ = Card.objects.get_or_create(note=note, etudiant=utilisateur)
+        carte, _ = Card.objects.get_or_create(note=note, etudiant=utilisateur, defaults={"deck": deck})
+        carte.deck = deck
         if planning:
             ivl = planning["ivl"] or 0
             carte.intervalle_jours = abs(ivl) if ivl >= 0 else abs(ivl) / 86400

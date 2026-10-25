@@ -69,7 +69,12 @@ class Note(models.Model):
     import/partage entre étudiants (cf. logique de diff GUID évoquée en chat).
     """
     guid = models.CharField(max_length=64, default=uuid.uuid4)
-    deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="notes")
+    # Paquet de l'AUTEUR (le propriétaire de la note) : c'est là que celui-ci range sa carte, et
+    # la provenance qui sert aux autres à ranger la leur (voir RegleRangement). Chacun range les
+    # cartes qu'il a dans SES paquets, via Card.deck : ce champ ne dit rien du rangement des autres.
+    deck = models.ForeignKey(
+        Deck, on_delete=models.SET_NULL, null=True, blank=True, related_name="notes",
+    )
 
     question = models.TextField(help_text="HTML autorisé, y compris <img src=\"...\">")
     reponse = models.TextField(help_text="HTML autorisé, y compris <img src=\"...\">")
@@ -113,7 +118,7 @@ class Note(models.Model):
         ordering = ["id"]
 
     def __str__(self):
-        return f"{self.deck.nom} — {self.question[:40]}"
+        return f"{self.deck.nom if self.deck_id else '—'} — {self.question[:40]}"
 
     def titre_affichage(self):
         """Ce qu'il faut montrer dans une liste (Édition, Import/Export) :
@@ -179,6 +184,11 @@ class Card(models.Model):
     etudiant = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="cartes_anki"
     )
+    # Le paquet, À MOI, dans lequel cette carte est rangée : chacun range les cartes qu'il a dans
+    # ses propres paquets, que personne d'autre ne voit. Une carte posée sans paquet est rangée
+    # automatiquement (règle de rangement, sinon paquet de même nom que l'original) : voir
+    # decks.paquet_par_defaut.
+    deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="cartes")
     # Sert à déterminer qui, parmi plusieurs détenteurs d'une même note,
     # l'a récupérée en premier — utilisé pour le transfert de propriété
     # quand le propriétaire d'origine supprime sa carte (cf.
@@ -203,6 +213,12 @@ class Card(models.Model):
 
     def __str__(self):
         return f"{self.etudiant} — {self.note_id} (échéance {self.prochaine_revision:%d/%m})"
+
+    def save(self, *args, **kwargs):
+        if self.deck_id is None:
+            from . import decks
+            self.deck = decks.paquet_par_defaut(self.etudiant, self.note)
+        super().save(*args, **kwargs)
 
 
 class PropositionModification(models.Model):
@@ -241,40 +257,26 @@ class PropositionModification(models.Model):
         super().save(*args, **kwargs)
 
 
-class SuggestionDeplacement(models.Model):
-    """Proposition faite à quelqu'un de déplacer lui aussi ses cartes d'un paquet vers un autre.
+class RegleRangement(models.Model):
+    """« Les cartes qui viennent de ce paquet, je les range dans celui-là. »
 
-    Créée quand `auteur` déplace ses cartes de `ancien_deck` vers `nouveau_deck` (voir
-    decks.proposer_aux_autres) : les autres personnes qui ont encore des cartes À ELLES dans
-    l'ancien paquet se voient proposer la même chose, pour finir de rassembler les cartes
-    (ex. deux paquets « Vocabulaire » écrits chacun de leur côté). C'est une suggestion, jamais
-    une action automatique : le destinataire accepte ou refuse."""
+    Posée quand on coche « se souvenir de ce choix » en récupérant des cartes : les prochaines
+    cartes venant du même paquet d'origine (celui de leur auteur) sont rangées sans question dans
+    `destination`. Ne vaut que pour l'avenir : rien n'est déplacé. Disparaît avec l'un ou l'autre
+    des deux paquets s'il est supprimé."""
 
-    class Statut(models.TextChoices):
-        EN_ATTENTE = "en_attente", "En attente"
-        ACCEPTEE = "acceptee", "Acceptée"
-        REFUSEE = "refusee", "Refusée"
-
-    destinataire = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="suggestions_deplacement"
+    etudiant = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="regles_rangement"
     )
-    auteur = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+",
-    )
-    ancien_deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="+")
-    nouveau_deck = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="+")
-    statut = models.CharField(max_length=12, choices=Statut.choices, default=Statut.EN_ATTENTE)
+    origine = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="+")
+    destination = models.ForeignKey(Deck, on_delete=models.CASCADE, related_name="+")
     cree_le = models.DateTimeField(auto_now_add=True)
-    traitee_le = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        ordering = ["-cree_le"]
-        # Une seule suggestion par (personne, ancien paquet, nouveau paquet) : un refus n'est
-        # pas redemandé, et deux personnes qui déplacent vers le même paquet n'en créent qu'une.
-        unique_together = [("destinataire", "ancien_deck", "nouveau_deck")]
+        unique_together = [("etudiant", "origine")]
 
     def __str__(self):
-        return f"Déplacement proposé à {self.destinataire} : {self.ancien_deck} → {self.nouveau_deck}"
+        return f"{self.etudiant} : {self.origine} → {self.destination}"
 
 
 class Activite(models.Model):

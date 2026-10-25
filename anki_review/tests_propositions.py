@@ -40,7 +40,7 @@ class PropositionsTests(TestCase):
     def _proposer(self):
         self.client.force_login(self.eleve)
         return self.client.post(reverse("anki_review:modifier_note", args=[self.note.id]), {
-            "deck": self.deck.id, "question": "Loi de Snell-Descartes", "reponse": "n1 sin i1 = n2 sin i2", "tags": "",
+            "deck": Deck.objects.get(cree_par=self.eleve).id, "question": "Loi de Snell-Descartes", "reponse": "n1 sin i1 = n2 sin i2", "tags": "",
         })
 
     def test_proposition_previent_le_proprietaire(self, _connexion):
