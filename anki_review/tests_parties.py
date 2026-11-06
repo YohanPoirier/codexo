@@ -1,5 +1,6 @@
 """Niveau « partie » (sous-matière) entre la matière et le paquet (chapitre)."""
 import io
+from unittest import mock
 import os
 import tempfile
 
@@ -13,7 +14,11 @@ from . import decks as gestion
 from .apkg_export import _nom_paquet_anki, exporter_notes_apkg
 from .apkg_import import importer_apkg
 from .forms import DeckForm
-from .management.commands.migrer_chapitres import CHAPITRES, chapitre_de
+from .management.commands.migrer_chapitres import CHAPITRES as CHAPITRES_REELS, chapitre_de
+
+# Config de test (la vraie a perdu Électricité une fois migrée).
+CHAPITRES = {("physique", "Électricité"): {
+    1: "C1 - Bases de l'électricité", 3: "C3 - Circuits du premier ordre"}}
 from .models import Card, Deck, Note
 from .tests_rangement import CONFIG, carte_de, eleve, prof
 from .views import _grouper_matieres
@@ -204,7 +209,8 @@ class MigrationChapitresTests(TestCase):
 
     def _lancer(self, *args):
         sortie = io.StringIO()
-        call_command("migrer_chapitres", *args, stdout=sortie)
+        with mock.patch.dict(CHAPITRES_REELS, CHAPITRES):
+            call_command("migrer_chapitres", "--partie", "Électricité", *args, stdout=sortie)
         return sortie.getvalue()
 
     def test_simulation_ne_modifie_rien(self):

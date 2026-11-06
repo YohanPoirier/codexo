@@ -341,7 +341,18 @@ def analyser_apkg(fichier_django):
         titre = html.unescape(strip_tags(champs[0]))[:80]
         par_deck.setdefault(nom_deck_anki, []).append({"guid": ligne["guid"], "titre": titre})
 
-    return [{"nom_deck": k, "notes": v} for k, v in par_deck.items()], nb_cloze
+    paquets = []
+    for nom_deck, notes in par_deck.items():
+        matiere, partie, nom = decomposer_nom_anki(nom_deck)
+        paquets.append({
+            "nom_deck": nom_deck, "notes": notes,
+            # Destination par défaut (d'après le nom du fichier), pré-remplie sur l'écran.
+            "defaut": {
+                "matiere": matiere, "partie": partie, "nom": nom,
+                "libelle": libelle_destination(matiere, partie, nom),
+            },
+        })
+    return paquets, nb_cloze
 
 
 def _deviner_matiere(nom_anki: str) -> str:
@@ -358,11 +369,59 @@ def _deviner_matiere(nom_anki: str) -> str:
     return ""
 
 
-def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
+def decomposer_nom_anki(nom_anki: str):
+    """Découpe le nom d'un paquet Anki en (matière, partie, nom du paquet) :
+    "Physique::Électricité::C1 - Bases" -> ("physique", "Électricité", "C1 - Bases")."""
+    matiere = _deviner_matiere(nom_anki)
+    partie = ""
+    nom_sans_matiere = nom_anki
+    if matiere:
+        # Le premier segment (avant "::") est déjà représenté par le champ `matiere` — on ne le
+        # garde pas en double dans le nom du paquet (sinon "Physique::Thermodynamique" deviendrait
+        # le paquet "Physique — Thermodynamique" DANS le groupe "Physique", redondant). Si rien ne
+        # reste après (paquet nommé exactement comme sa matière, sans sous-paquet), on garde le
+        # nom complet tel quel : Deck.nom ne peut pas être vide.
+        #
+        # S'il reste au moins DEUX segments, le premier devient la partie (sous-matière) et le
+        # reste le nom du paquet : "Physique::Électricité::C1 - Bases" -> matière Physique, partie
+        # Électricité, paquet "C1 - Bases". Avec un seul segment restant ("Physique::Optique",
+        # ancien format), pas de partie : le paquet garde ce nom.
+        segments = [seg.strip() for seg in nom_anki.split("::")[1:]]
+        segments = [seg for seg in segments if seg]
+        if len(segments) >= 2:
+            partie = segments[0][:100].replace("/", "-")
+            nom_sans_matiere = "::".join(segments[1:])
+        elif segments:
+            nom_sans_matiere = segments[0]
+    nom_propre = nom_sans_matiere.replace("::", " — ")  # sous-paquets Anki restants -> nom plat
+    return matiere, partie, nom_propre
+
+
+def libelle_destination(matiere: str, partie: str, nom: str) -> str:
+    """« Physique › Électricité › C1 - Bases » : affichage d'une destination."""
+    libelle_matiere = dict(Deck.Matiere.choices).get(matiere, "")
+    return " › ".join(x for x in (libelle_matiere, partie, nom) if x)
+
+
+def _trouver_ou_creer_deck(utilisateur, nom, matiere, partie):
+    deck = Deck.objects.filter(nom=nom, partie=partie, cree_par=utilisateur).first()
+    if deck is None:
+        deck = Deck.objects.create(
+            nom=nom, slug=slug_unique(nom), cree_par=utilisateur, matiere=matiere, partie=partie)
+    return deck
+
+
+def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None, destinations=None) -> dict:
     """
     Importe le contenu du fichier vers nos modèles, en ne retenant que les
     notes dont le guid figure dans `guids_selectionnes` (toutes, si ce
     paramètre vaut None).
+
+    `destinations` (facultatif) : {nom du paquet dans le fichier: {"deck_id": id d'un de MES
+    paquets} ou {"nouveau": {"nom", "matiere", "partie"}}} — la destination choisie sur l'écran
+    de sélection. Sans entrée pour un paquet, on garde le comportement par défaut : paquet créé
+    ou réutilisé d'après le nom du fichier, et cartes déjà connues du site rangées selon la règle
+    de rangement automatique.
 
     `utilisateur` devient le propriétaire (cree_par) de tout ce qui est
     importé — comme pour n'importe quelle création de contenu sur le site
@@ -377,43 +436,36 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
     lignes_notes, deck_par_note, planning_par_note, decks_anki, medias, ids_modeles_cloze = \
         _lire_contenu_brut(fichier_django)
 
+    destinations = destinations or {}
     cache_decks = {}
 
     def _obtenir_deck(nom_anki):
         if nom_anki in cache_decks:
             return cache_decks[nom_anki]
 
-        matiere = _deviner_matiere(nom_anki)
-        partie = ""
-        nom_sans_matiere = nom_anki
-        if matiere:
-            # Le premier segment (avant "::") est déjà représenté par le
-            # champ `matiere` — on ne le garde pas en double dans le nom du
-            # paquet (sinon "Physique::Thermodynamique" deviendrait le
-            # paquet "Physique — Thermodynamique" DANS le groupe "Physique",
-            # redondant). Si rien ne reste après (paquet nommé exactement
-            # comme sa matière, sans sous-paquet), on garde le nom complet
-            # tel quel : Deck.nom ne peut pas être vide.
-            #
-            # S'il reste au moins DEUX segments, le premier devient la partie (sous-matière)
-            # et le reste le nom du paquet : "Physique::Électricité::C1 - Bases" -> matière
-            # Physique, partie Électricité, paquet "C1 - Bases". Avec un seul segment restant
-            # ("Physique::Optique", ancien format), pas de partie : le paquet garde ce nom.
-            segments = [seg.strip() for seg in nom_anki.split("::")[1:]]
-            segments = [seg for seg in segments if seg]
-            if len(segments) >= 2:
-                partie = segments[0][:100].replace("/", "-")
-                nom_sans_matiere = "::".join(segments[1:])
-            elif segments:
-                nom_sans_matiere = segments[0]
-
-        nom_propre = nom_sans_matiere.replace("::", " — ")  # sous-paquets Anki restants -> nom plat
-        deck = Deck.objects.filter(nom=nom_propre, partie=partie, cree_par=utilisateur).first()
-        if deck is None:
-            deck = Deck.objects.create(
-                nom=nom_propre, slug=slug_unique(nom_propre), cree_par=utilisateur, matiere=matiere,
-                partie=partie,
-            )
+        # Destination choisie sur l'écran de sélection pour ce paquet du fichier ?
+        choix = destinations.get(nom_anki)
+        if choix and choix.get("deck_id"):
+            deck = Deck.objects.filter(id=choix["deck_id"], cree_par=utilisateur).first()
+            if deck is None:
+                raise ErreurImportApkg("Un des paquets choisis comme destination n'existe plus.")
+        elif choix and choix.get("nouveau"):
+            nouveau = choix["nouveau"]
+            nom = " ".join((nouveau.get("nom") or "").split())[:200]
+            matiere = nouveau.get("matiere") or ""
+            partie = " ".join((nouveau.get("partie") or "").split())[:100]
+            if not nom:
+                raise ErreurImportApkg("Donne un nom au nouveau paquet.")
+            if matiere not in dict(Deck.Matiere.choices):
+                matiere = ""
+            if "/" in partie or "::" in partie:
+                raise ErreurImportApkg("La partie ne peut contenir ni « / » ni « :: ».")
+            if not matiere:
+                partie = ""  # une partie n'a de sens que sous une matière
+            deck = _trouver_ou_creer_deck(utilisateur, nom, matiere, partie)
+        else:
+            matiere, partie, nom_propre = decomposer_nom_anki(nom_anki)
+            deck = _trouver_ou_creer_deck(utilisateur, nom_propre, matiere, partie)
         cache_decks[nom_anki] = deck
         return deck
 
@@ -464,9 +516,17 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
             candidates.sort(key=lambda n: (0 if n.cree_par is not None and n.cree_par.is_staff else 1, n.id))
             note_commune = candidates[0] if candidates else None
         if note_commune is not None:
+            did_anki = deck_par_note.get(ligne["id"])
+            nom_deck_anki = decks_anki.get(str(did_anki), {}).get("name", "Importé") if did_anki else "Importé"
+            if nom_deck_anki in destinations:
+                # Destination choisie pour ce paquet du fichier : elle prime sur la règle de rangement.
+                deck_commune = _obtenir_deck(nom_deck_anki)
+                decks_touches.add(deck_commune.id)
+            else:
+                deck_commune = paquet_par_defaut(utilisateur, note_commune)
             carte, creee = Card.objects.get_or_create(
                 note=note_commune, etudiant=utilisateur,
-                defaults={"deck": paquet_par_defaut(utilisateur, note_commune)},
+                defaults={"deck": deck_commune},
             )
             if creee:
                 planning = planning_par_note.get(ligne["id"])

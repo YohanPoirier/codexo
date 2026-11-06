@@ -5,7 +5,8 @@
 {% block content %}
 <p class="edition-fil"><a href="{% url 'anki_review:import_export_fichier' %}">← Import/Export</a></p>
 <h1>Choisir quoi importer</h1>
-<p>Tout est coché par défaut — décoche ce que tu ne veux pas importer.</p>
+<p>Tout est coché par défaut — décoche ce que tu ne veux pas importer. Pour chaque paquet du fichier, choisis aussi où le ranger.</p>
+{% if erreur %}<p class="erreur">{{ erreur }}</p>{% endif %}
 {% if nb_cloze %}
   <p class="editeur-champ-aide">{{ nb_cloze }} carte{{ nb_cloze|pluralize }} de type "texte à trous" ignorée{{ nb_cloze|pluralize }} (pas encore gérée).</p>
 {% endif %}
@@ -25,6 +26,29 @@
           <span class="edition-ligne-meta">{{ paquet.notes|length }} carte{{ paquet.notes|length|pluralize }}</span>
         </div>
       </summary>
+      <div class="ie-destination" onclick="event.stopPropagation()">
+        <input type="hidden" name="nom_deck_{{ paquet.numero }}" value="{{ paquet.nom_deck }}">
+        <label>Ranger dans :
+          <select name="dest_{{ paquet.numero }}" class="ie-dest-select" data-n="{{ paquet.numero }}">
+            <option value="defaut" selected>Par défaut — {{ paquet.defaut.libelle }}</option>
+            {% regroup mes_decks by libelle_matiere as groupes %}
+            {% for groupe in groupes %}
+              <optgroup label="{{ groupe.grouper }}">
+                {% for d in groupe.list %}<option value="deck:{{ d.id }}">{{ d.nom }}</option>{% endfor %}
+              </optgroup>
+            {% endfor %}
+            <option value="nouveau">+ Nouveau paquet…</option>
+          </select>
+        </label>
+        <div class="ie-dest-nouveau" id="ie-nouveau-{{ paquet.numero }}" hidden>
+          <input type="text" name="nom_{{ paquet.numero }}" value="{{ paquet.defaut.nom }}" placeholder="Nom du paquet" maxlength="200">
+          <select name="matiere_{{ paquet.numero }}">
+            <option value="">Sans matière</option>
+            {% for val, lib in matieres %}<option value="{{ val }}"{% if val == paquet.defaut.matiere %} selected{% endif %}>{{ lib }}</option>{% endfor %}
+          </select>
+          <input type="text" name="partie_{{ paquet.numero }}" value="{{ paquet.defaut.partie }}" placeholder="Partie (facultatif)" maxlength="100" list="ie-parties">
+        </div>
+      </div>
       <ul class="edition-liste ie-sous-liste ie-cases-{{ forloop.counter }}">
         {% for note in paquet.notes %}
           <li class="edition-ligne ie-sous-ligne">
@@ -38,6 +62,20 @@
     </details>
   {% endfor %}
 
+  <datalist id="ie-parties">
+    {% for matiere, parties in parties_par_matiere.items %}{% for p in parties %}<option value="{{ p }}">{% endfor %}{% endfor %}
+  </datalist>
+
   <button type="submit" class="btn-ajouter" style="margin-top:16px;">Importer la sélection</button>
 </form>
+
+<script>
+  // « Nouveau paquet… » : affiche nom / matière / partie sous le menu.
+  document.querySelectorAll(".ie-dest-select").forEach(sel => {
+    const bloc = document.getElementById("ie-nouveau-" + sel.dataset.n);
+    const maj = () => { bloc.hidden = sel.value !== "nouveau"; };
+    sel.addEventListener("change", maj);
+    maj();
+  });
+</script>
 {% endblock %}

@@ -920,15 +920,64 @@ def import_export_fichier(request):
             # Le chemin reste côté serveur (session) : il n'est PAS renvoyé au navigateur,
             # sinon l'utilisateur pourrait le remplacer par un autre fichier à supprimer.
             request.session[CLE_SESSION_APKG] = chemin_temp
-            return render(request, "anki_review/import_apkg_selection.html", {
-                "paquets": paquets, "nb_cloze": nb_cloze,
-            })
+            return render(request, "anki_review/import_apkg_selection.html",
+                          _contexte_selection_import(request.user, paquets, nb_cloze))
 
     decks_pour_export = _decks_pour_export(request.user)
 
     return render(request, "anki_review/import_export_fichier.html", {
         "erreur": erreur, "decks_pour_export": decks_pour_export,
     })
+
+
+def _contexte_selection_import(user, paquets, nb_cloze):
+    """Contexte de l'écran de sélection : chaque paquet du fichier reçoit un numéro (clé des
+    champs du formulaire), et on fournit mes paquets existants + les matières pour le choix
+    de destination."""
+    for i, paquet in enumerate(paquets, start=1):
+        paquet["numero"] = i
+    return {
+        "paquets": paquets, "nb_cloze": nb_cloze,
+        "mes_decks": _decks_pour_selecteur(gestion_paquets.mes_paquets(user)),
+        "matieres": Deck.Matiere.choices,
+        "parties_par_matiere": _parties_existantes(user),
+    }
+
+
+def _lire_destinations(request):
+    """Lit les destinations choisies sur l'écran de sélection :
+    champs dest_<n> ("defaut" | "deck:<id>" | "nouveau"), nom_deck_<n> (nom du paquet dans le
+    fichier), et pour "nouveau" : nom_<n>, matiere_<n>, partie_<n>.
+    Renvoie ({nom du paquet du fichier: destination}, message d'erreur ou None)."""
+    destinations = {}
+    for cle, valeur in request.POST.items():
+        if not cle.startswith("dest_"):
+            continue
+        n = cle[len("dest_"):]
+        nom_fichier = request.POST.get(f"nom_deck_{n}", "")
+        if not nom_fichier or valeur == "defaut":
+            continue
+        if valeur.startswith("deck:"):
+            try:
+                deck_id = int(valeur[len("deck:"):])
+            except ValueError:
+                return {}, "Destination invalide."
+            if not gestion_paquets.mes_paquets(request.user).filter(id=deck_id).exists():
+                return {}, "Un des paquets choisis comme destination n'existe pas."
+            destinations[nom_fichier] = {"deck_id": deck_id}
+        elif valeur == "nouveau":
+            nom = " ".join(request.POST.get(f"nom_{n}", "").split())
+            partie = " ".join(request.POST.get(f"partie_{n}", "").split())
+            if not nom:
+                return {}, f"Donne un nom au nouveau paquet pour « {nom_fichier} »."
+            if "/" in partie or "::" in partie:
+                return {}, "La partie ne peut contenir ni « / » ni « :: »."
+            destinations[nom_fichier] = {"nouveau": {
+                "nom": nom, "partie": partie, "matiere": request.POST.get(f"matiere_{n}", ""),
+            }}
+        else:
+            return {}, "Destination invalide."
+    return destinations, None
 
 
 @login_required
@@ -948,8 +997,24 @@ def import_apkg_confirmer(request):
     elif not guids:
         erreur = "Aucune carte cochée — rien à importer."
     else:
+        destinations, erreur = _lire_destinations(request)
+
+    if chemin_temp and guids and erreur:
+        # Choix de destination invalide : on réaffiche l'écran de sélection (le fichier
+        # temporaire est conservé), au lieu d'obliger à tout réimporter.
         try:
-            resultat = importer_apkg(default_storage.open(chemin_temp), request.user, guids_selectionnes=guids)
+            paquets, nb_cloze = analyser_apkg(default_storage.open(chemin_temp))
+        except ErreurImportApkg as e:
+            _oublier_apkg_temporaire(request)
+            erreur = str(e)
+        else:
+            contexte = _contexte_selection_import(request.user, paquets, nb_cloze)
+            contexte["erreur"] = erreur
+            return render(request, "anki_review/import_apkg_selection.html", contexte)
+    elif chemin_temp and guids:
+        try:
+            resultat = importer_apkg(default_storage.open(chemin_temp), request.user,
+                                     guids_selectionnes=guids, destinations=destinations)
         except ErreurImportApkg as e:
             erreur = str(e)
         finally:
