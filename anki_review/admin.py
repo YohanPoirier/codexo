@@ -5,7 +5,8 @@ from .models import Activite, Card, Deck, Note
 
 @admin.register(Deck)
 class DeckAdmin(admin.ModelAdmin):
-    list_display = ("nom", "slug")
+    list_display = ("nom", "matiere", "partie", "slug")
+    list_filter = ("matiere", "partie")
     prepopulated_fields = {"slug": ("nom",)}
 
 

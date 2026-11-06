@@ -384,6 +384,7 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
             return cache_decks[nom_anki]
 
         matiere = _deviner_matiere(nom_anki)
+        partie = ""
         nom_sans_matiere = nom_anki
         if matiere:
             # Le premier segment (avant "::") est déjà représenté par le
@@ -393,15 +394,25 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
             # redondant). Si rien ne reste après (paquet nommé exactement
             # comme sa matière, sans sous-paquet), on garde le nom complet
             # tel quel : Deck.nom ne peut pas être vide.
-            segments = nom_anki.split("::", 1)
-            if len(segments) > 1:
-                nom_sans_matiere = segments[1]
+            #
+            # S'il reste au moins DEUX segments, le premier devient la partie (sous-matière)
+            # et le reste le nom du paquet : "Physique::Électricité::C1 - Bases" -> matière
+            # Physique, partie Électricité, paquet "C1 - Bases". Avec un seul segment restant
+            # ("Physique::Optique", ancien format), pas de partie : le paquet garde ce nom.
+            segments = [seg.strip() for seg in nom_anki.split("::")[1:]]
+            segments = [seg for seg in segments if seg]
+            if len(segments) >= 2:
+                partie = segments[0][:100].replace("/", "-")
+                nom_sans_matiere = "::".join(segments[1:])
+            elif segments:
+                nom_sans_matiere = segments[0]
 
         nom_propre = nom_sans_matiere.replace("::", " — ")  # sous-paquets Anki restants -> nom plat
-        deck = Deck.objects.filter(nom=nom_propre, cree_par=utilisateur).first()
+        deck = Deck.objects.filter(nom=nom_propre, partie=partie, cree_par=utilisateur).first()
         if deck is None:
             deck = Deck.objects.create(
                 nom=nom_propre, slug=slug_unique(nom_propre), cree_par=utilisateur, matiere=matiere,
+                partie=partie,
             )
         cache_decks[nom_anki] = deck
         return deck

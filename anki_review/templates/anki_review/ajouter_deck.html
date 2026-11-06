@@ -26,8 +26,36 @@
     {{ form.matiere }}
     {% for erreur in form.matiere.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
   </div>
+  <div class="editeur-champ-groupe">
+    <label for="id_partie">Partie (optionnel)</label>
+    {{ form.partie }}
+    <datalist id="parties-existantes"></datalist>
+    <p class="editeur-champ-aide">Sous-matière dont ce paquet est un chapitre (ex. Électricité). Choisis-en une déjà utilisée ou tape-en une nouvelle.</p>
+    {% for erreur in form.partie.errors %}<p class="erreur-champ">{{ erreur }}</p>{% endfor %}
+  </div>
   <button type="submit" class="btn-ajouter">
     {% if deck %}Enregistrer{% else %}Créer le paquet{% endif %}
   </button>
 </form>
+{% endblock %}
+
+{% block scripts %}
+{{ parties_existantes|json_script:"parties-json" }}
+<script>
+(function () {
+  const parties = JSON.parse(document.getElementById('parties-json').textContent);
+  const matiere = document.getElementById('id_matiere');
+  const liste = document.getElementById('parties-existantes');
+  function remplir() {
+    liste.innerHTML = '';
+    (parties[matiere.value] || []).forEach(nom => {
+      const option = document.createElement('option');
+      option.value = nom;
+      liste.appendChild(option);
+    });
+  }
+  matiere.addEventListener('change', remplir);
+  remplir();
+})();
+</script>
 {% endblock %}

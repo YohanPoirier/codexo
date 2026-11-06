@@ -29,6 +29,37 @@
       </div>
     </summary>
     <ul class="ie-groupe-liste">
+      {% for p in m.parties %}
+        <li>
+          <details class="ie-groupe ie-groupe--partie" data-cle="revision-partie-{{ m.valeur }}-{{ p.nom }}">
+            <summary class="ie-groupe-entete edition-ligne edition-ligne--partie">
+              <div class="edition-ligne-titre">
+                <span>{{ p.nom }}</span>
+                <span class="edition-ligne-meta">
+                  {% if p.dues %}{{ p.dues }} carte{{ p.dues|pluralize }} à réviser{% else %}Rien à réviser{% endif %}
+                </span>
+              </div>
+              <div class="edition-actions" onclick="event.stopPropagation()">
+                <a class="ie-btn-action" href="{% url 'anki_review:reviser_partie' m.valeur p.nom %}">Réviser toute la partie</a>
+              </div>
+            </summary>
+            <ul class="ie-groupe-liste">
+              {% for item in p.paquets %}
+                <li>
+                  <a class="edition-ligne edition-ligne--paquet edition-ligne--lien" href="{% url 'anki_review:reviser' item.deck.slug %}">
+                    <div class="edition-ligne-titre">
+                      <span>{{ item.deck.nom }}</span>
+                      <span class="edition-ligne-meta">
+                        {% if item.dues %}{{ item.dues }} carte{{ item.dues|pluralize }} à réviser{% else %}Rien à réviser{% endif %}
+                      </span>
+                    </div>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </details>
+        </li>
+      {% endfor %}
       {% for item in m.paquets %}
         <li>
           <a class="edition-ligne edition-ligne--paquet edition-ligne--lien" href="{% url 'anki_review:reviser' item.deck.slug %}">

@@ -8,12 +8,27 @@ from .slugs import slug_unique
 class DeckForm(forms.ModelForm):
     class Meta:
         model = Deck
-        fields = ["nom", "description", "matiere"]
+        fields = ["nom", "description", "matiere", "partie"]
         widgets = {
             "nom": forms.TextInput(),
+            "partie": forms.TextInput(attrs={"list": "parties-existantes", "autocomplete": "off"}),
             "description": forms.Textarea(attrs={"rows": 3}),
             "matiere": forms.Select(attrs={"class": "select-stylise"}),
         }
+
+    def clean_partie(self):
+        # Une partie sert d'adresse (« /partie/<nom>/ ») et de segment de nom Anki (« :: ») :
+        # on interdit « / » et « :: », qui casseraient l'un ou l'autre.
+        partie = " ".join((self.cleaned_data.get("partie") or "").split())
+        if "/" in partie or "::" in partie:
+            raise forms.ValidationError("La partie ne peut contenir ni « / » ni « :: ».")
+        return partie
+
+    def clean(self):
+        donnees = super().clean()
+        if donnees.get("partie") and not donnees.get("matiere"):
+            self.add_error("partie", "Choisis d'abord une matière pour pouvoir indiquer une partie.")
+        return donnees
 
     def save(self, commit=True):
         deck = super().save(commit=False)

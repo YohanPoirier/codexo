@@ -595,3 +595,16 @@ details[open] > .ie-groupe-entete .edition-ligne-meta::before { transform: rotat
 .choix-paquet-souvenir { display: flex; gap: 10px; align-items: flex-start; margin-top: 10px; cursor: pointer; }
 .choix-paquet-souvenir input { margin-top: 4px; }
 .choix-paquet-souvenir .editeur-champ-aide { display: block; }
+
+/* --- Partie (sous-matière) : niveau intermédiaire entre la matière et les paquets (chapitres).
+   Même famille de couleur que la matière, en plus clair, avec une bordure à gauche. Les paquets
+   dessous sont arrondis sur leurs 4 coins (le « premier enfant à haut plat » ne vaut que sous
+   une matière), et décalés de 10 px comme sous une matière. --- */
+.edition-ligne--partie {
+  background: #e6e9f4; border: 1.5px solid var(--rule); border-left: 4px solid var(--indigo-deep);
+}
+.edition-ligne--partie .edition-ligne-titre > span:first-child { font-weight: 700; }
+details.ie-groupe.ie-groupe--partie > summary.edition-ligne.edition-ligne--partie { border-radius: 8px; }
+.ie-groupe--partie > .ie-groupe-liste { margin: 0 0 0 10px; }
+.ie-groupe--partie > .ie-groupe-liste > li > .edition-ligne.edition-ligne--paquet,
+.ie-groupe--partie > .ie-groupe-liste > li > .ie-groupe > .edition-ligne.edition-ligne--paquet { border-radius: 8px; }

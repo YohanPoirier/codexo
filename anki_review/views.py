@@ -1,3 +1,4 @@
+import unicodedata
 import uuid
 
 from django.conf import settings
@@ -46,16 +47,71 @@ PREFIXE_IMAGES_NOTES = f"{settings.MEDIA_URL}anki_review/notes/"
 SEUIL_REAPPARITION_SESSION = 3
 
 
+def _cle_tri_texte(texte):
+    """Clé de tri sans accents ni casse : « Électricité » se classe avant « Optique »."""
+    decompose = unicodedata.normalize("NFD", texte)
+    return "".join(c for c in decompose if unicodedata.category(c) != "Mn").casefold()
+
+
+def _grouper_matieres(items, sommes=()):
+    """Regroupe des éléments (dicts portant une clé "deck") en trois niveaux : matière, puis
+    partie (sous-matière), puis paquet. Renvoie la liste des matières triées par libellé ; chacune
+    est {"valeur", "libelle", "parties": [{"nom", "paquets", "nb", ...}], "paquets", "nb_paquets",
+    ...}, où "paquets" ne contient que les paquets SANS partie. Les clés listées dans `sommes`
+    (ex. "dues", "total") sont additionnées au niveau de la partie et de la matière. Les paquets
+    sans matière forment la pseudo-matière « Sans matière » (à plat, sans parties)."""
+    libelles = dict(Deck.Matiere.choices)
+    par_matiere = {}
+    sans_matiere = []
+    for item in items:
+        deck = item["deck"]
+        if deck.matiere:
+            par_matiere.setdefault(deck.matiere, []).append(item)
+        else:
+            sans_matiere.append(item)
+
+    def _totaux(elements):
+        return {cle: sum(e.get(cle, 0) for e in elements) for cle in sommes}
+
+    matieres = []
+    for valeur, elements in par_matiere.items():
+        par_partie = {}
+        directs = []
+        for item in elements:
+            if item["deck"].partie:
+                par_partie.setdefault(item["deck"].partie, []).append(item)
+            else:
+                directs.append(item)
+        parties = [
+            {"nom": nom, "paquets": paquets, "nb": len(paquets), **_totaux(paquets)}
+            for nom, paquets in sorted(par_partie.items(), key=lambda kv: _cle_tri_texte(kv[0]))
+        ]
+        matieres.append({
+            "valeur": valeur, "libelle": libelles.get(valeur, valeur),
+            "parties": parties, "paquets": directs, "nb_paquets": len(elements), **_totaux(elements),
+        })
+    matieres.sort(key=lambda m: m["libelle"])
+    if sans_matiere:
+        matieres.append({
+            "valeur": VALEUR_SANS_MATIERE, "libelle": LIBELLE_SANS_MATIERE, "parties": [],
+            "paquets": sans_matiere, "nb_paquets": len(sans_matiere), **_totaux(sans_matiere),
+        })
+    return matieres
+
+
 def _decks_pour_selecteur(decks):
     """Paquets triés par matière puis nom, avec un libellé de matière
     précalculé sur chaque instance (attribut non stocké en base, juste
     pour le regroupement du <select> du formulaire de carte, cf. template
     ajouter_note.html) — "Sans matière" pour ceux qui n'en ont pas, même
-    convention que le reste du site (VALEUR_SANS_MATIERE/LIBELLE_SANS_MATIERE)."""
-    decks = list(decks.order_by("matiere", "nom"))
+    convention que le reste du site (VALEUR_SANS_MATIERE/LIBELLE_SANS_MATIERE).
+    Quand le paquet a une partie, le libellé du groupe est « Matière › Partie »."""
+    decks = list(decks.order_by("matiere", "partie", "nom"))
     libelles = dict(Deck.Matiere.choices)
     for deck in decks:
         deck.libelle_matiere = libelles.get(deck.matiere, "") or LIBELLE_SANS_MATIERE
+        if deck.partie and deck.matiere:
+            deck.libelle_matiere += f" › {deck.partie}"
     return decks
 
 
@@ -64,8 +120,7 @@ def liste_decks(request):
     """Vue d'accueil de l'espace révision : les paquets ayant une matière
     sont regroupés dessous (dépliable, avec un bouton pour tout réviser
     d'un coup) ; les paquets sans matière restent à plat."""
-    par_matiere = {}
-    paquets_sans_matiere = []
+    items = []
     for deck in gestion_paquets.mes_paquets(request.user).order_by("nom"):
         dues = Card.objects.filter(
             deck=deck,
@@ -74,28 +129,9 @@ def liste_decks(request):
             prochaine_revision__lte=timezone.now(),
         ).count()
         total = Card.objects.filter(deck=deck, etudiant=request.user).count()
-        item = {"deck": deck, "dues": dues, "total": total}
-        if deck.matiere:
-            groupe = par_matiere.setdefault(deck.matiere, {"paquets": [], "dues": 0, "total": 0})
-            groupe["paquets"].append(item)
-            groupe["dues"] += dues
-            groupe["total"] += total
-        else:
-            paquets_sans_matiere.append(item)
+        items.append({"deck": deck, "dues": dues, "total": total})
 
-    matieres = [
-        {"valeur": valeur, "libelle": dict(Deck.Matiere.choices).get(valeur, valeur), **compte}
-        for valeur, compte in par_matiere.items()
-    ]
-    matieres.sort(key=lambda m: m["libelle"])
-
-    if paquets_sans_matiere:
-        matieres.append({
-            "valeur": VALEUR_SANS_MATIERE, "libelle": LIBELLE_SANS_MATIERE,
-            "paquets": paquets_sans_matiere,
-            "dues": sum(p["dues"] for p in paquets_sans_matiere),
-            "total": sum(p["total"] for p in paquets_sans_matiere),
-        })
+    matieres = _grouper_matieres(items, sommes=("dues", "total"))
 
     # Bandeau « modifications proposées » : sur les cartes dont il est propriétaire (toutes
     # pour le professeur, comme dans Édition où il les valide).
@@ -340,6 +376,18 @@ def reviser_matiere(request, matiere):
 
 
 @login_required
+def reviser_partie(request, matiere, partie):
+    """Révision de TOUS les paquets (chapitres) d'une partie d'une matière, comme
+    reviser_matiere mais restreinte à une sous-matière."""
+    decks = gestion_paquets.mes_paquets(request.user).filter(matiere=matiere, partie=partie)
+    if not decks.exists():
+        messages.error(request, "Aucun paquet pour cette partie.")
+        return redirect("anki_review:liste_decks")
+    libelle = f"{dict(Deck.Matiere.choices).get(matiere, matiere)} › {partie}"
+    return _traiter_revision(request, decks, libelle, "anki_review:reviser_partie", [matiere, partie])
+
+
+@login_required
 def edition_accueil(request):
     """
     Page d'accueil de l'espace Édition : liste des paquets VISIBLES par
@@ -377,8 +425,7 @@ def edition_accueil(request):
         decks = gestion_paquets.paquets_a_moderer().order_by("nom")
     else:
         decks = gestion_paquets.mes_paquets(request.user).order_by("nom")
-    par_matiere = {}
-    paquets_sans_matiere = []
+    items = []
     for deck in decks:
         if request.user.is_staff and not filtre_mes:
             notes = list(deck.notes.select_related("cree_par", "deck").order_by("id"))
@@ -386,20 +433,9 @@ def edition_accueil(request):
             notes = list(
                 gestion_paquets.notes_du_paquet(request.user, deck).select_related("cree_par", "deck").order_by("id")
             )
-        item = {"deck": deck, "notes": notes}
-        if deck.matiere:
-            par_matiere.setdefault(deck.matiere, []).append(item)
-        else:
-            paquets_sans_matiere.append(item)
+        items.append({"deck": deck, "notes": notes})
 
-    matieres = [
-        {"valeur": valeur, "libelle": dict(Deck.Matiere.choices).get(valeur, valeur), "paquets": paquets}
-        for valeur, paquets in par_matiere.items()
-    ]
-    matieres.sort(key=lambda m: m["libelle"])
-
-    if paquets_sans_matiere:
-        matieres.append({"valeur": VALEUR_SANS_MATIERE, "libelle": LIBELLE_SANS_MATIERE, "paquets": paquets_sans_matiere})
+    matieres = _grouper_matieres(items)
 
     return render(request, "anki_review/edition_accueil.html", {
         "matieres": matieres, "filtre_mes": filtre_mes, "propositions": propositions,
@@ -428,6 +464,20 @@ def _peut_editer_deck(user, deck):
     return user.is_staff or deck.cree_par_id == user.id
 
 
+def _parties_existantes(user):
+    """Parties déjà utilisées par les paquets de `user`, par matière : proposées dans le
+    formulaire de paquet (choisir une partie existante, ou en taper une nouvelle). Renvoie
+    {matière: [parties triées]}."""
+    resultat = {}
+    paires = (
+        gestion_paquets.mes_paquets(user).exclude(partie="").exclude(matiere="")
+        .values_list("matiere", "partie").distinct()
+    )
+    for matiere, partie in paires:
+        resultat.setdefault(matiere, set()).add(partie)
+    return {m: sorted(p, key=_cle_tri_texte) for m, p in resultat.items()}
+
+
 @login_required
 def ajouter_deck(request):
     """Création ou modification d'un paquet (même template, même vue) —
@@ -448,7 +498,8 @@ def ajouter_deck(request):
     else:
         form = DeckForm()
 
-    return render(request, "anki_review/ajouter_deck.html", {"form": form})
+    return render(request, "anki_review/ajouter_deck.html", {
+        "form": form, "parties_existantes": _parties_existantes(request.user)})
 
 
 @login_required
@@ -466,7 +517,8 @@ def modifier_deck(request, deck_id):
     else:
         form = DeckForm(instance=deck)
 
-    return render(request, "anki_review/ajouter_deck.html", {"form": form, "deck": deck})
+    return render(request, "anki_review/ajouter_deck.html", {
+        "form": form, "deck": deck, "parties_existantes": _parties_existantes(request.user)})
 
 
 @login_required
@@ -963,21 +1015,7 @@ def partage_etudiants(request):
             groupe["toutes_partagees"] = False
     mes_paquets = sorted(mes_paquets.values(), key=lambda g: g["deck"].nom)
 
-    mes_matieres_dict = {}
-    mes_paquets_sans_matiere = []
-    for groupe in mes_paquets:
-        if groupe["deck"].matiere:
-            mes_matieres_dict.setdefault(groupe["deck"].matiere, []).append(groupe)
-        else:
-            mes_paquets_sans_matiere.append(groupe)
-    mes_matieres = [
-        {"valeur": valeur, "libelle": dict(Deck.Matiere.choices).get(valeur, valeur), "paquets": paquets}
-        for valeur, paquets in mes_matieres_dict.items()
-    ]
-    mes_matieres.sort(key=lambda m: m["libelle"])
-
-    if mes_paquets_sans_matiere:
-        mes_matieres.append({"valeur": VALEUR_SANS_MATIERE, "libelle": LIBELLE_SANS_MATIERE, "paquets": mes_paquets_sans_matiere})
+    mes_matieres = _grouper_matieres(mes_paquets)
 
     notes_partagees = (
         Note.objects.filter(partagee_avec_classe=True)
@@ -1207,7 +1245,8 @@ def ranger_cartes(request):
             nom = (request.POST.get("nouveau_nom") or "").strip()[:200]
             if nom:
                 destination = gestion_paquets.creer_paquet(
-                    request.user, nom, matiere=origine.matiere if origine else "")
+                    request.user, nom, matiere=origine.matiere if origine else "",
+                    partie=origine.partie if origine else "")
         elif choix == "existant":
             destination = mes_decks.filter(pk=request.POST.get("deck_existant") or 0).first()
         if destination is None:

@@ -45,6 +45,10 @@ class Deck(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     matiere = models.CharField(max_length=30, choices=Matiere.choices, blank=True, default="")
+    # Sous-matière (« partie » du cours, ex. Électricité) : niveau facultatif entre la matière et
+    # le paquet, qui est alors un chapitre. Texte libre (on peut en créer), sans « / » ni « :: »
+    # (voir DeckForm) car il sert d'adresse (révision d'une partie) et de segment de nom Anki.
+    partie = models.CharField(max_length=100, blank=True, default="")
     cree_le = models.DateTimeField(auto_now_add=True)
     cree_par = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,

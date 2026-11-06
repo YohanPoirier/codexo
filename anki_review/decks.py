@@ -41,18 +41,21 @@ def mes_notes(user, deck):
 # ----------------------------------------------------------------------------- création de paquets
 
 
-def creer_paquet(user, nom, matiere="", description=""):
+def creer_paquet(user, nom, matiere="", description="", partie=""):
     return Deck.objects.create(
-        nom=nom, slug=slug_unique(nom), matiere=matiere, description=description, cree_par=user,
+        nom=nom, slug=slug_unique(nom), matiere=matiere, partie=partie, description=description,
+        cree_par=user,
     )
 
 
 def paquet_de_meme_nom(user, origine, creer=True):
-    """Le paquet à moi qui porte le nom (et la matière) du paquet `origine` ; créé s'il n'existe
-    pas encore (creer=True), sinon None."""
-    deck = mes_paquets(user).filter(nom=origine.nom, matiere=origine.matiere).first()
+    """Le paquet à moi qui porte le nom (la matière et la partie) du paquet `origine` ; créé
+    s'il n'existe pas encore (creer=True), sinon None."""
+    deck = mes_paquets(user).filter(
+        nom=origine.nom, matiere=origine.matiere, partie=origine.partie,
+    ).first()
     if deck is None and creer:
-        deck = creer_paquet(user, origine.nom, matiere=origine.matiere)
+        deck = creer_paquet(user, origine.nom, matiere=origine.matiere, partie=origine.partie)
     return deck
 
 

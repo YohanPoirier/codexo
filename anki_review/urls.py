@@ -27,6 +27,7 @@ urlpatterns = [
 
     path("uploader-image/", views.uploader_image, name="uploader_image"),
     path("matiere/<slug:matiere>/", views.reviser_matiere, name="reviser_matiere"),
+    path("matiere/<slug:matiere>/partie/<str:partie>/", views.reviser_partie, name="reviser_partie"),
 
     # Import/export — partage entre étudiants (le partage fichier .apkg
     # viendra ensuite dans import_export_fichier).

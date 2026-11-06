@@ -53,11 +53,13 @@ def _id_stable(texte: str) -> int:
 
 
 def _nom_paquet_anki(deck) -> str:
-    """Nom du paquet côté Anki — imbriqué sous sa matière avec la syntaxe
-    "::" (paquets imbriqués Anki), comme Physique::Optique ; à plat si le
-    paquet n'a pas de matière."""
+    """Nom du paquet côté Anki — imbriqué sous sa matière (et sa partie, s'il en a une) avec la
+    syntaxe "::" (paquets imbriqués Anki), comme Physique::Électricité::C1 - Bases ; à plat si
+    le paquet n'a pas de matière."""
     if deck.matiere:
         libelle_matiere = dict(Deck.Matiere.choices).get(deck.matiere, deck.matiere)
+        if deck.partie:
+            return f"{libelle_matiere}::{deck.partie}::{deck.nom}"
         return f"{libelle_matiere}::{deck.nom}"
     return deck.nom
 

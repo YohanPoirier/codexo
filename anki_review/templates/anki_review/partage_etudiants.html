@@ -13,10 +13,27 @@
     <summary class="ie-groupe-entete edition-ligne edition-ligne--matiere">
       <div class="edition-ligne-titre">
         <span>{{ m.libelle }}</span>
-        <span class="edition-ligne-meta">{{ m.paquets|length }} paquet{{ m.paquets|length|pluralize }}</span>
+        <span class="edition-ligne-meta">{{ m.nb_paquets }} paquet{{ m.nb_paquets|pluralize }}</span>
       </div>
     </summary>
     <ul class="ie-groupe-liste">
+      {% for p in m.parties %}
+        <li>
+          <details class="ie-groupe ie-groupe--partie" data-cle="mes-partie-{{ m.valeur }}-{{ p.nom }}">
+            <summary class="ie-groupe-entete edition-ligne edition-ligne--partie">
+              <div class="edition-ligne-titre">
+                <span>{{ p.nom }}</span>
+                <span class="edition-ligne-meta">{{ p.nb }} paquet{{ p.nb|pluralize }}</span>
+              </div>
+            </summary>
+            <ul class="ie-groupe-liste">
+              {% for groupe in p.paquets %}
+                <li>{% include "anki_review/_partage_mon_paquet.html" with groupe=groupe %}</li>
+              {% endfor %}
+            </ul>
+          </details>
+        </li>
+      {% endfor %}
       {% for groupe in m.paquets %}
         <li>{% include "anki_review/_partage_mon_paquet.html" with groupe=groupe %}</li>
       {% endfor %}
