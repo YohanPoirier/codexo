@@ -1023,13 +1023,22 @@ def partage_etudiants(request):
         .select_related("deck", "cree_par")
         .order_by("-modifie_le")
     )
-    mes_cartes_ids = set(Card.objects.filter(etudiant=request.user).values_list("note_id", flat=True))
+    # Une carte est reconnue par son identifiant (guid), pas par la ligne en base : deux élèves qui
+    # ont chacun leur copie de la même carte (ex. un .apkg échangé) la partagent sous deux notes.
+    # On n'en montre qu'UNE (la plus ancienne), et une carte dont l'identifiant est déjà dans ma
+    # révision est « déjà là », quelle que soit la version que je possède.
+    mes_guids = guids_de_ma_revision(request.user)
+    notes_partagees = list(notes_partagees)
+    plus_ancienne = {}
+    for note in notes_partagees:
+        if note.guid not in plus_ancienne or note.id < plus_ancienne[note.guid]:
+            plus_ancienne[note.guid] = note.id
 
     groupes_partages = {}
     for note in notes_partagees:
-        if note.deck_id is None:
+        if note.deck_id is None or plus_ancienne[note.guid] != note.id:
             continue
-        statut = "deja" if note.id in mes_cartes_ids else "absente"
+        statut = "deja" if note.guid in mes_guids else "absente"
         cle = (note.deck_id, note.cree_par_id)
         groupe = groupes_partages.setdefault(cle, {"deck": note.deck, "cree_par": note.cree_par, "notes": []})
         groupe["notes"].append({"note": note, "statut": statut})
@@ -1042,6 +1051,13 @@ def partage_etudiants(request):
         "mes_matieres": mes_matieres,
         "groupes_partages": groupes_partages,
     })
+
+
+def guids_de_ma_revision(user):
+    """Identifiants (guid) des cartes que `user` a déjà dans sa révision, qu'elles viennent de
+    ses propres notes ou de notes partagées : sert à ne jamais créer une seconde carte du même
+    identifiant, même si c'est une autre version (autre note) de la même carte."""
+    return {str(g) for g in Card.objects.filter(etudiant=user).values_list("note__guid", flat=True)}
 
 
 def _est_ajax(request):
@@ -1160,7 +1176,7 @@ def ajouter_carte_partagee(request, note_id):
         return HttpResponseForbidden("Réservé aux étudiants — le prof ne récupère pas de cartes ici.")
 
     note = get_object_or_404(Note, id=note_id, partagee_avec_classe=True)
-    if Card.objects.filter(note=note, etudiant=request.user).exists():
+    if Card.objects.filter(etudiant=request.user, note__guid=note.guid).exists():
         if _est_ajax(request):
             return JsonResponse({"cree": False})
         messages.success(request, "Tu avais déjà cette carte.")
@@ -1187,7 +1203,7 @@ def ajouter_paquet_partage(request, deck_id, cree_par_id):
     deja = Card.objects.filter(etudiant=request.user).values("note_id")
     notes = list(
         Note.objects.filter(deck_id=deck_id, cree_par_id=cree_par_id, partagee_avec_classe=True)
-        .exclude(id__in=deja).order_by("id")
+        .exclude(id__in=deja).exclude(guid__in=list(guids_de_ma_revision(request.user))).order_by("id")
     )
     if not notes:
         if _est_ajax(request):

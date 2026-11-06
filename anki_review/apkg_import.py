@@ -449,14 +449,20 @@ def importer_apkg(fichier_django, utilisateur, guids_selectionnes=None) -> dict:
         # créerait des doublons privés de toutes ses cartes.
         note_commune = None
         if not utilisateur.is_staff and not Note.objects.filter(guid=guid, cree_par=utilisateur).exists():
-            note_commune = (
+            # Déjà dans sa révision sous cet identifiant (peu importe de quelle version de la
+            # carte il s'agit) : rien à faire, on ne crée jamais une seconde carte du même guid.
+            if Card.objects.filter(etudiant=utilisateur, note__guid=guid).exists():
+                nb_notes_deja_a_soi += 1
+                continue
+            # Plusieurs versions possibles (copies d'élèves) : le professeur d'abord, sinon la
+            # plus ancienne — un choix stable, qui ne dépend pas de l'ordre des imports.
+            candidates = list(
                 Note.objects.filter(guid=guid)
-                .filter(
-                    Q(cree_par__isnull=True) | Q(cree_par__is_staff=True) | Q(partagee_avec_classe=True)
-                )
-                .order_by("cree_par__is_staff", "id")  # le professeur d'abord
-                .last()
+                .filter(Q(cree_par__isnull=True) | Q(cree_par__is_staff=True) | Q(partagee_avec_classe=True))
+                .select_related("cree_par")
             )
+            candidates.sort(key=lambda n: (0 if n.cree_par is not None and n.cree_par.is_staff else 1, n.id))
+            note_commune = candidates[0] if candidates else None
         if note_commune is not None:
             carte, creee = Card.objects.get_or_create(
                 note=note_commune, etudiant=utilisateur,
