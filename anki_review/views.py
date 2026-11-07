@@ -21,7 +21,7 @@ from . import decks as gestion_paquets
 from .html_propre import EXTENSIONS_IMAGE_AUTORISEES
 from .models import Activite, Card, Deck, Note, PropositionModification
 from .sm2 import Reponse, appliquer, calculer_prochaine_etape
-from .apkg_import import importer_apkg, analyser_apkg, ErreurImportApkg
+from .apkg_import import importer_apkg, analyser_apkg, libelle_destination, ErreurImportApkg
 from .apkg_export import exporter_notes_apkg
 from . import notifications, views_notifications
 
@@ -936,9 +936,13 @@ def _contexte_selection_import(user, paquets, nb_cloze):
     de destination."""
     for i, paquet in enumerate(paquets, start=1):
         paquet["numero"] = i
+    mes_decks = _decks_pour_selecteur(gestion_paquets.mes_paquets(user))
+    for deck in mes_decks:
+        # Chemin complet, lisible tel quel dans le menu : « Physique › Électricité › C1 - Bases ».
+        deck.chemin = libelle_destination(deck.matiere, deck.partie, deck.nom)
     return {
         "paquets": paquets, "nb_cloze": nb_cloze,
-        "mes_decks": _decks_pour_selecteur(gestion_paquets.mes_paquets(user)),
+        "mes_decks": mes_decks,
         "matieres": Deck.Matiere.choices,
         "parties_par_matiere": _parties_existantes(user),
     }
