@@ -103,3 +103,9 @@ class DestinationImportTests(TestCase):
         cible = Deck.objects.create(nom="Cible", slug="cible", cree_par=self.u)
         self._selection(dest_1=f"deck:{cible.id}")
         self.assertEqual(Card.objects.get(etudiant=self.u, note=note).deck, cible)
+
+
+class LibelleSansMatiereTests(TestCase):
+    def test_matiere_non_reconnue_est_ecrite_en_toutes_lettres(self):
+        paquets, _ = analyser_apkg(apkg("fysique::outils mathématiques"))
+        self.assertEqual(paquets[0]["defaut"]["libelle"], "Sans matière › fysique — outils mathématiques")

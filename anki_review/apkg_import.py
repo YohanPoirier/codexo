@@ -398,8 +398,9 @@ def decomposer_nom_anki(nom_anki: str):
 
 
 def libelle_destination(matiere: str, partie: str, nom: str) -> str:
-    """« Physique › Électricité › C1 - Bases » : affichage d'une destination."""
-    libelle_matiere = dict(Deck.Matiere.choices).get(matiere, "")
+    """« Physique › Électricité › C1 - Bases » : affichage d'une destination. Sans matière
+    reconnue, on l'écrit en toutes lettres (« Sans matière › … ») pour que ça se voie."""
+    libelle_matiere = dict(Deck.Matiere.choices).get(matiere, "") or "Sans matière"
     return " › ".join(x for x in (libelle_matiere, partie, nom) if x)
 
 

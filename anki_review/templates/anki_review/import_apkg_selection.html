@@ -31,13 +31,17 @@
         <div class="ie-dest-champ">
           <label for="dest-{{ paquet.numero }}">Où ranger ces cartes ?</label>
           <select id="dest-{{ paquet.numero }}" name="dest_{{ paquet.numero }}" class="ie-dest-select" data-n="{{ paquet.numero }}">
-            <option value="defaut" selected>Automatique, d'après le nom du fichier : {{ paquet.defaut.libelle }}</option>
+            <optgroup label="Automatique">
+              <option value="defaut" selected>D'après le nom du fichier : {{ paquet.defaut.libelle }}</option>
+            </optgroup>
+            <optgroup label="Nouveau paquet">
+              <option value="nouveau">＋ Créer un nouveau paquet…</option>
+            </optgroup>
             {% if mes_decks %}
-              <optgroup label="Ou dans un de mes paquets">
+              <optgroup label="Dans un paquet existant">
                 {% for d in mes_decks %}<option value="deck:{{ d.id }}">{{ d.chemin }}</option>{% endfor %}
               </optgroup>
             {% endif %}
-            <option value="nouveau">＋ Créer un nouveau paquet…</option>
           </select>
         </div>
         <div class="ie-dest-nouveau" id="ie-nouveau-{{ paquet.numero }}" hidden>
