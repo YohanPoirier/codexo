@@ -608,3 +608,22 @@ details.ie-groupe.ie-groupe--partie > summary.edition-ligne.edition-ligne--parti
 .ie-groupe--partie > .ie-groupe-liste { margin: 0 0 0 10px; }
 .ie-groupe--partie > .ie-groupe-liste > li > .edition-ligne.edition-ligne--paquet,
 .ie-groupe--partie > .ie-groupe-liste > li > .ie-groupe > .edition-ligne.edition-ligne--paquet { border-radius: 8px; }
+
+/* Import .apkg : choix de la destination d'un paquet du fichier */
+.ie-destination {
+  margin: 8px 0 12px; padding: 14px 16px;
+  background: #eef7f5; border: 1px solid #cfe5e0; border-left: 3px solid var(--anki-accent);
+  border-radius: 8px; display: grid; gap: 12px;
+}
+.ie-dest-nouveau { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.ie-dest-champ { display: grid; gap: 4px; align-content: start; }
+.ie-dest-champ > label { font-size: .85rem; font-weight: 600; color: var(--ink-soft); }
+.ie-dest-facultatif { font-weight: 400; }
+.ie-dest-champ select, .ie-dest-champ input[type="text"] {
+  width: 100%; padding: 8px 10px; font: inherit; color: inherit;
+  background: #fff; border: 1px solid var(--rule); border-radius: 6px;
+}
+.ie-dest-champ select:focus, .ie-dest-champ input[type="text"]:focus {
+  outline: 2px solid var(--anki-accent); outline-offset: 1px;
+}
+.ie-dest-champ input[type="text"] { margin-top: 6px; }

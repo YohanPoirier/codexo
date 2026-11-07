@@ -28,25 +28,36 @@
       </summary>
       <div class="ie-destination" onclick="event.stopPropagation()">
         <input type="hidden" name="nom_deck_{{ paquet.numero }}" value="{{ paquet.nom_deck }}">
-        <label>Ranger dans :
-          <select name="dest_{{ paquet.numero }}" class="ie-dest-select" data-n="{{ paquet.numero }}">
-            <option value="defaut" selected>Par défaut — {{ paquet.defaut.libelle }}</option>
+        <div class="ie-dest-champ">
+          <label for="dest-{{ paquet.numero }}">Où ranger ces cartes ?</label>
+          <select id="dest-{{ paquet.numero }}" name="dest_{{ paquet.numero }}" class="ie-dest-select" data-n="{{ paquet.numero }}">
+            <option value="defaut" selected>Selon le nom du fichier → {{ paquet.defaut.libelle }}</option>
             {% regroup mes_decks by libelle_matiere as groupes %}
             {% for groupe in groupes %}
-              <optgroup label="{{ groupe.grouper }}">
+              <optgroup label="Dans mon paquet : {{ groupe.grouper }}">
                 {% for d in groupe.list %}<option value="deck:{{ d.id }}">{{ d.nom }}</option>{% endfor %}
               </optgroup>
             {% endfor %}
-            <option value="nouveau">+ Nouveau paquet…</option>
+            <option value="nouveau">＋ Créer un nouveau paquet…</option>
           </select>
-        </label>
+        </div>
         <div class="ie-dest-nouveau" id="ie-nouveau-{{ paquet.numero }}" hidden>
-          <input type="text" name="nom_{{ paquet.numero }}" value="{{ paquet.defaut.nom }}" placeholder="Nom du paquet" maxlength="200">
-          <select name="matiere_{{ paquet.numero }}">
-            <option value="">Sans matière</option>
-            {% for val, lib in matieres %}<option value="{{ val }}"{% if val == paquet.defaut.matiere %} selected{% endif %}>{{ lib }}</option>{% endfor %}
-          </select>
-          <input type="text" name="partie_{{ paquet.numero }}" value="{{ paquet.defaut.partie }}" placeholder="Partie (facultatif)" maxlength="100" list="ie-parties">
+          <div class="ie-dest-champ">
+            <label for="matiere-{{ paquet.numero }}">Matière</label>
+            <select id="matiere-{{ paquet.numero }}" name="matiere_{{ paquet.numero }}" class="ie-dest-matiere" data-n="{{ paquet.numero }}">
+              <option value="">Sans matière</option>
+              {% for val, lib in matieres %}<option value="{{ val }}"{% if val == paquet.defaut.matiere %} selected{% endif %}>{{ lib }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="ie-dest-champ">
+            <label for="partie-choix-{{ paquet.numero }}">Partie <span class="ie-dest-facultatif">(facultatif)</span></label>
+            <select id="partie-choix-{{ paquet.numero }}" class="ie-dest-partie-choix" data-n="{{ paquet.numero }}" data-defaut="{{ paquet.defaut.partie }}"></select>
+            <input type="text" name="partie_{{ paquet.numero }}" id="partie-{{ paquet.numero }}" value="{{ paquet.defaut.partie }}" placeholder="Nom de la nouvelle partie" maxlength="100" hidden>
+          </div>
+          <div class="ie-dest-champ">
+            <label for="nom-{{ paquet.numero }}">Nom du paquet</label>
+            <input type="text" id="nom-{{ paquet.numero }}" name="nom_{{ paquet.numero }}" value="{{ paquet.defaut.nom }}" maxlength="200">
+          </div>
         </div>
       </div>
       <ul class="edition-liste ie-sous-liste ie-cases-{{ forloop.counter }}">
@@ -62,20 +73,52 @@
     </details>
   {% endfor %}
 
-  <datalist id="ie-parties">
-    {% for matiere, parties in parties_par_matiere.items %}{% for p in parties %}<option value="{{ p }}">{% endfor %}{% endfor %}
-  </datalist>
-
   <button type="submit" class="btn-ajouter" style="margin-top:16px;">Importer la sélection</button>
 </form>
 
+{{ parties_par_matiere|json_script:"ie-parties-json" }}
 <script>
-  // « Nouveau paquet… » : affiche nom / matière / partie sous le menu.
+  const PARTIES = JSON.parse(document.getElementById("ie-parties-json").textContent);
+
+  // Menu de partie d'un paquet à créer : « Aucune », les parties déjà utilisées dans la matière
+  // choisie, ou « Nouvelle partie… » (champ texte). Le champ texte est celui qui est envoyé.
+  function majParties(n) {
+    const matiere = document.getElementById("matiere-" + n).value;
+    const choix = document.getElementById("partie-choix-" + n);
+    const texte = document.getElementById("partie-" + n);
+    const courante = texte.value;
+    const existantes = PARTIES[matiere] || [];
+    choix.innerHTML = "";
+    const ajouter = (valeur, libelle) => choix.add(new Option(libelle, valeur));
+    ajouter("", "Aucune partie");
+    existantes.forEach(p => ajouter("p:" + p, p));
+    ajouter("nouvelle", "＋ Nouvelle partie…");
+    choix.disabled = !matiere;
+    if (!matiere) { texte.value = ""; texte.hidden = true; return; }
+    if (existantes.includes(courante)) choix.value = "p:" + courante;
+    else if (courante) choix.value = "nouvelle";
+    else choix.value = "";
+    appliquerChoixPartie(n);
+  }
+  function appliquerChoixPartie(n) {
+    const choix = document.getElementById("partie-choix-" + n);
+    const texte = document.getElementById("partie-" + n);
+    if (choix.value.startsWith("p:")) { texte.value = choix.value.slice(2); texte.hidden = true; }
+    else if (choix.value === "nouvelle") { texte.hidden = false; }
+    else { texte.value = ""; texte.hidden = true; }
+  }
+
   document.querySelectorAll(".ie-dest-select").forEach(sel => {
-    const bloc = document.getElementById("ie-nouveau-" + sel.dataset.n);
-    const maj = () => { bloc.hidden = sel.value !== "nouveau"; };
-    sel.addEventListener("change", maj);
-    maj();
+    const n = sel.dataset.n;
+    const bloc = document.getElementById("ie-nouveau-" + n);
+    sel.addEventListener("change", () => { bloc.hidden = sel.value !== "nouveau"; });
+    bloc.hidden = sel.value !== "nouveau";
+    document.getElementById("matiere-" + n).addEventListener("change", () => {
+      document.getElementById("partie-" + n).value = "";
+      majParties(n);
+    });
+    document.getElementById("partie-choix-" + n).addEventListener("change", () => appliquerChoixPartie(n));
+    majParties(n);
   });
 </script>
 {% endblock %}
