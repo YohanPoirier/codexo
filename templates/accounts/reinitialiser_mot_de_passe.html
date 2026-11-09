@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Nouveau mot de passe — Codexo{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <span class="eyebrow">Sécurité</span>
+  {% if validlink %}
+    <h2>Choisis ton nouveau mot de passe</h2>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <p>
+          <label>{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}{{ field.errors }}{% endif %}
+        </p>
+      {% endfor %}
+      {% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}
+      <button type="submit">Valider</button>
+    </form>
+  {% else %}
+    <h2>Lien invalide ou expiré</h2>
+    <p>Ce lien a déjà été utilisé ou n'est plus valable. Fais une nouvelle <a href="{% url 'mot_de_passe_oublie' %}">demande de réinitialisation</a>.</p>
+  {% endif %}
+</div>
+{% endblock %}

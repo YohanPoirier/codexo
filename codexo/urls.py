@@ -3,6 +3,7 @@ from django.urls import path, include, re_path
 from accounts.views import (
     IdentifiantLoginView,
     ChangerMotDePasseView,
+    ReinitialiserMotDePasseView,
     demande_mot_de_passe_oublie,
     mot_de_passe_oublie_envoye,
     demandes_reinitialisation,
@@ -40,6 +41,7 @@ urlpatterns = [
     path('login/', IdentifiantLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('changer-mot-de-passe/', ChangerMotDePasseView.as_view(), name='changer_mot_de_passe'),
+    path('reinitialiser/<uidb64>/<token>/', ReinitialiserMotDePasseView.as_view(), name='reinitialiser_mot_de_passe'),
     path('mot-de-passe-oublie/', demande_mot_de_passe_oublie, name='mot_de_passe_oublie'),
     path('mot-de-passe-oublie/envoye/', mot_de_passe_oublie_envoye, name='mot_de_passe_oublie_envoye'),
     path('demandes-reinitialisation/', demandes_reinitialisation, name='demandes_reinitialisation'),

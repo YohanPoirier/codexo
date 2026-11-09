@@ -162,3 +162,36 @@ class ImportWebEtCommandeTests(TestCase):
                 f.write(contenu.encode("cp1252"))
             call_command("importer_eleves", chemin, "--delimiter", ";", stdout=StringIO())
         self.assertEqual(User.objects.get(identifiant="rdupont").display_name, "René Dupont")
+
+
+@override_settings(**CONFIG)
+class LienReinitialisationTests(TestCase):
+    def setUp(self):
+        from accounts.models import DemandeReinitialisation
+        self.prof = User.objects.create_user("prof-l", "mdp-prof-solide-1", role=User.PROF)
+        self.eleve = User.objects.create_user("eleve-l", "ancien-mdp-solide-1")
+        DemandeReinitialisation.objects.create(identifiant_saisi="eleve-l", email_contact="eleve@example.org")
+
+    def test_page_prof_propose_un_mail_avec_lien_a_usage_unique(self):
+        self.client.force_login(self.prof)
+        reponse = self.client.get(reverse("demandes_reinitialisation"))
+        ligne = reponse.context["lignes"][0]
+        self.assertIn("/reinitialiser/", ligne["lien"])
+        self.assertTrue(ligne["mailto"].startswith("mailto:eleve%40example.org?subject="))
+        self.client.logout()
+
+        # L'élève ouvre le lien (redirigé vers l'URL « set-password »), choisit son mot de passe.
+        chemin = ligne["lien"].replace("http://testserver", "")
+        reponse = self.client.get(chemin, follow=True)
+        self.assertTrue(reponse.context["validlink"])
+        reponse = self.client.post(
+            reponse.redirect_chain[-1][0],
+            {"new_password1": "nouveau-mdp-solide-77", "new_password2": "nouveau-mdp-solide-77"},
+        )
+        self.assertRedirects(reponse, reverse("login"), fetch_redirect_response=False)
+        self.eleve.refresh_from_db()
+        self.assertTrue(self.eleve.check_password("nouveau-mdp-solide-77"))
+        self.assertFalse(self.eleve.doit_changer_mot_de_passe)
+
+        # Le lien ne sert qu'une fois.
+        self.assertFalse(self.client.get(chemin, follow=True).context["validlink"])

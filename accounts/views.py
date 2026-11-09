@@ -1,11 +1,16 @@
 import csv
 import io
+from urllib.parse import quote
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetConfirmView
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from .forms import ConnexionThrottleeForm, DemandeReinitialisationForm, ImporterElevesForm
 from .importation import (
@@ -53,6 +58,34 @@ class ChangerMotDePasseView(PasswordChangeView):
         return response
 
 
+class ReinitialiserMotDePasseView(PasswordResetConfirmView):
+    """Page ouverte par l'élève depuis le lien que le prof lui a envoyé (voir
+    demandes_reinitialisation) : il choisit lui-même son nouveau mot de passe, sans qu'aucun
+    mot de passe provisoire ne circule. Le lien (jeton Django) est à usage unique : il cesse
+    de marcher dès que le mot de passe change, et expire au bout de PASSWORD_RESET_TIMEOUT."""
+
+    template_name = "accounts/reinitialiser_mot_de_passe.html"
+    success_url = reverse_lazy("login")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        utilisateur = form.user
+        if utilisateur.doit_changer_mot_de_passe:
+            utilisateur.doit_changer_mot_de_passe = False
+            utilisateur.save(update_fields=["doit_changer_mot_de_passe"])
+        messages.success(self.request, "Mot de passe modifié : tu peux te connecter.")
+        return response
+
+
+def lien_reinitialisation(request, utilisateur):
+    """Adresse absolue de réinitialisation pour ce compte (jeton à usage unique)."""
+    uid = urlsafe_base64_encode(force_bytes(utilisateur.pk))
+    token = default_token_generator.make_token(utilisateur)
+    return request.build_absolute_uri(
+        reverse("reinitialiser_mot_de_passe", args=[uid, token])
+    )
+
+
 def demande_mot_de_passe_oublie(request):
     """Formulaire public : un élève qui a perdu son mot de passe indique son
     identifiant et une adresse email de contact. Aucune vérification n'est faite ici
@@ -96,15 +129,34 @@ def demandes_reinitialisation(request):
     # rien donner si l'élève s'est trompé en le saisissant, le prof devra alors
     # vérifier à la main.
     comptes_par_identifiant = {
-        u.identifiant: u.id
+        u.identifiant: u
         for u in User.objects.filter(
             identifiant__in=[d.identifiant_saisi for d in demandes]
         )
     }
-    lignes = [
-        {"demande": d, "user_id": comptes_par_identifiant.get(d.identifiant_saisi)}
-        for d in demandes
-    ]
+    lignes = []
+    for d in demandes:
+        compte = comptes_par_identifiant.get(d.identifiant_saisi)
+        ligne = {"demande": d, "user_id": compte.id if compte else None}
+        # Mail prêt à envoyer (avec lien de réinitialisation) pour les demandes en attente.
+        if compte is not None and not d.traite:
+            lien = lien_reinitialisation(request, compte)
+            sujet = "Codexo : réinitialisation de ton mot de passe"
+            corps = (
+                f"Bonjour,\n\n"
+                f"Voici le lien pour choisir un nouveau mot de passe sur Codexo "
+                f"(identifiant : {compte.identifiant}) :\n\n{lien}\n\n"
+                f"Ce lien ne fonctionne qu'une seule fois et expire dans "
+                f"{settings.PASSWORD_RESET_TIMEOUT // 86400} jours.\n\n"
+                f"Cordialement,\n{request.user.display_name or request.user.identifiant}"
+            )
+            ligne.update(
+                lien=lien,
+                sujet=sujet,
+                corps=corps,
+                mailto=f"mailto:{quote(d.email_contact)}?subject={quote(sujet)}&body={quote(corps)}",
+            )
+        lignes.append(ligne)
     return render(request, "accounts/demandes_reinitialisation.html", {"lignes": lignes})
 
 

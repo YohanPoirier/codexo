@@ -37,6 +37,15 @@
             {% endif %}
           </td>
           <td>
+            {% if ligne.mailto %}
+              <p><a href="{{ ligne.mailto }}">Écrire le mail</a></p>
+              <details>
+                <summary>Copier le mail</summary>
+                <p><input type="text" readonly value="{{ ligne.demande.email_contact }}" onclick="this.select()"></p>
+                <p><input type="text" readonly value="{{ ligne.sujet }}" onclick="this.select()"></p>
+                <p><textarea readonly rows="9" onclick="this.select()">{{ ligne.corps }}</textarea></p>
+              </details>
+            {% endif %}
             {% if not ligne.demande.traite %}
               <form method="post">
                 {% csrf_token %}

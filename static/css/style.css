@@ -102,6 +102,15 @@ header.site nav a:hover { color: var(--indigo); }
   text-decoration: none; white-space: nowrap;
 }
 .nav-dropdown-menu a:hover { background: var(--paper-alt); color: var(--indigo); }
+/* Menu « Compte » (dernier de la barre) : ouvert vers la gauche pour ne pas dépasser de l'écran. */
+.nav-dropdown-menu--droite { left: auto; right: 0; min-width: 180px; }
+/* « Déconnexion » dans un menu déroulant : même ligne que les liens, séparée par un trait. */
+.nav-dropdown-menu .logout-form { display: block; border-top: 1px solid var(--rule); margin-top: 6px; padding-top: 6px; }
+.nav-dropdown-menu .nav-link-btn {
+  display: block; width: 100%; box-sizing: border-box; text-align: left;
+  padding: 8px 16px; font-size: .92rem; white-space: nowrap;
+}
+.nav-dropdown-menu .nav-link-btn:hover { background: var(--paper-alt); }
 
 @media (max-width: 640px) {
   header.site .bar { padding: 14px 16px; }
@@ -155,6 +164,12 @@ header.site nav a:hover { color: var(--indigo); }
     border-top: none; border-left: 2px solid var(--rule);
   }
   header.site nav .nav-dropdown-menu a[aria-current="page"] { color: var(--indigo); border-left-color: var(--indigo); }
+  /* « Déconnexion » dans le menu Compte : sous-entrée comme les autres, séparée par un trait. */
+  header.site nav .nav-dropdown-menu .logout-form { margin-top: 4px; padding-top: 0; }
+  header.site nav .nav-dropdown-menu .nav-link-btn {
+    padding: 8px 10px 8px 14px; font-size: .95rem; color: var(--ink-soft);
+    border-top: none; border-left: 2px solid var(--rule);
+  }
   header.site nav .logout-form { display: block; width: 100%; border-top: 1px solid var(--rule); margin-top: 4px; }
   header.site nav .nav-link-btn { border-top: none; color: var(--ink-soft); }
   /* Même hauteur de ligne que les autres entrées du menu (liens et "Déconnexion"),

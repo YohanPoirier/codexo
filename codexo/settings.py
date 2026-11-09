@@ -250,3 +250,6 @@ VAPID_CONTACT = os.environ.get('VAPID_CONTACT', '')  # ex. mailto:prof@exemple.f
 # demande pour les professeurs). Réactivées le 23/10/2026 ; passer à False pour tout couper
 # (bandeau, page de réglages et envois). Les notifications d'ANKI ne dépendent pas de ce réglage.
 NOTIFICATIONS_CODEXO = True
+
+# Durée de validité du lien de réinitialisation de mot de passe envoyé par le prof (secondes).
+PASSWORD_RESET_TIMEOUT = 3 * 24 * 3600
