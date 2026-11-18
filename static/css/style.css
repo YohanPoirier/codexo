@@ -897,3 +897,14 @@ button.stop-btn[hidden] { display: none; }
 @media (max-width: 480px) {
   button.stop-btn { width: 100%; text-align: center; }
 }
+
+/* --- Bouton "Exercice suivant", sous le corrigé (réussite) ou la solution (abandon) --- */
+.next-exercise { margin-top: 18px; text-align: right; }
+.next-exercise-text { margin: 0 0 10px; color: var(--ink-soft); }
+a.next-exercise-btn {
+  display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+  background: var(--indigo); color: #fff; border-radius: 8px; padding: 11px 18px;
+  text-decoration: none;
+}
+a.next-exercise-btn:hover { background: var(--indigo-deep); }
+@media (max-width: 600px) { a.next-exercise-btn { display: block; text-align: center; } }

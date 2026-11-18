@@ -130,6 +130,37 @@ def exercise_list(request, theme_slug):
     )
 
 
+def exercice_suivant(user, theme, exercise):
+    """Prochain exercice du thème (dans l'ordre de la liste) APRÈS `exercise`, que l'étudiant
+    n'a pas encore réussi, visible pour sa classe et non verrouillé par un abandon récent.
+    Renvoie None s'il n'y en a pas (l'étudiant est alors renvoyé vers la liste du thème)."""
+    solved_ids = set(
+        Result.objects.filter(user=user, exercise__theme=theme, success=True)
+        .values_list("exercise_id", flat=True)
+    )
+    latest_abandon_at = {}
+    for ab in Abandonment.objects.filter(user=user, exercise__theme=theme):
+        current = latest_abandon_at.get(ab.exercise_id)
+        if current is None or ab.created_at > current:
+            latest_abandon_at[ab.exercise_id] = ab.created_at
+    now = timezone.now()
+
+    vu_courant = False
+    for ex in theme.exercises.all().prefetch_related("enabled_for_classes"):
+        if ex.id == exercise.id:
+            vu_courant = True
+            continue
+        if not vu_courant:
+            continue
+        if ex.id in solved_ids or not ex.is_visible_for(user):
+            continue
+        ts = latest_abandon_at.get(ex.id)
+        if ABANDON_LOCK_ENABLED and ts is not None and now < ts + ABANDON_LOCK_DURATION:
+            continue
+        return ex
+    return None
+
+
 @login_required
 def exercise_detail(request, theme_slug, exercise_slug):
     theme = get_object_or_404(Theme, slug=theme_slug)
@@ -178,6 +209,7 @@ def exercise_detail(request, theme_slug, exercise_slug):
             "show_solution_once": just_abandoned,
             "retry_at": retry_at,
             "pending_demande_aide": pending_demande_aide,
+            "next_exercise": exercice_suivant(request.user, theme, exercise),
             "pas_a_pas": pas_a_pas_autorise(request.user) and exercise.kind != Exercise.SQL,
             "schema_summary": exercise.schema_summary,
         },

@@ -36,6 +36,7 @@
     <pre class="solution-code"><code>{% if exercise.kind == "sql" %}{{ exercise.sql_solution }}{% else %}{{ exercise.solution_code }}{% endif %}</code></pre>
     <p>Vous pourrez retenter cet exercice à partir du <strong>{{ retry_at|date:"d/m/Y à H:i" }}</strong>. En attendant, il ne sera plus consultable.</p>
   </div>
+  {% include "exercises/_exercice_suivant.html" %}
 {% else %}
   <span class="section-label">Code</span>
   <div class="code-block">
@@ -71,6 +72,9 @@
   <div id="solution-reveal" class="solution-reveal" hidden>
     <p class="solution-reveal-title">Bravo, exercice réussi ! Voici une proposition de corrigé</p>
     <div id="solution-reveal-code" class="solution-code-editor"></div>
+  </div>
+  <div id="next-exercise-reveal" hidden>
+    {% include "exercises/_exercice_suivant.html" %}
   </div>
 
   <div id="abandon-modal" class="modal-overlay">

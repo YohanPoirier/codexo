@@ -4,6 +4,7 @@
   const resultBox = document.getElementById("result-box");
   const testsLabel = document.getElementById("tests-label");
   const solutionBox = document.getElementById("solution-reveal");
+  const nextExerciseBox = document.getElementById("next-exercise-reveal");
   const solutionCodeEl = document.getElementById("solution-reveal-code");
 
   const stopBtn = document.getElementById("stop-btn");
@@ -141,6 +142,8 @@
   // tests de la vérification en cours passent — masqué sinon, pour ne pas laisser un vieux
   // corrigé visible à tort si l'étudiant modifie son code puis relance une vérification ratée.
   function showSolutionIfSuccess(allOk) {
+    // Le bouton "Exercice suivant" apparaît dès que l'exercice est réussi, sous le corrigé.
+    if (nextExerciseBox) nextExerciseBox.hidden = !allOk;
     if (!solutionBox || !solutionCodeEl) return;
     if (allOk && solutionCode) {
       // Démasquer AVANT de créer/rafraîchir CodeMirror : un CodeMirror initialisé (ou
