@@ -2,7 +2,7 @@
 Inclus sous le corrigé après une réussite (révélé par exercise.js) et après un abandon.{% endcomment %}
 <div class="next-exercise">
   {% if next_exercise %}
-    <a class="next-exercise-btn" href="{% url 'exercise_detail' theme.slug next_exercise.slug %}">Exercice suivant : {{ next_exercise.title }} →</a>
+    <a class="next-exercise-btn" href="{% url 'exercise_detail' theme.slug next_exercise.slug %}">Exercice suivant : {{ next_exercise.title }}</a>
   {% else %}
     <p class="next-exercise-text">Vous êtes arrivé à la fin de ce thème.</p>
     <a class="next-exercise-btn" href="{% url 'exercise_list' theme.slug %}">Retour à la liste des exercices</a>
