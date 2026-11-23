@@ -144,6 +144,18 @@ class PasAPasTraficTests(TestCase):
         self.assertContains(r, "<strong>12</strong> étapes de pas à pas", html=False)
         self.assertContains(r, ">Pas à pas</th>")
 
+    def test_somme_affichee_dans_stats(self):
+        """La page Stats affiche la même somme que Trafic, dans les deux modes."""
+        StepperUsage.objects.create(user=self.eleve, exercise=self.exercise, steps=7)
+        StepperUsage.objects.create(user=self.eleve, exercise=self.exercise, steps=5)
+        self.client.force_login(self.prof)
+        for params in ({"mode": "student", "student_id": self.eleve.id},
+                       {"mode": "exercise", "exercise_id": self.exercise.id}):
+            with self.subTest(params=params):
+                r = self.client.get(reverse("stats"), params)
+                self.assertContains(r, ">Pas à pas</th>")
+                self.assertContains(r, '<td class="stats-cell-center">12</td>', html=False)
+
     def test_valeurs_invalides_refusees(self):
         for valeur in ("", "abc", "0", "-3"):
             with self.subTest(valeur=valeur):

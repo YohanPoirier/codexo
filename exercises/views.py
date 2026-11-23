@@ -513,6 +513,9 @@ def _stats_row(user, exercise, label):
     temps_total = results.aggregate(total=Sum("time_seconds"))["total"] or 0
     nb_indices = HintReveal.objects.filter(user=user, hint__exercise=exercise).count()
     nb_abandons = Abandonment.objects.filter(user=user, exercise=exercise).count()
+    # Pas à pas : somme des clics Avancer/Reculer (même définition que la page Trafic),
+    # et non le nombre d'ouvertures de la page.
+    nb_pas_a_pas = StepperUsage.objects.filter(user=user, exercise=exercise).aggregate(total=Sum("steps"))["total"] or 0
     return {
         "label": label,
         "reussi": reussi,
@@ -520,6 +523,7 @@ def _stats_row(user, exercise, label):
         "temps_total": temps_total,
         "nb_indices": nb_indices,
         "nb_abandons": nb_abandons,
+        "nb_pas_a_pas": nb_pas_a_pas,
         # Gardé pour stats.html (colonne "Corrigé vu"), maintenant dérivé de nb_abandons
         # plutôt que d'une requête .exists() séparée sur la même table.
         "corrige_vu": nb_abandons > 0,

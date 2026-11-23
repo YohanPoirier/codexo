@@ -53,6 +53,7 @@
                 <th>Essais</th>
                 <th>Temps</th>
                 <th>Indices vus</th>
+                <th title="Nombre de clics sur Avancer / Reculer dans le mode pas à pas">Pas à pas</th>
                 <th>Corrigé vu (abandon)</th>
               </tr>
             </thead>
@@ -64,6 +65,7 @@
                   <td class="stats-cell-center">{{ row.nb_essais }}</td>
                   <td class="stats-cell-center">{{ row.temps_total|duree_lisible }}</td>
                   <td class="stats-cell-center">{{ row.nb_indices }}</td>
+                  <td class="stats-cell-center">{{ row.nb_pas_a_pas }}</td>
                   <td class="stats-cell-center">{% if row.corrige_vu %}<span class="stats-warn">Oui</span>{% else %}<span class="stats-no">Non</span>{% endif %}</td>
                 </tr>
               {% endfor %}
@@ -86,6 +88,7 @@
             <th>Essais</th>
             <th>Temps</th>
             <th>Indices vus</th>
+            <th title="Nombre de clics sur Avancer / Reculer dans le mode pas à pas">Pas à pas</th>
             <th>Corrigé vu (abandon)</th>
           </tr>
         </thead>
@@ -97,6 +100,7 @@
               <td class="stats-cell-center">{{ row.nb_essais }}</td>
               <td class="stats-cell-center">{{ row.temps_total|duree_lisible }}</td>
               <td class="stats-cell-center">{{ row.nb_indices }}</td>
+              <td class="stats-cell-center">{{ row.nb_pas_a_pas }}</td>
               <td class="stats-cell-center">{% if row.corrige_vu %}<span class="stats-warn">Oui</span>{% else %}<span class="stats-no">Non</span>{% endif %}</td>
             </tr>
           {% endfor %}
